@@ -1,0 +1,21 @@
+{
+	// Installed Packages:
+	// SublimeCodeIntel, BracketHighlighter, SideBarEnhancements
+	// Git, Gist, GitGutter, Emmet, Alignment, Sublime Linter
+	"auto_complete": true,
+	"color_scheme": "Packages/User/FireCode (SL).tmTheme",
+	"font_face": "Inconsolata",
+	"font_options":["bold"],
+	"font_size": 11,
+	"highlight_line": false,
+	"highlight_modified_tabs": true,
+	"hot_exit": false,
+	"ignored_packages":["Vintage"],
+	"line_numbers": true,
+	"line_padding_bottom": 1,
+	"remember_open_files": false,
+	"tab_size": 2,
+	"theme": "Flatland Dark.sublime-theme",
+	"translate_tabs_to_spaces": true,
+	"trim_trailing_white_space_on_save": true
+}

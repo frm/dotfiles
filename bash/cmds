@@ -1,0 +1,34 @@
+#!/bin/bash
+#
+# This file should be sourced into .bashrc AFTER aliases
+# I want cdl to use the ls alias
+
+# Creating sb command for Sublime Text
+sb () {
+	subl $@ 2>&1 > /dev/null &
+}
+
+
+# Removing TeamSpeak 3 Client Polution
+ts3 () {
+	nohup ts3client 2>&1 > /dev/null &
+	exit 1
+}
+
+# Creating mkcd: mkdir and cd
+mkcd () {
+	mkdir -p "$@";
+	cd "$@"
+}
+
+# Creating cdl: cd and ls
+cdl () {
+	if [ "$#" -eq "0" ];
+		then
+			cd "$HOME";
+		else
+			cd "$@";
+	fi
+
+	ls;
+}

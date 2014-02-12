@@ -1,0 +1,22 @@
+[global_config]
+[keybindings]
+[profiles]
+  [[default]]
+    scrollbar_position = hidden
+    login_shell = True
+    palette = "#2e3436:#cc0000:#4e9a06:#c4a000:#3465a4:#75507b:#ffffff:#d3d7cf:#555753:#ef2929:#9d0d00:#fce94f:#b17c00:#2fa091:#34e256:#eeeeec"
+    background_image = None
+    use_system_font = False
+    font = Inconsolata Bold 11
+    allow_bold = False
+[layouts]
+  [[default]]
+    [[[child1]]]
+      type = Terminal
+      parent = window0
+      profile = default
+    [[[window0]]]
+      type = Window
+      parent = ""
+      size = 680, 400
+[plugins]

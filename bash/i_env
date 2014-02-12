@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [[ $EUID -eq 0 ]];
+  then
+    source $MB_DIR/i_envs/i_env_root
+  else
+    source $MB_DIR/i_envs/i_env_regular
+fi
+
+export PROMPT_COMMAND=setup_ps1

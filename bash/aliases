@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Listing files
+alias .="ls -alF ."
+alias ls="ls -CF --color=auto"
+alias lla="ls -alF | less"
+alias lsa="ls -alF"
+
+# Creating compacted cd ..
+alias ..="cdl .."
+alias ..2="cdl ../.."
+alias ..3="cdl ../../.."
+alias ..4="cdl ../../../.."
+alias ..5="cdl ../../../../.."
+
+# Reloading bashrc
+alias reload="source ~/.bashrc"
+
+# vim-like exit
+alias :q="exit"
+
+# Cleanups
+alias clr="clear"
+alias cleanup="clear"
+
+# Display notification
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'

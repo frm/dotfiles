@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+# root user PS1 Config
+
+#Including colors
+source $MB_DIR/colors
+alias GIT='__git_ps1 %s'
+
+# Placeholders
+TIMESTAMP=$GREEN
+USER=$RED
+AT=$YELLOW
+HOST=$BLUE
+DIR=$RED
+GIT_CLR=$YELLOW
+TXT=$WHITE
+SEP=$RED
+
+setup_ps1() {
+  export PS1="\n $TIMESTAMP[\t] $USER\u$AT@$HOST\H $DIR(\w): $GIT_CLR[$(GIT)]\n    $SEP\$$TXT "
+}

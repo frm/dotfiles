@@ -1,0 +1,19 @@
+#!/bin/bash
+#
+# Obtaining a random quote on bash start
+
+# Retrieving quotes
+source $MB_DIR/i_envs/quote_db
+
+# Generating random number from 0 to number of quotes
+# $quoteLen comes from quote_db
+
+get_random_quote() {
+  SIGN='~ ' # Choosing author separator
+  COL=50    # Setting right align distance
+
+  RAND_NUMB=$[ ( $RANDOM % $quoteLen ) ]
+
+  echo ${quotes[$RAND_NUMB]}
+  printf "%*s %s %s" $COL $SIGN ${authors[$RAND_NUMB]}
+}

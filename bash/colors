@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# Defining colors for custom prompt
+
+RED='\e[0;31m'
+GREEN='\e[0;32m'
+YELLOW='\e[0;33m'
+BLUE='\e[0;34m'
+PURPLE='\e[0;35m'
+CYAN='\e[0;36m'
+LIGHT_GRAY='\e[0;37m'
+LIGHT_YELLOW='\e[1;33m'
+LIGHT_BLUE='\e[1;34m'
+WHITE='\e[1;37m'
