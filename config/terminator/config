@@ -3,10 +3,13 @@
 [profiles]
   [[default]]
     scrollbar_position = hidden
-    login_shell = True
     palette = "#2e3436:#cc0000:#4e9a06:#c4a000:#3465a4:#75507b:#ffffff:#d3d7cf:#555753:#ef2929:#9d0d00:#fce94f:#b17c00:#2fa091:#34e256:#eeeeec"
+    login_shell = True
     background_image = None
+    background_darkness = 0.91
+    background_type = transparent
     use_system_font = False
+    cursor_shape = ibeam
     font = Inconsolata Bold 11
     allow_bold = False
 [layouts]
