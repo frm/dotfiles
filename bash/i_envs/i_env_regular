@@ -1,21 +1,24 @@
-#!/bin/bash
-#
 # Regular user PS1 config
 
 #Including colors
 source $MB_DIR/colors
+
 alias GIT='__git_ps1 %s'
 
 # Placeholders
 TIMESTAMP=$LIGHT_GRAY
-USER=$GREEN
+USER=$LIGHT_GRAY
 AT=$YELLOW
-HOST=$BLUE
+HOST=$GREEN
 DIR=$YELLOW
-GIT_CLR=$LIGHT_YELLOW
+GIT_CLR=$GREEN
 TXT=$WHITE
 SEP=$RED
 
+#setup_ps1() {
+#  export PS1="\n $TIMESTAMP[\t] $USER\u$AT@$HOST\H $DIR(\w): $GIT_CLR[$(GIT)]\n    $SEP\$$TXT "
+#}
+
 setup_ps1() {
-  export PS1="\n $TIMESTAMP[\t] $USER\u$AT@$HOST\H $DIR(\w): $GIT_CLR[$(GIT)]\n    $SEP\$$TXT "
+    export PS1="\n $USER\u@\H $DIR(\w): $GIT_CLR[$(GIT)]\n    $SEP\$$TXT "
 }
