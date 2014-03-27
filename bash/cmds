@@ -1,7 +1,4 @@
 #!/bin/bash
-#
-# This file should be sourced into .bashrc AFTER aliases
-# I want cdl to use the ls alias
 
 # Creating sb command for Sublime Text
 sb () {
@@ -12,6 +9,12 @@ sb () {
 # Removing TeamSpeak 3 Client Polution
 ts3 () {
 	nohup ts3client 2>&1 > /dev/null &
+	exit 1
+}
+
+# Preventing NetBeans from occupying the terminal
+nb() {
+	nohup netbeans 2>&1 /dev/null &
 	exit 1
 }
 
