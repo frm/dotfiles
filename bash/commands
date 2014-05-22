@@ -2,19 +2,19 @@
 
 # Creating sb command for Sublime Text
 sb () {
-	subl $@ 2>&1 > /dev/null &
+	if which subl &> /dev/null;
+		then subl $@
+	elif which subl3 > /dev/null;
+		then subl3 $@
+	else
+		subl $@ 2>&1 > /dev/null &
+	fi
 }
 
 
 # Removing TeamSpeak 3 Client Polution
 ts3 () {
 	nohup ts3client 2>&1 > /dev/null &
-	exit 1
-}
-
-# Preventing NetBeans from occupying the terminal
-nb() {
-	nohup netbeans 2>&1 /dev/null &
 	exit 1
 }
 

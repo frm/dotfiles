@@ -14,4 +14,3 @@ LIGHT_BLUE='\[\e[1;34m]'
 LIGHT_PURPLE='\[\e[1;35m\]'
 LIGHT_CYAN='\[\e[1;36m\]'
 WHITE='\[\e[1;37m\]'
-

@@ -1,6 +1,0 @@
-#!/bin/bash
-
-xfce4-terminal --hide-borders --hide-toolbar --hide-menubar --title=desktopconsole1 --geometry=80x25+0+0 &
-sleep 5
-wmctrl -r desktopconsole1 -b add,below,sticky
-wmctrl -r desktopconsole1 -b add,skip_taskbar,skip_pager

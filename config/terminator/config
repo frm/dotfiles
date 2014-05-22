@@ -9,7 +9,7 @@
     background_darkness = 0.91
     background_type = transparent
     use_system_font = False
-    cursor_shape = ibeam
+    cursor_shape = underline
     font = Inconsolata Bold 11
     allow_bold = False
 [layouts]
