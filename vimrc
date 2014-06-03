@@ -19,7 +19,7 @@ Plugin 'bling/vim-airline'
 Plugin 'bling/vim-bufferline'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'majutsushi/tagbar'
-Plugin 'Valloric/YouCompleteMe'
+Plugin 'Raimondi/delimitMate'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -87,15 +87,10 @@ set confirm
 " Better command-line completion
 set wildmenu
 
-" Ctrl+T opens a new tab
-
-" AutoComplete Parentheses
-inoremap ( ()<Esc>:call BC_AddChar(")")<CR>i
-inoremap { {<CR>}<Esc>:call BC_AddChar("}")<CR><Esc>kA<CR>
-inoremap [ []<Esc>:call BC_AddChar("]")<CR>i
-inoremap " ""<Esc>:call BC_AddChar("\"")<CR>i
-" jump out of parenthesis
-inoremap <C-j> <Esc>:call search(BC_GetChar(), "W")<CR>a
+" Better tab control
+nnoremap <C-t> :tabnew <CR>
+nnoremap <S-tab> :tabprevious<CR>
+nnoremap <C-tab> :tabnext<CR>
 
 function! BC_AddChar(schar)
  if exists("b:robstack")
