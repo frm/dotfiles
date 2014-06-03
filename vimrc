@@ -15,6 +15,11 @@ Plugin 'oplatek/Conque-Shell.git'
 Plugin 'scrooloose/nerdtree.git'
 Plugin 'Lokaltog/vim-easymotion.git'
 Plugin 'tpope/vim-rails.git'
+Plugin 'bling/vim-airline'
+Plugin 'bling/vim-bufferline'
+Plugin 'airblade/vim-gitgutter'
+Plugin 'majutsushi/tagbar'
+Plugin 'Valloric/YouCompleteMe'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -35,6 +40,7 @@ set nocompatible
 
 " Show line numbers
 set number
+set relativenumber
 
 " Enable clicking with the mouse to move around in the editor
 set mouse=a
@@ -80,6 +86,8 @@ set confirm
 
 " Better command-line completion
 set wildmenu
+
+" Ctrl+T opens a new tab
 
 " AutoComplete Parentheses
 inoremap ( ()<Esc>:call BC_AddChar(")")<CR>i
@@ -128,3 +136,11 @@ vmap <silent> ,y y:new<CR>:call setline(1,getregtype())<CR>o<Esc>P:wq! ~/.reg.tx
 nmap <silent> ,y :new<CR>:call setline(1,getregtype())<CR>o<Esc>P:wq! ~/.reg.txt<CR>
 map <silent> ,p :sview ~/.reg.txt<CR>"zdddG:q!<CR>:call setreg('"', @", @z)<CR>p
 map <silent> ,P :sview ~/.reg.txt<CR>"zdddG:q!<CR>:call setreg('"', @", @z)<CR>P
+
+" ### VIM Airline Settings
+let g:airline_enable_branch=1					" Enables git branch
+let g:airline#extensions#tabline#enabled=1		
+let g:airline#extensions#tabline#left_sep = ' '
+let g:airline#extensions#tabline#left_alt_sep = '|'
+let g:airline_branch_prefix="\uf020"			" Octicons
+
