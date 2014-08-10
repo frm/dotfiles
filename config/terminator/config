@@ -1,16 +1,22 @@
 [global_config]
+  title_hide_sizetext = True
+  suppress_multiple_term_dialog = True
 [keybindings]
 [profiles]
   [[default]]
     scrollbar_position = hidden
-    palette = "#2e3436:#cc0000:#4e9a06:#c4a000:#3465a4:#75507b:#ffffff:#d3d7cf:#555753:#ef2929:#9d0d00:#fce94f:#b17c00:#2fa091:#34e256:#eeeeec"
+    palette = "#073642:#dc322f:#859900:#b58900:#268bd2:#d33682:#2aa198:#eee8d5:#002b36:#cb4b16:#586e75:#657b83:#8a4549:#6c71c4:#93a1a1:#fdf6e3"
     login_shell = True
     background_image = None
     background_darkness = 0.91
     background_type = transparent
     use_system_font = False
+    cursor_color = "#11ff00"
+    icon_bell = False
+    show_titlebar = False
     cursor_shape = underline
-    font = Inconsolata Bold 11
+    font = Inconsolata Medium 11
+    background_color = "#1e3243"
     allow_bold = False
 [layouts]
   [[default]]
