@@ -11,7 +11,7 @@
  	p = push
  	pl = pull
   	rb = rebase
-    st = status
+	st = status
 	conflicts = diff --name-only --diff-filter=U
 [branch]
 	autosetuprebase = always
