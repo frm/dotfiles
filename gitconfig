@@ -1,21 +1,25 @@
 [user]
 	name = Fernando Mendes
-	email = devfjmendes@gmail.com
+	email = devfrmendes@gmail.com
 [github]
 	user = frmendes
- [alias]
+[alias]
  	a = add
  	b = branch
  	co = checkout
  	c = commit
  	p = push
  	pl = pull
-  rb = rebase
+  	rb = rebase
+    st = status
 	conflicts = diff --name-only --diff-filter=U
-
-[credential]
-	helper = cache --timeout=3600
+[branch]
+	autosetuprebase = always
+[color]
+ 	ui = true
 [core]
 	editor = vim -f
+[credential]
+   	helper = cache --timeout=3600
 [push]
 	default = simple
