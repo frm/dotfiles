@@ -1,0 +1,23 @@
+# Mac OS X hidden files
+.DS_Store
+
+# Vim swap files
+.*.sw?
+
+# Temps
+tmp/
+.tmp/
+
+# RVM and rbenv
+/.rvmrc
+/.rbenv-version
+
+# Bundler binstubs
+/bin/
+.bundle
+
+# db and logs
+log/
+*.log
+*.sql
+*.sqlite
