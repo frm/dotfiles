@@ -1,0 +1,43 @@
+# Credits: http://lovelybacon.deviantart.com/art/spectrum-conky-proper-372003016
+
+background no
+update_interval 1
+
+alignment bottom_middle
+gap_y 100
+gap_x -15
+own_window yes
+own_window_type normal
+own_window_argb_visual yes
+own_window_argb_value 255
+own_window_transparent yes
+own_window_hints undecorated,below,sticky,skip_taskbar,skip_pager
+draw_outline no
+draw_borders no
+double_buffer yes
+no_buffers yes
+draw_graph_borders no
+
+override_utf8_locale yes
+
+use_xft yes
+
+border_inner_margin 0
+border_outer_margin 0
+minimum_size 220 300
+
+xftfont Raleway:size=7
+xftalpha 0,1
+
+default_color f1f1f1
+color1 F1F1F1
+
+TEXT
+${cpugraph cpu0 28,84 FFFFFF FFFFFF}${cpugraph cpu1 28,84 FFFFFF FFFFFF}
+${offset 4}${voffset -2}${color1}cpu1${offset 6}${color1}${hwmon 1 temp 1}  °C${offset 38}${voffset -2}${color1}cpu2${offset 6}${color1}${hwmon 1 temp 2}  °C
+
+${cpugraph cpu2 28,84 FFFFFF FFFFFF}${cpugraph cpu3 28,84 FFFFFF FFFFFF}
+${offset 4}${voffset -2}${color1}cpu3${offset 6}${color1}${hwmon 1 temp 3}  °C${offset 38}${voffset -2}${color1}cpu4${offset 6}${color1}${hwmon 1 temp 4}  °C
+
+${downspeedgraph enp3s0 28,86 FFFFFF FFFFFF}${upspeedgraph enp3s0 28,87 FFFFFF FFFFFF}
+${color1}down${offset 63}${color1}up

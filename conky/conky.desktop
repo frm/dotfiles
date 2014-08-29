@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Conky
+GenericName=Conky
+Comment=Conky files startup
+Exec=/home/frmendes/.conky/auto_start.sh
+Terminal=false
+Type=Application
+X-GNOME-Autostart-enabled=true
