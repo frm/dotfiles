@@ -8,5 +8,5 @@ source $FRM_BASH/aliases
 # Loading execs from ~/local/bin
 export PATH="$HOME/local/bin:${PATH}"
 
-archey
-
+# Prevents bash history duplication
+export HISTCONTROL=ignoredups
