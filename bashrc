@@ -10,3 +10,6 @@ export PATH="$HOME/local/bin:${PATH}"
 
 # Prevents bash history duplication
 export HISTCONTROL=ignoredups
+
+# Formast bash history
+export HISTTIMEFORMAT='%F %T '
