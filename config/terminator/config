@@ -1,55 +1,39 @@
 [global_config]
-  title_hide_sizetext = True
   enabled_plugins = LaunchpadCodeURLHandler, APTURLHandler, LaunchpadBugURLHandler
+  title_hide_sizetext = True
+  title_transmit_bg_color = "#bf616a"
+  focus = system
+  title_inactive_bg_color = "#65737e"
 [keybindings]
 [profiles]
   [[default]]
     scrollbar_position = hidden
-    palette = "#073642:#dc322f:#859900:#b58900:#268bd2:#d33682:#2aa198:#eee8d5:#002b36:#cb4b16:#586e75:#657b83:#8a4549:#6c71c4:#93a1a1:#fdf6e3"
-    #palette = "#073642:#dc322f:#859900:#cd9203:#268bd2:#d33682:#2aa198:#eee8d5:#002b36:#cb4b16:#586e75:#657b83:#8a4549:#6c71c4:#93a1a1:#fdf6e3"
+    palette = "#2b303b:#bf616a:#a3be8c:#ebcb8b:#8fa1b3:#b48ead:#96b5b4:#c0c5ce:#65737e:#bf616a:#a3be8c:#ebcb8b:#8fa1b3:#b48ead:#96b5b4:#eff1f5"
     login_shell = True
     background_image = None
     background_darkness = 0.91
     background_type = transparent
     use_system_font = False
-    cursor_color = "#11ff00"
+    cursor_color = "#f1f1f1"
+    foreground_color = "#c0c5ce"
     icon_bell = False
     show_titlebar = False
+    custom_command = /usr/bin/zsh
     cursor_shape = underline
-    font = Inconsolata Medium 11
-    background_color = "#1e3243"
+    font = Inconsolata Bold 11
+    background_color = "#2b303b"
     allow_bold = False
 [layouts]
   [[default]]
     [[[child0]]]
-      position = 0:26
+      position = 318:252
       type = Window
       order = 0
       parent = ""
-      size = 1140, 852
-    [[[child1]]]
-      position = 242
-      type = VPaned
+      size = 604, 471
+    [[[terminal1]]]
+      profile = default
+      type = Terminal
       order = 0
       parent = child0
-    [[[child2]]]
-      position = 351
-      type = HPaned
-      order = 0
-      parent = child1
-    [[[terminal3]]]
-      profile = default
-      type = Terminal
-      order = 0
-      parent = child2
-    [[[terminal5]]]
-      profile = default
-      type = Terminal
-      order = 1
-      parent = child1
-    [[[terminal4]]]
-      profile = default
-      type = Terminal
-      order = 1
-      parent = child2
 [plugins]
