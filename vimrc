@@ -1,141 +1,85 @@
-" Vundle stuff
-set nocompatible              " be iMproved, required
-filetype off                  " required
+set nocompatible    " vim not vi
+filetype off        " required for Vundle
 
+" set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
+" let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
-Plugin 'tpope/vim-fugitive'
-Plugin 'L9'
-Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
-Plugin 'kien/ctrlp.vim.git'
-Plugin 'scrooloose/syntastic.git'
-Plugin 'oplatek/Conque-Shell.git'
-Plugin 'scrooloose/nerdtree.git'
-Plugin 'Lokaltog/vim-easymotion.git'
-Plugin 'tpope/vim-rails.git'
-Plugin 'bling/vim-airline'
-Plugin 'bling/vim-bufferline'
-Plugin 'airblade/vim-gitgutter'
-Plugin 'majutsushi/tagbar'
-Plugin 'Raimondi/delimitMate'
 
-" All of your Plugins must be added before the following line
-call vundle#end()            " required
-filetype plugin indent on    " required
+" Plugin 'tpope/vim-fugitive'
+" Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
 
+" http://vimawesome.com/plugin/surround-vim
+" Plugin 'tpope/vim-surround'
 
+" http://vimawesome.com/plugin/rails-vim
+" Plugin 'tpope/vim-rails'
 
-" My stuff
-"
-" Set color scheme -- check available schemes in /usr/share/vim/vim73/colors
+Plugin 'scrooloose/syntastic'
+Plugin 'scrooloose/nerdtree'
+Plugin 'Lokaltog/vim-easymotion'
+Plugin 'vim-ruby/vim-ruby'
+Plugin 'tpope/vim-markdown'
+Plugin 'Shougo/neocomplcache.vim'
+Plugin 'kien/rainbow_parentheses.vim'
+
+call vundle#end()            " required for Vundler
+filetype plugin indent on    " required for Vundler
+
 color slate
 
-" Choose the background color
-set background=dark
+set hlsearch    " Highlights search
+set incsearch   " Incremental Search: show search matches as you type
 
-" Preventing the arrow keys compatibility problem
-set nocompatible
-
-" Show line numbers
-set number
-set relativenumber
-
-" Enable clicking with the mouse to move around in the editor
+" Enable mouse support in console
 set mouse=a
 
-" Show cursor
-set ruler
-
-" Enable autoindentation in lines after opening a bracket
-set smartindent
-set autoindent
-
-" Aparently, improves tabbing -- Allow smart tab option
-set smarttab
-
-" Telling Vim how much spaces a tab is
+" Set tabsize
 set tabstop=4
 set shiftwidth=4
 
-" Using line wrapping
+" Set backspace
+set backspace=2
+
+" Use spaces instead of tabs
+set expandtab
+set smarttab
+
+" Line wrapping
 set wrap
 set linebreak
 
-" Make backspace function like a regular program
-set backspace=2
+set autoindent
 
-" Enable syntax highlight
+set number
+
 syntax on
 
-" Make the navigation keys work like any other program
+" Allow arrow navigation
 imap <silent> <Down> <C-o>gj
 imap <silent> <Up> <C-o>gk
 nmap <silent> <Down> gj
 nmap <silent> <Up> gk
 
-" Allow to hide code sections
-set foldmethod=manual
+" Remove any trailing whitespace that is in the file
+autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
 
-" Highlight search
-set hlsearch
+set pastetoggle=<F2>    " Use F2 to go to paste mode
 
-" Ask for confirmation for unsaved changes
-set confirm
+" neocomplcache plugin
+let g:neocomplcache_enable_at_startup = 1
 
-" Better command-line completion
-set wildmenu
-
-" Better tab control
-nnoremap <C-t> :tabnew <CR>
-nnoremap <S-tab> :tabprevious<CR>
-nnoremap <C-tab> :tabnext<CR>
-
-function! BC_AddChar(schar)
- if exists("b:robstack")
- let b:robstack = b:robstack . a:schar
- else
- let b:robstack = a:schar
- endif
-endfunction
-
-function! BC_GetChar()
- let l:char = b:robstack[strlen(b:robstack)-1]
- let b:robstack = strpart(b:robstack, 0, strlen(b:robstack)-1)
- return l:char
-endfunction
-
-
-" ### CtrlP Settings
-let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlP'
-let g:ctrlp_working_path_mode = 'ra'
-
-" ### NERDTree Settings
-"
-" Run NERDTree on vim startup
-autocmd vimenter * NERDTree
-" Run NERDTree on vim startup with no files specified
-autocmd vimenter * if !argc() | NERDTree | endif
-" Ctrl+N to toggle NERDTree
-map <C-n> :NERDTreeToggle<CR>
-" Close NERDTree if only window left open
+" NerdTree
+autocmd vimenter * NERDTree     " autostart NerdTree
+" Autostart NerdTree when no files are present
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+" Close NerdTree if it's the only window open
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
-" Autofocus on vim instead of NERDTree
+" Ctrl+n closes NerdTree
+map <C-n> :NERDTreeToggle<CR>
+" Set initial focus to vim instead of NerdTree
 autocmd VimEnter * wincmd l
 autocmd BufNew   * wincmd l
-
-" ### Copy-Paste Settings
-vmap <silent> ,y y:new<CR>:call setline(1,getregtype())<CR>o<Esc>P:wq! ~/.reg.txt<CR>
-nmap <silent> ,y :new<CR>:call setline(1,getregtype())<CR>o<Esc>P:wq! ~/.reg.txt<CR>
-map <silent> ,p :sview ~/.reg.txt<CR>"zdddG:q!<CR>:call setreg('"', @", @z)<CR>p
-map <silent> ,P :sview ~/.reg.txt<CR>"zdddG:q!<CR>:call setreg('"', @", @z)<CR>P
-
-" ### VIM Airline Settings
-let g:airline_enable_branch=1					" Enables git branch
-let g:airline#extensions#tabline#enabled=1		
-let g:airline#extensions#tabline#left_sep = ' '
-let g:airline#extensions#tabline#left_alt_sep = '|'
-let g:airline_branch_prefix="\uf020"			" Octicons
-
