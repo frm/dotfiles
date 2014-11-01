@@ -1,20 +1,35 @@
-	// Installed Packages:
-	// SublimeCodeIntel, BracketHighlighter, SideBarEnhancements
-	// Git, Gist, GitGutter, Emmet, Alignment, Sublime Linter
+/* Installed Packages:
+ * BeautifyRuby, SassBeautify, JavaScriptBeautify, Minifier
+ * Markdown Extended, SublimeBuildOnSave, SassBuilder, Emmet
+ * Git, GitGutter, Markdown Preview, BracketHighlighter
+ * SublimeREPL, Autofilename, ColorPicker, DocBlockr
+ *
+ * Installed Themes: Numix, itg.flat, Watson
+ */
+
+{
 	"auto_complete": true,
-	"color_scheme": "Packages/User/FireCode (SL).tmTheme",
+	"build_on_save": 1,
+	"color_scheme": "Packages/Theme - itg.flat/itg.dark.tmTheme",
+	"filename_filter": ".(sass|scss)$",
 	"font_face": "Inconsolata",
-	"font_options":["bold"],
-	"font_size": 11,
+	"font_options":
+	[
+		"bold"
+	],
+	"font_size": 12,
 	"highlight_line": false,
 	"highlight_modified_tabs": true,
 	"hot_exit": false,
-	"ignored_packages":["Vintage"],
+	"ignored_packages":
+	[
+		"Vintage"
+	],
 	"line_numbers": true,
 	"line_padding_bottom": 1,
 	"remember_open_files": false,
 	"tab_size": 4,
-	"theme": "Flatland Dark.sublime-theme",
+	"theme": "itg.flat.light.sublime-theme",
 	"translate_tabs_to_spaces": true,
 	"trim_trailing_white_space_on_save": true
 }
