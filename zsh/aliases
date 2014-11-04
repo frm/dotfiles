@@ -2,8 +2,8 @@
 
 # Listing files
 alias -g ls="ls -CF --color=auto"
-alias -g lla="ls -alF | less"
-alias -g lsa="ls -alF"
+alias -g lla="ls -alF"
+alias -g lsa="ls -aF"
 
 # Creating sb command for Sublime Text
 sb () {
@@ -18,9 +18,9 @@ sb () {
 
 # v command for vim
 v() {
-	if which vim &> /dev/null;
-		then vim $@
-	fi
+    if which vim &> /dev/null;
+        then vim $@
+    fi
 }
 
 # g command for git
@@ -65,7 +65,7 @@ alias -g ..4="cdl ../../../.."
 alias -g ..5="cdl ../../../../.."
 
 # Reloading bashrc
-alias -g reload="source ~/.bashrc"
+alias -g reload="source ~/.zshrc"
 
 # vim-like exit
 alias -g :q="exit"
