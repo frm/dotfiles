@@ -5,8 +5,7 @@ export ZSH=$HOME/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME=avit
-
+ZSH_THEME="avit"
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
 
@@ -64,11 +63,9 @@ source $HOME/local/zsh/aliases
 # Loading execs from ~/local/bin
 export PATH="$HOME/local/bin:${PATH}"
 
-export WINEARCH=win32
-
-export BROWSER=google-chrome-stable
-
 # Base16 Shell
-BASE16_SCHEME="default"
-BASE16_SHELL="$HOME/.config/base16-shell/base16-$BASE16_SCHEME.dark.sh"
-[[ -s $BASE16_SHELL ]] && . $BASE16_SHELL
+#BASE16_SCHEME="tomorrow"
+#BASE16_SHELL="$HOME/.config/base16-shell/base16-$BASE16_SCHEME.dark.sh"
+#[[ -s $BASE16_SHELL ]] && . $BASE16_SHELL
+
+export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
