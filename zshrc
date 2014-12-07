@@ -69,3 +69,9 @@ export PATH="$HOME/local/bin:${PATH}"
 #[[ -s $BASE16_SHELL ]] && . $BASE16_SHELL
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+
+# Remove annoying deprecated warning
+unset GREP_OPTIONS
+
+# Rust support
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
