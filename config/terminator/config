@@ -4,7 +4,7 @@
 [profiles]
   [[default]]
     scrollbar_position = hidden
-    palette = "#4d4d4d:#ff2b2b:#98fb98:#f0e68c:#cd853f:#ffdead:#ffa0a0:#f5deb3:#555555:#ff5555:#55ff55:#ffff55:#87ceff:#ff55ff:#ffd700:#ffffff"
+    palette = "#4d4d4d:#f32625:#98fb98:#f0e68c:#cd853f:#ffdead:#ffa0a0:#f5deb3:#555555:#ff5555:#55ff55:#ffff55:#87ceff:#ff55ff:#ffd700:#ffffff"
     login_shell = True
     background_image = None
     cursor_shape = underline
@@ -14,7 +14,7 @@
     icon_bell = False
     show_titlebar = False
     font = Inconsolata 12
-    background_color = "#333333"
+    background_color = "#263238"
     scrollback_infinite = True
 [layouts]
   [[default]]
