@@ -24,11 +24,18 @@ Plugin 'vim-ruby/vim-ruby'
 Plugin 'tpope/vim-markdown'
 Plugin 'Shougo/neocomplcache.vim'
 Plugin 'kien/rainbow_parentheses.vim'
+Plugin 'altercation/vim-colors-solarized'
 
 call vundle#end()            " required for Vundler
 filetype plugin indent on    " required for Vundler
 
-color slate
+set encoding=utf-8
+scriptencoding utf-8
+
+syntax enable
+let g:solarized_termcolors=256
+set background=light
+colorscheme solarized
 
 set hlsearch    " Highlights search
 set incsearch   " Incremental Search: show search matches as you type
@@ -55,8 +62,6 @@ set autoindent
 
 set number
 
-syntax on
-
 " Allow arrow navigation
 imap <silent> <Down> <C-o>gj
 imap <silent> <Up> <C-o>gk
@@ -73,6 +78,8 @@ let g:neocomplcache_enable_at_startup = 1
 
 " NerdTree
 autocmd vimenter * NERDTree     " autostart NerdTree
+let g:NERDTreeDirArrows=1
+
 " Autostart NerdTree when no files are present
 autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
