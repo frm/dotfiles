@@ -71,7 +71,14 @@ nmap <silent> <Up> gk
 " Remove any trailing whitespace that is in the file
 autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
 
-set pastetoggle=<F2>    " Use F2 to go to paste mode
+" Use F2 to go to paste mode
+set pastetoggle=<F2>
+
+" Yanking between vim sessions
+vmap <silent> ,y y:new<CR>:call setline(1,getregtype())<CR>o<Esc>P:wq! ~/.vim/.reg.txt<CR>
+nmap <silent> ,y :new<CR>:call setline(1,getregtype())<CR>o<Esc>P:wq! ~/.vim/.reg.txt<CR>
+map <silent> ,p :sview ~/.vim/.reg.txt<CR>"zdddG:q!<CR>:call setreg('"', @", @z)<CR>p
+map <silent> ,P :sview ~/.vim/.reg.txt<CR>"zdddG:q!<CR>:call setreg('"', @", @z)<CR>P
 
 " neocomplcache plugin
 let g:neocomplcache_enable_at_startup = 1
@@ -83,10 +90,13 @@ let g:NERDTreeDirArrows=1
 " Autostart NerdTree when no files are present
 autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+
 " Close NerdTree if it's the only window open
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
+
 " Ctrl+n closes NerdTree
 map <C-n> :NERDTreeToggle<CR>
+
 " Set initial focus to vim instead of NerdTree
 autocmd VimEnter * wincmd l
 autocmd BufNew   * wincmd l
