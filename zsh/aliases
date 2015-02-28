@@ -1,10 +1,5 @@
 #!/bin/zsh
 
-# Listing files
-alias -g ls="ls -CF --color=auto"
-alias -g lla="ls -alF"
-alias -g lsa="ls -aF"
-
 # Creating sb command for Sublime Text
 sb () {
     if which subl &> /dev/null;
@@ -57,6 +52,12 @@ cdl () {
     ls;
 }
 
+
+# Listing files
+alias -g ls="ls -CF --color=auto"
+alias -g lla="ls -alF"
+alias -g lsa="ls -aF"
+
 # Creating compacted cd ..
 alias -g ..="cdl .."
 alias -g ..2="cdl ../.."
@@ -64,7 +65,7 @@ alias -g ..3="cdl ../../.."
 alias -g ..4="cdl ../../../.."
 alias -g ..5="cdl ../../../../.."
 
-# Reloading bashrc
+# Reloading zshrc
 alias -g reload="source ~/.zshrc"
 
 # vim-like exit
@@ -73,3 +74,12 @@ alias -g :q="exit"
 # valgrind alias
 alias -g valleak="valgrind --tool=memcheck --leak-check=yes"
 alias -g valleak-line="valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all"
+
+# Resuming screen
+alias -g sr="screen -r"
+
+# zeus alias
+alias -g z="zeus"
+
+# atom alias
+alias -g at="atom"
