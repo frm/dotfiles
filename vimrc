@@ -71,6 +71,10 @@ nmap <silent> <Up> gk
 " Remove any trailing whitespace that is in the file
 autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
 
+" Associate *.prolog and *.gawk with prolog and awk filetypes
+au BufRead,BufNewFile *.prolog setfiletype prolog
+au BufRead,BufNewFile *.gawk setfiletype awk
+
 " Use F2 to go to paste mode
 set pastetoggle=<F2>
 
