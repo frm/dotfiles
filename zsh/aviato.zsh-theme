@@ -9,7 +9,7 @@ PROMPT2='  ›%{$fg[red]%}› %{$reset_color%} '
 RPROMPT='$(_ruby_version)'
 
 local _current_dir="%{$fg[red]%}%3~%{$reset_color%}"
-local _user_host="%{$fg[magenta]%}%n%{$reset_color%} at %{$fg[grey]%}%m%{$reset_color%}"
+local _user_host="%{$fg[yellow]%}%n%{$reset_color%} at %{$fg[grey]%}%m%{$reset_color%}"
 
 function _ruby_version() {
  rb=$(rbenv version | awk '{ print $1 }')
