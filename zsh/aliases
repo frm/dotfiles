@@ -53,6 +53,16 @@ cdl () {
 }
 
 
+# cat aliases
+catv () {
+    cat $@ | view -
+}
+
+
+catl () {
+    cat $@ | less
+}
+
 # Listing files
 alias -g ls="ls -CF --color=auto"
 alias -g lla="ls -alF"
@@ -83,3 +93,6 @@ alias -g z="zeus"
 
 # atom alias
 alias -g at="atom"
+
+# prolog alias
+alias -g prolog="rlwrap sicstus"
