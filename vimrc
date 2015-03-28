@@ -34,7 +34,7 @@ scriptencoding utf-8
 
 syntax enable
 let g:solarized_termcolors=256
-set background=light
+set background=dark
 colorscheme solarized
 
 set hlsearch    " Highlights search
@@ -60,7 +60,7 @@ set linebreak
 
 set autoindent
 
-set number
+set relativenumber
 
 " Allow arrow navigation
 imap <silent> <Down> <C-o>gj
@@ -68,7 +68,7 @@ imap <silent> <Up> <C-o>gk
 nmap <silent> <Down> gj
 nmap <silent> <Up> gk
 
-" Remove any trailing whitespace that is in the file
+" Remove trailing whitespaces
 autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
 
 " Associate *.prolog and *.gawk with prolog and awk filetypes
