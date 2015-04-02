@@ -8,7 +8,6 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
 
-" Plugin 'tpope/vim-fugitive'
 " Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
 
 " http://vimawesome.com/plugin/surround-vim
@@ -27,6 +26,9 @@ Plugin 'kien/rainbow_parentheses.vim'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'justinmk/vim-syntax-extra'
 Plugin 'chriskempson/base16-vim'
+Plugin 'bling/vim-airline'
+Plugin 'airblade/vim-gitgutter'
+Plugin 'tpope/vim-fugitive'
 
 call vundle#end()            " required for Vundler
 filetype plugin indent on    " required for Vundler
@@ -41,45 +43,36 @@ set background=dark
 colorscheme base16-tomorrow
 "colorscheme solarized
 
-set hlsearch    " Highlights search
-set incsearch   " Incremental Search: show search matches as you type
+set hlsearch
+set incsearch
 
-" Enable mouse support in console
-set mouse=a
-
-" Set tabsize
 set tabstop=4
 set shiftwidth=4
-
-" Set backspace
 set backspace=2
 
-" Use spaces instead of tabs
 set expandtab
 set smarttab
 
-" Line wrapping
 set wrap
 set linebreak
 
 set autoindent
 
-set number
+set relativenumber
 
-" Allow arrow navigation
+" Arrow navigation
 imap <silent> <Down> <C-o>gj
 imap <silent> <Up> <C-o>gk
 nmap <silent> <Down> gj
 nmap <silent> <Up> gk
 
-" Remove any trailing whitespace that is in the file
+" Remove trailing whitespaces
 autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
 
 " Associate *.prolog and *.gawk with prolog and awk filetypes
 au BufRead,BufNewFile *.prolog setfiletype prolog
 au BufRead,BufNewFile *.gawk setfiletype awk
 
-" Use F2 to go to paste mode
 set pastetoggle=<F2>
 
 " Yanking between vim sessions
@@ -108,3 +101,17 @@ map <C-n> :NERDTreeToggle<CR>
 " Set initial focus to vim instead of NerdTree
 autocmd VimEnter * wincmd l
 autocmd BufNew   * wincmd l
+
+" Vim airline
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#branch#enabled=1
+
+if !exists('g:airline_symbols')
+    let g:airline_symbols = {}
+endif
+
+let g:airline_symbols.branch = "⎇ "
+
+" Preventing airline from hiding with NerdTreeToggle
+set laststatus=2
+
