@@ -25,6 +25,8 @@ Plugin 'tpope/vim-markdown'
 Plugin 'Shougo/neocomplcache.vim'
 Plugin 'kien/rainbow_parentheses.vim'
 Plugin 'altercation/vim-colors-solarized'
+Plugin 'justinmk/vim-syntax-extra'
+Plugin 'chriskempson/base16-vim'
 
 call vundle#end()            " required for Vundler
 filetype plugin indent on    " required for Vundler
@@ -34,8 +36,10 @@ scriptencoding utf-8
 
 syntax enable
 let g:solarized_termcolors=256
+let base16colorspace=256
 set background=dark
-colorscheme solarized
+colorscheme base16-tomorrow
+"colorscheme solarized
 
 set hlsearch    " Highlights search
 set incsearch   " Incremental Search: show search matches as you type
@@ -60,7 +64,7 @@ set linebreak
 
 set autoindent
 
-set relativenumber
+set number
 
 " Allow arrow navigation
 imap <silent> <Down> <C-o>gj
@@ -68,7 +72,7 @@ imap <silent> <Up> <C-o>gk
 nmap <silent> <Down> gj
 nmap <silent> <Up> gk
 
-" Remove trailing whitespaces
+" Remove any trailing whitespace that is in the file
 autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
 
 " Associate *.prolog and *.gawk with prolog and awk filetypes

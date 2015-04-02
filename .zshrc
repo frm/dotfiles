@@ -11,10 +11,11 @@ COMPLETION_WAITING_DOTS="true"
 HIST_STAMPS="dd.mm.yyyy"
 
 # Base16 Shell
-BASE16_SHELL="$HOME/.config/base16-shell/base16-default.dark.sh"
+BASE16_THEME="default"
+BASE16_SHELL="$HOME/.config/base16-shell/base16-$BASE16_THEME.dark.sh"
 [[ -s $BASE16_SHELL ]] && source $BASE16_SHELL
 
-export PATH="/Users/mendes/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export PATH="/Users/mendes/local/bin:/usr/local/bin:/bin:/usr/sbin:/sbin/usr/bin"
 source $ZSH/oh-my-zsh.sh
 export EDITOR='vim'
 
@@ -38,3 +39,4 @@ source ~/.nvm/nvm.sh
 MYSQL=/usr/local/mysql/bin
 export PATH=$PATH:$MYSQL
 export DYLD_LIBRARY_PATH=/usr/local/mysql/lib:$DYLD_LIBRARY_PATH
+
