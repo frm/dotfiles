@@ -36,7 +36,7 @@
 	pt = push origin --tags
 	r = remote -v
 	ra = remote add
-  rb = rebase
+	rb = rebase
 	sh = show --pretty
 	ss = status -s
 	st = status
