@@ -9,7 +9,7 @@ PROMPT2='  ›%{$fg[red]%}› %{$reset_color%} '
 RPROMPT='$(_ruby_version)'
 
 local _current_dir="%{$fg[red]%}%3~%{$reset_color%}"
-local _user_host="%{$fg[yellow]%}%n%{$reset_color%} at %{$fg[grey]%}%m%{$reset_color%}"
+local _user_host="%{$fg[yellow]%}%n%{$reset_color%} at %{$fg[white]%}%m%{$reset_color%}"
 
 function _ruby_version() {
  rb=$(rbenv version | awk '{ print $1 }')
@@ -18,9 +18,18 @@ function _ruby_version() {
 
 function _git_info() {
   if git rev-parse --git-dir > /dev/null 2>&1; then
-    echo ":: git:($(current_branch) | $(_git_time_since_commit) |$(parse_git_dirty))"
+    echo ":: git:($(_git_branch) | $(_git_time_since_commit) |$(parse_git_dirty))"
   fi
 }
+
+# Get current git branch
+# git zsh plugin function
+function _git_branch() {
+  ref=$(git symbolic-ref HEAD 2> /dev/null) || \
+  ref=$(git rev-parse --short HEAD 2> /dev/null) || return
+  echo ${ref#refs/heads/}
+}
+
 
 # Determine the time since last commit. If branch is clean,
 # use a neutral color, otherwise colors will vary according to time.
@@ -53,7 +62,6 @@ function _git_time_since_commit() {
     echo "$color$commit_age%{$reset_color%}"
   fi
 }
-
 
 if [[ $USER == "root" ]]; then
  CARETCOLOR="red"
