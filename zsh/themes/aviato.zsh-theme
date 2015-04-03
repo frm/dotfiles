@@ -12,8 +12,15 @@ local _current_dir="%{$fg[red]%}%3~%{$reset_color%}"
 local _user_host="%{$fg[yellow]%}%n%{$reset_color%} at %{$fg[white]%}%m%{$reset_color%}"
 
 function _ruby_version() {
- rb=$(rbenv version | awk '{ print $1 }')
- echo "%{$fg[red]%}rb: $rb%{$reset_color%}"
+    if which rbenv &> /dev/null; then
+        rb=$( rbenv version | awk '{ print $1 }' )
+    elif which rvm &> /dev/null; then
+        rb=$(rvm-prompt v g s)
+    else
+        return
+    fi
+
+    echo "%{$fg[red]%}rb: $rb%{$reset_color%}"
 }
 
 function _git_info() {
