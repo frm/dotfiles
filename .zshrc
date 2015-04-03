@@ -9,7 +9,7 @@ source $ZSH/oh-my-zsh.sh
 export EDITOR='vim'
 
 # Loading personal commands
-source $HOME/zsh/aliases
+source $HOME/local/aliases
 
 # Loading personal execs
 export PATH="$HOME/local/bin:${PATH}"
@@ -19,8 +19,11 @@ BASE16_THEME="default"
 BASE16_SHELL="$HOME/.config/base16-shell/base16-$BASE16_THEME.dark.sh"
 [[ -s $BASE16_SHELL ]] && source $BASE16_SHELL
 
+# Loading zsh-syntax-highlight
+source $ZSH/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
 # Linux specific settings
-if [ $(uname) == "Linux" ]; then
+if [ $(uname)="Linux" ]; then
     export PATH="$PATH:/home/frmendes/.rvm/gems/ruby-2.1.2/bin:/home/frmendes/.rvm/gems/ruby-2.1.2@global/bin:/home/frmendes/.rvm/rubies/ruby-2.1.2/bin:/home/frmendes/local/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/core_perl"
 
     # Add RVM to PATH for scripting
@@ -45,9 +48,6 @@ if [ $(uname) == "Linux" ]; then
 # OS X specific settings
 else
     export PATH=/Users/frm/local/bin:/Users/frm/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/mysql/bin:$PATH
-
-    # Loading zsh-syntax-highlight
-    source $ZSH/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
     # Loading rbenv
     eval "$(rbenv init -)"
