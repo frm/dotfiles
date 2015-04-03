@@ -1,9 +1,37 @@
-#!/bin/bash
+#!/bin/zsh
 
-# Listing files
-alias ls="ls -CF --color=auto"
-alias lla="ls -alF | less"
-alias lsa="ls -alF"
+# v command for vim
+if which vim &> /dev/null
+    then alias v="vim"
+fi
+
+alias v.="v ."
+alias vw="view"
+
+#v() {
+#    if which vim &> /dev/null;
+#        then vim $@
+#    fi
+#}
+
+
+# r command for rails
+if which rails &> /dev/null;
+    then alias r="rails"
+fi
+
+# g command for git
+if which git &> /dev/null;
+    then alias g="git"
+fi
+
+gcl() {
+    if which git &> /dev/null;
+    then
+        git clone $@ | cd $( echo $@ | awk -F/ '{ print $NF }' | cut -d. -f1)
+    fi
+}
+
 
 # Creating sb command for Sublime Text
 sb () {
@@ -16,22 +44,8 @@ sb () {
     fi
 }
 
-# v command for vim
-v() {
-	if which vim &> /dev/null;
-		then vim $@
-	fi
-}
-
-# g command for git
-if which git &> /dev/null;
-    then alias g="git"
-fi
-
-# r command for rails
-if which rails &> /dev/null;
-    then alias r="rails"
-fi
+# atom alias
+alias at="atom"
 
 # Removing TeamSpeak 3 Client Polution
 ts3 () {
@@ -64,12 +78,30 @@ alias ..3="cdl ../../.."
 alias ..4="cdl ../../../.."
 alias ..5="cdl ../../../../.."
 
-# Reloading bashrc
-alias reload="source ~/.bashrc"
+catl () {
+    cat $@ | less
+}
+
+# Reloading rc file
+reload() {
+    eval source $( echo $SHELL | awk -F/ '{ print "$HOME/."$NF"rc" }' )
+}
+
+alias rl="reload"
 
 # vim-like exit
 alias :q="exit"
 
+# Resuming screen
+alias sr="screen -r"
+
+# zeus alias
+alias z="zeus"
+
 # valgrind alias
 alias valleak="valgrind --tool=memcheck --leak-check=yes"
 alias valleak-line="valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all"
+
+# prolog alias
+alias prolog="rlwrap sicstus"
+
