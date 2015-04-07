@@ -82,6 +82,23 @@ catl () {
     cat $@ | less
 }
 
+# Copying text to clipboard
+copy() {
+    if which xclip &> /dev/null; then
+        xclip -selection clipboard < $@
+    elif which pbcopy &> /dev/null; then
+        if [ -f $@ ]; then
+            cat $@ | pbcopy
+        else
+            echo $@ | pbcopy
+        fi
+    fi
+}
+
+if which xclip &> /dev/null; then
+    alias xcopy="xclip -selection clipboard"
+fi
+
 # Reloading rc file
 reload() {
     eval source $( echo $SHELL | awk -F/ '{ print "$HOME/."$NF"rc" }' )
