@@ -29,6 +29,7 @@ Plugin 'chriskempson/base16-vim'
 Plugin 'bling/vim-airline'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'tpope/vim-fugitive'
+Plugin 'kien/ctrlp.vim'
 
 call vundle#end()            " required for Vundler
 filetype plugin indent on    " required for Vundler
@@ -43,22 +44,56 @@ set background=dark
 colorscheme base16-tomorrow
 "colorscheme solarized
 
+" allow unsaved background buffers
+set hidden
+
+" remember more commands
+set history=10000
+
 set hlsearch
 set incsearch
+" ignores case when searching except when pattern is all uppercase
+set ignorecase smartcase
 
 set tabstop=4
+set softtabstop=4
 set shiftwidth=4
 set backspace=2
 
 set expandtab
 set smarttab
+set autoindent
+
+" briefly jump to matching parenthesis
+set showmatch
 
 set wrap
 set linebreak
 
-set autoindent
-
 set relativenumber
+
+" highlights current line
+set cursorline
+
+set switchbuf=useopen
+
+set shell=zsh
+
+" change number of lines between cursor and scroll
+set scrolloff=3
+
+" no backups after overwritting
+set nobackup
+
+" backspacing to the start of line
+set backspace=indent,eol,start
+
+" setting menu for command line completion and command status
+set showcmd
+set wildmenu
+
+" autoread file when changed outside vim
+set autoread
 
 " Arrow navigation
 imap <silent> <Down> <C-o>gj
@@ -130,3 +165,5 @@ let g:airline_powerline_fonts = 1
 " Preventing airline from hiding with NerdTreeToggle
 set laststatus=2
 
+" Fuzzy search by filename
+let g:ctrlp_by_filename = 1
