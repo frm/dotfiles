@@ -1,21 +1,14 @@
-/* Installed Packages:
- * BeautifyRuby, SassBeautify, JavaScriptBeautify, Minifier
- * Markdown Extended, SublimeBuildOnSave, SassBuilder, Emmet
- * Git, GitGutter, Markdown Preview, BracketHighlighter
- * SublimeREPL, Autofilename, ColorPicker, DocBlockr
- *
- * Installed Themes: Numix, itg.flat, Watson
- */
-
 {
+	"always_show_minimap_viewport": true,
 	"auto_complete": true,
+	"bold_folder_labels": true,
 	"build_on_save": 1,
-	"color_scheme": "Packages/Theme - itg.flat/itg.dark.tmTheme",
+	"color_scheme": "Packages/Material Theme/schemes/Material-Theme.tmTheme",
 	"filename_filter": ".(sass|scss)$",
-	"font_face": "Inconsolata",
+	"font_face": "Roboto Mono",
 	"font_options":
 	[
-		"bold"
+		"gray_antialias" // apparently, only on OS X
 	],
 	"font_size": 12,
 	"highlight_line": false,
@@ -25,11 +18,18 @@
 	[
 		"Vintage"
 	],
+	"indent_guide_options":
+	[
+		"draw_normal",
+		"draw_active"
+	],
 	"line_numbers": true,
 	"line_padding_bottom": 1,
+	"line_padding_top": 1,
+	"overlay_scroll_bars": "enabled",
 	"remember_open_files": false,
 	"tab_size": 4,
-	"theme": "itg.flat.light.sublime-theme",
+	"theme": "Material-Theme.sublime-theme",
 	"translate_tabs_to_spaces": true,
 	"trim_trailing_white_space_on_save": true
 }
