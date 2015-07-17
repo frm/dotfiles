@@ -109,8 +109,14 @@ alias rl="reload"
 # vim-like exit
 alias :q="exit"
 
-# Resuming screen
-alias sr="screen -r"
+# Re-attaching detached sessions
+if which screen &> /dev/null; then
+    alias sr="screen -r"
+fi
+
+if which tmux &> /dev/null; then
+    alias ta="tmux attach"
+fi
 
 # zeus alias
 alias z="zeus"
