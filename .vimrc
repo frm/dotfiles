@@ -18,6 +18,7 @@ Plugin 'gmarik/Vundle.vim'
 
 Plugin 'scrooloose/syntastic'
 Plugin 'scrooloose/nerdtree'
+Plugin 'ryanoasis/vim-devicons'
 Plugin 'Lokaltog/vim-easymotion'
 Plugin 'vim-ruby/vim-ruby'
 Plugin 'tpope/vim-markdown'
@@ -25,12 +26,13 @@ Plugin 'Shougo/neocomplcache.vim'
 Plugin 'kien/rainbow_parentheses.vim'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'justinmk/vim-syntax-extra'
-Plugin 'chriskempson/base16-vim'
 Plugin 'bling/vim-airline'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'tpope/vim-fugitive'
 Plugin 'kien/ctrlp.vim'
 Plugin 'rking/ag.vim'
+Plugin 'chriskempson/base16-vim'
+Plugin 'morhetz/gruvbox'
 
 call vundle#end()            " required for Vundler
 filetype plugin indent on    " required for Vundler
@@ -109,8 +111,10 @@ nmap <silent> <Down> gj
 nmap <silent> <Up> gk
 
 " Cycling through buffers
-nnoremap <C-p> :bnext<CR>
-nnoremap <C-n> :bprevious<CR>
+exe "set <M-b>=\<Esc>b"
+exe "set <M-n>=\<Esc>n"
+nmap <M-b> :bprevious<CR>
+nmap <M-n> :bnext<CR>
 
 " Remove trailing whitespaces
 autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
