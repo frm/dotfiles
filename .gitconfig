@@ -10,7 +10,8 @@
 [core]
 	editor = vim -f
 	pager = less
-	excludesfile = /Users/frm/.gitignore_global
+	excludesfile = $HOME/.gitignore_global
+	filemode = false
 [credential]
    	helper = cache --timeout=3600
 [push]
