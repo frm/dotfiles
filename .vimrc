@@ -30,6 +30,7 @@ Plugin 'bling/vim-airline'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'tpope/vim-fugitive'
 Plugin 'kien/ctrlp.vim'
+Plugin 'rking/ag.vim'
 
 call vundle#end()            " required for Vundler
 filetype plugin indent on    " required for Vundler
@@ -46,6 +47,12 @@ colorscheme base16-tomorrow
 
 " allow unsaved background buffers
 set hidden
+
+" Horizontal split to the bottom
+set splitbelow
+
+" Vertical split to the right
+set splitright
 
 " remember more commands
 set history=10000
@@ -100,6 +107,10 @@ imap <silent> <Down> <C-o>gj
 imap <silent> <Up> <C-o>gk
 nmap <silent> <Down> gj
 nmap <silent> <Up> gk
+
+" Cycling through buffers
+nnoremap <C-p> :bnext<CR>
+nnoremap <C-n> :bprevious<CR>
 
 " Remove trailing whitespaces
 autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
@@ -167,3 +178,6 @@ set laststatus=2
 
 " Fuzzy search by filename
 let g:ctrlp_by_filename = 1
+
+" Mapping ag.vim to Ctrl + A
+nnoremap <C-a> :Ag<Space>
