@@ -19,7 +19,7 @@ Plugin 'gmarik/Vundle.vim'
 Plugin 'scrooloose/syntastic'
 Plugin 'scrooloose/nerdtree'
 Plugin 'ryanoasis/vim-devicons'
-Plugin 'Lokaltog/vim-easymotion'
+Plugin 'easymotion/vim-easymotion'
 Plugin 'vim-ruby/vim-ruby'
 Plugin 'tpope/vim-markdown'
 Plugin 'Shougo/neocomplcache.vim'
@@ -64,10 +64,10 @@ set incsearch
 " ignores case when searching except when pattern is all uppercase
 set ignorecase smartcase
 
-set tabstop=4
-set softtabstop=4
-set shiftwidth=4
-set backspace=2
+set tabstop=2
+set softtabstop=2
+set shiftwidth=2
+set backspace=1
 
 set expandtab
 set smarttab
@@ -80,6 +80,11 @@ set wrap
 set linebreak
 
 set relativenumber
+
+set ttyfast
+
+" Using mouse and scroll
+set mouse=a
 
 " highlights current line
 set cursorline
@@ -105,10 +110,11 @@ set wildmenu
 set autoread
 
 " Arrow navigation
-imap <silent> <Down> <C-o>gj
-imap <silent> <Up> <C-o>gk
-nmap <silent> <Down> gj
-nmap <silent> <Up> gk
+"imap <silent> <Down> <C-o>gj
+"imap <silent> <Up> <C-o>gk
+"nmap <silent> <Down> gj
+"nmap <silent> <Up> gk
+" Be a man!
 
 " Cycling through buffers
 exe "set <M-b>=\<Esc>b"
@@ -134,23 +140,26 @@ map <silent> ,P :sview ~/.vim/.reg.txt<CR>"zdddG:q!<CR>:call setreg('"', @", @z)
 " neocomplcache plugin
 let g:neocomplcache_enable_at_startup = 1
 
-" NerdTree
-autocmd vimenter * NERDTree     " autostart NerdTree
-let g:NERDTreeDirArrows=1
-
-" Autostart NerdTree when no files are present
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
-
-" Close NerdTree if it's the only window open
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
-
-" Ctrl+n closes NerdTree
+" NERDTree
+" Ctrl+n toggles NERDTree
 map <C-n> :NERDTreeToggle<CR>
 
-" Set initial focus to vim instead of NerdTree
-autocmd VimEnter * wincmd l
-autocmd BufNew   * wincmd l
+" Using custom arrows with NERDTree
+let g:NERDTreeDirArrows=1
+
+" Close NERDTree if it's the only window open
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
+
+" Autostart NERDTree
+"autocmd vimenter * NERDTree
+
+" Autostart NERDTree when no files are present
+"autocmd StdinReadPre * let s:std_in=1
+"autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+
+" Set initial focus to vim instead of NERDTree
+"autocmd VimEnter * wincmd l
+"autocmd BufNew   * wincmd l
 
 " Vim airline
 let g:airline#extensions#tabline#enabled = 1
@@ -185,3 +194,6 @@ let g:ctrlp_by_filename = 1
 
 " Mapping ag.vim to Ctrl + A
 nnoremap <C-a> :Ag<Space>
+
+" Old EasyMotion keybinding
+map <Leader> <Plug>(easymotion-prefix)
