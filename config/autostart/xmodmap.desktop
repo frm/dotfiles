@@ -1,0 +1,8 @@
+
+[Desktop Entry]
+Name=xmodmap
+Exec=bash -c 'sleep 3 && xmodmap $HOME/.Xmodmap'
+Terminal=false
+Type=Application
+Comment=Fixing xmodmap error on loginn
+Categories=Utility
