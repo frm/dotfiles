@@ -9,3 +9,6 @@ keycode  62 = grave asciitilde backslash bar notsign notsign grave asciitilde
 
 ! Mapping caps lock to another ctrl
 keycode  66 = Control_L NoSymbol Control_L NoSymbol Control_L
+
+! Mapping right ctrl to left shift
+keycode 105 = Shift_L NoSymbol Shift_L NoSymbol Shift_L Shift_L
