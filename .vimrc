@@ -22,7 +22,7 @@ Plugin 'ryanoasis/vim-devicons'
 Plugin 'easymotion/vim-easymotion'
 Plugin 'vim-ruby/vim-ruby'
 Plugin 'tpope/vim-markdown'
-Plugin 'Shougo/neocomplcache.vim'
+Plugin 'Shougo/neocomplete.vim'
 Plugin 'kien/rainbow_parentheses.vim'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'justinmk/vim-syntax-extra'
@@ -201,8 +201,8 @@ set laststatus=2
 " Fuzzy search by filename
 let g:ctrlp_by_filename = 1
 
-" Mapping ag.vim to Ctrl + A
-nnoremap <C-a> :Ag<Space>
+" Mapping ag.vim to Ctrl + G
+nnoremap <C-g> :Ag<Space>
 
 " Old EasyMotion keybinding
 map <Leader> <Plug>(easymotion-prefix)
