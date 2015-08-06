@@ -8,30 +8,36 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
 
-" Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
+" Completion
+Plugin 'Shougo/neocomplete.vim'
 
-" http://vimawesome.com/plugin/surround-vim
-" Plugin 'tpope/vim-surround'
-
-" http://vimawesome.com/plugin/rails-vim
-" Plugin 'tpope/vim-rails'
-
+" General Syntax
 Plugin 'scrooloose/syntastic'
+Plugin 'justinmk/vim-syntax-extra'
+
+" NERDTree
 Plugin 'scrooloose/nerdtree'
 Plugin 'ryanoasis/vim-devicons'
-Plugin 'easymotion/vim-easymotion'
-Plugin 'vim-ruby/vim-ruby'
-Plugin 'tpope/vim-markdown'
-Plugin 'Shougo/neocomplete.vim'
-Plugin 'kien/rainbow_parentheses.vim'
-Plugin 'altercation/vim-colors-solarized'
-Plugin 'justinmk/vim-syntax-extra'
+
 Plugin 'bling/vim-airline'
 Plugin 'airblade/vim-gitgutter'
-Plugin 'tpope/vim-fugitive'
+
+Plugin 'kien/rainbow_parentheses.vim'
+Plugin 'easymotion/vim-easymotion'
 Plugin 'kien/ctrlp.vim'
 Plugin 'rking/ag.vim'
+
+" Language specific
+Plugin 'vim-ruby/vim-ruby'
+Plugin 'slim-template/vim-slim'
+Plugin 'othree/yajs.vim'
+Plugin 'othree/javascript-libraries-syntax.vim'
+Plugin 'plasticboy/vim-markdown'
+Plugin 'godlygeek/tabular' " dependency for vim-markdown
+
+" Colors
 Plugin 'chriskempson/base16-vim'
+Plugin 'altercation/vim-colors-solarized'
 Plugin 'morhetz/gruvbox'
 
 call vundle#end()            " required for Vundler
@@ -206,3 +212,6 @@ nnoremap <C-g> :Ag<Space>
 
 " Old EasyMotion keybinding
 map <Leader> <Plug>(easymotion-prefix)
+
+" Activate Neocomplete
+let g:neocomplete#enable_at_startup = 1
