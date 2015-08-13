@@ -17,7 +17,7 @@ Plugin 'justinmk/vim-syntax-extra'
 
 " NERDTree
 Plugin 'scrooloose/nerdtree'
-Plugin 'ryanoasis/vim-devicons'
+" Plugin 'ryanoasis/vim-devicons'
 
 Plugin 'bling/vim-airline'
 Plugin 'airblade/vim-gitgutter'
@@ -25,7 +25,6 @@ Plugin 'airblade/vim-gitgutter'
 Plugin 'kien/rainbow_parentheses.vim'
 Plugin 'easymotion/vim-easymotion'
 Plugin 'kien/ctrlp.vim'
-Plugin 'rking/ag.vim'
 
 " Language specific
 Plugin 'vim-ruby/vim-ruby'
@@ -124,13 +123,6 @@ set wildmenu
 " autoread file when changed outside vim
 set autoread
 
-" Arrow navigation
-"imap <silent> <Down> <C-o>gj
-"imap <silent> <Up> <C-o>gk
-"nmap <silent> <Down> gj
-"nmap <silent> <Up> gk
-" Be a man!
-
 " Cycling through buffers
 exe "set <M-b>=\<Esc>b"
 exe "set <M-n>=\<Esc>n"
@@ -146,18 +138,13 @@ au BufRead,BufNewFile *.gawk setfiletype awk
 
 set pastetoggle=<F2>
 
-" Yanking between vim sessions
-vmap <silent> ,y y:new<CR>:call setline(1,getregtype())<CR>o<Esc>P:wq! ~/.vim/.reg.txt<CR>
-nmap <silent> ,y :new<CR>:call setline(1,getregtype())<CR>o<Esc>P:wq! ~/.vim/.reg.txt<CR>
-map <silent> ,p :sview ~/.vim/.reg.txt<CR>"zdddG:q!<CR>:call setreg('"', @", @z)<CR>p
-map <silent> ,P :sview ~/.vim/.reg.txt<CR>"zdddG:q!<CR>:call setreg('"', @", @z)<CR>P
-
 " neocomplcache plugin
 let g:neocomplcache_enable_at_startup = 1
 
 " NERDTree
 " Ctrl+n toggles NERDTree
 map <C-n> :NERDTreeToggle<CR>
+map <C-m> :NERDTreeFind<CR>
 
 " Using custom arrows with NERDTree
 let g:NERDTreeDirArrows=1
@@ -206,6 +193,31 @@ set laststatus=2
 
 " Fuzzy search by filename
 let g:ctrlp_by_filename = 1
+
+
+" Thoughtbot's ag on vim
+if executable('ag')
+  " Use ag over grep
+  set grepprg=ag\ --nogroup\ --nocolor
+
+  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
+  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+
+  " ag is fast enough that CtrlP doesn't need to cache
+  let g:ctrlp_use_caching = 0
+
+  " Ag command
+  command -nargs=+ -complete=file -bar Ag silent! grep! <args>|cwindow|redraw!
+endif
+
+" Mapping ag.vim to Ctrl + G
+nnoremap <C-g> :Ag<Space>
+
+" Old EasyMotion keybinding
+map <Leader> <Plug>(easymotion-prefix)
+
+" Activate Neocomplete
+let g:neocomplete#enable_at_startup = 1
 
 " Mapping ag.vim to Ctrl + G
 nnoremap <C-g> :Ag<Space>
