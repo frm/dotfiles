@@ -126,8 +126,10 @@ set autoread
 " Cycling through buffers
 exe "set <M-b>=\<Esc>b"
 exe "set <M-n>=\<Esc>n"
+exe "set <M-w>=\<Esc>w"
 nmap <M-b> :bprevious<CR>
 nmap <M-n> :bnext<CR>
+nmap <M-w> :bw<CR>
 
 " Remove trailing whitespaces
 autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
@@ -215,9 +217,6 @@ nnoremap <C-g> :Ag<Space>
 
 " Old EasyMotion keybinding
 map <Leader> <Plug>(easymotion-prefix)
-
-" Activate Neocomplete
-let g:neocomplete#enable_at_startup = 1
 
 " Mapping ag.vim to Ctrl + G
 nnoremap <C-g> :Ag<Space>
