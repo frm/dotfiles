@@ -218,11 +218,5 @@ nnoremap <C-g> :Ag<Space>
 " Old EasyMotion keybinding
 map <Leader> <Plug>(easymotion-prefix)
 
-" Mapping ag.vim to Ctrl + G
-nnoremap <C-g> :Ag<Space>
-
-" Old EasyMotion keybinding
-map <Leader> <Plug>(easymotion-prefix)
-
 " Activate Neocomplete
 let g:neocomplete#enable_at_startup = 1
