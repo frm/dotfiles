@@ -1,26 +1,36 @@
-export ZSH=$HOME/.oh-my-zsh
-ZSH_THEME="aviato"
-ENABLE_CORRECTION="false"
+# Loading Antigen
+ANTIGEN=$HOME/.antigen/antigen
+source $ANTIGEN/antigen.zsh
+
+# Load oh-my-zsh's library
+antigen use oh-my-zsh
+
+# Fish-like syntax highlighting
+antigen bundle zsh-users/zsh-syntax-highlighting
+
+# Theming
+antigen theme $ANTIGEN/themes aviato
+
+# Custom variables
 COMPLETION_WAITING_DOTS="true"
-
 HIST_STAMPS="dd.mm.yyyy"
+ENABLE_CORRECTION="false"
 
-source $ZSH/oh-my-zsh.sh
-export EDITOR='vim'
+antigen apply
 
 # Loading personal commands
 source $HOME/local/aliases
 
-# Loading personal execs
+# Loading execs from ~/local/bin
 export PATH="$HOME/local/bin:${PATH}"
 
-# Base16 Shell by Chris Kempson
-BASE16_THEME="default"
-BASE16_SHELL="$HOME/.config/base16-shell/base16-$BASE16_THEME.dark.sh"
-[[ -s $BASE16_SHELL ]] && source $BASE16_SHELL
+# Base16 Shell
+BASE16_SCHEME="ocean"
+BASE16_SHELL="$HOME/.config/base16-shell/base16-$BASE16_SCHEME.dark.sh"
+[[ -s $BASE16_SHELL ]] && . $BASE16_SHELL
 
-# Loading zsh-syntax-highlight
-source $ZSH/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# Loading nvm
+source ~/.nvm/nvm.sh
 
 # Linux specific settings
 if [ $(uname)="Linux" ]; then
@@ -47,16 +57,6 @@ if [ $(uname)="Linux" ]; then
 
 # OS X specific settings
 else
-    export PATH=/Users/frm/local/bin:/Users/frm/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/mysql/bin:$PATH
-
     # Loading rbenv
     eval "$(rbenv init -)"
-
-    # Loading nvm
-    source ~/.nvm/nvm.sh
-
-    # MySQL settings
-    MYSQL=/usr/local/mysql/bin
-    export PATH=$PATH:$MYSQL
-    export DYLD_LIBRARY_PATH=/usr/local/mysql/lib:$DYLD_LIBRARY_PATH
 fi
