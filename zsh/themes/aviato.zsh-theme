@@ -1,26 +1,19 @@
 # Based on AVIT ZSH Theme
 
+CURR_DIR="%{$fg[red]%}%3~%{$reset_color%}"
+USER_HOST="%{$fg[blue]%}%n%{$reset_color%} at %{$fg[white]%}%m%{$reset_color%}"
+
 PROMPT='
-$_user_host in $_current_dir $(_git_info)
+$USER_HOST in $CURR_DIR $(_git_info)
   › '
 
 PROMPT2='  ›%{$fg[red]%}› %{$reset_color%} '
 
 RPROMPT='$(_ruby_version)'
 
-local _current_dir="%{$fg[red]%}%3~%{$reset_color%}"
-local _user_host="%{$fg[yellow]%}%n%{$reset_color%} at %{$fg[white]%}%m%{$reset_color%}"
-
 function _ruby_version() {
-    if which rbenv &> /dev/null; then
-        rb=$( rbenv version | awk '{ print $1 }' )
-    elif which rvm &> /dev/null; then
-        rb=$(rvm-prompt v g s)
-    else
-        return
-    fi
-
-    echo "%{$fg[red]%}rb: $rb%{$reset_color%}"
+ rb=$(rbenv version | awk '{ print $1 }')
+ echo "%{$fg[red]%}rb: $rb%{$reset_color%}"
 }
 
 function _git_info() {
@@ -36,7 +29,6 @@ function _git_branch() {
   ref=$(git rev-parse --short HEAD 2> /dev/null) || return
   echo ${ref#refs/heads/}
 }
-
 
 # Determine the time since last commit. If branch is clean,
 # use a neutral color, otherwise colors will vary according to time.
