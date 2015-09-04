@@ -12,8 +12,13 @@ PROMPT2='  ›%{$fg[red]%}› %{$reset_color%} '
 RPROMPT='$(_ruby_version)'
 
 function _ruby_version() {
- rb=$(rbenv version | awk '{ print $1 }')
- echo "%{$fg[red]%}rb: $rb%{$reset_color%}"
+  rb=""
+  if [which rbenv 2> /dev/null];
+    then rb=$(rbenv version | awk '{ print $1 }');
+  elif [which rvm 2> /dev/null];
+    then rb=$(rvm_prompt_info | awk -F - '{ print $ 2 }' | sed 's/)$//');
+  fi
+  echo "%{$fg[red]%}rb: $rb%{$reset_color%}"
 }
 
 function _git_info() {
