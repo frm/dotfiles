@@ -123,13 +123,22 @@ set wildmenu
 " autoread file when changed outside vim
 set autoread
 
+let mapleader="\<Space>"
+
 " Cycling through buffers
-exe "set <M-b>=\<Esc>b"
-exe "set <M-n>=\<Esc>n"
-exe "set <M-w>=\<Esc>w"
-nmap <M-b> :bprevious<CR>
-nmap <M-n> :bnext<CR>
-nmap <M-w> :bw<CR>
+"exe "set <M-b>=\<Esc>b"
+"exe "set <M-n>=\<Esc>n"
+"exe "set <M-w>=\<Esc>w"
+"nmap <M-b> :bprevious<CR>
+"nmap <M-n> :bnext<CR>
+"nmap <M-w> :bw<CR>
+nmap <Leader>b :bprevious<CR>
+nmap <Leader>n :bnext<CR>
+nmap <Leader>w :bw<CR>
+
+" Remove highlight
+nnoremap <leader>, :noh<cr>
+
 
 " Remove trailing whitespaces
 autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
