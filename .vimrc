@@ -26,6 +26,8 @@ Plugin 'kien/rainbow_parentheses.vim'
 Plugin 'easymotion/vim-easymotion'
 Plugin 'kien/ctrlp.vim'
 
+Plugin 'junegunn/goyo.vim'
+
 " Language specific
 Plugin 'vim-ruby/vim-ruby'
 Plugin 'slim-template/vim-slim'
@@ -222,7 +224,10 @@ if executable('ag')
 endif
 
 " Mapping ag.vim to Ctrl + G
-nnoremap <C-g> :Ag<Space>
+nnoremap <C-f> :Ag<Space>
+
+" Mapping Goyo
+nnoremap <C-g> :Goyo<Cr>
 
 " Old EasyMotion keybinding
 map <Leader> <Plug>(easymotion-prefix)
