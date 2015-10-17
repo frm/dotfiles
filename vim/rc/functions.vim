@@ -16,5 +16,7 @@ if executable('ag')
   command -nargs=+ -complete=file -bar Ag silent! grep! <args>|cwindow|redraw!
 endif
 
-" Mapping ag.vim to Ctrl + G
+" Mapping ag function to Ctrl + G
 nnoremap <Leader>f :Ag<Space>
+
+command Reload :so ~/.vimrc

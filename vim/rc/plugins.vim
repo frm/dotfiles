@@ -1,4 +1,3 @@
-
 filetype off        " required for Vundle
 
 " set the runtime path to include Vundle and initialize
@@ -19,6 +18,7 @@ Plugin 'justinmk/vim-syntax-extra'
 Plugin 'scrooloose/nerdtree'
 
 Plugin 'bling/vim-airline'
+Plugin 'tpope/vim-fugitive'
 Plugin 'airblade/vim-gitgutter'
 
 Plugin 'kien/rainbow_parentheses.vim'
@@ -32,6 +32,8 @@ Plugin 'vim-ruby/vim-ruby'
 Plugin 'slim-template/vim-slim'
 Plugin 'othree/yajs.vim'
 Plugin 'othree/javascript-libraries-syntax.vim'
+Plugin 'elixir-lang/vim-elixir'
+Plugin 'mattreduce/vim-mix'
 
 " Colors
 Plugin 'chriskempson/base16-vim'
@@ -73,8 +75,16 @@ let g:ctrlp_by_filename = 1
 " Mapping Goyo
 nnoremap <C-g> :Goyo<Cr>
 
-" Old EasyMotion keybinding
-map <Leader> <Plug>(easymotion-prefix)
+" Easymotion
+" s for one character search
+" S for double character search
+nmap s <Plug>(easymotion-s)
+nmap S <Plug>(easymotion-s2)
+" replacing vim default search
+nmap / <Plug>(easymotion-sn)
+omap / <Plug>(easymotion-tn)
+nmap n <Plug>(easymotion-next)
+nmap N <Plug>(easymotion-prev)
 
 " Activate Neocomplete
 let g:neocomplete#enable_at_startup = 1

@@ -11,5 +11,5 @@ endif
 let g:solarized_termcolors=256
 let base16colorspace=256
 set background=dark
-colorscheme base16-ocean
+colorscheme base16-eighties
 "colorscheme solarized

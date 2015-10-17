@@ -8,3 +8,7 @@ nmap <Leader>w :bw<CR>
 nnoremap <leader>, :noh<cr>
 
 set pastetoggle=<F2>
+
+" Remapping Esc
+imap jj <Esc>
+set timeoutlen=300
