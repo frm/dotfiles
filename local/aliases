@@ -1,39 +1,52 @@
 #!/bin/zsh
 
-# v command for vim
-if which vim &> /dev/null
-    then alias v="vim"
-fi
-
-alias v.="v ."
 alias vw="view"
+alias v="vim"
+alias g="git"
+alias at="atom"
 
-#v() {
-#    if which vim &> /dev/null;
-#        then vim $@
-#    fi
-#}
+alias ta="tmux attach"
+alias sr="screen -r"
 
+# vim-like exit
+alias :q="exit"
 
-# r command for rails
+# Creating compacted cd ..
+alias ..="cdl .."
+alias ..2="cdl ../.."
+alias ..3="cdl ../../.."
+alias ..4="cdl ../../../.."
+alias ..5="cdl ../../../../.."
+
+# r for rails
 if which rails &> /dev/null;
     then alias r="rails"
 fi
 
-# g command for git
-if which git &> /dev/null;
-    then alias g="git"
+if which guard &> /dev/null;
+    then alias beg="bundle exec guard"
+fi
+
+# prolog alias
+if which sicstus &> /dev/null;
+    then alias prolog="rlwrap sicstus"
+fi
+
+# Group ls by name, type & extension
+if which gls &> /dev/null;
+then
+  alias ll="gls -lFX --color"
+else
+  alias ll="ls -lFX"
 fi
 
 gcl() {
     if which git &> /dev/null;
     then
-        git clone $@ | cd $( echo $@ | awk -F/ '{ print $NF }' | cut -d. -f1)
+        git clone $@ | cd $( echo $@ | awk -F/ '{ print $NF }' | cut -d. -f1 )
     fi
 }
 
-
-# Creating sb command for Sublime Text
 sb () {
     if which subl &> /dev/null;
         then subl $@
@@ -42,15 +55,6 @@ sb () {
     else
         subl $@ 2>&1 > /dev/null &
     fi
-}
-
-# atom alias
-alias at="atom"
-
-# Removing TeamSpeak 3 Client Polution
-ts3 () {
-    nohup ts3client 2>&1 > /dev/null &
-    exit 1
 }
 
 # Creating mkcd: mkdir and cd
@@ -71,17 +75,6 @@ cdl () {
     ls;
 }
 
-# Creating compacted cd ..
-alias ..="cdl .."
-alias ..2="cdl ../.."
-alias ..3="cdl ../../.."
-alias ..4="cdl ../../../.."
-alias ..5="cdl ../../../../.."
-
-catl () {
-    cat $@ | less
-}
-
 # Copying text to clipboard
 copy() {
     if which xclip &> /dev/null; then
@@ -95,36 +88,9 @@ copy() {
     fi
 }
 
-if which xclip &> /dev/null; then
-    alias xcopy="xclip -selection clipboard"
-fi
-
 # Reloading rc file
 reload() {
     eval source $( echo $SHELL | awk -F/ '{ print "$HOME/."$NF"rc" }' )
 }
 
 alias rl="reload"
-
-# vim-like exit
-alias :q="exit"
-
-# Re-attaching detached sessions
-if which screen &> /dev/null; then
-    alias sr="screen -r"
-fi
-
-if which tmux &> /dev/null; then
-    alias ta="tmux attach"
-fi
-
-# zeus alias
-alias z="zeus"
-
-# valgrind alias
-alias valleak="valgrind --tool=memcheck --leak-check=yes"
-alias valleak-line="valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all"
-
-# prolog alias
-alias prolog="rlwrap sicstus"
-
