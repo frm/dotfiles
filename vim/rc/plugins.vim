@@ -28,17 +28,17 @@ Plugin 'kien/ctrlp.vim'
 Plugin 'junegunn/goyo.vim'
 
 " Language specific
-Plugin 'vim-ruby/vim-ruby'
-Plugin 'slim-template/vim-slim'
 Plugin 'othree/yajs.vim'
 Plugin 'othree/javascript-libraries-syntax.vim'
+
 Plugin 'elixir-lang/vim-elixir'
 Plugin 'mattreduce/vim-mix'
 
-" Colors
-Plugin 'chriskempson/base16-vim'
-Plugin 'altercation/vim-colors-solarized'
-Plugin 'morhetz/gruvbox'
+Plugin 'vim-ruby/vim-ruby'
+Plugin 'slim-template/vim-slim'
+
+Plugin 'tpope/vim-rails'
+Plugin 'tpope/vim-bundler'
 
 
 call vundle#end()            " required for Vundler
@@ -50,8 +50,8 @@ let g:neocomplcache_enable_at_startup = 1
 
 " NERDTree
 " leader+n toggles NERDTree
-map <Leader>n :NERDTreeToggle<CR>
-map <Leader>m :NERDTreeFind<CR>
+map <C-n> :NERDTreeToggle<CR>
+map <C-m> :NERDTreeFind<CR>
 
 " Using custom arrows with NERDTree
 let g:NERDTreeDirArrows=1
@@ -88,3 +88,4 @@ nmap N <Plug>(easymotion-prev)
 
 " Activate Neocomplete
 let g:neocomplete#enable_at_startup = 1
+

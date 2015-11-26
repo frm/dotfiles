@@ -8,8 +8,16 @@ if &term =~ '256color'
   set t_ut=
 endif
 
-let g:solarized_termcolors=256
-let base16colorspace=256
+" Colors
+Plugin 'chriskempson/base16-vim'
+Plugin 'altercation/vim-colors-solarized'
+Plugin 'morhetz/gruvbox'
+
+set t_Co=256
+
 set background=dark
-colorscheme base16-eighties
+"let g:solarized_termcolors=256
 "colorscheme solarized
+colorscheme tomorrow-night
+"let base16colorspace=256
+"colorscheme base16-eighties

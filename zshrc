@@ -9,7 +9,7 @@ antigen use oh-my-zsh
 antigen bundle zsh-users/zsh-syntax-highlighting
 
 # Theming
-antigen theme $ANTIGEN/themes aviato
+antigen theme $ANTIGEN/themes frm
 
 # Custom variables
 COMPLETION_WAITING_DOTS="true"
@@ -30,9 +30,10 @@ source $HOME/local/initpsql.sh
 export PATH="$HOME/local/bin:${PATH}"
 
 # Base16 Shell
-BASE16_SCHEME="ocean"
-BASE16_SHELL="$HOME/.config/base16-shell/base16-$BASE16_SCHEME.dark.sh"
-[[ -s $BASE16_SHELL ]] && . $BASE16_SHELL
+#BASE16_SCHEME="ocean"
+#BASE16_SHELL="$HOME/.config/base16-shell/base16-$BASE16_SCHEME.dark.sh"
+#[[ -s $BASE16_SHELL ]] && . $BASE16_SHELL
+export TERM=xterm-256color
 
 # Remove annoying deprecated warning
 unset GREP_OPTIONS
