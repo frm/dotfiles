@@ -41,9 +41,8 @@ else
 fi
 
 gcl() {
-    if which git &> /dev/null;
-    then
-        git clone $@ | cd $( echo $@ | awk -F/ '{ print $NF }' | cut -d. -f1 )
+    if which git &> /dev/null; then
+        git clone $@ && cd $( echo $@ | awk -F/ '{ print $NF }' | cut -d. -f1 )
     fi
 }
 
