@@ -8,7 +8,7 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 
 " Completion
-Plugin 'Shougo/neocomplete.vim'
+Plugin 'Valloric/YouCompleteMe'
 
 " General Syntax
 Plugin 'scrooloose/syntastic'
@@ -40,18 +40,16 @@ Plugin 'slim-template/vim-slim'
 Plugin 'tpope/vim-rails'
 Plugin 'tpope/vim-bundler'
 
+Plugin 'tpope/vim-endwise'
+
 
 call vundle#end()            " required for Vundler
 filetype plugin indent on    " required for Vundler
 
-
-" neocomplcache plugin
-let g:neocomplcache_enable_at_startup = 1
-
 " NERDTree
 " leader+n toggles NERDTree
-map <C-n> :NERDTreeToggle<CR>
-map <C-m> :NERDTreeFind<CR>
+nnoremap <C-n> :NERDTreeToggle<CR>
+nnoremap <C-m> :NERDTreeFind<CR>
 
 " Using custom arrows with NERDTree
 let g:NERDTreeDirArrows=1
@@ -85,7 +83,4 @@ nmap / <Plug>(easymotion-sn)
 omap / <Plug>(easymotion-tn)
 nmap n <Plug>(easymotion-next)
 nmap N <Plug>(easymotion-prev)
-
-" Activate Neocomplete
-let g:neocomplete#enable_at_startup = 1
 
