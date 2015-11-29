@@ -1,5 +1,8 @@
 let mapleader="\<Space>"
 
+nnoremap j gj
+nnoremap k gk
+
 nmap <Leader>b :bprevious<CR>
 nmap <Leader>n :bnext<CR>
 nmap <Leader>w :bw<CR>
