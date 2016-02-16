@@ -18,7 +18,7 @@ ENABLE_CORRECTION="false"
 
 antigen apply
 
-export EDITOR='vim'
+export EDITOR='nvim'
 
 # Loading personal commands
 source $HOME/local/aliases

@@ -1,12 +1,15 @@
 #!/bin/zsh
 
 alias vw="view"
-alias v="vim"
+alias v="nvim"
+alias vv="vim"
 alias g="git"
 alias at="atom"
 
 alias ta="tmux attach"
 alias sr="screen -r"
+
+alias irssi='TERM=screen-256color irssi'
 
 # vim-like exit
 alias :q="exit"
@@ -42,7 +45,7 @@ fi
 
 gcl() {
     if which git &> /dev/null; then
-        git clone $@ && cd $( echo $@ | awk -F/ '{ print $NF }' | cut -d. -f1 )
+      git clone $@ && cd $( echo $@ | awk -F/ '{ print $NF }' | cut -d. -f1 )
     fi
 }
 

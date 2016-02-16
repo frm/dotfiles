@@ -8,7 +8,7 @@
 [color]
  	ui = true
 [core]
-	editor = vim -f
+	editor = nvim -f
 	pager = less
 	excludesfile = $HOME/.gitignore_global
 	filemode = false
