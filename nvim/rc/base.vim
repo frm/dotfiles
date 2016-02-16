@@ -53,3 +53,11 @@ set relativenumber
 
 " Automatically read file if it was changed outside of vim
 set autoread
+
+" Highlight whitespaces
+set list
+set listchars=""
+set listchars+=tab:>\
+set listchars+=trail:•
+set listchars+=extends:#
+set listchars+=nbsp:•
