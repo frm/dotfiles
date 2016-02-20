@@ -14,7 +14,14 @@ Plugin 'airblade/vim-gitgutter'
 " Movement
 Plugin 'scrooloose/nerdtree'
 Plugin 'easymotion/vim-easymotion'
-Plugin 'kien/ctrlp.vim'
+Plugin 'ctrlpvim/ctrlp.vim'
+
+" Language
+Plugin 'elixir-lang/vim-elixir'
+
+" Language Helpers
+Plugin 'tpope/vim-endwise'
+Plugin 'jiangmiao/auto-pairs'
 
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -33,7 +40,7 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTree
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#branch#enabled=1
 
-" Use Powerline fonts 
+" Use Powerline fonts
 let g:airline_powerline_fonts = 1
 
 " Preventing airline from hiding with NerdTreeToggle
@@ -42,6 +49,9 @@ set laststatus=2
 " ------------- Ctrl-P
 " Fuzzy search by filename
 " let g:ctrlp_by_filename = 1
+
+" Starting Ctrl-P in the git directory if no specific one is provided
+let g:ctrlp_working_path_mode = 'ra'
 
 " ------------- Goyo
 nnoremap <C-g> :Goyo<Cr>
