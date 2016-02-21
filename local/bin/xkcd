@@ -1,0 +1,33 @@
+#! /bin/bash
+
+info=$(curl -s http://xkcd.com/info.0.json)
+
+get_param() {
+  echo $1 \
+    | sed -n 's,^.*"'"$2"'": "*\([^",]*\).*,\1,p'
+}
+
+xkcd() {
+  local img=$(get_param "$info" "img" \
+    | sed 's/\\\//\//g')
+
+  local title=$(get_param "$info" "title")
+
+  local alt=$(get_param "$info" "alt")
+
+  local num=$(get_param "$info" "num")
+
+  local year=$(get_param "$info" "year")
+  local month=$(get_param "$info" "month")
+  local day=$(get_param "$info" "day")
+
+  curl -s $img | imgcat
+
+  echo "Title: $title"
+  echo "alt: $alt"
+  echo "$year/$month/$day"
+  echo "link: http://xkcd.com/$num"
+  echo "click if you're dumb: http://explainxkcd.com/$num"
+}
+
+xkcd
