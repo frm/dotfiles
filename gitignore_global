@@ -1,8 +1,10 @@
 # Mac OS X hidden files
 .DS_Store
 
-# Vim swap files
-.*.sw?
+# Vim
+*~
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
 
 # Temps
 tmp/

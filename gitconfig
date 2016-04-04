@@ -10,14 +10,17 @@
 [core]
 	editor = nvim -f
 	pager = less
-	excludesfile = $HOME/.gitignore_global
-	filemode = false
+	excludesfile = /Users/frm/.gitignore_global
 [credential]
    	helper = cache --timeout=3600
 [push]
 	default = current
 [diff]
-	tool = vimdiff
+	tool = nvimdiff
+[difftool]
+  prompt = true
+[difftool "nvimdiff"]
+  cmd= "nvim -d \"$LOCAL\" \"$REMOTE\""
 [alias]
  	a = add
  	b = branch -a -v
@@ -50,3 +53,6 @@
 	upstream = remote add upstream
 	us = reset HEAD # unstage
 	wc = whatchanged -p --abbrev-commit --pretty
+	ctags = !.git/hooks/ctags
+[init]
+	templatedir = ~/.git_template
