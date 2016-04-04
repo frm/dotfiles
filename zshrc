@@ -7,9 +7,10 @@ antigen use oh-my-zsh
 
 # Fish-like syntax highlighting
 antigen bundle zsh-users/zsh-syntax-highlighting
+#antigen bundle marzocchi/zsh-notify
 
 # Theming
-antigen theme $ANTIGEN/themes frm
+antigen theme $ANTIGEN/themes geometry
 
 # Custom variables
 COMPLETION_WAITING_DOTS="true"
@@ -43,7 +44,7 @@ source ~/.nvm/nvm.sh
 
 # Loading rbenv
 export PATH="$HOME/.rbenv/bin:$PATH"
-eval "$(rbenv init -)"
+eval "$(rbenv init - --no-rehash)"
 
 # Loading tmuxinator
 source ~/local/bin/tmuxinator.zsh
@@ -51,5 +52,8 @@ source ~/local/bin/tmuxinator.zsh
 # Use mux given window names
 export DISABLE_AUTO_TITLE=true
 
-# Rust support
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
+# z
+. `brew --prefix`/etc/profile.d/z.sh
+
+# Loading pyenv
+if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
