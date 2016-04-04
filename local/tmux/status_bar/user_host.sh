@@ -1,5 +1,3 @@
-#!/bin/bash
-
 ROOT_COLOR="#[fg=red]"
 SEPARATOR_COLOR="#[fg=white]"
 HOSTNAME_COLOR="#[fg=green]"

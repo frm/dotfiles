@@ -1,5 +1,3 @@
-#!/bin/bash
-
 SEPARATOR_COLOR="#[fg=white]"
 IP_COLOR="#[fg=yellow]"
 
