@@ -17,6 +17,12 @@ nmap <Leader>j :b#<CR>
 " Remove highlight from the last search
 nnoremap <Leader>, :noh<CR>
 
+" Alt-backspace
+inoremap <M-BS> <C-W>
+
+" Delete current line
+imap <C-d> <ESC>ddi
+
 " jj is the way to Esc
 imap jj <Esc>
 set timeoutlen=300
@@ -27,6 +33,7 @@ command Rl source ~/.config/nvim/init.vim
 " Remove trailing whitespaces
 autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
 
+" The Silver Searcher
 if executable('ag')
   " Use ag over grep
   set grepprg=ag\ --nogroup\ --nocolor
@@ -36,13 +43,18 @@ if executable('ag')
 
   " ag is fast enough that CtrlP doesn't need to cache
   let g:ctrlp_use_caching = 0
-
-  " Ag command
-  command -nargs=+ -complete=file -bar Ag silent! grep! <args>|cwindow|redraw!
 endif
+
+" bind \ (backward slash) to grep shortcut
+command -nargs=+ -complete=file -bar Ag silent! grep! <args>|cwindow|redraw!
 
 " Mapping ag
 nnoremap <Leader>a :Ag<Space>
+nnoremap \ :Ag<SPACE>
+
+" Using c-tags
+nnoremap <Leader>p :CtrlPTag<cr>
+nmap <leader>P :ta<space>
 
 " Renaming files
 function! Rename()
@@ -58,5 +70,5 @@ endfunction
 map <Leader>r :call Rename()<CR>
 
 " Saving buffers
-map <Leader>s <ESC>:w<CR>
-map <Leader>S <ESC>:wq<CR>
+map <C-s> <ESC>:w<CR>
+map <Leader>s <ESC>:wq<CR>

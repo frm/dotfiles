@@ -1,30 +1,37 @@
-filetype off " required by Vundle
-
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.config/nvim/bundle/Vundle.vim
-call vundle#rc('~/.config/nvim/bundle')
-
-" let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
-
-" Vim looks
-Plugin 'bling/vim-airline'
-Plugin 'airblade/vim-gitgutter'
-
+call plug#begin('~/.config/nvim/plugged')
+"
 " Movement
-Plugin 'scrooloose/nerdtree'
-Plugin 'easymotion/vim-easymotion'
-Plugin 'ctrlpvim/ctrlp.vim'
+Plug 'scrooloose/nerdtree'
+Plug 'easymotion/vim-easymotion'
+Plug 'ctrlpvim/ctrlp.vim'
+
+" Tooling
+Plug 'tpope/vim-fugitive'
 
 " Language
-Plugin 'elixir-lang/vim-elixir'
+Plug 'elixir-lang/vim-elixir'
+Plug 'slim-template/vim-slim'
 
 " Language Helpers
-Plugin 'tpope/vim-endwise'
-Plugin 'jiangmiao/auto-pairs'
+Plug 'tpope/vim-endwise'
+Plug 'jiangmiao/auto-pairs'
+Plug 'Shougo/deoplete.nvim'
+Plug 'hdima/python-syntax'
+Plug 'ternjs/tern_for_vim'
 
-call vundle#end()            " required
-filetype plugin indent on    " required
+" Vim looks
+Plug 'bling/vim-airline'
+Plug 'airblade/vim-gitgutter'
+Plug 'ryanoasis/vim-devicons'
+" Plug 'Xuyuanp/nerdtree-git-plugin'
+" TODO:
+" - fix space marker issue on devicons
+" - add file highlighting based on git status
+" - add icon highlighting based on file type
+" - add icon highlighting based on current theme
+
+
+call plug#end()
 
 " ------------- NERDTree
 nnoremap <C-n> :NERDTreeToggle<CR>
@@ -36,6 +43,14 @@ let g:NERDTreeDirArrows=1
 " Close NERDTree if it's the only window open
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
 
+"function UnsetSpacesNerdTree()
+"  NERDTreeToggle
+"  setlocal listchars=""
+"  NERDTreeToggle
+"endfunction
+"
+"autocmd VimEnter * call UnsetSpacesNerdTree()
+
 " ------------- Vim Airline
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#branch#enabled=1
@@ -46,9 +61,16 @@ let g:airline_powerline_fonts = 1
 " Preventing airline from hiding with NerdTreeToggle
 set laststatus=2
 
+" ------------- DevIcons
+let g:webdevicons_enable_unite = 0
+let g:webdevicons_enable_vimfiler = 0
+let g:webdevicons_enable_flagship_statusline = 0
+let g:WebDevIconsUnicodeGlyphDoubleWidth = 0
+let g:WebDevIconsNerdTreeAfterGlyphPadding = ''
+
 " ------------- Ctrl-P
 " Fuzzy search by filename
-" let g:ctrlp_by_filename = 1
+let g:ctrlp_by_filename = 1
 
 " Starting Ctrl-P in the git directory if no specific one is provided
 let g:ctrlp_working_path_mode = 'ra'
@@ -68,3 +90,6 @@ nmap / <Plug>(easymotion-sn)
 omap / <Plug>(easymotion-tn)
 nmap n <Plug>(easymotion-next)
 nmap N <Plug>(easymotion-prev)
+
+" Running deoplete
+let g:deoplete#enable_at_startup = 1

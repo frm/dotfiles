@@ -18,9 +18,9 @@ set t_Co=256
 
 " Color Plugins
 " Colors
-Plugin 'chriskempson/base16-vim'
-Plugin 'altercation/vim-colors-solarized'
-Plugin 'morhetz/gruvbox'
+Plug 'chriskempson/base16-vim'
+Plug 'altercation/vim-colors-solarized'
+Plug 'morhetz/gruvbox'
 
 set background=dark
 colorscheme tomorrow-night

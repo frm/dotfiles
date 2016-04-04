@@ -43,12 +43,16 @@ set showmatch
 " Wrapping lines
 set wrap
 set linebreak
+set textwidth=80
 
 " Always show relative numbers
 set relativenumber
 
+" Number column size
+set numberwidth=2
+
 " Using mouse and scroll
-" (note: this is already the default)
+" (note: already the default in nvim)
 " set mouse=a
 
 " Automatically read file if it was changed outside of vim
