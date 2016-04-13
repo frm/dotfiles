@@ -1,4 +1,5 @@
 let mapleader="\<Space>"
+let maplocalleader="\,"
 
 " Moving between wrapped lines
 nnoremap j gj
@@ -72,3 +73,11 @@ map <Leader>r :call Rename()<CR>
 " Saving buffers
 map <C-s> <ESC>:w<CR>
 map <Leader>s <ESC>:wq<CR>
+
+function ChromeRefresh()
+  silent !chrome.refresh
+  redraw
+endfunction
+
+" Refresh Chrome
+nnoremap <localleader>r :call ChromeRefresh()<CR>
