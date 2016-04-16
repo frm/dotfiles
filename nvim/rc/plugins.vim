@@ -23,13 +23,6 @@ Plug 'ternjs/tern_for_vim'
 Plug 'bling/vim-airline'
 Plug 'airblade/vim-gitgutter'
 Plug 'ryanoasis/vim-devicons'
-" Plug 'Xuyuanp/nerdtree-git-plugin'
-" TODO:
-" - fix space marker issue on devicons
-" - add file highlighting based on git status
-" - add icon highlighting based on file type
-" - add icon highlighting based on current theme
-
 
 call plug#end()
 
@@ -43,13 +36,8 @@ let g:NERDTreeDirArrows=1
 " Close NERDTree if it's the only window open
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
 
-"function UnsetSpacesNerdTree()
-"  NERDTreeToggle
-"  setlocal listchars=""
-"  NERDTreeToggle
-"endfunction
-"
-"autocmd VimEnter * call UnsetSpacesNerdTree()
+" Don't show
+autocmd FileType nerdtree setlocal listchars=""
 
 " ------------- Vim Airline
 let g:airline#extensions#tabline#enabled = 1
