@@ -21,14 +21,14 @@ antigen apply
 
 export EDITOR='nvim'
 
+# Loading execs from ~/local/bin
+export PATH="$HOME/local/bin:${PATH}"
+
 # Loading personal commands
 source $HOME/local/aliases
 
 # Loading local postgresql commands
 source $HOME/local/initpsql.sh
-
-# Loading execs from ~/local/bin
-export PATH="$HOME/local/bin:${PATH}"
 
 # Base16 Shell
 #BASE16_SCHEME="ocean"
