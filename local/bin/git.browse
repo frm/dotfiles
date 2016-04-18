@@ -1,4 +1,6 @@
 #!/bin/sh
+# Open git remote on a browser
+# OS X version
 
 if [[ $# -eq 0 ]]; then
   DIR=.

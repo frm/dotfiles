@@ -6,6 +6,7 @@ alias vv="vim"
 alias g="git"
 alias at="atom"
 alias zx="zeus" # used to be z but thats for autojumping
+alias gh="git.browse" # see bin/git.browse
 
 # postgres on OS X
 alias pg.server="pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log"

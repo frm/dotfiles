@@ -23,6 +23,7 @@
   cmd= "nvim -d \"$LOCAL\" \"$REMOTE\""
 [alias]
   a = add
+  ac = !git.autoclean # See bin/git.autoclean
   b = branch -a -v
   c = commit
   co = checkout
@@ -47,11 +48,9 @@
   sta = stash apply
   std = stash drop
   sts = stash save
-  sync = !git fetch upstream && git checkout master && git merge upstream/master
+  sync = !git.sync # See bin/git.sync
   t = tag
   tree = log --graph --abbrev-commit --decorate --oneline --date=relative --color --all
-  upstream = remote add upstream
-  us = reset HEAD # unstage
   wc = whatchanged -p --abbrev-commit --pretty
   ctags = !.git/hooks/ctags
 [init]
