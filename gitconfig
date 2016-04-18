@@ -1,58 +1,58 @@
 [user]
-	name = Fernando Mendes
-	email = devfrmendes@gmail.com
+  name = Fernando Mendes
+  email = devfrmendes@gmail.com
 [github]
-	user = frmendes
+  user = frmendes
 [branch]
-	autosetuprebase = always
+  autosetuprebase = always
 [color]
- 	ui = true
+  ui = true
 [core]
-	editor = nvim -f
-	pager = less
-	excludesfile = /Users/frm/.gitignore_global
+  editor = nvim -f
+  pager = less
+  excludesfile = /Users/frm/.gitignore_global
 [credential]
-   	helper = cache --timeout=3600
+  helper = cache --timeout=3600
 [push]
-	default = current
+  default = current
 [diff]
-	tool = nvimdiff
+  tool = nvimdiff
 [difftool]
   prompt = true
 [difftool "nvimdiff"]
   cmd= "nvim -d \"$LOCAL\" \"$REMOTE\""
 [alias]
- 	a = add
- 	b = branch -a -v
-	c = commit
- 	co = checkout
-	ca = commit --ammend
-	cfg = config --list
-	conflicts = diff --name-only --diff-filter=U
-	d = diff
-	dc = diff --cached
-	dt = difftool
-	f = fetch
-	l = log
-	m = merge
- 	p = push
- 	pl = pull
-	pt = push origin --tags
-	r = remote -v
-	ra = remote add
-	rb = rebase
-	sh = show --pretty
-	ss = status -s
-	st = status
-	sta = stash apply
-	std = stash drop
-	sts = stash save
-	sync = !git fetch upstream && git checkout master && git merge upstream/master
-	t = tag
-	tree = log --graph --abbrev-commit --decorate --oneline --date=relative --color --all
-	upstream = remote add upstream
-	us = reset HEAD # unstage
-	wc = whatchanged -p --abbrev-commit --pretty
-	ctags = !.git/hooks/ctags
+  a = add
+  b = branch -a -v
+  c = commit
+  co = checkout
+  ca = commit --ammend
+  cfg = config --list
+  conflicts = diff --name-only --diff-filter=U
+  d = diff
+  dc = diff --cached
+  dt = difftool
+  f = fetch
+  l = log
+  m = merge
+  p = push
+  pl = pull
+  pt = push origin --tags
+  r = remote -v
+  ra = remote add
+  rb = rebase
+  sh = show --pretty
+  ss = status -s
+  st = status
+  sta = stash apply
+  std = stash drop
+  sts = stash save
+  sync = !git fetch upstream && git checkout master && git merge upstream/master
+  t = tag
+  tree = log --graph --abbrev-commit --decorate --oneline --date=relative --color --all
+  upstream = remote add upstream
+  us = reset HEAD # unstage
+  wc = whatchanged -p --abbrev-commit --pretty
+  ctags = !.git/hooks/ctags
 [init]
-	templatedir = ~/.git_template
+  templatedir = ~/.git_template
