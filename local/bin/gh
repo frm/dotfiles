@@ -1,0 +1,14 @@
+#!/bin/sh
+
+if [[ $# -eq 0 ]]; then
+  DIR=.
+else
+  DIR=$1
+fi
+
+# Use --git-dir=$DIR/.git if git version < 1.8.5
+open $(git -C $DIR remote -v \
+        | awk '/fetch/ { print $2 }' \
+        | sed -e 's/:/\//' \
+              -e 's/git@/https:\/\//' \
+              -e 's/\.git$//')
