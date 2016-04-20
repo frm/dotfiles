@@ -31,9 +31,9 @@ source $HOME/local/aliases
 source $HOME/local/initpsql.sh
 
 # Base16 Shell
-#BASE16_SCHEME="ocean"
-#BASE16_SHELL="$HOME/.config/base16-shell/base16-$BASE16_SCHEME.dark.sh"
-#[[ -s $BASE16_SHELL ]] && . $BASE16_SHELL
+BASE16_SCHEME="tomorrow"
+BASE16_SHELL="$HOME/.config/base16-shell/base16-$BASE16_SCHEME.dark.sh"
+[[ -s $BASE16_SHELL ]] && . $BASE16_SHELL
 export TERM=xterm-256color
 
 # Remove annoying deprecated warning
@@ -57,3 +57,10 @@ export DISABLE_AUTO_TITLE=true
 
 # Loading pyenv
 if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
+
+# Shell integration
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+# hub completion
+fpath=(~/.zsh/completions $fpath)
+autoload -U compinit && compinit
