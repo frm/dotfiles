@@ -23,6 +23,7 @@ Plug 'altercation/vim-colors-solarized'
 Plug 'morhetz/gruvbox'
 
 set background=dark
-colorscheme tomorrow-night
-"color slate
 let base16colorspace=256
+colorscheme base16-tomorrow
+" colorscheme tomorrow-night
+"color slate
