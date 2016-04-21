@@ -11,6 +11,7 @@ Plug 'tpope/vim-fugitive'
 " Language
 Plug 'elixir-lang/vim-elixir'
 Plug 'slim-template/vim-slim'
+Plug 'tpope/vim-rails'
 
 " Language Helpers
 Plug 'tpope/vim-endwise'
@@ -36,8 +37,9 @@ let g:NERDTreeDirArrows=1
 " Close NERDTree if it's the only window open
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
 
-" Don't show
+" Don't show whitespaces on NERDTree enter
 autocmd FileType nerdtree setlocal listchars=""
+autocmd BufReadPre * call WhiteSpaceHighlight()
 
 " ------------- Vim Airline
 let g:airline#extensions#tabline#enabled = 1

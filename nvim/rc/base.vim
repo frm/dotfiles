@@ -1,7 +1,6 @@
 set encoding=utf-8
 scriptencoding utf-8
 
-" TODO: try this later
 " Behavior when switching buffers
 set switchbuf=useopen
 
@@ -61,6 +60,13 @@ set autoread
 " Highlight whitespaces
 set list
 set listchars=""
-set listchars+=tab:>-
-set listchars+=trail:•
-set listchars+=nbsp:•
+function WhiteSpaceHighlight()
+  if &listchars == ""
+    set listchars+=tab:>-
+    set listchars+=trail:•
+    set listchars+=nbsp:•
+  endif
+endfunction
+
+call WhiteSpaceHighlight()
+
