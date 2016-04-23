@@ -7,10 +7,7 @@ antigen use oh-my-zsh
 
 # Fish-like syntax highlighting
 antigen bundle zsh-users/zsh-syntax-highlighting
-#antigen bundle marzocchi/zsh-notify
-
-# Theming
-antigen theme $ANTIGEN/themes geometry
+antigen bundle frmendes/geometry
 
 # Custom variables
 COMPLETION_WAITING_DOTS="true"
