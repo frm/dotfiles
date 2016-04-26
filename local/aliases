@@ -18,6 +18,7 @@ alias irssi='TERM=screen-256color irssi'
 
 # vim-like exit
 alias :q="exit"
+alias :qa="_qa"
 
 # Creating compacted cd ..
 alias ..="cdl .."
