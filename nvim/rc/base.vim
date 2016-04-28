@@ -1,12 +1,12 @@
 set encoding=utf-8
 scriptencoding utf-8
 
-" TODO: try this later
 " Behavior when switching buffers
 set switchbuf=useopen
 
 " No backups after overwritting
 set nobackup
+set backupskip=/tmp/*,/private/tmp/*
 
 " Horizontal spilt bottom
 set splitbelow
@@ -64,3 +64,4 @@ set listchars=""
 set listchars+=tab:>-
 set listchars+=trail:•
 set listchars+=nbsp:•
+

@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+today=$(date +%Y%m%d)
+$HOME/local/bin/xkcd > $HOME/local/mail/xkcd/$today
