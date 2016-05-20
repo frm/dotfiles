@@ -7,17 +7,19 @@ Plug 'ctrlpvim/ctrlp.vim'
 
 " Tooling
 Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-surround'
 
 " Language
 Plug 'elixir-lang/vim-elixir'
 Plug 'slim-template/vim-slim'
+Plug 'tpope/vim-rails'
 
 " Language Helpers
 Plug 'tpope/vim-endwise'
 Plug 'jiangmiao/auto-pairs'
 Plug 'Shougo/deoplete.nvim'
 Plug 'hdima/python-syntax'
-Plug 'ternjs/tern_for_vim'
+" Plug 'ternjs/tern_for_vim'
 
 " Vim looks
 Plug 'bling/vim-airline'
@@ -36,7 +38,7 @@ let g:NERDTreeDirArrows=1
 " Close NERDTree if it's the only window open
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
 
-" Don't show
+" Don't show whitespaces on NERDTree enter
 autocmd FileType nerdtree setlocal listchars=""
 
 " ------------- Vim Airline
