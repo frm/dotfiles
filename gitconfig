@@ -1,7 +1,7 @@
 [user]
   name = Fernando Mendes
   email = devfrmendes@gmail.com
-  signingkey = 457F2F46
+  signingkey = DE2222D9
 [github]
   user = frmendes
 [branch]
@@ -26,7 +26,7 @@
   a = add
   ac = !git.autoclean # See bin/git.autoclean
   b = branch -a -v
-  c = commit -S
+  c = commit
   co = checkout
   ca = commit --ammend
   cfg = config --list
