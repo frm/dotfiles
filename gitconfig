@@ -1,6 +1,7 @@
 [user]
   name = Fernando Mendes
   email = devfrmendes@gmail.com
+  signingkey = 457F2F46
 [github]
   user = frmendes
 [branch]
@@ -25,7 +26,7 @@
   a = add
   ac = !git.autoclean # See bin/git.autoclean
   b = branch -a -v
-  c = commit
+  c = commit -S
   co = checkout
   ca = commit --ammend
   cfg = config --list
@@ -50,7 +51,8 @@
   sts = stash save
   sync = !git.sync # See bin/git.sync
   t = tag
-  tree = log --graph --abbrev-commit --decorate --oneline --date=relative --color --all
+  tree = log --graph --pretty=format:'%Cred%h%Creset %an: %s - %Creset %C(yellow)%d%Creset %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+  j
   wc = whatchanged -p --abbrev-commit --pretty
   ctags = !.git/hooks/ctags
 [init]
