@@ -7,25 +7,26 @@ antigen use oh-my-zsh
 
 # Fish-like syntax highlighting
 antigen bundle zsh-users/zsh-syntax-highlighting
+antigen bundle zsh-users/zsh-history-substring-search
 antigen bundle frmendes/geometry
+antigen apply
+#export LSCOLORS="exfxcxdxbxegedabagacad"
 
 # Custom variables
 COMPLETION_WAITING_DOTS="true"
 HIST_STAMPS="dd.mm.yyyy"
 ENABLE_CORRECTION="false"
 
-antigen apply
-
 export EDITOR='nvim'
+
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
 
 # Loading execs from ~/local/bin
 export PATH="$HOME/local/bin:${PATH}"
 
 # Loading personal commands
 source $HOME/local/aliases
-
-# Loading local postgresql commands
-source $HOME/local/initpsql.sh
 
 # Base16 Shell
 BASE16_SCHEME="tomorrow"
@@ -47,16 +48,13 @@ eval "$(rbenv init - --no-rehash)"
 source ~/local/bin/tmuxinator.zsh
 
 # Use mux given window names
-export DISABLE_AUTO_TITLE=true
+# export DISABLE_AUTO_TITLE=true
 
 # z
 . `brew --prefix`/etc/profile.d/z.sh
 
 # Loading pyenv
 if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
-
-# Shell integration
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 # hub completion
 fpath=(~/.zsh/completions $fpath)
