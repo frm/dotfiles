@@ -6,6 +6,7 @@ alias vv="vim"
 alias g="git"
 alias at="atom"
 alias zx="zeus" # used to be z but thats for autojumping
+alias be="bundle exec"
 alias gh="git.browse" # see bin/git.browse
 
 # postgres on OS X
@@ -99,6 +100,11 @@ copy() {
 # Reloading rc file
 reload() {
     eval source $( echo $SHELL | awk -F/ '{ print "$HOME/."$NF"rc" }' )
+}
+
+# Keynote syntax highlighting
+knhl() {
+  highlight -O rtf $1 | pbcopy
 }
 
 alias rl="reload"
