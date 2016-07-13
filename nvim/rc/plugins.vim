@@ -1,3 +1,7 @@
+function! DoRemote(arg)
+  UpdateRemotePlugins
+endfunction
+
 call plug#begin('~/.config/nvim/plugged')
 "
 " Movement
@@ -13,16 +17,18 @@ Plug 'tpope/vim-surround'
 Plug 'elixir-lang/vim-elixir'
 Plug 'slim-template/vim-slim'
 Plug 'tpope/vim-rails'
+Plug 'jalvesaq/Nvim-R'
 
 " Language Helpers
 Plug 'tpope/vim-endwise'
 Plug 'jiangmiao/auto-pairs'
-Plug 'Shougo/deoplete.nvim'
+Plug 'Shougo/deoplete.nvim', { 'do': function('DoRemote') }
 Plug 'hdima/python-syntax'
 " Plug 'ternjs/tern_for_vim'
 
 " Vim looks
-Plug 'bling/vim-airline'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
 Plug 'airblade/vim-gitgutter'
 Plug 'ryanoasis/vim-devicons'
 
@@ -30,7 +36,7 @@ call plug#end()
 
 " ------------- NERDTree
 nnoremap <C-n> :NERDTreeToggle<CR>
-nnoremap <C-j> :NERDTreeFind<CR>
+nnoremap <Leader>n :NERDTreeFind<CR>
 
 " Using custom arrows with NERDTree
 let g:NERDTreeDirArrows=1
@@ -60,7 +66,7 @@ let g:WebDevIconsNerdTreeAfterGlyphPadding = ''
 
 " ------------- Ctrl-P
 " Fuzzy search by filename
-let g:ctrlp_by_filename = 1
+let g:ctrlp_by_filename = 0
 
 " Starting Ctrl-P in the git directory if no specific one is provided
 let g:ctrlp_working_path_mode = 'ra'
