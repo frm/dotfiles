@@ -1,0 +1,9 @@
+bin/imgcat
+completions/tmuxinator.zsh
+nvim/autoload
+nvim/colors
+nvim/plugged
+tmux/plugins
+zsh/env_global.symlink # don't update with important env variables
+
+setup.sh # ignore setup script until it is ready
