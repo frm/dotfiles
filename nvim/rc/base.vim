@@ -2,7 +2,7 @@ set encoding=utf-8
 scriptencoding utf-8
 
 " Behavior when switching buffers
-set switchbuf=useopen
+" set switchbuf=useopen
 
 " No backups after overwritting
 set nobackup
@@ -51,10 +51,6 @@ set relativenumber
 " Number column size
 set numberwidth=2
 
-" Using mouse and scroll
-" (note: already the default in nvim)
-" set mouse=a
-
 " Automatically read file if it was changed outside of vim
 set autoread
 
@@ -64,4 +60,3 @@ set listchars=""
 set listchars+=tab:>-
 set listchars+=trail:•
 set listchars+=nbsp:•
-
