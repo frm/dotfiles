@@ -4,6 +4,9 @@ nvim/autoload
 nvim/colors
 nvim/plugged
 tmux/plugins
-zsh/env_global.symlink # don't update with important env variables
 
-setup.sh # ignore setup script until it is ready
+# Ignore global variables after tracking them
+zsh/env_global.symlink
+
+# Ignore setup script until it is ready
+setup.sh
