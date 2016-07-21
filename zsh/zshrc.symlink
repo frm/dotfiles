@@ -1,0 +1,33 @@
+export DOTFILES="$HOME/.dotfiles"
+ZSH="$DOTFILES/system"
+
+# Load custom variables before anything else
+source $ZSH/env.zsh
+
+# Load custom shell settings
+source $ZSH/shell.zsh
+
+# Load prompt
+source $ZSH/prompt.zsh
+
+# Init antibody
+source $DOTFILES/antibody/antibody.init
+
+# Load aliases and functions
+source $DOTFILES/system/aliases.zsh
+source $DOTFILES/functions/functions.zsh
+
+# Add custom bins to path
+export PATH="$DOTFILES/bin:${PATH}"
+
+# Inits
+source $DOTFILES/ruby/rbenv.init
+source $DOTFILES/python/pyenv.init
+source $DOTFILES/node/nvm.init
+
+# Load fzf and z
+source $ZSH/fzf.zsh
+source $ZSH/z.zsh
+
+# Load completions
+source $ZSH/completions.zsh

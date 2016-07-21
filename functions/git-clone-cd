@@ -1,0 +1,10 @@
+#!/bin/sh
+# git clone a repo and cd to it
+
+git-clone-cd() {
+  if which git &> /dev/null; then
+    git clone $@ && cd $( echo $@ | awk -F/ '{ print $NF }' | cut -d. -f1 )
+  fi
+}
+
+alias gcl="git-clone-cd"
