@@ -19,9 +19,6 @@ set t_Co=256
 " Color Plugins
 " Colors
 Plug 'chriskempson/base16-vim'
-Plug 'altercation/vim-colors-solarized'
-Plug 'morhetz/gruvbox'
-Plug 'hhff/spacegrayeighties.vim'
 
 set background=dark
 let base16colorspace=256

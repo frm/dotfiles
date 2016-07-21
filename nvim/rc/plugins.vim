@@ -7,24 +7,26 @@ call plug#begin('~/.config/nvim/plugged')
 " Movement
 Plug 'scrooloose/nerdtree'
 Plug 'easymotion/vim-easymotion'
-Plug 'ctrlpvim/ctrlp.vim'
+Plug 'christoomey/vim-tmux-navigator'
 
 " Tooling
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+Plug 'junegunn/goyo.vim'
 
 " Language
 Plug 'elixir-lang/vim-elixir'
 Plug 'slim-template/vim-slim'
 Plug 'tpope/vim-rails'
-Plug 'jalvesaq/Nvim-R'
+Plug 'pangloss/vim-javascript'
 
 " Language Helpers
 Plug 'tpope/vim-endwise'
-Plug 'jiangmiao/auto-pairs'
+Plug 'eapache/auto-pairs'
 Plug 'Shougo/deoplete.nvim', { 'do': function('DoRemote') }
 Plug 'hdima/python-syntax'
-" Plug 'ternjs/tern_for_vim'
 
 " Vim looks
 Plug 'vim-airline/vim-airline'
@@ -64,12 +66,11 @@ let g:webdevicons_enable_flagship_statusline = 0
 let g:WebDevIconsUnicodeGlyphDoubleWidth = 0
 let g:WebDevIconsNerdTreeAfterGlyphPadding = ''
 
-" ------------- Ctrl-P
-" Fuzzy search by filename
-let g:ctrlp_by_filename = 0
-
-" Starting Ctrl-P in the git directory if no specific one is provided
-let g:ctrlp_working_path_mode = 'ra'
+" ------------- fzf
+nmap <C-p> :Files<CR>
+nmap <C-f> :Ag<CR>
+nmap <Leader>p :BTags <CR>
+nmap <Leader>P :Tags <CR>
 
 " ------------- Goyo
 nnoremap <C-g> :Goyo<Cr>
