@@ -1,0 +1,13 @@
+#!/bin/sh
+# cd to a directory and ls
+
+cdl() {
+  if [ "$#" -eq "0" ];
+      then
+        cd "$HOME";
+      else
+        cd "$@";
+  fi
+
+  ls;
+}

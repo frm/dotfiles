@@ -1,0 +1,7 @@
+#!/bin/sh
+# mkcd: mkdir and cd
+
+mkcd() {
+  mkdir -p "$@";
+  cd "$@"
+}
