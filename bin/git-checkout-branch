@@ -1,0 +1,4 @@
+#!/bin/sh
+# Create a new branch based on master
+
+git checkout master && git checkout -b $@

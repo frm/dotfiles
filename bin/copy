@@ -1,0 +1,12 @@
+#!/bin/sh
+# Copy text to clipboard
+
+if which pbcopy &> /dev/null; then
+    if [ -f $@ ]; then
+        cat $@ | pbcopy
+    else
+        echo $@ | pbcopy
+    fi
+elif which xclip &> /dev/null; then
+    xclip -selection clipboard < $@
+fi
