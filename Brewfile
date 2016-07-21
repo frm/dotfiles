@@ -1,0 +1,23 @@
+cask_args appdir: '/Applications'
+tap 'caskroom/cask'
+
+brew 'ctags'
+brew 'curl'
+brew 'git'
+brew 'imagemagick'
+brew 'mpv'
+brew 'neovim/neovim/neovim'
+brew 'openssl'
+brew 'postgresql'
+brew 'rbenv'
+brew 'the_silver_searcher'
+brew 'tmux'
+brew 'wget'
+brew 'youtube-dl'
+brew 'zsh'
+
+cask 'google-chrome'
+cask 'slack'
+cask 'transmission'
+
+linkapps 'mpv'
