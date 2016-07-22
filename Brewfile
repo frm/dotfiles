@@ -18,6 +18,5 @@ brew 'zsh'
 
 cask 'google-chrome'
 cask 'slack'
+cask 'spotify'
 cask 'transmission'
-
-linkapps 'mpv'
