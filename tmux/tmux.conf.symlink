@@ -25,12 +25,6 @@ set-option -g renumber-windows on
 unbind r
 bind r source-file ~/.tmux.conf
 
-# Vim keybindings to cycle through panes
-# bind h select-pane -L
-# bind j select-pane -D
-# bind k select-pane -U
-# bind l select-pane -R
-
 # Use Ctrl-V/B to cycle
 bind-key b previous-window
 bind-key n next-window
@@ -77,19 +71,19 @@ set -g visual-activity off
 
 # status bar colors
 set-option -g status-bg colour235
-set-option -g status-fg green
+set-option -g status-fg blue
 set-option -g status-attr dim
 
 # set current window
-set-window-option -g window-status-current-fg yellow
+set-window-option -g window-status-current-fg cyan
 set-window-option -g window-status-current-bg colour235
-setw -g window-status-current-format "|#I:#W|"
+setw -g window-status-current-format "«#I:#W»"
 
 set -g status-left-length 70
-set -g status-left "#[fg=magenta]#($DOTFILES/tmux/scripts/status_bar/user_host.sh)#[fg=blue]#(curl icanhazip.com) #[fg=white]:: #(~/.dotfiles/tmux/scripts/status_bar/local_ips.sh)"
+set -g status-left "#[fg=red]#($DOTFILES/tmux/scripts/status_bar/user_host.sh)#[fg=yellow]#(curl icanhazip.com) #[fg=white]:: #[fg=red]#(~/.dotfiles/tmux/scripts/status_bar/local_ips.sh)"
 
-set -g status-right-length 40
-set -g status-right "#[fg=magenta]#{battery_percentage} (#{battery_remain}) #[fg=white]:: #[fg=blue]%d %b %Y #[fg=white]:: #[fg=green]%l:%M %p"
+set -g status-right-length 70
+set -g status-right "#(~/.dotfiles/bin/battery -tep) #[fg=white]::#[fg=cyan]%l:%M %p - #[fg=blue]%d %b %Y#[fg=white] ::#(~/.dotfiles/tmux/scripts/status_bar/timetrap.sh)"
 
 set-window-option -g automatic-rename off
 
@@ -98,7 +92,6 @@ set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-sensible'
 set -g @plugin 'tmux-plugins/tmux-copycat'
 set -g @plugin 'tmux-plugins/tmux-yank'
-set -g @plugin 'tmux-plugins/tmux-battery'
 set -g @plugin 'christoomey/vim-tmux-navigator'
 
 # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)

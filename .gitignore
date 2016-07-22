@@ -1,4 +1,7 @@
 bin/imgcat
+# Ignore personal version of battery:
+# https://github.com/frmendes/Battery
+bin/battery
 completions/tmuxinator.zsh
 nvim/autoload
 nvim/colors
