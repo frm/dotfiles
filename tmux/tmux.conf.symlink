@@ -61,7 +61,7 @@ setw -g mode-keys vi
 set-option -g status on               # turn on status bar
 set-option -g status-position bottom
 
-set -g status-interval 5          # updating every 5 sec (default: 15s)
+set -g status-interval 10          # updating every 10 sec (default: 15s)
 
 set -g status-justify centre      # center window list
 
