@@ -10,6 +10,12 @@ export REPORTTIME=10
 setopt interactivecomments
 
 # Prompt settings
-COMPLETION_WAITING_DOTS="true"
+COMPLETION_WAITING_DOTS=true
+ENABLE_CORRECTION=false
+
+# History settings
+setopt hist_ignore_all_dups inc_append_history
 HIST_STAMPS="dd.mm.yyyy"
-ENABLE_CORRECTION="false"
+HISTFILE=~/.zsh_history
+SAVEHIST=10240
+HISTSIZE=10240
