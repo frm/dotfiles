@@ -58,12 +58,12 @@ set-window-option -g pane-base-index 1
 setw -g mode-keys vi
 
 # Tmux Status Bar
-set-option -g status on               # turn on status bar
+set-option -g status on                 # turn on status bar
 set-option -g status-position bottom
 
-set -g status-interval 10          # updating every 10 sec (default: 15s)
+set -g status-interval 10               # updating every 10 sec (default: 15s)
 
-set -g status-justify centre      # center window list
+set -g status-justify centre            # center window list
 
 # visual notification for activity in other windows
 setw -g monitor-activity off
@@ -77,15 +77,21 @@ set-option -g status-attr dim
 # set current window
 set-window-option -g window-status-current-fg cyan
 set-window-option -g window-status-current-bg colour235
-setw -g window-status-current-format "«#I:#W»"
+set-window-option -g window-status-fg colour242
+set-window-option -g window-status-bg colour235
+setw -g window-status-format "  #W  "
+setw -g window-status-current-format "  #W  "
 
-set -g status-left-length 70
+# center align window list
+set -g status-justify centre
+
+set -g status-left-length 80
 set -g status-left "#[fg=red]#($DOTFILES/tmux/scripts/status_bar/user_host.sh)#[fg=yellow]#(curl icanhazip.com) #[fg=white]:: #[fg=red]#(~/.dotfiles/tmux/scripts/status_bar/local_ips.sh)"
 
-set -g status-right-length 70
-set -g status-right "#(~/.dotfiles/bin/battery -tep) #[fg=white]::#[fg=cyan]%l:%M %p - #[fg=blue]%d %b %Y#[fg=white] ::#(~/.dotfiles/tmux/scripts/status_bar/timetrap.sh)"
+set -g status-right-length 80
+set -g status-right "#(~/.dotfiles/bin/battery -tep) #[fg=white]:: #[fg=cyan]%l:%M %p - #[fg=blue]%d %b %Y#[fg=white] ::#(~/.dotfiles/tmux/scripts/status_bar/timetrap.sh)"
 
-set-window-option -g automatic-rename off
+# set-window-option -g automatic-rename off
 
 # List of plugins
 set -g @plugin 'tmux-plugins/tpm'
