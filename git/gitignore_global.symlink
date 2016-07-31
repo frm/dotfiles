@@ -54,3 +54,6 @@ Temporary Items
 /target/
 ## File-based project format:
 *.iws
+
+# Default ignore files
+*.ignore
