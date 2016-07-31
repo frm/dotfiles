@@ -17,10 +17,13 @@ Plug 'junegunn/fzf.vim'
 Plug 'junegunn/goyo.vim'
 
 " Language
-Plug 'elixir-lang/vim-elixir'
 Plug 'slim-template/vim-slim'
 Plug 'tpope/vim-rails'
 Plug 'pangloss/vim-javascript'
+
+" Elixir
+Plug 'elixir-lang/vim-elixir'
+Plug 'thinca/vim-ref'
 
 " Language Helpers
 Plug 'tpope/vim-endwise'
