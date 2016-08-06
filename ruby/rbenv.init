@@ -1,3 +1,5 @@
 # Loading rbenv
-export PATH="$HOME/.rbenv/bin:$PATH"
-eval "$(rbenv init - --no-rehash)"
+if [[ `uname` == "Darwin" ]]; then
+  export PATH="$HOME/.rbenv/bin:$PATH"
+  eval "$(rbenv init - --no-rehash)"
+fi
