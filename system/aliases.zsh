@@ -5,6 +5,7 @@ alias vv="vim"
 alias g="git"
 
 alias r="rails"
+alias s="bin/server"
 alias b="bundle"
 alias be="bundle exec"
 alias ber="bundle exec rake"
