@@ -20,6 +20,7 @@ Plug 'junegunn/goyo.vim'
 Plug 'slim-template/vim-slim'
 Plug 'tpope/vim-rails'
 Plug 'pangloss/vim-javascript'
+Plug 'rust-lang/rust.vim'
 
 " Elixir
 Plug 'elixir-lang/vim-elixir'
