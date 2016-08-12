@@ -31,3 +31,6 @@ source $ZSH/z.zsh
 
 # Load completions
 source $ZSH/completions.zsh
+
+# Load keyboard settings
+source $ZSH/keys.zsh
