@@ -25,8 +25,8 @@ source $DOTFILES/ruby/rbenv.init
 source $DOTFILES/python/pyenv.init
 source $DOTFILES/node/nvm.init
 
-# Load fzf and z
 source $ZSH/fzf.zsh
+source $ZSH/hub.zsh
 source $ZSH/z.zsh
 
 # Load completions
