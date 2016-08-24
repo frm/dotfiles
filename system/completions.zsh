@@ -12,4 +12,5 @@ zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 
 # custom completions
 source $DOTFILES/completions/tmuxinator.zsh
-source $DOTFILES/completions/hub.zsh
+
+fpath=($DOTFILES/completions $fpath)
