@@ -10,8 +10,6 @@ zstyle ':completion:*' menu select
 # list-colors when completing
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 
-# Loading tmuxinator completion
+# custom completions
 source $DOTFILES/completions/tmuxinator.zsh
-
-# hub completion
-fpath=(~/.zsh/completions $fpath)
+source $DOTFILES/completions/hub.zsh
