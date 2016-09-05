@@ -75,6 +75,10 @@ set -g status-justify centre            # center window list
 setw -g monitor-activity off
 set -g visual-activity off
 
+# Border color
+set -g pane-border-style fg=colour248
+set -g pane-active-border-style fg=blue
+
 # status bar colors
 #set-option -g status-bg colour235
 set-option -g status-bg black
