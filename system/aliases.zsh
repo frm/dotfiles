@@ -8,7 +8,7 @@ alias r="rails"
 alias s="bin/server"
 alias b="bundle"
 alias be="bundle exec"
-alias ber="bundle exec rake"
+alias tm="tmux new -s"
 
 alias gh="git-browse" # see bin/git-browse
 
@@ -17,6 +17,7 @@ alias mux="tmuxinator"
 
 # postgres on OS X
 alias pg.server="pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log"
+alias mongo.server="mongod --config /usr/local/etc/mongod.conf"
 
 # vim-like exit
 alias :q="exit"
