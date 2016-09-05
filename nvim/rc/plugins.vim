@@ -3,24 +3,16 @@ function! DoRemote(arg)
 endfunction
 
 call plug#begin('~/.config/nvim/plugged')
-"
-" Movement
-Plug 'scrooloose/nerdtree'
-Plug 'easymotion/vim-easymotion'
-Plug 'christoomey/vim-tmux-navigator'
-
-" Tooling
-Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-surround'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'junegunn/fzf.vim'
-Plug 'junegunn/goyo.vim'
 
 " Language
-Plug 'slim-template/vim-slim'
-Plug 'tpope/vim-rails'
 Plug 'pangloss/vim-javascript'
 Plug 'rust-lang/rust.vim'
+
+" Ruby
+Plug 'tpope/vim-rails'
+Plug 'slim-template/vim-slim'
+Plug 'tpope/vim-bundler'
+Plug 'kassio/neoterm'
 
 " Elixir
 Plug 'elixir-lang/vim-elixir'
@@ -36,7 +28,17 @@ Plug 'hdima/python-syntax'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'airblade/vim-gitgutter'
+Plug 'scrooloose/nerdtree'
 Plug 'ryanoasis/vim-devicons'
+
+" Tooling
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-surround'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+Plug 'junegunn/goyo.vim'
+Plug 'easymotion/vim-easymotion'
+Plug 'christoomey/vim-tmux-navigator'
 
 call plug#end()
 
@@ -73,8 +75,8 @@ let g:WebDevIconsNerdTreeAfterGlyphPadding = ''
 " ------------- fzf
 nmap <C-p> :Files<CR>
 nmap <C-f> :Ag<CR>
-nmap <Leader>p :BTags <CR>
-nmap <Leader>P :Tags <CR>
+nmap <leader>f :Tags <CR>
+nmap <localleader>f :BTags <CR>
 
 " ------------- Goyo
 nnoremap <C-g> :Goyo<Cr>
@@ -92,5 +94,15 @@ omap / <Plug>(easymotion-tn)
 nmap n <Plug>(easymotion-next)
 nmap N <Plug>(easymotion-prev)
 
-" Running deoplete
+" ------------- Deoplete
 let g:deoplete#enable_at_startup = 1
+
+" ------------- Neoterm
+let g:neoterm_shell = 'zsh'
+let g:neoterm_position='vertical'
+nnoremap <silent> <localleader>l :call neoterm#clear()<cr>
+nnoremap <silent> <localleader>q :call neoterm#close()<cr>
+nnoremap <silent> <localleader>a :call neoterm#test#run('all')<cr>
+nnoremap <silent> <localleader>c :call neoterm#test#run('current')<cr>
+nnoremap <silent> <localleader>f :call neoterm#test#run('file')<cr>
+nnoremap <silent> <localleader>, :call neoterm#test#rerun()<cr>
