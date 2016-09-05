@@ -23,7 +23,7 @@ export PATH="$DOTFILES/bin:${PATH}"
 # Inits
 source $DOTFILES/ruby/rbenv.init
 source $DOTFILES/python/pyenv.init
-source $DOTFILES/node/nvm.init
+#source $DOTFILES/node/nvm.init
 
 source $ZSH/fzf.zsh
 source $ZSH/hub.zsh
@@ -33,4 +33,4 @@ source $ZSH/z.zsh
 source $ZSH/completions.zsh
 
 # Load keyboard settings
-source $ZSH/keys.zsh
+#source $ZSH/keys.zsh
