@@ -1,8 +1,5 @@
 # Shell-specific config options
 
-# Vim Mode
-bindkey -v
-
 # Enable comments in shell and history
 setopt interactivecomments
 
