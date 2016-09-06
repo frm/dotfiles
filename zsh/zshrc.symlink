@@ -33,4 +33,4 @@ source $ZSH/z.zsh
 source $ZSH/completions.zsh
 
 # Load keyboard settings
-#source $ZSH/keys.zsh
+source $ZSH/keys.zsh
