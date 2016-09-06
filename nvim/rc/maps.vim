@@ -15,6 +15,12 @@ nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
 
+" Switching panes around
+nnoremap <M-h> <C-w>H
+nnoremap <M-j> <C-w>J
+nnoremap <M-k> <C-w>K
+nnoremap <M-l> <C-w>L
+
 " Moving between buffers
 nmap <Leader>h :bprevious!<CR>
 nmap <Leader>l :bnext!<CR>
