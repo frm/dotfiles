@@ -1,6 +1,8 @@
 # https://bbs.archlinux.org/viewtopic.php?pid=201976#p201976
 autoload zkbd
 
+bindkey -e
+
 [[ ! -f ${ZDOTDIR:-$HOME}/.zkbd/$TERM-$VENDOR-$OSTYPE ]] && zkbd
 source ${ZDOTDIR:-$HOME}/.zkbd/$TERM-$VENDOR-$OSTYPE
 
