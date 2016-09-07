@@ -1,0 +1,4 @@
+#!/bin/sh
+# Commits changes for code review
+
+git add . && git commit -m "Code review"
