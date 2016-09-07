@@ -1,5 +1,4 @@
 #!/bin/sh
-# Removing deleted remote branches and local branches with no references
-# CAUTION: Removes local branches that have no remote counterpart
+# Deletes local branches that were already merged into master
 
-git fetch --prune && git branch --merged | grep -v master | xargs git branch -d
+git branch --merged | grep -v master | grep -v '^*' | xargs git branch -d

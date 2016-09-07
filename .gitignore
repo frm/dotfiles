@@ -2,6 +2,7 @@ bin/imgcat
 # Ignore personal version of battery:
 # https://github.com/frmendes/Battery
 bin/battery
+bin/mustacheme
 completions/tmuxinator.zsh
 completions/_hub
 nvim/autoload

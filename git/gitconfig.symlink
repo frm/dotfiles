@@ -27,33 +27,28 @@
   ac = !git-autoclean # See bin/git-autoclean
   b = branch -a -v
   c = commit
-  ca = commit --ammend
-  cfg = config --list
   co = checkout
   cob = !git-checkout-branch # See bin/git-checkout-branch
   cp = cherry-pick
-  conflicts = diff --name-only --diff-filter=U
+  conf = diff --name-only --diff-filter=U
   d = diff
-  dc = diff --cached
   dt = difftool
   f = fetch
   l = log
   ls = log --oneline --abbrev-commit # log short
   m = merge
+  nuke = !git-nuke # See bin/git-nuke
   p = push
   pl = pull
   pt = push origin --tags
-  r = remote -v
-  ra = remote add
   rb = rebase
   s = status -s
-  set = remote set-url origin
-  set-url = remote set-url
   st = status
   sts = stash save -u
   sync = !git-sync # See bin/git-sync
   tree = log --graph --pretty=format:'%Cred%h%Creset %an: %s - %Creset %C(yellow)%d%Creset %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
   wc = whatchanged -p --abbrev-commit --pretty
+
   ctags = !.git/hooks/ctags
 [init]
   templatedir = ~/.git_template
