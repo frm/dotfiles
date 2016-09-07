@@ -30,6 +30,7 @@
   co = checkout
   cob = !git-checkout-branch # See bin/git-checkout-branch
   cp = cherry-pick
+  cr = !git-code-review # See bin/git-code-review
   conf = diff --name-only --diff-filter=U
   d = diff
   dt = difftool
