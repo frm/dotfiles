@@ -9,8 +9,8 @@ setw -g xterm-keys on
 set -g default-terminal "screen-256color"
 
 # Splitting with s/S
-bind-key s split-window -h
-bind-key S split-window
+bind-key s split-window -h -c '#{pane_current_path}'
+bind-key S split-window -v -c '#{pane_current_path}'
 
 # Using regular scroll
 set -g mouse on
