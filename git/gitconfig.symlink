@@ -49,6 +49,7 @@
   sts = stash save -u
   sync = !git-sync # See bin/git-sync
   tree = log --graph --pretty=format:'%Cred%h%Creset %an: %s - %Creset %C(yellow)%d%Creset %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+  trump = !git-trump
   wc = whatchanged -p --abbrev-commit --pretty
 
   ctags = !.git/hooks/ctags
