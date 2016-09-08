@@ -1,4 +1,4 @@
 #!/bin/sh
 # Deletes local branches that were already merged into master
 
-git branch --merged | grep -v master | grep -v '^*' | xargs git branch -d
+git branch --merged | grep -v master | grep -v '^*' | xargs git branch -d && git remote prune origin
