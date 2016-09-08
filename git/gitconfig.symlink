@@ -33,6 +33,7 @@
   cr = !git-code-review # See bin/git-code-review
   conf = diff --name-only --diff-filter=U
   d = diff
+  del = !git-del # See bin/git-del
   div = !git-divergence # See bin/git-divergence
   dt = difftool
   f = fetch
