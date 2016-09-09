@@ -12,9 +12,17 @@ alias r="rails"
 alias s="bin/server"
 alias b="bundle"
 alias be="bundle exec"
+
+# Create a named tmux session
 alias tm="tmux new -s"
 
-alias gh="git-browse" # see bin/git-browse
+# Create a tmux session named after the current directory
+alias tmu="tmux new -s ${PWD##*/}"
+
+alias ta="tmux attach"
+alias tat="tmux attach -t"
+
+alias gh="hub browse"
 
 # Workaround while tmuxinator doesn't properly symlink mux
 alias mux="tmuxinator"
@@ -27,8 +35,6 @@ alias mongo.server="mongod --config /usr/local/etc/mongod.conf"
 alias :q="exit"
 alias :qa="_qa" # see bin/_qa
 
-alias ta="tmux attach"
-alias sr="screen -r"
 alias cl="clear"
 
 # irssi please
