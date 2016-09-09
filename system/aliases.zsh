@@ -1,6 +1,10 @@
 alias vw="view"
 alias v="nvim"
-alias vv="vim"
+
+# Just screw the world
+alias vim="nvim"
+alias vi="command vim"
+alias ireallywantvi="command vi"
 
 alias g="git"
 
