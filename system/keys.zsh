@@ -1,7 +1,27 @@
+# emacs keybindings
+bindkey -e
+
+# Fix backward-kill-word:
+# http://stackoverflow.com/questions/19202521/deleting-word-like-bash-in-zsh-autoload-is-not-working
+x-bash-backward-kill-word(){
+    WORDCHARS='' zle backward-kill-word
+}
+zle -N x-bash-backward-kill-word
+bindkey '^W' x-bash-backward-kill-word
+
+x-backward-kill-word(){
+    WORDCHARS='*?_-[]~\!#$%^(){}<>|`@#$%^*()+:?' zle backward-kill-word
+}
+
+zle -N x-backward-kill-word
+bindkey '\e^?' x-backward-kill-word
+
+# Fix Fn + Backspace on macOS
+# See: http://superuser.com/questions/169920/binding-fn-delete-in-zsh-on-mac-os-x
+bindkey "^[[3~" delete-char
+
 # https://bbs.archlinux.org/viewtopic.php?pid=201976#p201976
 autoload zkbd
-
-bindkey -e
 
 [[ ! -f ${ZDOTDIR:-$HOME}/.zkbd/$TERM-$VENDOR-$OSTYPE ]] && zkbd
 source ${ZDOTDIR:-$HOME}/.zkbd/$TERM-$VENDOR-$OSTYPE
