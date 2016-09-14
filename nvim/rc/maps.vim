@@ -1,8 +1,8 @@
 let mapleader="\<Space>"
 let maplocalleader="\,"
 
-" jj is the way to Esc
-imap jj <Esc>
+" jk is the way to Esc
+imap jk <Esc>
 set timeoutlen=300
 
 " Moving between wrapped lines
