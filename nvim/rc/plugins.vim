@@ -32,6 +32,7 @@ Plug 'scrooloose/nerdtree'
 Plug 'ryanoasis/vim-devicons'
 
 " Tooling
+Plug 'neomake/neomake'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
@@ -106,3 +107,17 @@ nnoremap <silent> <localleader>a :call neoterm#test#run('all')<cr>
 nnoremap <silent> <localleader>c :call neoterm#test#run('current')<cr>
 nnoremap <silent> <localleader>f :call neoterm#test#run('file')<cr>
 nnoremap <silent> <localleader>, :call neoterm#test#rerun()<cr>
+
+" ------------- Neomake
+let g:neomake_ruby_enabled_makers = ['rubocop']
+let g:neomake_css_enabled_makers = ['scss_lint']
+let g:neomake_javascript_enabled_makers = ['eslint']
+
+autocmd! BufWritePost * Neomake
+map <Leader>l :Neomake!<CR>
+
+highlight NeomakeErrorSign ctermfg=1 ctermbg=8
+highlight NeomakeWarningSign ctermfg=3 ctermbg=8
+
+let g:neomake_error_sign={'text': '▶', 'texthl': 'NeomakeErrorSign'}
+let g:neomake_warning_sign={'text': '▶', 'texthl': 'NeomakeErrorSign'}
