@@ -1,0 +1,5 @@
+osascript <<EOF
+  tell application "Google Chrome"
+    open location "http://localhost:$1"
+  end tell
+EOF
