@@ -43,6 +43,7 @@
   nuke = !git-nuke # See bin/git-nuke
   p = push
   pl = pull
+  pr = pull-request
   pt = push origin --tags
   rb = rebase
   s = status -s
@@ -55,4 +56,4 @@
 
   ctags = !.git/hooks/ctags
 [init]
-  templatedir = ~/.git_template
+	templatedir = ~/.git_template
