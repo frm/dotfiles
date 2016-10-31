@@ -12,7 +12,6 @@ tmp/
 /.rbenv-version
 
 # Bundler binstubs
-/bin/
 .bundle
 
 # db and logs
