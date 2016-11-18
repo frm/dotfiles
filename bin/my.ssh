@@ -1,0 +1,10 @@
+#!/bin/sh
+# Copy my ssh key
+
+SSH_PUB=$HOME/.ssh/id_rsa.pub
+
+if which pbcopy &> /dev/null; then
+    pbcopy < $SSH_PUB
+elif which xclip &> /dev/null; then
+    xclip -selection clipboard < $SSH_PUB
+fi
