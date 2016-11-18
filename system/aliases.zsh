@@ -8,10 +8,17 @@ alias ireallywantvi="command vi"
 
 alias g="git"
 
-alias r="rails"
 alias s="bin/server"
+alias l="bin/lint"
+alias r="rails"
+alias rk="rake"
 alias b="bundle"
 alias be="bundle exec"
+alias ber="bundle exec rake"
+
+alias prod="production"
+alias stag="staging"
+alias dev="development"
 
 # Create a named tmux session
 alias tm="tmux new -s"
