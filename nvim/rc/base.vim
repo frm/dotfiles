@@ -17,9 +17,6 @@ set splitright
 " History size
 set history=10000
 
-" Highlight search matches after the search has been done
-" set hlsearch
-
 " Search ignores case unless the pattern is all uppercase
 set ignorecase smartcase
 

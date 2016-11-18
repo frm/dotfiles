@@ -1,8 +1,8 @@
 let mapleader="\<Space>"
 let maplocalleader="\,"
 
-" jk is the way to Esc
-imap jk <Esc>
+" jj is the way to Esc
+imap jj <Esc>
 set timeoutlen=300
 
 " Moving between wrapped lines
@@ -25,26 +25,24 @@ nnoremap <M-l> <C-w>L
 nmap <Leader>h :bprevious!<CR>
 nmap <Leader>l :bnext!<CR>
 
-" Closing buffers
-" Don't close the pane
+" Close buffer but not the pane
 nmap <Leader>w :bp\|bd #<CR>
-" Close the pane
+" Close buffer and the pane
 nmap <Leader>q :bw<CR>
 
 " Saving buffers
 map <C-s> <ESC>:w<CR>
-map <Leader>s <ESC>:wq<CR>
 
 " Remove highlight from the last search
 nnoremap <Leader>, :noh<CR>
 
-" Alt-backspace
+" Mimic Alt-backspace
 inoremap <M-BS> <C-W>
 
 " Remove trailing whitespaces
 autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
 
-" Renaming files
+" Rename the current file
 function! Rename()
   let current = expand('%')
   let new_file = input('New name: ', current)
@@ -57,12 +55,12 @@ endfunction
 
 map <Leader>r :call Rename()<CR>
 
+" Refresh Chrome
 function ChromeRefresh()
   silent !chrome.refresh
   redraw
 endfunction
 
-" Refresh Chrome
 nnoremap <localleader>r :call ChromeRefresh()<CR>
 
 " Reloading configs
