@@ -1,2 +1,3 @@
-# Loading nvm
-source ~/.nvm/nvm.sh
+# use eef12cc commit
+export NVM_DIR="/Users/frm/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
