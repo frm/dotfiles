@@ -4,50 +4,50 @@ endfunction
 
 call plug#begin('~/.config/nvim/plugged')
 
-" Language
-Plug 'pangloss/vim-javascript'
-Plug 'rust-lang/rust.vim'
-
-" Ruby
-Plug 'tpope/vim-rails'
+" Ruby Toolkit
 Plug 'slim-template/vim-slim'
+Plug 'tpope/vim-rails'
 Plug 'tpope/vim-bundler'
 Plug 'kassio/neoterm'
+Plug 'janko-m/vim-test'
 
-" Elixir
-Plug 'elixir-lang/vim-elixir'
-Plug 'thinca/vim-ref'
-
-" Language Helpers
-Plug 'tpope/vim-endwise'
-Plug 'eapache/auto-pairs'
-Plug 'Shougo/deoplete.nvim', { 'do': function('DoRemote') }
-Plug 'hdima/python-syntax'
-
-" Vim looks
+" Scheme
+Plug 'chriskempson/base16-vim'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'airblade/vim-gitgutter'
-Plug 'scrooloose/nerdtree'
-Plug 'ryanoasis/vim-devicons'
 
-" Tooling
+" All the rest
+Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'javascript.jsx'] }
+Plug 'mxw/vim-jsx', { 'for': ['javascript', 'javascript.jsx'] }
+Plug 'rust-lang/rust.vim', { 'for': 'rust' }
+Plug 'hdima/python-syntax', { 'for': 'python' }
+Plug 'Valloric/MatchTagAlways', { 'for': ['html', 'xml'] }
+Plug 'elixir-lang/vim-elixir', { 'for': 'elixir' }
+Plug 'thinca/vim-ref'
+
+Plug 'AndrewRadev/splitjoin.vim'
+Plug 'tpope/vim-endwise'
+Plug 'eapache/auto-pairs'
+Plug 'gcmt/wildfire.vim'
+Plug 'junegunn/goyo.vim', { 'for': 'markdown' }
+Plug 'Shougo/deoplete.nvim', { 'do': function('DoRemote') }
 Plug 'neomake/neomake'
+Plug 'tpope/vim-sleuth'
+
+Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'junegunn/fzf.vim'
-Plug 'junegunn/goyo.vim'
 Plug 'easymotion/vim-easymotion'
 Plug 'christoomey/vim-tmux-navigator'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 
 call plug#end()
 
-" ------------- NERDTree
+" NERDTree
 nnoremap <C-n> :NERDTreeToggle<CR>
 nnoremap <Leader>n :NERDTreeFind<CR>
-
-" Using custom arrows with NERDTree
 let g:NERDTreeDirArrows=1
 
 " Close NERDTree if it's the only window open
@@ -56,38 +56,16 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTree
 " Don't show whitespaces on NERDTree enter
 autocmd FileType nerdtree setlocal listchars=""
 
-" ------------- Vim Airline
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#branch#enabled=1
-
-" Use Powerline fonts
-let g:airline_powerline_fonts = 1
-
-" Preventing airline from hiding with NerdTreeToggle
-set laststatus=2
-
-" ------------- DevIcons
-let g:webdevicons_enable_unite = 0
-let g:webdevicons_enable_vimfiler = 0
-let g:webdevicons_enable_flagship_statusline = 0
-let g:WebDevIconsUnicodeGlyphDoubleWidth = 0
-let g:WebDevIconsNerdTreeAfterGlyphPadding = ''
-
-" ------------- fzf
+" fzf
 nmap <C-p> :Files<CR>
 nmap <C-f> :Ag<CR>
 nmap <leader>f :Tags <CR>
-nmap <localleader>f :BTags <CR>
+nmap <leader>b :BTags <CR>
 
-" ------------- Goyo
-nnoremap <C-g> :Goyo<Cr>
-
-" ------------- EasyMotion
-
+" EasyMotion
 " s for one character search
 " S for double character search
-nmap s <Plug>(easymotion-s)
-nmap S <Plug>(easymotion-s2)
+nmap <localleader>s <Plug>(easymotion-s)
 
 " replacing vim default search
 nmap / <Plug>(easymotion-sn)
@@ -95,26 +73,31 @@ omap / <Plug>(easymotion-tn)
 nmap n <Plug>(easymotion-next)
 nmap N <Plug>(easymotion-prev)
 
-" ------------- Deoplete
+" Deoplete
 let g:deoplete#enable_at_startup = 1
 
-" ------------- Neoterm
+" Neoterm
 let g:neoterm_shell = 'zsh'
 let g:neoterm_position='vertical'
+let g:neoterm_size=60
 nnoremap <silent> <localleader>l :call neoterm#clear()<cr>
 nnoremap <silent> <localleader>q :call neoterm#close()<cr>
-nnoremap <silent> <localleader>a :call neoterm#test#run('all')<cr>
-nnoremap <silent> <localleader>c :call neoterm#test#run('current')<cr>
-nnoremap <silent> <localleader>f :call neoterm#test#run('file')<cr>
-nnoremap <silent> <localleader>, :call neoterm#test#rerun()<cr>
 
-" ------------- Neomake
+" Neotest
+let test#strategy = "neoterm"
+nnoremap <silent> <localleader>a :TestSuite<cr>
+nnoremap <silent> <localleader>c :TestNearest<cr>
+nnoremap <silent> <localleader>f :TestFile<cr>
+nnoremap <silent> <localleader>, :TestLast<cr>
+
+" Neomake
 let g:neomake_ruby_enabled_makers = ['rubocop']
 let g:neomake_css_enabled_makers = ['scss_lint']
 let g:neomake_javascript_enabled_makers = ['eslint']
+let g:neomake_elixir_enabled_makers = ['credo']
 
 autocmd! BufWritePost * Neomake
-map <Leader>l :Neomake!<CR>
+map <localleader>n :Neomake<CR>
 
 highlight NeomakeErrorSign ctermfg=1 ctermbg=8
 highlight NeomakeWarningSign ctermfg=3 ctermbg=8
