@@ -7,6 +7,9 @@ source $ZSH/env.zsh
 # Load custom shell settings
 source $ZSH/shell.zsh
 
+# Load keyboard settings
+source $ZSH/keys.zsh
+
 # Load prompt
 source $ZSH/prompt.zsh
 
@@ -23,7 +26,9 @@ export PATH="$DOTFILES/bin:${PATH}"
 # Inits
 source $DOTFILES/ruby/rbenv.init
 source $DOTFILES/python/pyenv.init
-#source $DOTFILES/node/nvm.init
+source $DOTFILES/node/nvm.init
+source $DOTFILES/node/yarn.init
+source $DOTFILES/haskell/ghc.init
 
 source $ZSH/fzf.zsh
 source $ZSH/hub.zsh
@@ -32,5 +37,7 @@ source $ZSH/z.zsh
 # Load completions
 source $ZSH/completions.zsh
 
-# Load keyboard settings
-source $ZSH/keys.zsh
+# added by travis gem
+[ -f ~/.travis/travis.sh ] && source ~/.travis/travis.sh
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
