@@ -101,7 +101,7 @@ set -g status-justify left
 set -g status-left ""
 
 set -g status-right-length 80
-set -g status-right "#(~/.dotfiles/bin/battery -tep) #[fg=white]| #[fg=cyan]%l:%M %p #[fg=white]| #[fg=blue]#(~/.dotfiles/tmux/scripts/status_bar/local_ips.sh)"
+set -g status-right "#(~/.dotfiles/bin/battery -tep) #[fg=white]| #[fg=cyan]%l:%M %p #[fg=white]| #[fg=blue]#(~/.dotfiles/tmux/scripts/status_bar/local_ips.sh) #[fg=white]| #(~/.dotfiles/tmux/scripts/status_bar/timetrap.sh)"
 
 # set-window-option -g automatic-rename off
 
