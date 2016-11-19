@@ -33,13 +33,16 @@ nmap <Leader>q :bw<CR>
 " Saving buffers
 map <C-s> <ESC>:w<CR>
 
+nmap <leader>s :%s/\v
+nmap <leader>a :s/\v
+
 " Remove highlight from the last search
 nnoremap <Leader>, :noh<CR>
 
 " Mimic Alt-backspace
 inoremap <M-BS> <C-W>
 
-" Remove trailing whitespaces
+" Remove trailing whitespaces when reading and writing to file
 autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
 
 " Rename the current file
