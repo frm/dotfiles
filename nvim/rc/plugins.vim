@@ -66,6 +66,7 @@ nmap <leader>b :BTags <CR>
 " s for one character search
 " S for double character search
 nmap <localleader>s <Plug>(easymotion-s)
+nmap <localleader>S <Plug>(easymotion-s2)
 
 " replacing vim default search
 nmap / <Plug>(easymotion-sn)
