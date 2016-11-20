@@ -35,7 +35,7 @@ source $ZSH/hub.zsh
 source $ZSH/z.zsh
 
 # Load completions
-source $ZSH/completions.zsh
+source $DOTFILES/completions/completions.zsh
 
 # added by travis gem
 [ -f ~/.travis/travis.sh ] && source ~/.travis/travis.sh
