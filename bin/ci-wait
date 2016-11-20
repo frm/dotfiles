@@ -61,6 +61,10 @@ function spinner_round() {
   done
 }
 
+function pretty_print() {
+  printf "\r\e[38;05;$1m$2\e[m"
+}
+
 check_ci &
 ASYNC_PROC=$!
 
@@ -69,15 +73,19 @@ do
   spinner_round
 done
 
+RED="001"
+GREEN="002"
+YELLOW="003"
+
 if [ $CI_STATUS -eq 0 ];
 then
-  printf "\r\e[38;05;002m$SUCCESS_MSG\e[m"
+  pretty_print $GREEN $SUCCESS_MSG
 elif [ $CI_STATUS -eq 2 ];
 then
-  printf "\r\e[38;05;003m$NO_CI_MSG\e[m"
+  pretty_print $YELLOW $NO_CI_MSG
   CI_STATUS=0
 else
-  printf "\r\e[38;05;001m$FAILURE_MSG\e[m"
+  pretty_print $RED $FAILURE_MSG
 fi
 
 clear_input
