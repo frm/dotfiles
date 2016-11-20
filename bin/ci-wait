@@ -1,0 +1,86 @@
+#!/usr/local/bin/zsh
+
+SUCCESS_MSG="✓ CI passed!"
+FAILURE_MSG="✗ CI failed."
+NO_CI_MSG="No CI running."
+
+WAITING_MSG="waiting for CI..."
+CAR_RET=${#WAITING_MSG}
+
+CI_WAIT_SEC=2
+
+CI_PASSED=0
+CI_STATUS=0
+ASYNC_PROC=0
+
+function check_ci() {
+  local ci_status=$(hub ci-status)
+
+  while [[ $ci_status == "pending" ]];
+  do
+    sleep $CI_WAIT_SEC
+    ci_status=$(hub ci-status)
+  done
+
+  kill -s USR1 $$
+
+  # 0: CI passed
+  # 2: no CI running
+  # 1: Failed for any other reason
+  if [[ $ci_status == "success" ]];
+  then
+    exit 0
+  elif [[ $ci_status == "no status" ]];
+  then
+    exit 2
+  else
+    exit 1
+  fi
+}
+
+function TRAPUSR1() {
+  wait $ASYNC_PROC
+  CI_STATUS=$?
+  CI_PASSED=1
+}
+
+function clear_input() {
+  for i in {1..$CAR_RET};
+  do
+    printf "  "
+  done
+}
+
+function spinner_round() {
+  spinner=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
+
+  for spin in "${spinner[@]}";
+  do
+    printf "\r$spin $WAITING_MSG"
+    sleep 0.1
+  done
+}
+
+check_ci &
+ASYNC_PROC=$!
+
+while [ $CI_PASSED -eq 0 ];
+do
+  spinner_round
+done
+
+if [ $CI_STATUS -eq 0 ];
+then
+  printf "\r\e[38;05;002m$SUCCESS_MSG\e[m"
+elif [ $CI_STATUS -eq 2 ];
+then
+  printf "\r\e[38;05;003m$NO_CI_MSG\e[m"
+  CI_STATUS=0
+else
+  printf "\r\e[38;05;001m$FAILURE_MSG\e[m"
+fi
+
+clear_input
+echo ""
+
+exit $CI_STATUS
