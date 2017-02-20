@@ -6,7 +6,7 @@ set -g prefix C-a
 setw -g xterm-keys on
 
 # 256 colorspace
-set -g default-terminal "screen-256color"
+set-option -g default-terminal "screen-256color"
 
 # Splitting with s/S
 bind-key s split-window -h -c '#{pane_current_path}'
@@ -54,8 +54,8 @@ bind -n M-9 select-window -t 9
 unbind [
 bind v copy-mode
 
-# When in copy (visual) mode, v begins selection
-bind-key -t vi-copy v begin-selection
+bind-key -Tcopy-mode-vi 'v' send -X begin-selection
+bind-key -Tcopy-mode-vi 'y' send -X copy-selection
 
 # Start window count at 1
 set-window-option -g pane-base-index 1

@@ -8,9 +8,14 @@ COMPLETION_WAITING_DOTS=true
 ENABLE_CORRECTION=false
 
 # History settings
-setopt hist_ignore_all_dups inc_append_history
-setopt sharehistory
-HIST_STAMPS="dd.mm.yyyy"
-HISTFILE=~/.zsh_history
-SAVEHIST=10240
-HISTSIZE=10240
+
+export HISTFILE="$HOME/.zhistory"
+export HIST_STAMPS="dd.mm.yyyy"
+export HISTSIZE=10000000
+export SAVEHIST=10000000
+
+setopt HIST_FIND_NO_DUPS
+setopt EXTENDED_HISTORY
+setopt INC_APPEND_HISTORY
+setopt SHARE_HISTORY
+setopt HIST_REDUCE_BLANKS

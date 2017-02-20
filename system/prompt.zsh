@@ -10,8 +10,8 @@ autoload -U promptinit
 autoload -Uz compinit && compinit
 
 # Use base16
-#BASE16_SCHEME="tomorrow-night"
-BASE16_SCHEME="default-dark"
+BASE16_SCHEME="tomorrow-night"
+# BASE16_SCHEME="default-dark"
 BASE16_SHELL="$HOME/.config/base16-shell/scripts/base16-$BASE16_SCHEME.sh"
 [[ -s $BASE16_SHELL ]] && . $BASE16_SHELL
 
@@ -21,4 +21,10 @@ GEOMETRY_COLOR_GIT_BRANCH=6
 GEOMETRY_COLOR_EXIT_VALUE=9
 GEOMETRY_COLOR_DIR=242
 GEOMETRY_SYMBOL_EXIT_VALUE="▲"
+GEOMETRY_SYMBOL_GIT_DIRTY="•"
+GEOMETRY_SYMBOL_GIT_CLEAN="•"
+GEOMETRY_PROMPT_PLUGINS=(git)
 PROMPT_GEOMETRY_GIT_CONFLICTS=true
+
+GEOMETRY_ENV="production"
+source $HOME/Developer/geometry/$GEOMETRY_ENV/geometry.zsh

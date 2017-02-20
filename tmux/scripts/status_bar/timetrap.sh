@@ -7,6 +7,6 @@ if [[ "$timetrap_now" =~ \@([a-zA-Z]+)* ]]; then
   project=${BASH_REMATCH[1]}
   echo "#[fg=colour242]$project#[default]"
 else
-  echo "#[fg=red]get to work#[default]"
+  echo "#[fg=red]timetrap off#[default]"
   exit 1
 fi

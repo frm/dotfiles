@@ -1,0 +1,11 @@
+#!/bin/sh
+
+branch=$(git rev-parse --abbrev-ref HEAD)
+destination=${1:-master}
+
+# TODO: add fetching and squashing logic
+ci-wait \
+&& git checkout $destination \
+&& git merge $branch \
+&& git push \
+&& git del $branch

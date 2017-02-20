@@ -2,6 +2,9 @@ function! DoRemote(arg)
   UpdateRemotePlugins
 endfunction
 
+let g:python_host_prog = '/Users/frm/.pyenv/versions/neovim2/bin/python'
+let g:python3_host_prog = '/Users/frm/.pyenv/versions/neovim3/bin/python'
+
 call plug#begin('~/.config/nvim/plugged')
 
 " Ruby Toolkit
@@ -9,7 +12,11 @@ Plug 'slim-template/vim-slim'
 Plug 'tpope/vim-rails'
 Plug 'tpope/vim-bundler'
 Plug 'kassio/neoterm'
-Plug 'janko-m/vim-test'
+
+" Elixir
+Plug 'elixir-lang/vim-elixir', { 'for': 'elixir' }
+Plug 'slashmili/alchemist.vim', { 'for': 'elixir' }
+Plug 'c-brenn/phoenix.vim', { 'for': 'elixir' }
 
 " Scheme
 Plug 'chriskempson/base16-vim'
@@ -19,26 +26,28 @@ Plug 'vim-airline/vim-airline-themes'
 " All the rest
 Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'javascript.jsx'] }
 Plug 'mxw/vim-jsx', { 'for': ['javascript', 'javascript.jsx'] }
+Plug 'ternjs/tern_for_vim', { 'for': ['javascript', 'javasacript.jsx'] }
 Plug 'rust-lang/rust.vim', { 'for': 'rust' }
 Plug 'hdima/python-syntax', { 'for': 'python' }
 Plug 'Valloric/MatchTagAlways', { 'for': ['html', 'xml'] }
-Plug 'elixir-lang/vim-elixir', { 'for': 'elixir' }
 Plug 'thinca/vim-ref'
-
+Plug 'janko-m/vim-test'
 Plug 'AndrewRadev/splitjoin.vim'
 Plug 'tpope/vim-endwise'
 Plug 'eapache/auto-pairs'
 Plug 'gcmt/wildfire.vim'
 Plug 'junegunn/goyo.vim', { 'for': 'markdown' }
-Plug 'Shougo/deoplete.nvim', { 'do': function('DoRemote') }
+" Plug 'Shougo/deoplete.nvim', { 'do': function('DoRemote') }
 Plug 'neomake/neomake'
 Plug 'tpope/vim-sleuth'
 
 Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-projectionist'
 Plug 'tpope/vim-surround'
 Plug 'easymotion/vim-easymotion'
 Plug 'christoomey/vim-tmux-navigator'
+Plug 'wellle/tmux-complete.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'scrooloose/nerdtree', { 'on':  ['NERDTreeToggle', 'NERDTreeFind'] }
@@ -80,7 +89,7 @@ let g:deoplete#enable_at_startup = 1
 " Neoterm
 let g:neoterm_shell = 'zsh'
 let g:neoterm_position='vertical'
-let g:neoterm_size=60
+let g:neoterm_size=50
 nnoremap <silent> <localleader>l :call neoterm#clear()<cr>
 nnoremap <silent> <localleader>q :call neoterm#close()<cr>
 
