@@ -3,11 +3,13 @@ bin/imgcat
 # https://github.com/frmendes/Battery
 bin/battery
 bin/mustacheme
+bin/flake8
 completions/tmuxinator.zsh
 completions/_hub
 nvim/autoload
 nvim/colors
 nvim/plugged
+nvim/.netrwhist
 tmux/plugins
 iterm2/vendor/
 iterm2/vendor/

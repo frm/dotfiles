@@ -13,7 +13,7 @@
   pager = diff-so-fancy | less --tabs=4 -RFX
   excludesfile = /Users/frm/.gitignore_global
 [credential]
-  helper = osxkeychain
+	helper = osxkeychain
 [push]
   default = current
 [diff]
@@ -30,6 +30,7 @@
   co = checkout
   cob = !git-checkout-branch # See bin/git-checkout-branch
   cp = cherry-pick
+  cpr = !git-close-pr # See bin/git-close-pr
   cr = !git-code-review # See bin/git-code-review
   conf = diff --name-only --diff-filter=U
   d = diff

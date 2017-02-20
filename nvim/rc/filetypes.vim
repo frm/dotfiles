@@ -1,15 +1,15 @@
-" Associate *.prolog and *.gawk with prolog and awk filetypes
 au BufRead,BufNewFile *.prolog setfiletype prolog
 au BufRead,BufNewFile *.gawk setfiletype awk
 au BufRead,BufNewFile *.ignore setfiletype shell
+au BufRead,BufNewFile Vagrantfile set filetype=ruby
 
-" Allow every file ending with .slim to be highlighted
+" .html.slim should be highlighted as well
 autocmd BufNewFile,BufRead *.slim set ft=slim
 
 " Filetype syntax highlighting
 function! NERDTreeHighlightFile(extension, fg, bg, guifg, guibg)
-exec 'autocmd FileType nerdtree highlight ' . a:extension .' ctermbg='. a:bg .' ctermfg='. a:fg .' guibg='. a:guibg .' guifg='. a:guifg
-exec 'autocmd FileType nerdtree syn match ' . a:extension .' #^\s\+.*'. a:extension .'$#'
+  exec 'autocmd FileType nerdtree highlight ' . a:extension .' ctermbg='. a:bg .' ctermfg='. a:fg .' guibg='. a:guibg .' guifg='. a:guifg
+  exec 'autocmd FileType nerdtree syn match ' . a:extension .' #^\s\+.*'. a:extension .'$#'
 endfunction
 
 call NERDTreeHighlightFile('jade', 'green', 'none', 'green', 'none')

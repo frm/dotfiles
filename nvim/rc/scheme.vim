@@ -21,8 +21,8 @@ let g:enable_bold_font = 2
 set background=dark
 let g:base_16_shell='~/.config/base16-shell/scripts/'
 let base16colorspace=256
-"colorscheme base16-tomorrow-night
-colorscheme base16-default-dark
+colorscheme base16-tomorrow-night
+" colorscheme base16-default-dark
 
 " Vim Airline
 let g:airline_theme = 'hybrid'

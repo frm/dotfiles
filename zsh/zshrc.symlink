@@ -24,7 +24,8 @@ source $DOTFILES/functions/functions.zsh
 export PATH="$DOTFILES/bin:${PATH}"
 
 # Inits
-source $DOTFILES/ruby/rbenv.init
+source $DOTFILES/docker/docker-machine.init
+source $DOTFILES/ruby/rvm.init
 source $DOTFILES/python/pyenv.init
 source $DOTFILES/node/nvm.init
 source $DOTFILES/node/yarn.init
@@ -41,3 +42,11 @@ source $DOTFILES/completions/completions.zsh
 [ -f ~/.travis/travis.sh ] && source ~/.travis/travis.sh
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+
+PATH="/Users/frm/perl5/bin${PATH:+:${PATH}}"; export PATH;
+PERL5LIB="/Users/frm/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
+PERL_LOCAL_LIB_ROOT="/Users/frm/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
+PERL_MB_OPT="--install_base \"/Users/frm/perl5\""; export PERL_MB_OPT;
+PERL_MM_OPT="INSTALL_BASE=/Users/frm/perl5"; export PERL_MM_OPT;
