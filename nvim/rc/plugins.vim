@@ -37,7 +37,7 @@ Plug 'tpope/vim-endwise'
 Plug 'eapache/auto-pairs'
 Plug 'gcmt/wildfire.vim'
 Plug 'junegunn/goyo.vim', { 'for': 'markdown' }
-" Plug 'Shougo/deoplete.nvim', { 'do': function('DoRemote') }
+Plug 'Valloric/YouCompleteMe'
 Plug 'neomake/neomake'
 Plug 'tpope/vim-sleuth'
 
@@ -57,7 +57,11 @@ call plug#end()
 " NERDTree
 nnoremap <C-n> :NERDTreeToggle<CR>
 nnoremap <Leader>n :NERDTreeFind<CR>
+let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
 let g:NERDTreeDirArrows=1
+let g:NERDTreeMouseMode=2
+let g:NERDTreeShowHidden=1
+let g:NERDTreeWinPos = "right"
 
 " Close NERDTree if it's the only window open
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
@@ -114,3 +118,5 @@ highlight NeomakeWarningSign ctermfg=3 ctermbg=8
 
 let g:neomake_error_sign={'text': '▶', 'texthl': 'NeomakeErrorSign'}
 let g:neomake_warning_sign={'text': '▶', 'texthl': 'NeomakeErrorSign'}
+
+let g:ycm_server_python_interpreter="/Users/frm/.pyenv/versions/neovim3/bin/python"
