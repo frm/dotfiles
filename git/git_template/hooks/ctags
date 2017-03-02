@@ -1,8 +1,10 @@
 #!/bin/sh
+
 set -e
+
+echo -e "[HOOK: ctags at .git/tags]"
+
 PATH="/usr/local/bin:$PATH"
-dir="`git rev-parse --git-dir`"
-trap 'rm -f "$dir/$$.tags"' EXIT
-git ls-files | \
-  ctags --tag-relative -L - -f"$dir/$$.tags" --languages=-javascript,sql
-mv "$dir/$$.tags" "$dir/tags"
+trap "rm -f .git/tags.$$" EXIT
+ctags --tag-relative -Rf.git/tags.$$ --exclude=.git --languages=-javascript,sql > /dev/null 2>&1
+mv .git/tags.$$ .git/tags
