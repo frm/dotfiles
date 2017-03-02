@@ -16,7 +16,7 @@ Plug 'kassio/neoterm'
 " Elixir
 Plug 'elixir-lang/vim-elixir', { 'for': 'elixir' }
 Plug 'slashmili/alchemist.vim', { 'for': 'elixir' }
-Plug 'c-brenn/phoenix.vim', { 'for': 'elixir' }
+" Plug 'c-brenn/phoenix.vim', { 'for': 'elixir' }
 
 " Scheme
 Plug 'chriskempson/base16-vim'
@@ -30,24 +30,24 @@ Plug 'ternjs/tern_for_vim', { 'for': ['javascript', 'javasacript.jsx'] }
 Plug 'rust-lang/rust.vim', { 'for': 'rust' }
 Plug 'hdima/python-syntax', { 'for': 'python' }
 Plug 'Valloric/MatchTagAlways', { 'for': ['html', 'xml'] }
-Plug 'thinca/vim-ref'
+" Plug 'thinca/vim-ref'
 Plug 'janko-m/vim-test'
-Plug 'AndrewRadev/splitjoin.vim'
+" Plug 'AndrewRadev/splitjoin.vim'
 Plug 'tpope/vim-endwise'
 Plug 'eapache/auto-pairs'
-Plug 'gcmt/wildfire.vim'
+" Plug 'gcmt/wildfire.vim'
 Plug 'junegunn/goyo.vim', { 'for': 'markdown' }
 Plug 'Valloric/YouCompleteMe'
 Plug 'neomake/neomake'
-Plug 'tpope/vim-sleuth'
+" Plug 'tpope/vim-sleuth'
 
 Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-projectionist'
+" Plug 'tpope/vim-projectionist'
 Plug 'tpope/vim-surround'
 Plug 'easymotion/vim-easymotion'
 Plug 'christoomey/vim-tmux-navigator'
-Plug 'wellle/tmux-complete.vim'
+" Plug 'wellle/tmux-complete.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'scrooloose/nerdtree', { 'on':  ['NERDTreeToggle', 'NERDTreeFind'] }

@@ -29,8 +29,8 @@ endif
 set background=dark
 let base16colorspace=256
 "let g:base_16_shell_path='~/.config/base16-shell/scripts/'
-" colorscheme base16-tomorrow-night
-colorscheme base16-default-dark
+colorscheme base16-tomorrow-night
+" colorscheme base16-default-dark
 
 " Vim Airline
 let g:airline_theme = 'hybrid'
