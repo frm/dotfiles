@@ -1,5 +1,6 @@
 au BufRead,BufNewFile *.prolog setfiletype prolog
 au BufRead,BufNewFile *.gawk setfiletype awk
+au BufRead,BufNewFile *.cql setfiletype sql
 au BufRead,BufNewFile *.ignore setfiletype shell
 au BufRead,BufNewFile Vagrantfile set filetype=ruby
 
