@@ -8,6 +8,9 @@ setw -g xterm-keys on
 # 256 colorspace
 set-option -g default-terminal "screen-256color"
 
+# Fix copy/pasting on macOS Sierra
+set-option -g default-command "reattach-to-user-namespace -l zsh"
+
 # Splitting with s/S
 bind-key s split-window -h -c '#{pane_current_path}'
 bind-key S split-window -v -c '#{pane_current_path}'
