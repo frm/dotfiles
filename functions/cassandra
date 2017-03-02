@@ -1,0 +1,14 @@
+#!/bin/sh
+# Start/stop cassandra
+
+cassandra.start() {
+  cassandra_do load
+}
+
+cassandra.stop() {
+  cassandra_do unload
+}
+
+cassandra_do() {
+  launchctl $1 ~/Library/LaunchAgents/homebrew.mxcl.cassandra.plist
+}
