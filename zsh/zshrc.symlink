@@ -1,17 +1,11 @@
 export DOTFILES="$HOME/.dotfiles"
-ZSH="$DOTFILES/system"
+SYSTEM="$DOTFILES/system"
 
-# Load custom variables before anything else
-source $ZSH/env.zsh
-
-# Load custom shell settings
-source $ZSH/shell.zsh
-
-# Load keyboard settings
-source $ZSH/keys.zsh
+# Load system configs
+source $SYSTEM/system.init
 
 # Load prompt
-source $ZSH/prompt.zsh
+source $DOTFILES/prompt/prompt.init
 
 # Init antibody
 source $DOTFILES/antibody/antibody.init
@@ -24,7 +18,6 @@ source $DOTFILES/functions/functions.zsh
 export PATH="$DOTFILES/bin:${PATH}"
 
 # Inits
-source $DOTFILES/docker/docker-machine.init
 source $DOTFILES/ruby/rvm.init
 source $DOTFILES/python/pyenv.init
 source $DOTFILES/node/nvm.init
@@ -42,11 +35,3 @@ source $DOTFILES/completions/completions.zsh
 [ -f ~/.travis/travis.sh ] && source ~/.travis/travis.sh
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-
-PATH="/Users/frm/perl5/bin${PATH:+:${PATH}}"; export PATH;
-PERL5LIB="/Users/frm/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
-PERL_LOCAL_LIB_ROOT="/Users/frm/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
-PERL_MB_OPT="--install_base \"/Users/frm/perl5\""; export PERL_MB_OPT;
-PERL_MM_OPT="INSTALL_BASE=/Users/frm/perl5"; export PERL_MM_OPT;

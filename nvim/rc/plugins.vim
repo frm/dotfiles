@@ -117,6 +117,6 @@ highlight NeomakeErrorSign ctermfg=1 ctermbg=8
 highlight NeomakeWarningSign ctermfg=3 ctermbg=8
 
 let g:neomake_error_sign={'text': '▶', 'texthl': 'NeomakeErrorSign'}
-let g:neomake_warning_sign={'text': '▶', 'texthl': 'NeomakeErrorSign'}
+let g:neomake_warning_sign={'text': '▶', 'texthl': 'NeomakeWarningSign'}
 
 let g:ycm_server_python_interpreter="/Users/frm/.pyenv/versions/neovim3/bin/python"
