@@ -1,0 +1,10 @@
+ZSH="$DOTFILES/system"
+
+# Load custom variables before anything else
+source $ZSH/env.zsh
+
+# Load custom shell settings
+source $ZSH/shell.zsh
+
+# Load keyboard settings
+source $ZSH/keys.zsh
