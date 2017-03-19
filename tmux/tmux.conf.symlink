@@ -6,7 +6,7 @@ set -g prefix C-a
 setw -g xterm-keys on
 
 # 256 colorspace
-set-option -g default-terminal "screen-256color"
+set-option -g default-terminal "xterm-256color"
 
 # Fix copy/pasting on macOS Sierra
 set-option -g default-command "reattach-to-user-namespace -l zsh"
@@ -57,8 +57,8 @@ bind -n M-9 select-window -t 9
 unbind [
 bind v copy-mode
 
-bind-key -Tcopy-mode-vi 'v' send -X begin-selection
-bind-key -Tcopy-mode-vi 'y' send -X copy-selection
+bind-key -t vi-copy v begin-selection
+bind-key -t vi-copy y copy-pipe "reattach-to-user-namespace pbcopy"
 
 # Start window count at 1
 set-window-option -g pane-base-index 1
