@@ -15,3 +15,6 @@ sudo scutil --set ComputerName "$1"
 sudo scutil --set LocalHostName "$1"
 sudo scutil --set HostName "$1"
 dscacheutil -flushcache # Flushes the DNS cache to see hostname changes
+
+# Remove that annoying login message
+touch ~/.hushlogin
