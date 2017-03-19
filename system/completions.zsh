@@ -13,6 +13,8 @@ zstyle ':completion:*' menu select
 # list-colors when completing
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 
-source $DOTFILES/completions/tmuxinator.zsh
+if [ $(uname) == "Linux" ]; then
+  source $DOTFILES/completions/tmuxinator.zsh
+fi
 
 fpath=($DOTFILES/completions $fpath)

@@ -11,7 +11,7 @@ source $DOTFILES/prompt/prompt.init
 source $DOTFILES/antibody/antibody.init
 
 # Load aliases and functions
-source $DOTFILES/system/aliases.zsh
+source $DOTFILES/functions/aliases.zsh
 source $DOTFILES/functions/functions.zsh
 
 # Add custom bins to path
@@ -19,19 +19,15 @@ export PATH="$DOTFILES/bin:${PATH}"
 
 # Inits
 source $DOTFILES/ruby/rvm.init
+source $DOTFILES/elixir/kerl.init
+source $DOTFILES/elixir/kiex.init
 source $DOTFILES/python/pyenv.init
 source $DOTFILES/node/nvm.init
 source $DOTFILES/node/yarn.init
 source $DOTFILES/haskell/ghc.init
 
-source $ZSH/fzf.zsh
-source $ZSH/hub.zsh
-source $ZSH/z.zsh
-
-# Load completions
-source $DOTFILES/completions/completions.zsh
-
-# added by travis gem
-[ -f ~/.travis/travis.sh ] && source ~/.travis/travis.sh
-
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+source $SYSTEM/fzf.zsh
+source $SYSTEM/hub.zsh
+source $SYSTEM/z.zsh
+source $SYSTEM/travis.zsh
+source $SYSTEM/completions.zsh
