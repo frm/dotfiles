@@ -57,4 +57,4 @@
 
   ctags = !.git/hooks/ctags
 [init]
-	templatedir = ~/.git_template
+  templatedir = ~/.git_template
