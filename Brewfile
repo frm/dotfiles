@@ -2,6 +2,7 @@ cask_args appdir: '/Applications'
 tap 'caskroom/cask'
 tap 'telemachus/homebrew-desc'
 
+brew 'arp-scan'
 brew 'ctags'
 brew 'curl'
 brew 'diff-so-fancy'
