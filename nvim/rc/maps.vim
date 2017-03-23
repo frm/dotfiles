@@ -33,8 +33,9 @@ nmap <Leader>q :bw<CR>
 " Saving buffers
 map <C-s> <ESC>:w<CR>
 
-nmap <leader>s :%s/\v
 nmap <leader>a :s/\v
+nmap <leader>s :%s/\v
+vmap <leader>s :s/\v
 
 " Remove highlight from the last search
 nnoremap <Leader>, :noh<CR>
