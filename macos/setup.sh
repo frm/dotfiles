@@ -18,3 +18,7 @@ dscacheutil -flushcache # Flushes the DNS cache to see hostname changes
 
 # Remove that annoying login message
 touch ~/.hushlogin
+
+# Allow automatic text replacement
+# &shrug; should equal ¯\_(ツ)_/¯ now
+defaults write -g WebAutomaticTextReplacementEnabled -bool true
