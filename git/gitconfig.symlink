@@ -25,7 +25,7 @@
 [alias]
   a = add
   ac = !git-autoclean # See bin/git-autoclean
-  b = branch -a -v
+  b = branch -avv
   c = commit
   co = checkout
   cob = !git-checkout-branch # See bin/git-checkout-branch
