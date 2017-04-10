@@ -8,6 +8,8 @@ set timeoutlen=300
 " Moving between wrapped lines
 nnoremap j gj
 nnoremap k gk
+vnoremap j gj
+vnoremap k gk
 
 " Moving between panes
 nnoremap <C-h> <C-w>h
