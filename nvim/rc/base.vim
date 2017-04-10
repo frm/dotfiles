@@ -44,6 +44,7 @@ set textwidth=80
 
 " Always show relative numbers
 set relativenumber
+set number
 
 " Number column size
 set numberwidth=2
