@@ -37,8 +37,12 @@ Plug 'tpope/vim-endwise'
 Plug 'eapache/auto-pairs'
 " Plug 'gcmt/wildfire.vim'
 Plug 'junegunn/goyo.vim', { 'for': 'markdown' }
+Plug 'vim-scripts/VOoM', { 'for': 'markdown' }
+Plug 'rhysd/vim-grammarous', { 'for': 'markdown' }
 Plug 'Valloric/YouCompleteMe'
+Plug 'larrylv/ycm-elixir', { 'for': 'elixir' }
 Plug 'neomake/neomake'
+Plug 'tpope/vim-abolish'
 " Plug 'tpope/vim-sleuth'
 
 Plug 'airblade/vim-gitgutter'
@@ -120,3 +124,14 @@ let g:neomake_error_sign={'text': '▶', 'texthl': 'NeomakeErrorSign'}
 let g:neomake_warning_sign={'text': '▶', 'texthl': 'NeomakeWarningSign'}
 
 let g:ycm_server_python_interpreter="/Users/frm/.pyenv/versions/neovim3/bin/python"
+
+function! WriteMode()
+  setlocal nonumber
+  setlocal norelativenumber
+  Goyo
+  Voom markdown
+  execute "normal \<c-w>l"
+  execute "normal 60\<c-w>>"
+endfunction
+
+nmap <leader>w :call WriteMode()<CR>
