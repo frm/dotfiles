@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+branch=$(git rev-parse --abbrev-ref HEAD)
+ci-wait && git checkout master && git merge $branch && git push && git push origin :$branch && git autoclean

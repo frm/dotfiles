@@ -41,6 +41,7 @@
   l = log
   ls = log --oneline --abbrev-commit # log short
   m = merge
+  mpr = !git-merge-pr # See bin/git-merge-pr
   nuke = !git-nuke # See bin/git-nuke
   p = push
   pl = pull
