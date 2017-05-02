@@ -39,6 +39,7 @@ Plug 'eapache/auto-pairs'
 Plug 'junegunn/goyo.vim', { 'for': 'markdown' }
 Plug 'vim-scripts/VOoM', { 'for': 'markdown' }
 Plug 'rhysd/vim-grammarous', { 'for': 'markdown' }
+" Plug 'sbdchd/neoformat'
 Plug 'Valloric/YouCompleteMe'
 Plug 'larrylv/ycm-elixir', { 'for': 'elixir' }
 Plug 'neomake/neomake'
@@ -124,6 +125,11 @@ let g:neomake_error_sign={'text': '▶', 'texthl': 'NeomakeErrorSign'}
 let g:neomake_warning_sign={'text': '▶', 'texthl': 'NeomakeWarningSign'}
 
 let g:ycm_server_python_interpreter="/Users/frm/.pyenv/versions/neovim3/bin/python"
+
+" augroup fmt
+"   autocmd!
+"   autocmd BufWritePre * Neoformat
+" augroup END
 
 function! WriteMode()
   setlocal nonumber
