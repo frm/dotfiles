@@ -1,9 +1,10 @@
-bin/imgcat
 # Ignore personal version of battery:
 # https://github.com/frmendes/Battery
 bin/battery
-bin/mustacheme
 bin/flake8
+bin/imgcat
+bin/mustacheme
+functions/transfer
 completions/tmuxinator.zsh
 completions/_hub
 nvim/autoload
