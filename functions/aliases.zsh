@@ -53,12 +53,7 @@ if which sicstus &> /dev/null;
 fi
 
 # Group ls by name, type & extension
-if which gls &> /dev/null;
-then
-  alias ll="gls -lFX --color"
-else
-  alias ll="ls -lFX"
-fi
+alias ll="ls -lh"
 
 # Creating compacted cd ..
 alias ..="cdl .."
