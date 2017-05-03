@@ -35,7 +35,7 @@ nmap <Leader>q :bw<CR>
 " Saving buffers
 map <C-s> <ESC>:w<CR>
 
-nmap <leader>a :s/\v
+nmap <leader>ss :s/\v
 nmap <leader>s :%s/\v
 vmap <leader>s :s/\v
 
@@ -68,6 +68,18 @@ function ChromeRefresh()
 endfunction
 
 nnoremap <localleader>r :call ChromeRefresh()<CR>
+
+" Note: works for fullscreen only
+function! WriteMode()
+  setlocal nonumber
+  setlocal norelativenumber
+  Goyo
+  Voom markdown
+  execute "normal \<c-w>l"
+  execute "normal 60\<c-w>>"
+endfunction
+
+nmap <leader>w :call WriteMode()<CR>
 
 " Reloading configs
 command Rl source ~/.config/nvim/init.vim
