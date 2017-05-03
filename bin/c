@@ -3,13 +3,18 @@
 typeset -A websites
 
 websites=(
-  semaphore semaphoreci.com
+  sem semaphoreci.com
   gh github.com
   github github.com
   fb facebook.com
   ig instagram.com
   msg messenger.com
   so stackoverflow.com
+  rd reddit.com
+  yt youtube.com
+  amz amazon.co.uk
+  med medium.com
+  pkt getpocket.com
 )
 
 location=${websites[$1]:-$1}
