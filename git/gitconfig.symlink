@@ -24,25 +24,16 @@
   cmd= "nvim -d \"$LOCAL\" \"$REMOTE\""
 [alias]
   a = add
-  ac = !git-autoclean # See bin/git-autoclean
   b = branch -avv
   c = commit
   co = checkout
-  cob = !git-checkout-branch # See bin/git-checkout-branch
   cp = cherry-pick
-  cpr = !git-close-pr # See bin/git-close-pr
-  cr = !git-code-review # See bin/git-code-review
-  conf = diff --name-only --diff-filter=U
   d = diff
-  del = !git-del # See bin/git-del
-  div = !git-divergence # See bin/git-divergence
   dt = difftool
   f = fetch
   l = log
   ls = log --oneline --abbrev-commit # log short
   m = merge
-  mpr = !git-merge-pr # See bin/git-merge-pr
-  nuke = !git-nuke # See bin/git-nuke
   p = push
   pl = pull
   pr = pull-request
@@ -51,11 +42,23 @@
   s = status -s
   st = status
   sts = stash save -u
-  sync = !git-sync # See bin/git-sync
-  tree = log --graph --pretty=format:'%Cred%h%Creset %an: %s - %Creset %C(yellow)%d%Creset %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
-  trump = !git-trump
   wc = whatchanged -p --abbrev-commit --pretty
 
+  conf = diff --name-only --diff-filter=U
   ctags = !.git/hooks/ctags
+  pulls = browse -- pulls
+  issues = browse -- issues
+  tree = log --graph --pretty=format:'%Cred%h%Creset %an: %s - %Creset %C(yellow)%d%Creset %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+
+  ac = !git-autoclean
+  cob = !git-checkout-branch
+  cpr = !git-close-pr
+  cr = !git-code-review
+  del = !git-del
+  div = !git-divergence
+  mpr = !git-merge-pr
+  nuke = !git-nuke
+  sync = !git-sync
+  trump = !git-trump
 [init]
   templatedir = ~/.git_template
