@@ -51,11 +51,15 @@ Plug 'tpope/vim-abolish'
 Plug 'Valloric/YouCompleteMe'
 Plug 'larrylv/ycm-elixir', { 'for': 'elixir' }
 
+Plug 'easymotion/vim-easymotion'
+Plug 'haya14busa/incsearch.vim'
+Plug 'haya14busa/incsearch-fuzzy.vim'
+Plug 'haya14busa/incsearch-easymotion.vim'
+
 Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-projectionist'
 Plug 'tpope/vim-surround'
-Plug 'easymotion/vim-easymotion'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'wellle/tmux-complete.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
@@ -91,11 +95,34 @@ nmap <leader>b :BTags <CR>
 nmap <localleader>s <Plug>(easymotion-s)
 nmap <localleader>fs <Plug>(easymotion-overwin-f)
 
-" replacing vim default search
-nmap / <Plug>(easymotion-sn)\v
-omap / <Plug>(easymotion-tn)\v
-nmap n <Plug>(easymotion-next)
-nmap N <Plug>(easymotion-prev)
+" IncSearch
+function! s:incsearch_config(...) abort
+  return incsearch#util#deepextend(deepcopy({
+  \   'modules': [incsearch#config#easymotion#module({'overwin': 1})],
+  \   'keymap': {
+  \     "\<CR>": '<Over>(easymotion)'
+  \   },
+  \   'is_expr': 0
+  \ }), get(a:, 1, {}))
+endfunction
+
+function! s:config_easyfuzzymotion(...) abort
+  return extend(copy({
+  \   'converters': [
+  \     incsearch#config#fuzzyword#converter(),
+  \     incsearch#config#fuzzyspell#converter()
+  \   ],
+  \   'modules': [incsearch#config#easymotion#module({'overwin': 1})],
+  \   'keymap': {"\<CR>": '<Over>(easymotion)'},
+  \   'is_expr': 0,
+  \   'is_stay': 1
+  \ }), get(a:, 1, {}))
+endfunction
+
+noremap <silent><expr> /  incsearch#go(<SID>incsearch_config()) . '\v'
+noremap <silent><expr> ?  incsearch#go(<SID>incsearch_config({'command': '?'})) . '\v'
+" noremap <silent><expr> g/ incsearch#go(<SID>incsearch_config({'is_stay': 1})) . '\v'
+map <silent><expr> <leader>/ incsearch#go(<SID>config_easyfuzzymotion())
 
 " Deoplete
 let g:deoplete#enable_at_startup = 1
