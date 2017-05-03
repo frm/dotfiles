@@ -3,7 +3,7 @@
   email = devfrmendes@gmail.com
   signingkey = DE2222D9
 [github]
-  user = frmendes
+  user = fribmendes
 [branch]
   autosetuprebase = always
 [color]
