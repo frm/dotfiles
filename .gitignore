@@ -15,6 +15,8 @@ tmux/plugins
 iterm2/vendor/
 iterm2/vendor/
 iterm2/vendor/
+__pycache__
+*.pyc
 
 # Ignore global variables after tracking them
 zsh/env_global.symlink
