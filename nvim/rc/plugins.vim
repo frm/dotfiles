@@ -86,14 +86,14 @@ nmap <leader>f :Tags <CR>
 nmap <leader>b :BTags <CR>
 
 " EasyMotion
-" s for one character search
-" S for double character search
+" s for character search
+" fs for character search across buffers
 nmap <localleader>s <Plug>(easymotion-s)
-nmap <localleader>S <Plug>(easymotion-s2)
+nmap <localleader>fs <Plug>(easymotion-overwin-f)
 
 " replacing vim default search
-nmap / <Plug>(easymotion-sn)
-omap / <Plug>(easymotion-tn)
+nmap / <Plug>(easymotion-sn)\v
+omap / <Plug>(easymotion-tn)\v
 nmap n <Plug>(easymotion-next)
 nmap N <Plug>(easymotion-prev)
 
