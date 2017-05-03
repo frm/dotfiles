@@ -11,12 +11,21 @@ call plug#begin('~/.config/nvim/plugged')
 Plug 'slim-template/vim-slim'
 Plug 'tpope/vim-rails'
 Plug 'tpope/vim-bundler'
-Plug 'kassio/neoterm'
 
 " Elixir
 Plug 'elixir-lang/vim-elixir', { 'for': 'elixir' }
 Plug 'slashmili/alchemist.vim', { 'for': 'elixir' }
-" Plug 'c-brenn/phoenix.vim', { 'for': 'elixir' }
+Plug 'c-brenn/phoenix.vim', { 'for': 'elixir' }
+
+" JavaScript
+Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'javascript.jsx'] }
+Plug 'mxw/vim-jsx', { 'for': ['javascript', 'javascript.jsx'] }
+Plug 'ternjs/tern_for_vim', { 'for': ['javascript', 'javasacript.jsx'] }
+
+" Other Languages
+Plug 'rust-lang/rust.vim', { 'for': 'rust' }
+Plug 'hdima/python-syntax', { 'for': 'python' }
+Plug 'Valloric/MatchTagAlways', { 'for': ['html', 'xml'] }
 
 " Scheme
 Plug 'chriskempson/base16-vim'
@@ -24,35 +33,30 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 
 " All the rest
-Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'javascript.jsx'] }
-Plug 'mxw/vim-jsx', { 'for': ['javascript', 'javascript.jsx'] }
-Plug 'ternjs/tern_for_vim', { 'for': ['javascript', 'javasacript.jsx'] }
-Plug 'rust-lang/rust.vim', { 'for': 'rust' }
-Plug 'hdima/python-syntax', { 'for': 'python' }
-Plug 'Valloric/MatchTagAlways', { 'for': ['html', 'xml'] }
+Plug 'kassio/neoterm'
 " Plug 'thinca/vim-ref'
 Plug 'janko-m/vim-test'
 " Plug 'AndrewRadev/splitjoin.vim'
 Plug 'tpope/vim-endwise'
 Plug 'eapache/auto-pairs'
-" Plug 'gcmt/wildfire.vim'
+Plug 'gcmt/wildfire.vim'
 Plug 'junegunn/goyo.vim', { 'for': 'markdown' }
 Plug 'vim-scripts/VOoM', { 'for': 'markdown' }
 Plug 'rhysd/vim-grammarous', { 'for': 'markdown' }
 " Plug 'sbdchd/neoformat'
-Plug 'Valloric/YouCompleteMe'
-Plug 'larrylv/ycm-elixir', { 'for': 'elixir' }
 Plug 'neomake/neomake'
 Plug 'tpope/vim-abolish'
-" Plug 'tpope/vim-sleuth'
+
+Plug 'Valloric/YouCompleteMe'
+Plug 'larrylv/ycm-elixir', { 'for': 'elixir' }
 
 Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-fugitive'
-" Plug 'tpope/vim-projectionist'
+Plug 'tpope/vim-projectionist'
 Plug 'tpope/vim-surround'
 Plug 'easymotion/vim-easymotion'
 Plug 'christoomey/vim-tmux-navigator'
-" Plug 'wellle/tmux-complete.vim'
+Plug 'wellle/tmux-complete.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'scrooloose/nerdtree', { 'on':  ['NERDTreeToggle', 'NERDTreeFind'] }
@@ -131,13 +135,8 @@ let g:ycm_server_python_interpreter="/Users/frm/.pyenv/versions/neovim3/bin/pyth
 "   autocmd BufWritePre * Neoformat
 " augroup END
 
-function! WriteMode()
-  setlocal nonumber
-  setlocal norelativenumber
-  Goyo
-  Voom markdown
-  execute "normal \<c-w>l"
-  execute "normal 60\<c-w>>"
-endfunction
-
-nmap <leader>w :call WriteMode()<CR>
+" Vim Projectionist
+map <localleader>aa :A<CR>
+nmap <localleader>av :AV<CR>
+map <localleader>as :AS<CR>
+map <localleader>at :AT<CR>
