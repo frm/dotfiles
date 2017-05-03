@@ -72,7 +72,7 @@ let g:NERDTreeWinPos = "right"
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
 
 " Don't show whitespaces on NERDTree enter
-autocmd FileType nerdtree setlocal listchars=""
+autocmd FileType nerdtree setlocal nolist
 
 " fzf
 nmap <C-p> :Files<CR>
