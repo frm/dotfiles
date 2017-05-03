@@ -1,0 +1,24 @@
+#!/usr/local/bin/zsh
+
+typeset -A websites
+
+websites=(
+  semaphore semaphoreci.com
+  gh github.com
+  github github.com
+  fb facebook.com
+  ig instagram.com
+  msg messenger.com
+  so stackoverflow.com
+)
+
+location=${websites[$1]:-$1}
+
+osascript <<EOF
+  tell application "Google Chrome"
+    open location "http://$location"
+
+    activate
+    windows where name contains "Google Chrome"
+  end tell
+EOF
