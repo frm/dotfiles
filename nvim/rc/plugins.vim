@@ -33,6 +33,7 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 
 " All the rest
+Plug 'SirVer/ultisnips'
 Plug 'kassio/neoterm'
 " Plug 'thinca/vim-ref'
 Plug 'janko-m/vim-test'
@@ -140,3 +141,6 @@ map <localleader>aa :A<CR>
 nmap <localleader>av :AV<CR>
 map <localleader>as :AS<CR>
 map <localleader>at :AT<CR>
+
+" UltiSnips
+let g:UltiSnipsExpandTrigger="<C-j>"

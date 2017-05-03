@@ -1,0 +1,9 @@
+global !p
+from snippet_helpers_elixir import *
+endglobal
+
+snippet defm "module definition"
+defmodule `!p ex_module_name(path, snip)` do
+	$1
+end
+endsnippet
