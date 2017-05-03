@@ -3,5 +3,6 @@
 so ~/.config/nvim/rc/base.vim
 so ~/.config/nvim/rc/maps.vim
 so ~/.config/nvim/rc/plugins.vim
+so ~/.config/nvim/rc/skel.vim
 so ~/.config/nvim/rc/scheme.vim
 so ~/.config/nvim/rc/filetypes.vim
