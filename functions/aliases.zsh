@@ -20,11 +20,11 @@ alias prod="production"
 alias stag="staging"
 alias dev="development"
 
+# Create a tmux session named after the current directory
+alias t="tmux new -s $(basename `pwd`)"
+#
 # Create a named tmux session
 alias tm="tmux new -s"
-
-# Create a tmux session named after the current directory
-alias tmu="tmux new -s ${PWD##*/}"
 
 alias ta="tmux attach"
 alias tat="tmux attach -t"
