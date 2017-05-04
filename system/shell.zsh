@@ -20,3 +20,6 @@ setopt HIST_REDUCE_BLANKS
 alias history="fc -El 1"
 
 unsetopt beep
+setopt long_list_jobs
+
+export LESS_TERMCAP_so=$'\E[01;33;03;40m'
