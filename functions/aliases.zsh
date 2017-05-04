@@ -6,6 +6,8 @@ alias vim="nvim"
 alias vi="command vim"
 alias ireallywantvi="command vi"
 
+alias ls="gls --color -h -F --group-directories-first"
+
 alias g="git"
 
 alias s="bin/server"
