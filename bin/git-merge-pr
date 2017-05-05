@@ -1,4 +1,13 @@
 #!/usr/bin/env sh
 
-branch=$(git rev-parse --abbrev-ref HEAD)
-ci-wait && git checkout master && git merge $branch && git push && git push origin :$branch && git autoclean
+
+_git_merge_pr() {
+  branch=$(git rev-parse --abbrev-ref HEAD)
+  git checkout master && git merge $branch && git push && git push origin :$branch && git autoclean
+}
+
+if [[ $1 == "-f" ]]; then
+  _git_merge_pr
+else
+  ci-wait && _git_merge_pr
+fi
