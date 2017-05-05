@@ -41,6 +41,7 @@
   rb = rebase
   s = status -s
   st = status
+  stp = stash pop
   sts = stash save -u
   wc = whatchanged -p --abbrev-commit --pretty
 
