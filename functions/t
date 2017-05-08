@@ -1,0 +1,4 @@
+# Create a tmux session named after the current directory
+t() {
+  tmux new -s $(basename `pwd`)
+}
