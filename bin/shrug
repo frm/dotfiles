@@ -1,1 +1,3 @@
-echo "¯\_(ツ)_/¯" | pbcopy
+#!/usr/bin/env zsh
+
+echo "¯\_(ツ)_/¯" | tee >(pbcopy)
