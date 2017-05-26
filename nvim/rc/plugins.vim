@@ -51,6 +51,8 @@ Plug 'tpope/vim-abolish'
 Plug 'Valloric/YouCompleteMe'
 Plug 'larrylv/ycm-elixir', { 'for': 'elixir' }
 
+Plug 'ElmCast/elm-vim', { 'for': 'elm' }
+
 Plug 'easymotion/vim-easymotion'
 Plug 'haya14busa/incsearch.vim'
 Plug 'haya14busa/incsearch-fuzzy.vim'
