@@ -7,5 +7,5 @@ source $ZSH/env.zsh
 source $ZSH/shell.zsh
 
 # Load keyboard settings
-# source $ZSH/keys.zsh
+source $ZSH/keys.zsh
 source $ZSH/keybindings.zsh
