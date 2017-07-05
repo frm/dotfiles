@@ -1,4 +1,10 @@
 # Create a tmux session named after the current directory
 t() {
-  tmux new -s $(basename `pwd`)
+  if [ $# -eq 0 ]; then
+    SESSION_NAME=$(basename `pwd`)
+  else
+    SESSION_NAME=$1
+  fi
+
+  tmux new -s $SESSION_NAME;
 }
