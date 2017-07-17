@@ -22,4 +22,4 @@ fi
 
 autoload -Uz compinit && compinit
 
-fpath=($DOTFILES/completions $fpath)
+fpath+=($DOTFILES/completions $fpath)
