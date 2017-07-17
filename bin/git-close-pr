@@ -1,11 +1,29 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 branch=$(git rev-parse --abbrev-ref HEAD)
 destination=${1:-master}
 
-# TODO: add fetching and squashing logic
-ci-wait \
-&& git checkout $destination \
-&& git merge $branch \
-&& git push \
-&& git del $branch
+echo "fetching..."
+git fetch origin $destination
+
+echo "rebasing $destination..."
+git checkout $destination || exit "couldn't checkout $destination"
+git rebase
+
+echo "rebasing $branch"
+git checkout $branch
+git rebase -i origin/$destination
+
+echo "force pushing..."
+git push -f
+
+ci-wait || exit 1
+
+echo "merging..."
+git checkout $destination
+git merge $branch
+git push
+
+echo "cleaning up..."
+git push origin :$branch
+git branch -d $branch
