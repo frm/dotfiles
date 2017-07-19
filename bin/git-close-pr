@@ -17,6 +17,8 @@ git rebase -i origin/$destination
 echo "force pushing..."
 git push -f
 
+echo "waiting for ci to start..."
+sleep 3
 ci-wait || exit 1
 
 echo "merging..."
