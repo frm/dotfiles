@@ -43,9 +43,6 @@ alias :qa="_qa" # see bin/_qa
 
 alias cl="clear"
 
-# irssi please
-alias irssi='TERM=screen-256color irssi'
-
 # prolog alias
 if which sicstus &> /dev/null;
     then alias prolog="rlwrap sicstus"
