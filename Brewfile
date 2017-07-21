@@ -4,6 +4,7 @@ tap 'telemachus/homebrew-desc'
 
 brew 'arp-scan'
 brew 'chruby'
+brew 'cowsay'
 brew 'ctags'
 brew 'curl'
 brew 'diff-so-fancy'
