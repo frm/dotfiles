@@ -4,3 +4,19 @@ export NVM_DIR="/Users/frm/.nvm"
 
 # loading nvm is slow af. Just load it when needed
 alias loadnvm=". $NVM_DIR/nvm.sh"
+
+# nvm causes a shell to load slowly
+# So I've only been loading it when needed.
+# Unfortunately, with all these tmux panes, I end up doing it
+# more times than I'd like to admit and it has become a pain
+# to load nvm and run it.
+# this is a wrapper around nvm to load it if it hasn't been yet.
+function nv() {
+  which nvm 2>/dev/null 1>&2
+
+  if [[ $? -eq 1 ]]; then
+    loadnvm
+  fi
+
+  nvm $@
+}
