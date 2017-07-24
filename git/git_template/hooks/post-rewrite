@@ -1,5 +1,5 @@
 #!/bin/sh
 
 case "$1" in
-  rebase) exec ~/.git_template/hooks/post-merge ;;
+  rebase) exec $DOTFILES/git/git_template/hooks/post-merge ;;
 esac
