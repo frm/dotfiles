@@ -1,9 +1,3 @@
-# Ignore personal version of battery:
-# https://github.com/frmendes/Battery
-bin/battery
-bin/flake8
-bin/imgcat
-bin/mustacheme
 functions/transfer
 completions/tmuxinator.zsh
 completions/_hub
