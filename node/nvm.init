@@ -15,6 +15,7 @@ function nv() {
   which nvm 2>/dev/null 1>&2
 
   if [[ $? -eq 1 ]]; then
+    echo "loading nvm..."
     loadnvm
   fi
 
