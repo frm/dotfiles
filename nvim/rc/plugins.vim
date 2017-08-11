@@ -20,11 +20,9 @@ Plug 'c-brenn/phoenix.vim', { 'for': 'elixir' }
 " JavaScript
 Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'javascript.jsx'] }
 Plug 'mxw/vim-jsx', { 'for': ['javascript', 'javascript.jsx'] }
-Plug 'ternjs/tern_for_vim', { 'for': ['javascript', 'javasacript.jsx'] }
 
 " Other Languages
 Plug 'rust-lang/rust.vim', { 'for': 'rust' }
-Plug 'hdima/python-syntax', { 'for': 'python' }
 Plug 'Valloric/MatchTagAlways', { 'for': ['html', 'xml'] }
 
 " Scheme
@@ -35,23 +33,19 @@ Plug 'vim-airline/vim-airline-themes'
 " All the rest
 Plug 'SirVer/ultisnips'
 Plug 'kassio/neoterm'
-" Plug 'thinca/vim-ref'
 Plug 'janko-m/vim-test'
-" Plug 'AndrewRadev/splitjoin.vim'
 Plug 'tpope/vim-endwise'
 Plug 'eapache/auto-pairs'
 Plug 'gcmt/wildfire.vim'
 Plug 'junegunn/goyo.vim', { 'for': 'markdown' }
 Plug 'vim-scripts/VOoM', { 'for': 'markdown' }
 Plug 'rhysd/vim-grammarous', { 'for': 'markdown' }
-" Plug 'sbdchd/neoformat'
-Plug 'neomake/neomake'
+Plug 'w0rp/ale'
+" Plug 'neomake/neomake'
 Plug 'tpope/vim-abolish'
 
 Plug 'Valloric/YouCompleteMe'
 Plug 'larrylv/ycm-elixir', { 'for': 'elixir' }
-
-Plug 'ElmCast/elm-vim', { 'for': 'elm' }
 
 Plug 'easymotion/vim-easymotion'
 Plug 'haya14busa/incsearch.vim'
@@ -144,26 +138,44 @@ nnoremap <silent> <localleader>f :TestFile<cr>
 nnoremap <silent> <localleader>, :TestLast<cr>
 
 " Neomake
-let g:neomake_ruby_enabled_makers = ['rubocop']
-let g:neomake_css_enabled_makers = ['scss_lint']
-let g:neomake_javascript_enabled_makers = ['eslint']
-let g:neomake_elixir_enabled_makers = ['credo']
-
-autocmd! BufWritePost * Neomake
-map <localleader>n :Neomake<CR>
-
-highlight NeomakeErrorSign ctermfg=1 ctermbg=8
-highlight NeomakeWarningSign ctermfg=3 ctermbg=8
-
-let g:neomake_error_sign={'text': '▶', 'texthl': 'NeomakeErrorSign'}
-let g:neomake_warning_sign={'text': '▶', 'texthl': 'NeomakeWarningSign'}
+" let g:neomake_ruby_enabled_makers = ['rubocop']
+" let g:neomake_css_enabled_makers = ['stylelint']
+" let g:neomake_scss_enabled_makers = ['stylelint']
+" let g:neomake_javascript_enabled_makers = ['eslint']
+" let g:neomake_elixir_enabled_makers = ['credo']
+"
+" autocmd! BufWritePost * Neomake
+" map <localleader>n :Neomake<CR>
+"
+" highlight NeomakeErrorSign ctermfg=1 ctermbg=8
+" highlight NeomakeWarningSign ctermfg=3 ctermbg=8
+"
+" let g:neomake_error_sign={'text': '▶', 'texthl': 'NeomakeErrorSign'}
+" let g:neomake_warning_sign={'text': '▶', 'texthl': 'NeomakeWarningSign'}
 
 let g:ycm_server_python_interpreter="/Users/frm/.pyenv/versions/neovim3/bin/python"
 
-" augroup fmt
-"   autocmd!
-"   autocmd BufWritePre * Neoformat
-" augroup END
+" ale
+let g:airline#extensions#ale#enabled = 1
+let g:ale_sign_column_always = 1
+let g:ale_emit_conflict_warnings = 0
+let g:ale_ruby_rubocop_options = '--except Lint/Debugger'
+
+let g:ale_sign_error = '▶'
+let g:ale_sign_warning = '▶'
+let g:ale_linters = {
+      \ 'ruby': ['rubocop'],
+      \ 'elixir': ['credo'],
+      \ 'javascript': [],
+      \ 'typescript': ['tslint', 'tsserver'],
+      \ }
+
+let g:ale_fix_on_save = 1
+let g:ale_fixers = {
+      \ 'ruby': ['rubocop'],
+      \ 'javascript': [],
+      \ 'typescript': ['prettier']
+      \ }
 
 " Vim Projectionist
 map <localleader>aa :A<CR>
