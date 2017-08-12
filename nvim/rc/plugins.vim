@@ -167,6 +167,7 @@ let g:ale_sign_warning = '▶'
 let g:ale_linters = {
       \ 'ruby': ['rubocop'],
       \ 'elixir': ['credo'],
+      \ 'scss': ['stylelint'],
       \ 'javascript': [],
       \ 'typescript': ['tslint', 'tsserver'],
       \ }
