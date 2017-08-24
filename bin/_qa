@@ -1,9 +1,0 @@
-#!/usr/bin/env osascript
-
-tell application "iTerm2"
-  tell current window
-    repeat with aTab in tabs
-      close
-    end repeat
-  end tell
-end tell

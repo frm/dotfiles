@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env zsh
 # Copy my ssh key
 
 SSH_PUB=$HOME/.ssh/id_rsa.pub
@@ -7,4 +7,11 @@ if which pbcopy &> /dev/null; then
     pbcopy < $SSH_PUB
 elif which xclip &> /dev/null; then
     xclip -selection clipboard < $SSH_PUB
+else
+  echo "[ssh]: could not find a suitable clipboard binary. \
+try installing pbcopy or xclip"
+  exit 1
+
 fi
+
+echo "[ssh]: ssh public key copied"

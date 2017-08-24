@@ -3,7 +3,7 @@
 todos=`ls $HOME/Desktop/*.todo 2>/dev/null`
 
 if [[ -z $todos ]]; then
-  echo "Nothing to do today! Well done!"
+  echo "[todo]: nothing at all! well done, lad!"
 else
   for todo in $todos
   do
