@@ -13,9 +13,11 @@
   pager = diff-so-fancy | less --tabs=4 -RFX
   excludesfile = /Users/frm/.gitignore_global
 [credential]
-	helper = osxkeychain
+  helper = osxkeychain
 [push]
   default = current
+[fetch]
+  prune = true
 [diff]
   tool = nvimdiff
 [difftool]
