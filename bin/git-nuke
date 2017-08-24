@@ -11,6 +11,10 @@
 # someone deleted its remote counterpart for some reason
 # without merging it first, YOU WILL LOSE YOUR WORK
 #
+# Beware that this script DELETES LOCAL BRANCHES
+# WHICH HAVEN'T BEEN PUSHED YET.
+# TODO: Add a --safe flag to avoid this
+#
 # For a lighter version see bin/git-bomb
 
 # Prune origin
@@ -31,7 +35,8 @@ git branch -avv \
   | xargs git branch -D
 
 if which cowsay &> /dev/null; then
-  cowsay "I AM BECOME DEATH, DESTROYER OF WORLDS"
+  (echo "I AM BECOME DEATH,\n\nDESTROYER OF WORLDS") \
+  | cowsay
 else
-  echo "\n\nI AM BECOME DEATH, DESTROYER OF WORLDS"
+  echo "\n\nI AM BECOME DEATH,\nDESTROYER OF WORLDS"
 fi
