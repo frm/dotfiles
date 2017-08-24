@@ -1,4 +1,15 @@
 #!/bin/sh
 # Synchronize a git repo with its forked upstream
+# This assumes there is a remote named upstream
 
-git fetch upstream && git checkout master && git rebase upstream/master
+set -e
+
+if ! git config remote.upstream.url > /dev/null; then
+  echo "[git]: no remote upstream found"
+  echo "[git]: please add a remote named upstream set to the forked repo"
+  exit 1
+fi
+
+git fetch upstream
+git checkout master
+git rebase upstream/master
