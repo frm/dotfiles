@@ -9,3 +9,6 @@ alias loadrvm='[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/r
 
 # Add RVM to PATH for scripting
 export PATH="$rvm_path/bin:$PATH"
+
+# Fix capybara-webkit
+export PATH="$(brew --prefix qt@5.5)/bin:$PATH"
