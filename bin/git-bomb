@@ -1,6 +1,14 @@
 #!/bin/sh
+# # # # # # # # # # # # # # # # # #
+# CAUTION: BEWARE OF THIS SCRIPT! #
+# # # # # # # # # # # # # # # # # #
+#
 # Delete local branches that were already merged into master
 # To see the full version of this script check bin/git-nuke
+#
+# Beware that this script DELETES LOCAL BRANCHES
+# WHICH HAVEN'T BEEN PUSHED YET.
+# TODO: Add a --safe flag to avoid this
 
 # Prune origin
 echo "[git]: pruning..."
