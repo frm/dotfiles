@@ -1,10 +1,11 @@
 #!/usr/local/bin/zsh
 
-SUCCESS_MSG="✓ CI passed!"
-FAILURE_MSG="✗ CI failed."
-NO_CI_MSG="No CI running."
+SUCCESS_MSG="✓"
+FAILURE_MSG="✗"
+NO_CI_MSG="none running."
 
-WAITING_MSG="waiting for CI..."
+PREFIX_MSG="[ci]:"
+WAITING_MSG="waiting..."
 CAR_RET=${#WAITING_MSG}
 
 CI_WAIT_SEC=2
@@ -38,8 +39,7 @@ function check_ci() {
   fi
 }
 
-function TRAPUSR1() {
-  wait $ASYNC_PROC
+function TRAPUSR1() { wait $ASYNC_PROC
   CI_STATUS=$?
   CI_PASSED=1
 }
@@ -56,7 +56,7 @@ function spinner_round() {
 
   for spin in "${spinner[@]}";
   do
-    printf "\r$spin $WAITING_MSG"
+    printf "\r$PREFIX_MSG $spin $WAITING_MSG"
     sleep 0.1
   done
 }
@@ -76,16 +76,17 @@ done
 RED="001"
 GREEN="002"
 YELLOW="003"
+BLUE="004"
 
 if [ $CI_STATUS -eq 0 ];
 then
-  pretty_print $GREEN $SUCCESS_MSG
+  pretty_print $GREEN "$PREFIX_MSG $SUCCESS_MSG"
 elif [ $CI_STATUS -eq 2 ];
 then
-  pretty_print $YELLOW $NO_CI_MSG
+  pretty_print $BLUE "$PREFIX_MSG $NO_CI_MSG"
   CI_STATUS=0
 else
-  pretty_print $RED $FAILURE_MSG
+  pretty_print $RED "$PREFIX_MSG $FAILURE_MSG"
 fi
 
 clear_input
