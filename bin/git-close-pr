@@ -3,29 +3,30 @@
 branch=$(git rev-parse --abbrev-ref HEAD)
 destination=${1:-master}
 
-echo "fetching..."
+echo "[git]: fetching..."
 git fetch origin $destination
 
-echo "rebasing $destination..."
+echo "[git]: rebasing $destination..."
 git checkout $destination || exit "couldn't checkout $destination"
 git rebase
 
-echo "rebasing $branch"
+echo "[git]: rebasing $branch"
 git checkout $branch
 git rebase -i origin/$destination
 
-echo "force pushing..."
+echo "[git]: force pushing..."
 git push -f
 
-echo "waiting for ci to start..."
+echo "[git]: waiting for ci to start..."
 sleep 3
 ci-wait || exit 1
 
-echo "merging..."
+echo "[git]: merging..."
 git checkout $destination
 git merge $branch
 git push
 
-echo "cleaning up..."
+echo "[git]: cleaning up..."
 git push origin :$branch
 git branch -d $branch
+git nuke
