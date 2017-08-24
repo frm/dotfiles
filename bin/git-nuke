@@ -5,10 +5,11 @@
 #
 # This script prunes remote branches and
 # deletes local branches with no remote counterpart
-# INCLUDING UNMERGED BRANCHES
+# INCLUDING UNMERGED BRANCHES WITH NO REMOTE
 #
-# If you have a local branch which hasn't been pushed yet,
-# DON'T USE THIS SCRIPT. YOU WILL LOSE ALL YOUR WORK
+# This means that if you have an unmerged branch and
+# someone deleted its remote counterpart for some reason
+# without merging it first, YOU WILL LOSE YOUR WORK
 #
 # For a lighter version see bin/git-bomb
 
