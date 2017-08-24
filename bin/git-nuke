@@ -1,5 +1,36 @@
 #!/bin/sh
-# Removing deleted remote branches and local branches with no references
-# CAUTION: Removes local branches that have no remote counterpart
+# # # # # # # # # # # # # # # # # #
+# CAUTION: BEWARE OF THIS SCRIPT! #
+# # # # # # # # # # # # # # # # # #
+#
+# This script prunes remote branches and
+# deletes local branches with no remote counterpart
+# INCLUDING UNMERGED BRANCHES
+#
+# If you have a local branch which hasn't been pushed yet,
+# DON'T USE THIS SCRIPT. YOU WILL LOSE ALL YOUR WORK
+#
+# For a lighter version see bin/git-bomb
 
-git fetch --prune && git branch --merged | grep -v master | xargs git branch -d
+# Prune origin
+echo "[git]: pruning..."
+git fetch --prune
+
+# Delete merged branches
+echo "[git]: deleting merged branches..."
+git branch --merged \
+  | grep -v master \
+  | grep -v '^\*' \
+  | xargs git branch -d
+
+# Delete unmerged branches with no remote counterpart
+echo "[git]: deleting unmerged branches..."
+git branch -avv \
+  | awk '/: gone\]/ { print $1 }' \
+  | xargs git branch -D
+
+if which cowsay &> /dev/null; then
+  cowsay "I AM BECOME DEATH, DESTROYER OF WORLDS"
+else
+  echo "\n\nI AM BECOME DEATH, DESTROYER OF WORLDS"
+fi
