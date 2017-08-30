@@ -9,3 +9,6 @@ export TERM=screen-256color
 
 # Loading global env variables
 source $HOME/.env_global
+
+# Load direnv
+eval "$(direnv hook zsh)"
