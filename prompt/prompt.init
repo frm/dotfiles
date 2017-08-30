@@ -30,5 +30,5 @@ GEOMETRY_SYMBOL_GIT_CLEAN="•"
 GEOMETRY_PROMPT_PLUGINS=(git)
 PROMPT_GEOMETRY_GIT_CONFLICTS=true
 
-GEOMETRY_ENV="production"
+GEOMETRY_ENV="development"
 source $HOME/Developer/geometry/$GEOMETRY_ENV/geometry.zsh
