@@ -26,9 +26,11 @@ Plug 'rust-lang/rust.vim', { 'for': 'rust' }
 Plug 'Valloric/MatchTagAlways', { 'for': ['html', 'xml'] }
 
 " Scheme
-Plug 'chriskempson/base16-vim'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
+" Plug 'chriskempson/base16-vim'
+" Plug 'vim-airline/vim-airline'
+" Plug 'vim-airline/vim-airline-themes'
+Plug 'kristijanhusak/vim-hybrid-material'
+" Plug 'w0ng/vim-hybrid'
 
 " All the rest
 Plug 'SirVer/ultisnips'
