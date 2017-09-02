@@ -28,7 +28,6 @@ log/
 # Icon must end with two \r
 Icon
 
-
 # Thumbnails
 ._*
 
@@ -58,7 +57,5 @@ Temporary Items
 # Default ignore files
 *.ignore
 
-# lvh
-bin/lvh
-
 .env
+.envrc
