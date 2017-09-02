@@ -7,16 +7,17 @@ set cursorline
 set scrolloff=4
 
 " Fix for background using tmux on Linux
-" if &term =~ '256color'
-"   " disable Background Color Erase (BCE) so that color schemes
-"   " render properly when inside 256-color tmux and GNU screen.
-"   " see also http://snk.tuxfamily.org/log/vim-256color-bce.html
-"   set t_ut=
-" endif
+if &term =~ '256color'
+  " disable Background Color Erase (BCE) so that color schemes
+  " render properly when inside 256-color tmux and GNU screen.
+  " see also http://snk.tuxfamily.org/log/vim-256color-bce.html
+  set t_ut=
+endif
 
 set t_Co=256
 
-let g:enable_bold_font=2
+let g:enable_bold_font=1
+let g:enable_italic_font = 1
 
 " Neovim runs in true color mode,
 " which means iTerm2 falls back to default pallette.
@@ -29,6 +30,7 @@ endif
 set background=dark
 colorscheme hybrid_reverse
 let g:hybrid_reduced_contrast = 1
+let g:hybrid_custom_term_colors = 1
 " let base16colorspace=256
 "let g:base_16_shell_path='~/.config/base16-shell/scripts/'
 " colorscheme base16-tomorrow-night

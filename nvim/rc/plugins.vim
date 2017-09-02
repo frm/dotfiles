@@ -27,10 +27,10 @@ Plug 'Valloric/MatchTagAlways', { 'for': ['html', 'xml'] }
 
 " Scheme
 " Plug 'chriskempson/base16-vim'
-" Plug 'vim-airline/vim-airline'
-" Plug 'vim-airline/vim-airline-themes'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
 Plug 'kristijanhusak/vim-hybrid-material'
-" Plug 'w0ng/vim-hybrid'
+Plug 'w0ng/vim-hybrid'
 
 " All the rest
 Plug 'SirVer/ultisnips'
@@ -39,9 +39,10 @@ Plug 'janko-m/vim-test'
 Plug 'tpope/vim-endwise'
 Plug 'eapache/auto-pairs'
 Plug 'gcmt/wildfire.vim'
-Plug 'junegunn/goyo.vim', { 'for': 'markdown' }
-Plug 'vim-scripts/VOoM', { 'for': 'markdown' }
-Plug 'rhysd/vim-grammarous', { 'for': 'markdown' }
+Plug 'junegunn/goyo.vim', { 'for': 'markdown,txt' }
+Plug 'vim-scripts/VOoM', { 'for': 'markdown,txt' }
+Plug 'rhysd/vim-grammarous', { 'for': 'markdown,txt' }
+Plug 'gabrielelana/vim-markdown', { 'for': 'markdown' }
 Plug 'w0rp/ale'
 " Plug 'neomake/neomake'
 Plug 'tpope/vim-abolish'
