@@ -6,7 +6,8 @@ set -g prefix C-a
 setw -g xterm-keys on
 
 # 256 colorspace
-set-option -g default-terminal "screen-256color"
+set -g default-terminal "screen-256color"
+set -ga terminal-overrides ',screen-256color:Tc'
 
 # Fix copy/pasting on macOS Sierra
 # set-option -g default-command "reattach-to-user-namespace -l zsh"
@@ -78,29 +79,29 @@ setw -g monitor-activity off
 set -g visual-activity off
 
 # Border color
-# set -g pane-border-style fg=colour248
-# set -g pane-active-border-style fg=blue
+set -g pane-border-style fg=default
+set -g pane-active-border-style fg=colour9
 
 # status bar colors
-set-option -g status-bg black
-set-option -g status-fg blue
+set-option -g status-bg default
+set-option -g status-fg colour12
 set-option -g status-attr dim
 
 # set current window
-set-window-option -g window-status-current-fg cyan
-set-window-option -g window-status-current-bg black
-set-window-option -g window-status-fg colour242
-set-window-option -g window-status-bg black
+set-window-option -g window-status-current-fg blue
+set-window-option -g window-status-current-bg default
+set-window-option -g window-status-fg white
+set-window-option -g window-status-bg default
 setw -g window-status-format "  #W  "
 setw -g window-status-current-format "  #W  "
 
 # Mimic iTerm dim
-set -g window-style 'fg=colour247,bg=colour236'
-set -g window-active-style 'fg=colour250,bg=black'
-set -g pane-border-fg colour250
-set -g pane-border-bg colour236
-set -g pane-active-border-fg colour250
-set -g pane-active-border-bg colour236
+# set -g window-style 'fg=colour247,bg=colour237'
+# set -g window-active-style 'fg=colour250,bg=colour237'
+# set -g pane-border-fg colour250
+# set -g pane-border-bg default
+# set -g pane-active-border-fg colour250
+# set -g pane-active-border-bg default
 
 # center align window list
 set -g status-justify left
