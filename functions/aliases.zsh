@@ -39,7 +39,6 @@ alias mongo.server="mongod --config /usr/local/etc/mongod.conf"
 
 # vim-like exit
 alias :q="exit"
-alias :qa="_qa" # see bin/_qa
 
 alias cl="clear"
 
