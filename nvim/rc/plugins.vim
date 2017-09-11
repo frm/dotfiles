@@ -38,7 +38,10 @@ Plug 'kassio/neoterm'
 Plug 'janko-m/vim-test'
 Plug 'tpope/vim-endwise'
 Plug 'eapache/auto-pairs'
-Plug 'gcmt/wildfire.vim'
+Plug 'terryma/vim-expand-region'
+Plug 'kana/vim-textobj-user'
+Plug 'andyl/vim-textobj-elixir'
+Plug 'rhysd/vim-textobj-ruby'
 Plug 'junegunn/goyo.vim', { 'for': 'markdown,txt' }
 Plug 'vim-scripts/VOoM', { 'for': 'markdown,txt' }
 Plug 'rhysd/vim-grammarous', { 'for': 'markdown,txt' }
@@ -190,3 +193,7 @@ map <localleader>at :AT<CR>
 
 " UltiSnips
 let g:UltiSnipsExpandTrigger="<C-j>"
+
+" vim-expand-region
+map K <Plug>(expand_region_expand)
+map J <Plug>(expand_region_shrink)
