@@ -7,8 +7,8 @@ _git_merge_pr() {
 
   git checkout master
   git merge $branch
-  git push
-  git push origin:$branch
+  git push origin master
+  git push origin :$branch
   git nuke
 }
 
