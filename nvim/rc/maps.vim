@@ -71,10 +71,33 @@ nnoremap <localleader>r :call ChromeRefresh()<CR>
 
 " Note: works for fullscreen only
 function! WriteMode()
+  if (&ft=='tex' || &ft=='bib')
+    call WriteModeLatex()
+  else
+    call WriteModeMarkdown()
+  end
+
+  execute "normal \<c-w>l"
+  execute "normal 60\<c-w>>"
+endfunction
+
+function! WriteModeMarkdown()
   setlocal nonumber
   setlocal norelativenumber
+
   Goyo
   Voom markdown
+
+  execute "normal \<c-w>l"
+  execute "normal 60\<c-w>>"
+endfunction
+
+function! WriteModeLatex()
+  Goyo
+  Voom latex
+
+  let NERDTreeIgnore = ['\(\.tex\)\@<!$[[file]]']
+
   execute "normal \<c-w>l"
   execute "normal 60\<c-w>>"
 endfunction
