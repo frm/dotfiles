@@ -11,11 +11,14 @@ call plug#begin('~/.config/nvim/plugged')
 Plug 'slim-template/vim-slim'
 Plug 'tpope/vim-rails'
 Plug 'tpope/vim-bundler'
+Plug 'rhysd/vim-textobj-ruby'
 
 " Elixir
 Plug 'elixir-lang/vim-elixir', { 'for': 'elixir' }
 Plug 'slashmili/alchemist.vim', { 'for': 'elixir' }
 Plug 'c-brenn/phoenix.vim', { 'for': 'elixir' }
+Plug 'andyl/vim-textobj-elixir', { 'for': 'elixir' }
+Plug 'larrylv/ycm-elixir', { 'for': 'elixir' }
 
 " JavaScript
 Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'javascript.jsx'] }
@@ -38,20 +41,24 @@ Plug 'kassio/neoterm'
 Plug 'janko-m/vim-test'
 Plug 'tpope/vim-endwise'
 Plug 'eapache/auto-pairs'
+Plug 'AndrewRadev/splitjoin.vim'
 Plug 'terryma/vim-expand-region'
 Plug 'kana/vim-textobj-user'
-Plug 'andyl/vim-textobj-elixir'
-Plug 'rhysd/vim-textobj-ruby'
-Plug 'junegunn/goyo.vim', { 'for': 'markdown,txt' }
-Plug 'vim-scripts/VOoM', { 'for': 'markdown,txt' }
-Plug 'rhysd/vim-grammarous', { 'for': 'markdown,txt' }
-Plug 'gabrielelana/vim-markdown', { 'for': 'markdown' }
 Plug 'w0rp/ale'
 " Plug 'neomake/neomake'
 Plug 'tpope/vim-abolish'
 
+" Writing
+Plug 'junegunn/goyo.vim', { 'for': ['markdown', 'txt', 'tex', 'bib'] }
+Plug 'vim-scripts/VOoM', { 'for': ['markdown', 'txt', 'tex', 'bib'] }
+Plug 'vim-scripts/LanguageTool', { 'for': ['markdown', 'txt', 'tex', 'bib'] }
+Plug 'rhysd/vim-grammarous', { 'for': ['markdown', 'txt', 'tex', 'bib'] }
+Plug 'gabrielelana/vim-markdown', { 'for': 'markdown' }
+Plug 'junegunn/limelight.vim', { 'for': ['markdown', 'txt', 'tex', 'bib'] }
+Plug 'beloglazov/vim-online-thesaurus'
+Plug 'lervag/vimtex', { 'for': 'tex' }
+
 Plug 'Valloric/YouCompleteMe'
-Plug 'larrylv/ycm-elixir', { 'for': 'elixir' }
 
 Plug 'easymotion/vim-easymotion'
 Plug 'haya14busa/incsearch.vim'
@@ -61,6 +68,7 @@ Plug 'haya14busa/incsearch-easymotion.vim'
 Plug 'scrooloose/nerdcommenter'
 Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-rhubarb'
 Plug 'tpope/vim-projectionist'
 Plug 'tpope/vim-surround'
 Plug 'christoomey/vim-tmux-navigator'
@@ -197,3 +205,19 @@ let g:UltiSnipsExpandTrigger="<C-j>"
 " vim-expand-region
 map K <Plug>(expand_region_expand)
 map J <Plug>(expand_region_shrink)
+
+" Writing plugins
+
+" Autorun limelight
+autocmd! User GoyoEnter Limelight
+autocmd! User GoyoLeave Limelight!
+
+" Remap thesaurus
+let g:online_thesaurus_map_keys = 0
+nnoremap <localleader>t :OnlineThesaurusCurrentWord<CR>
+let g:tex_flavor = 'tex'
+
+let g:grammarous#use_vim_spelllang = 0
+let g:grammarous#enable_spell_check = 1
+
+let g:languagetool_jar='$HOME/.bin/languagetool/languagetool-commandline.jar'
