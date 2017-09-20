@@ -10,6 +10,8 @@ nnoremap j gj
 nnoremap k gk
 vnoremap j gj
 vnoremap k gk
+nnoremap $ g$
+vnoremap $ g$
 
 " Moving between panes
 nnoremap <C-h> <C-w>h
