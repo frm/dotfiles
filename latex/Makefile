@@ -14,9 +14,15 @@ define pretty_print
 	@printf "\e[38;05;$(1)m[$(2)]: $(3)\e[m\n"
 endef
 
+.PHONY: clean FORCE_MAKE
+
 all: $(NAME).pdf
 
-%.pdf: %.tex
+open: $(NAME).pdf
+open:
+	@open $(NAME).pdf
+
+%.pdf: %.tex FORCE_MAKE
 	$(call pretty_print,$(BLUE),make,compiling...)
 	$(call compile_tex,$(basename $<))
 	$(call pretty_print,$(GREEN),make,✓ done!)
@@ -29,4 +35,3 @@ clean:
 	$(RM) $(NAME).{acn,glo,ist,run.xml,upa,upb,bcf,aux,bbl,blg,lof,log,synctex.gz,toc,pdf} texput.log
 	@echo ""
 	$(call pretty_print,$(GREEN),make,✓ done!)
-
