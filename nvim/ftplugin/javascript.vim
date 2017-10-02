@@ -1,4 +1,5 @@
 map <localleader>d odebugger;<ESC>:w<CR>
+map <localleader>D Odebugger;<ESC>:w<CR>
 
 function! JSAddLinterIfFileExists(linter, file)
   let l:current = g:ale_linters.javascript
