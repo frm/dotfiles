@@ -17,6 +17,7 @@ alias b="bundle"
 alias be="bundle exec"
 alias rk="bundle exec rake"
 alias m="mix"
+alias mk="make"
 
 alias prod="production"
 alias stag="staging"
