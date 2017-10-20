@@ -64,5 +64,6 @@
   nuke = !git-nuke
   sync = !git-sync
   trump = !git-trump
+  wip = !git-wip
 [init]
   templatedir = ~/.git_template
