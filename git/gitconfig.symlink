@@ -41,6 +41,7 @@
   pr = pull-request
   pt = push origin --tags
   rb = rebase
+  rv = browse -- 'pulls?q=is:pr is:open -review:approved -author:fribmendes'
   s = status -s
   st = status
   stp = stash pop
