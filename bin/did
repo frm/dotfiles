@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-
-echo $@ | tr ' ' '_' | xargs -I {} rm ~/Desktop/{}.todo

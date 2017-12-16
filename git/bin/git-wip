@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+git add . && git commit -m "[skip ci] wip"
+
+if [[ $1 == "-p" ]]; then
+  git push
+fi

@@ -1,38 +1,39 @@
-# screen-like hotkey
+# Use C-A for prefix
 unbind C-b
 set -g prefix C-a
 
-# xterm-style function key sequences
-setw -g xterm-keys on
-
-# 256 colorspace
+# 256 colourspace
 set -g default-terminal "screen-256color"
 set -ga terminal-overrides ',screen-256color:Tc'
 
-# Fix copy/pasting on macOS Sierra
-# set-option -g default-command "reattach-to-user-namespace -l zsh"
-
-# Splitting with s/S
+# Bind splits to C-A s/S
 bind-key s split-window -h -c '#{pane_current_path}'
 bind-key S split-window -v -c '#{pane_current_path}'
 
-# Using regular scroll
-set -g mouse on
-
-# Window numbering starting at 1
-set -g base-index 1
-
-# Automatically renumber windows
-set-option -g renumber-windows on
-
-# Reloading config with R
+# C-A R to reload config
 unbind r
 bind r source-file ~/.tmux.conf
 
-# Use Ctrl-V/B to cycle
-bind-key b previous-window
-bind-key n next-window
+# Use the mouse
+set -g mouse on
 
+# Window numbering starts at 1
+set -g base-index 1
+
+# Automatic window renumber
+set-option -g renumber-windows on
+
+# v to start copy mode as Vim's Visual Mode
+unbind [
+bind v copy-mode
+
+# Vim keybindings in copy mode
+setw -g mode-keys vi
+
+bind-key -Tcopy-mode-vi 'v' send -X begin-selection
+bind-key -Tcopy-mode-vi 'y' send -X copy-pipe "pbcopy"
+
+# Better movement
 bind-key -n C-H previous-window
 bind-key -n C-L next-window
 
@@ -42,7 +43,7 @@ bind -n S-Right resize-pane -R 1
 bind -n S-Down  resize-pane -D 1
 bind -n S-Up    resize-pane -U 1
 
-# choosing windows with Alt-#
+# Choosing windows with Alt-#
 bind -n M-0 select-window -t 0
 bind -n M-1 select-window -t 1
 bind -n M-2 select-window -t 2
@@ -54,41 +55,19 @@ bind -n M-7 select-window -t 7
 bind -n M-8 select-window -t 8
 bind -n M-9 select-window -t 9
 
-# v to start copy mode as Vim's Visual Mode
-unbind [
-bind v copy-mode
-
-bind-key -Tcopy-mode-vi 'v' send -X begin-selection
-bind-key -Tcopy-mode-vi 'y' send -X copy-pipe "pbcopy"
-
-# Start window count at 1
-set-window-option -g pane-base-index 1
-
-# Vim keybindings in copy mode
-setw -g mode-keys vi
-
-# Tmux Status Bar
-set-option -g status on                 # turn on status bar
+# Status bar config
+set-option -g status on
 set-option -g status-position bottom
 
-set -g status-interval 10               # updating every 10 sec (default: 15s)
-set -g status-justify centre            # center window list
-
-# Disable visual notification for activity in other windows
-setw -g monitor-activity off
-set -g visual-activity off
-
-# Border color
-set -g pane-border-style fg=default
-# set -g pane-active-border-style fg=colour9
-set -g pane-active-border-style fg=colour6
-
-# status bar colors
 set-option -g status-bg default
 set-option -g status-fg colour12
 set-option -g status-attr dim
 
-# set current window
+# Border colors
+set -g pane-border-style fg=default
+set -g pane-active-border-style fg=colour6
+
+# Window colors
 set-window-option -g window-status-current-fg colour6
 set-window-option -g window-status-current-bg default
 set-window-option -g window-status-fg white
@@ -96,20 +75,9 @@ set-window-option -g window-status-bg default
 setw -g window-status-format "  #W  "
 setw -g window-status-current-format "  #W  "
 
-# Mimic iTerm dim
-# set -g window-style 'fg=colour247,bg=colour237'
-# set -g window-active-style 'fg=colour250,bg=colour237'
-# set -g pane-border-fg colour250
-# set -g pane-border-bg default
-# set -g pane-active-border-fg colour250
-# set -g pane-active-border-bg default
-
-# center align window list
 set -g status-justify left
 set -g status-left ""
-
-set -g status-right-length 80
-set -g status-right "#(battery -tep) #[fg=white]| #[fg=cyan]%l:%M %p #[fg=white]| #[fg=blue]#(~/.dotfiles/tmux/scripts/status_bar/local_ips.sh) #[fg=white]| #(~/.dotfiles/tmux/scripts/status_bar/timetrap.sh)"
+set -g status-right "#[fg=white]%l:%M %p"
 
 # TPM plugins
 set -g @plugin 'tmux-plugins/tpm'

@@ -1,0 +1,3 @@
+export FZF_DEFAULT_COMMAND="rg --files --hidden --follow --ignore-file $DOTFILES/ripgrep/ignore"
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

@@ -1,7 +1,0 @@
-# Ignore locally installed binaries
-battery
-flake8
-imgcat
-mustacheme
-pngout
-languagetool/

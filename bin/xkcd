@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env sh
 
 info=$(curl -s http://xkcd.com/info.0.json)
 

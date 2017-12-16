@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+# Make git great again
+
+git add . && git commit -m "Make this build green again"

@@ -1,0 +1,23 @@
+#!/usr/bin/env zsh
+
+# TODO: check when there is nothing to update
+
+git_prefix="[git]:"
+destination=${1:-master}
+branch=$(git rev-parse --abbrev-ref HEAD)
+
+_echo() {
+  echo -e "$git_prefix $@"
+}
+
+_echo "fetching origin/$destination..."
+git fetch origin $destination
+
+
+_echo "rebasing $destination..."
+git checkout $destination || exit "couldn't checkout $destination"
+git rebase
+
+_echo "rebasing $branch"
+git checkout $branch
+git rebase -i origin/$destination

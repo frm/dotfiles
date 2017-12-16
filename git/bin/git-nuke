@@ -1,0 +1,38 @@
+#!/usr/bin/env sh
+# # # # # # # # # # # # # # # # # #
+# CAUTION: BEWARE OF THIS SCRIPT! #
+# # # # # # # # # # # # # # # # # #
+#
+# This script prunes remote branches and
+# deletes local branches with no remote counterpart
+# INCLUDING UNMERGED BRANCHES WITH NO REMOTE
+#
+# This means that if you have an unmerged branch and
+# someone deleted its remote counterpart for some reason
+# without merging it first, YOU WILL LOSE YOUR WORK
+#
+# For a lighter version see bin/git-bomb
+
+# Prune origin
+echo "[git]: pruning..."
+git fetch --prune
+
+# Delete merged branches
+echo "[git]: deleting merged branches..."
+git branch --merged \
+  | grep -v master \
+  | grep -v '^\*' \
+  | xargs git branch -d
+
+# Delete unmerged branches with no remote counterpart
+echo "[git]: deleting unmerged branches..."
+git branch -avv \
+  | awk '/: gone\]/ { print $1 }' \
+  | xargs git branch -D
+
+if which cowsay &> /dev/null; then
+  (echo "I AM BECOME DEATH,\n\nDESTROYER OF WORLDS") \
+  | cowsay
+else
+  echo "\n\nI AM BECOME DEATH,\nDESTROYER OF WORLDS"
+fi

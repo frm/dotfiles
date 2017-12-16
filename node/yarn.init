@@ -1,2 +1,0 @@
-# Loading yarn
-export PATH="$PATH:$HOME/.yarn/bin"
