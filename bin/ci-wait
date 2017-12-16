@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/usr/bin/env zsh
 
 SUCCESS_MSG="✓"
 FAILURE_MSG="✗"

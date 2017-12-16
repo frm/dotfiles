@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env sh
 # Copy my ssh key
 
 SSH_PUB=$HOME/.ssh/id_rsa.pub

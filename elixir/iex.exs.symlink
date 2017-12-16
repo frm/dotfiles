@@ -1,0 +1,57 @@
+prompt_timestamp = fn ->
+  {_date, {hour, minute, _second}} = :calendar.local_time
+  [hour, minute]
+  |> Enum.map(&(String.pad_leading(Integer.to_string(&1), 2, "0")))
+  |> Enum.join(":")
+end
+
+prompt_color = fn ->
+  case System.get_env("MIX_ENV") do
+    "prod" -> IO.ANSI.red_background()
+    "stag" -> IO.ANSI.blue_background()
+    _ -> IO.ANSI.white()
+  end
+end
+
+IEx.configure(
+  colors: [
+    syntax_colors: [
+      number: :light_yellow,
+      atom: :light_green,
+      string: :light_red,
+      boolean: :blue,
+      nil: [:magenta, :bright],
+    ],
+    ls_directory: :cyan,
+    ls_device: :yellow,
+    doc_code: :green,
+    doc_inline_code: :magenta,
+    doc_headings: [:cyan, :underline],
+    doc_title: [:cyan, :bright, :underline],
+  ],
+  default_prompt:
+    "#{prompt_color.()}%prefix#{IO.ANSI.reset} " <>
+    "[#{IO.ANSI.light_black}#{prompt_timestamp.()}#{IO.ANSI.reset} " <>
+    "(#{IO.ANSI.light_blue}%counter#{IO.ANSI.reset})] >",
+  alive_prompt:
+    "#{prompt_color.()}%prefix#{IO.ANSI.reset} " <>
+    "(#{IO.ANSI.yellow}%node#{IO.ANSI.reset}) " <>
+    "[#{IO.ANSI.light_black}#{prompt_timestamp.()}#{IO.ANSI.reset} " <>
+    "(#{IO.ANSI.light_blue}%counter#{IO.ANSI.reset})] >",
+  history_size: 50,
+  inspect: [
+    pretty: true,
+    limit: :infinity,
+    width: 80
+  ],
+  width: 80
+)
+
+defmodule IExHelpers do
+  def reload! do
+    Mix.Task.reenable "compile.elixir"
+    Mix.Task.run "compile.elixir"
+  end
+end
+
+iex = IExHelpers

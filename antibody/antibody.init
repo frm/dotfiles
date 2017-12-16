@@ -1,3 +1,0 @@
-# Setup antibody
-source <(antibody init)
-antibody bundle < "$DOTFILES/antibody/bundles"

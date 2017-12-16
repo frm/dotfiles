@@ -1,9 +1,0 @@
-#!/usr/bin/env sh
-
-tmux has-session -t irc 2>/dev/null 1>&2
-
-if [[ $? -eq 1 ]]; then
-  tmux new-session -s irc -d "irssi"
-fi
-
-tmux attach-session -t irc

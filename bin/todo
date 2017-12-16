@@ -1,4 +1,0 @@
-#!/usr/bin/env sh
-# holman is a genius
-
-echo $@ | tr ' ' '_' | xargs -I {} touch ~/Desktop/{}.todo

@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+# Checkout a new branch based on master
+
+echo "[git]: checking out master..."
+git checkout master
+
+echo "[git]: updating..."
+git pull origin master
+
+echo "[git]: creating a new branch..."
+git checkout -b $1

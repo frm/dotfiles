@@ -1,5 +1,0 @@
-#!/bin/sh
-# Keynote syntax highlight
-# Copies syntax highlighted version to clipboard
-
-highlight -O rtf $1 | pbcopy

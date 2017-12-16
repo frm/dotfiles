@@ -1,7 +1,6 @@
 [user]
   name = Fernando Mendes
   email = devfrmendes@gmail.com
-  signingkey = DE2222D9
 [github]
   user = fribmendes
 [branch]
@@ -11,59 +10,52 @@
 [core]
   editor = nvim -f
   pager = diff-so-fancy | less --tabs=4 -RFX
-  excludesfile = /Users/frm/.gitignore_global
+  excludesfile = ~/.gitignore_global
 [credential]
   helper = osxkeychain
+[init]
+  templatedir = ~/.git_template
 [push]
   default = current
-[fetch]
-  prune = true
 [diff]
   tool = nvimdiff
 [difftool]
   prompt = true
 [difftool "nvimdiff"]
-  cmd= "nvim -d \"$LOCAL\" \"$REMOTE\""
+  cmd = "nvim -d \"$LOCAL\" \"$REMOTE\""
 [alias]
   a = add
   b = branch -avv
   c = commit
   co = checkout
   cp = cherry-pick
+  conf = diff --name-only --diff-filter=U
   d = diff
   dt = difftool
   f = fetch
-  l = log
-  ls = log --oneline --abbrev-commit # log short
+  l = log --oneline --abbrev-commit
   m = merge
   p = push
   pl = pull
   pr = pull-request
+  prs = browse -- 'pulls?q=is:pr is:open -review:approved -author:fribmendes'
+  pulls = browse -- pulls
   pt = push origin --tags
   rb = rebase
-  rv = browse -- 'pulls?q=is:pr is:open -review:approved -author:fribmendes'
+  rbc = rebase --continue
   s = status -s
-  st = status
-  stp = stash pop
   sts = stash save -u
-  wc = whatchanged -p --abbrev-commit --pretty
-
-  conf = diff --name-only --diff-filter=U
-  ctags = !.git/hooks/ctags
-  pulls = browse -- pulls
-  issues = browse -- issues
   tree = log --graph --pretty=format:'%Cred%h%Creset %an: %s - %Creset %C(yellow)%d%Creset %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
 
   bomb = !git-bomb
+  cl = !git-clone-cd
   cob = !git-checkout-branch
   cpr = !git-close-pr
   cr = !git-code-review
-  del = !git-del
   div = !git-divergence
   mpr = !git-merge-pr
+  rbm = !git-rebase-master
   nuke = !git-nuke
-  sync = !git-sync
   trump = !git-trump
+  ch = !git-whatchanged
   wip = !git-wip
-[init]
-  templatedir = ~/.git_template

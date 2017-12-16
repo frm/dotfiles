@@ -1,33 +1,25 @@
+# Custom variables
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+export EDITOR='nvim'
+
+# Set TERM to screen-256color to allow neovim to capture <M-BS>
+export TERM=screen-256color
 export DOTFILES="$HOME/.dotfiles"
-SYSTEM="$DOTFILES/system"
 
-# Load system configs
-source $SYSTEM/system.init
+# Load custom bins
+export PATH="$PATH:$DOTFILES/bin"
 
-# Load prompt
-source $DOTFILES/prompt/prompt.init
+source $DOTFILES/zsh/prompt.zsh
+source $DOTFILES/zsh/completions.zsh
+source $DOTFILES/zsh/keys.zsh
 
-# Init antibody
-source $DOTFILES/antibody/antibody.init
-
-# Load aliases and functions
 source $DOTFILES/functions/aliases.zsh
 source $DOTFILES/functions/functions.zsh
 
-# Add custom bins to path
-export PATH="$DOTFILES/bin:${PATH}"
+source $DOTFILES/git/init.zsh
+source $DOTFILES/javascript/nvm.init
 
-# Inits
-source $DOTFILES/elixir/kerl.init
-source $DOTFILES/elixir/kiex.init
-source $DOTFILES/python/pyenv.init
-source $DOTFILES/node/nvm.init
-source $DOTFILES/node/yarn.init
-source $DOTFILES/haskell/ghc.init
-source $DOTFILES/ruby/rvm.init
-
-source $SYSTEM/fzf.zsh
-source $SYSTEM/hub.zsh
-source $SYSTEM/z.zsh
-source $SYSTEM/travis.zsh
-source $SYSTEM/completions.zsh
+source $DOTFILES/system/direnv.init
+source $DOTFILES/system/fzf.init
+source $DOTFILES/system/z.init

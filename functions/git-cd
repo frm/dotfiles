@@ -1,8 +1,0 @@
-#!/bin/sh
-# cd to git project directory
-
-git-cd() {
-  cd `git rev-parse --show-toplevel`
-}
-
-alias cg="git-cd"
