@@ -10,6 +10,7 @@ Plug 'tpope/vim-rhubarb'
 Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-abolish'
 Plug 'chrisbra/Colorizer'
+Plug 'easymotion/vim-easymotion'
 
 " Scheme
 Plug 'vim-airline/vim-airline'
@@ -107,7 +108,7 @@ let test#strategy = "neoterm"
 nnoremap <silent> <localleader>a :TestSuite<cr>
 nnoremap <silent> <localleader>c :TestNearest<cr>
 nnoremap <silent> <localleader>f :TestFile<cr>
-nnoremap <silent> <localleader>s :TestLast<cr>
+nnoremap <silent> <localleader><localleader> :TestLast<cr>
 
 """""""""""""""""""""
 "        Ale        "
@@ -128,3 +129,11 @@ let g:ale_linters = {
 "     Colorizer     "
 """""""""""""""""""""
 let g:colorizer_auto_filetype='css,html,scss,slim,sass,less'
+
+"""""""""""""""""""""
+"    EasyMotion     "
+"""""""""""""""""""""
+" s for character search
+" fs for character search across buffers
+nmap <localleader>s <Plug>(easymotion-s)
+nmap <localleader>fs <Plug>(easymotion-overwin-f)
