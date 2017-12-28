@@ -25,3 +25,9 @@ set splitright
 
 " Number of lines between cursor and scroll
 set scrolloff=4
+
+" Highlight current cursor column
+set cursorcolumn
+
+" Set sane J in normal mode
+set formatoptions+=j

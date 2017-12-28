@@ -17,7 +17,7 @@ nnoremap <M-k> <C-w>K
 nnoremap <M-l> <C-w>L
 
 " Clear search results
-nnoremap <localleader>, :noh<CR>
+nnoremap <localleader><leader> :noh<CR>
 
 " Mimic Alt-backspace
 inoremap <M-BS> <C-W>
