@@ -5,9 +5,9 @@ loud_mode() {
 }
 
 ci_result() {
-  result=$(ci-wait)
+  _result=$(ci-wait)
 
-  case $result in
+  case $? in
     0)
       msg="passed"
       ;;
