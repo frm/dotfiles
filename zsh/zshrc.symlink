@@ -10,6 +10,8 @@ export DOTFILES="$HOME/.dotfiles"
 # Load custom bins
 export PATH="$PATH:$DOTFILES/bin"
 
+source $DOTFILES/system/env.init
+
 source $DOTFILES/zsh/prompt.zsh
 source $DOTFILES/zsh/completions.zsh
 source $DOTFILES/zsh/keys.zsh
