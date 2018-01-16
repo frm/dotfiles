@@ -9,11 +9,12 @@ source $DOTFILES/zsh/prompt.zsh
 source $DOTFILES/zsh/completions.zsh
 source $DOTFILES/zsh/keys.zsh
 
+source $DOTFILES/asdf/asdf.init
+
 source $DOTFILES/functions/aliases.zsh
 source $DOTFILES/functions/functions.zsh
 
 source $DOTFILES/git/init.zsh
-source $DOTFILES/javascript/nvm.init
 
 source $DOTFILES/system/direnv.init
 source $DOTFILES/system/fzf.init
