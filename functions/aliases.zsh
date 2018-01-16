@@ -9,6 +9,7 @@ alias ta="tmux attach"
 alias tls="tmux list-sessions"
 alias mux="tmuxinator"
 
+alias git="hub"
 alias g="hub"
 alias gh="hub browse"
 
