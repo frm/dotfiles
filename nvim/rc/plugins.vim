@@ -113,17 +113,51 @@ nnoremap <silent> <localleader><localleader> :TestLast<cr>
 """""""""""""""""""""
 "        Ale        "
 """""""""""""""""""""
+let g:airline#extensions#ale#enabled = 1
+let g:ale_sign_error = '→'
+let g:ale_sign_warning = '→'
+let g:ale_fix_on_save = 1
+
+let g:ale_fixers = {
+\   'ruby':  [],
+\   'elixir':  [],
+\   'typescript': ['tslint', 'tsserver', 'prettier'],
+\   'javascript': [],
+\ }
+
 let g:ale_linters = {
-\   'javascript': ['eslint'],
+\   'javascript': [],
 \   'typescript': ['tslint'],
-\   'jsx': ['eslint'],
-\   'css': ['stylelint'],
-\   'scss': ['scsslint'],
-\   'elixir': ['credo'],
-\   'ruby': ['rubocop'],
+\   'jsx': [],
+\   'css': [],
+\   'scss': [],
+\   'elixir': [],
+\   'ruby': [],
 \   'html': [],
 \   'markdown': [],
 \}
+
+function! AddLinterIfFileExists(lang, linter, file, lint, fix)
+  let l:current = g:ale_linters[a:lang]
+
+  if filereadable(a:file) && index(l:current, a:linter) == -1
+    if a:lint
+      let g:ale_linters[a:lang] = g:ale_linters.javascript + [a:linter]
+    endif
+    if a:fix
+      let g:ale_fixers[a:lang] = g:ale_linters.javascript + [a:linter]
+    end
+  endif
+endfunction
+
+call AddLinterIfFileExists('javascript', 'eslint', '.eslintrc.json', 1, 1)
+call AddLinterIfFileExists('javascript', 'standard', 'node_modules/.bin/standard', 1, 1)
+call AddLinterIfFileExists('css', 'stylelint', '.stylelintrc', 1, 0)
+call AddLinterIfFileExists('scss', 'stylelint', '.stylelintrc', 1, 0)
+call AddLinterIfFileExists('scss', 'scss-lint', '.scss-lint.yml', 1, 0)
+call AddLinterIfFileExists('ruby', 'rubocop', '.rubocop.yml', 1, 1)
+call AddLinterIfFileExists('elixir', 'credo', 'config/.credo.exs', 1, 0)
+call AddLinterIfFileExists('elixir', 'credo', '.credo.exs', 1, 0)
 
 """""""""""""""""""""
 "     Colorizer     "
