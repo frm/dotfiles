@@ -1,7 +1,7 @@
 export DOTFILES="$HOME/.dotfiles"
 
 # Load custom bins
-export PATH="$PATH:$DOTFILES/bin"
+export PATH="$PATH:$DOTFILES/bin:/usr/local/bin"
 
 source $DOTFILES/system/env.init
 
