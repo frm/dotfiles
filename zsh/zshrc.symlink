@@ -5,6 +5,7 @@ export PATH="$PATH:$DOTFILES/bin:/usr/local/bin"
 
 source $DOTFILES/system/env.init
 
+source $DOTFILES/zsh/init.zsh
 source $DOTFILES/zsh/prompt.zsh
 source $DOTFILES/zsh/completions.zsh
 source $DOTFILES/zsh/keys.zsh
