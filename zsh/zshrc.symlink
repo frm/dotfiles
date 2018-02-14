@@ -9,6 +9,7 @@ source $DOTFILES/zsh/init.zsh
 source $DOTFILES/zsh/prompt.zsh
 source $DOTFILES/zsh/completions.zsh
 source $DOTFILES/zsh/keys.zsh
+source $DOTFILES/zsh/keybindings.zsh
 
 source $DOTFILES/asdf/asdf.init
 
