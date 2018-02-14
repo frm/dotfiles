@@ -23,6 +23,7 @@ Plug 'tpope/vim-surround'
 Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-endwise'
 Plug 'kana/vim-textobj-user'
+Plug 'AndrewRadev/splitjoin.vim'
 
 " Testing
 Plug 'kassio/neoterm'
