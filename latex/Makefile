@@ -39,4 +39,4 @@ clean:
 	@echo "\n"
 	$(RM) $(NAME).{acn,glo,ist,run.xml,upa,upb,bcf,aux,bbl,blg,lof,log,synctex.gz,toc,pdf} texput.log
 	@echo ""
-$(call pretty_print,$(GREEN),✓ done!)
+	$(call pretty_print,$(GREEN),✓ done!)
