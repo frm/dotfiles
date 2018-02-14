@@ -85,6 +85,7 @@ command! -bang -nargs=* Rg
 """""""""""""""""""""
 "     Deoplete      "
 """""""""""""""""""""
+set runtimepath+=~/.local/shared/nvim/plugged/deoplete.nvim/
 let g:deoplete#enable_at_startup = 1
 
 """""""""""""""""""""
