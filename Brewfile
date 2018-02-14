@@ -1,9 +1,12 @@
+tap 'eddieantonio/eddieantonio'
+
 brew 'coreutils'
 brew 'cowsay'
 brew 'ctags'
 brew 'curl'
 brew 'diff-so-fancy'
 brew 'direnv'
+brew 'imgcat'
 brew 'mpv'
 brew 'neovim'
 brew 'openssl'
