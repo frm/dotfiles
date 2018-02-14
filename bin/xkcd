@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-info=$(curl -s http://xkcd.com/info.0.json)
+info=$(wget -q -O - "$@" https://xkcd.com/info.0.json)
 
 get_param() {
   echo $1 \
