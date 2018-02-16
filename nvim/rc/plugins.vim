@@ -44,6 +44,11 @@ Plug 'nelstrom/vim-textobj-rubyblock', { 'for': 'ruby' }
 Plug 'slim-template/vim-slim', { 'for': 'slim' }
 
 Plug 'elzr/vim-json', { 'for': 'json' }
+Plug 'prettier/vim-prettier', {
+  \ 'do': 'yarn install',
+  \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue']}
+
+Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'cpp', 'flex'] }
 
 call plug#end()
 
@@ -123,13 +128,13 @@ let g:ale_fix_on_save = 1
 let g:ale_fixers = {
 \   'ruby':  [],
 \   'elixir':  [],
-\   'typescript': ['tslint', 'tsserver', 'prettier'],
-\   'javascript': [],
+\   'typescript': ['prettier'],
+\   'javascript': ['prettier'],
 \ }
 
 let g:ale_linters = {
-\   'javascript': [],
-\   'typescript': ['tslint'],
+\   'javascript': ['prettier'],
+\   'typescript': ['prettier'],
 \   'jsx': [],
 \   'css': [],
 \   'scss': [],
