@@ -20,6 +20,7 @@ source $DOTFILES/git/init.zsh
 
 source $DOTFILES/elixir/erl.init
 source $DOTFILES/node/node.init
+source $DOTFILES/go/go.init
 
 source $DOTFILES/system/direnv.init
 source $DOTFILES/system/fzf.init
