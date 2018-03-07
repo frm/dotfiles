@@ -34,4 +34,4 @@ set formatoptions+=j
 
 " Set python locations
 let g:python_host_prog = "/usr/local/bin/python2.7"
-let g:python3_host_prog = "/usr/local/bin/python3.6"
+let g:python3_host_prog = "/Users/frm/.asdf/shims/python3.6"
