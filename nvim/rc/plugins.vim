@@ -48,6 +48,8 @@ Plug 'prettier/vim-prettier', {
   \ 'do': 'yarn install',
   \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue']}
 
+Plug 'shime/vim-livedown', { 'for': 'markdown' }
+
 Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'cpp', 'flex'] }
 
 call plug#end()
@@ -105,6 +107,8 @@ let g:AutoPairsOnlyWhitespace = 1
 let g:neoterm_shell = 'zsh'
 let g:neoterm_position='vertical'
 let g:neoterm_size=50
+let g:neoterm_fixedsize=50
+let g:neoterm_autoscroll=1
 nnoremap <silent> <localleader>l :call neoterm#clear()<cr>
 nnoremap <silent> <localleader>q :call neoterm#close()<cr>
 
@@ -127,7 +131,7 @@ let g:ale_fix_on_save = 1
 
 let g:ale_fixers = {
 \   'ruby':  [],
-\   'elixir':  [],
+\   'elixir':  ['mix_format'],
 \   'typescript': ['prettier'],
 \   'javascript': ['prettier'],
 \ }
@@ -178,3 +182,18 @@ let g:colorizer_auto_filetype='css,html,scss,slim,sass,less'
 " fs for character search across buffers
 nmap <localleader>s <Plug>(easymotion-s)
 nmap <localleader>fs <Plug>(easymotion-overwin-f)
+
+"""""""""""""""""""""
+"     LiveDown      "
+"""""""""""""""""""""
+" should markdown preview get shown automatically upon opening markdown buffer
+let g:livedown_autorun = 0
+
+" should the browser window pop-up upon previewing
+let g:livedown_open = 1
+
+" the port on which Livedown server will run
+let g:livedown_port = 7654
+
+" the browser to use
+let g:livedown_browser = "firefox"
