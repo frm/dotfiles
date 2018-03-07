@@ -17,6 +17,15 @@ mkcd() {
   cd $@
 }
 
+# Search the tree for files and open them in $EDITOR
+f() {
+  file=$(fzf)
+
+  if [ ! -z $file ]; then
+    $EDITOR $file
+  fi
+}
+
 # Create a tmux session named after the current directory
 t() {
   if [ $# -eq 0 ]; then
