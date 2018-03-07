@@ -11,6 +11,7 @@ Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-abolish'
 Plug 'chrisbra/Colorizer'
 Plug 'easymotion/vim-easymotion'
+Plug 'embear/vim-localvimrc'
 
 " Scheme
 Plug 'vim-airline/vim-airline'
@@ -100,6 +101,11 @@ let g:deoplete#enable_at_startup = 1
 """""""""""""""""""""
 let g:AutoPairsMultilineClose = 0
 let g:AutoPairsOnlyWhitespace = 1
+
+"""""""""""""""""""""
+"    LocalVimRc     "
+"""""""""""""""""""""
+let g:localvimrc_ask = 0
 
 """""""""""""""""""""
 "      NeoTerm      "
