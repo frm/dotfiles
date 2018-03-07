@@ -5,8 +5,11 @@ set -g prefix C-a
 setw -g xterm-keys on
 
 # 256 colourspace
-set -g default-terminal "screen-256color"
+set -ga default-terminal "screen-256color"
 set -ga terminal-overrides ',screen-256color:Tc'
+
+# Fix cursor change in nvim
+set -g -a terminal-overrides ',*:Ss=\E[%p1%d q:Se=\E[2 q'
 
 # Bind splits to C-A s/S
 bind-key s split-window -h -c '#{pane_current_path}'
@@ -38,6 +41,7 @@ bind-key -Tcopy-mode-vi 'y' send -X copy-pipe "pbcopy"
 # Better movement
 bind-key -n C-H previous-window
 bind-key -n C-L next-window
+bind-key -n C-S send-keys -R \; send-keys "Enter"
 
 # Resizing windows
 bind -n S-Left  resize-pane -L 1
