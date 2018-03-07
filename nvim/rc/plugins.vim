@@ -110,10 +110,27 @@ let g:neoterm_size=50
 let g:neoterm_fixedsize=50
 let g:neoterm_autoscroll=1
 nnoremap <silent> <localleader>l :call neoterm#clear()<cr>
-nnoremap <silent> <localleader>q :call neoterm#close()<cr>
+nnoremap <silent> <localleader>q :Ttoggle<cr>
+tnoremap <silent> <C-E> <C-\><C-n>
+
+function! HorizontalTerm()
+  let g:neoterm_position='horizontal'
+  let g:neoterm_size=15
+  let g:neoterm_fixed_size=15
+  let g:neoterm_autojump=1
+  let g:neoterm_autoinsert=1
+
+  call neoterm#toggle()
+
+  let g:neoterm_position='vertical'
+  let g:neoterm_size=50
+  let g:neoterm_fixedsize=50
+endfunction
+
+nnoremap <silent> <localleader>T :call HorizontalTerm()<cr>
 
 """""""""""""""""""""
-"      NeoTest      "
+"      VimTest      "
 """""""""""""""""""""
 let test#strategy = "neoterm"
 nnoremap <silent> <localleader>a :TestSuite<cr>
