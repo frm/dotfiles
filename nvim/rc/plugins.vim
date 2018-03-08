@@ -41,6 +41,7 @@ Plug 'andyl/vim-textobj-elixir', { 'for': 'elixir' }
 
 Plug 'vim-ruby/vim-ruby', { 'for': 'ruby' }
 Plug 'tpope/vim-rails', { 'for': 'ruby' }
+Plug 'tpope/vim-bundler', { 'for': 'ruby' }
 Plug 'nelstrom/vim-textobj-rubyblock', { 'for': 'ruby' }
 Plug 'slim-template/vim-slim', { 'for': 'slim' }
 
