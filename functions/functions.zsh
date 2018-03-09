@@ -41,6 +41,7 @@ t() {
 # git clone a repo and cd to it
 # This needs to be a function to change the current environment
 alias gcl="git-clone-cd"
+
 git-clone-cd() {
   if which hub &> /dev/null; then
     git="hub"
@@ -50,8 +51,10 @@ git-clone-cd() {
 
   $git clone $@
 
-  repo=$(echo $@ | awk -F / '{ print $NF }' | sed 's/.git//g')
-  cd $repo
+  if [[ $? -eq 0 ]]; then
+    repo=$(echo $@ | awk -F / '{ print $NF }' | sed 's/.git//g')
+    cd $repo
+  fi
 }
 
 x() {
