@@ -32,7 +32,8 @@ Plug 'janko-m/vim-test'
 
 " Languages & Completions
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-Plug 'w0rp/ale'
+" Plug 'w0rp/ale'
+Plug '~/Developer/ale'
 
 Plug 'elixir-editors/vim-elixir', { 'for': 'elixir' }
 Plug 'slashmili/alchemist.vim', { 'for': 'elixir' }
@@ -53,6 +54,8 @@ Plug 'prettier/vim-prettier', {
 Plug 'shime/vim-livedown', { 'for': 'markdown' }
 
 Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'cpp', 'flex'] }
+
+Plug 'junegunn/vader.vim'
 
 call plug#end()
 
@@ -152,10 +155,11 @@ let g:airline#extensions#ale#enabled = 1
 let g:ale_sign_error = '→'
 let g:ale_sign_warning = '→'
 let g:ale_fix_on_save = 1
+let g:ale_completion_enabled = 1
 
 let g:ale_fixers = {
 \   'ruby':  [],
-\   'elixir':  ['mix_format'],
+\   'elixir':  [],
 \   'typescript': ['prettier'],
 \   'javascript': ['prettier'],
 \ }
@@ -177,10 +181,10 @@ function! AddLinterIfFileExists(lang, linter, file, lint, fix)
 
   if filereadable(a:file) && index(l:current, a:linter) == -1
     if a:lint
-      let g:ale_linters[a:lang] = g:ale_linters.javascript + [a:linter]
+      let g:ale_linters[a:lang] = [a:linter]
     endif
     if a:fix
-      let g:ale_fixers[a:lang] = g:ale_linters.javascript + [a:linter]
+      let g:ale_fixers[a:lang] = [a:linter]
     end
   endif
 endfunction
@@ -193,6 +197,25 @@ call AddLinterIfFileExists('scss', 'scss-lint', '.scss-lint.yml', 1, 0)
 call AddLinterIfFileExists('ruby', 'rubocop', '.rubocop.yml', 1, 1)
 call AddLinterIfFileExists('elixir', 'credo', 'config/.credo.exs', 1, 0)
 call AddLinterIfFileExists('elixir', 'credo', '.credo.exs', 1, 0)
+
+function! LoadNearestFormatter()
+  let l:formatters = []
+  let l:directory = fnameescape(expand("%:p:h"))
+
+  for l:fmt in findfile(".formatter.exs", l:directory . ";", -1)
+    call insert(l:formatters, l:fmt)
+  endfor
+
+  call reverse(l:formatters)
+
+  let g:ale_fixers['elixir'] = ['mix_format']
+
+  if len(l:formatters) > 0
+    let g:ale_elixir_mix_format_options = "--dot-formatter " . l:formatters[0]
+  endif
+endfunction
+
+call LoadNearestFormatter()
 
 """""""""""""""""""""
 "     Colorizer     "
