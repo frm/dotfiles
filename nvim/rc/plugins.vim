@@ -119,7 +119,7 @@ let g:neoterm_position='vertical'
 let g:neoterm_size=50
 let g:neoterm_fixedsize=50
 let g:neoterm_autoscroll=1
-nnoremap <silent> <localleader>l :call neoterm#clear()<cr>
+nnoremap <silent> <localleader>l :Tclear<cr>
 nnoremap <silent> <localleader>q :Ttoggle<cr>
 tnoremap <silent> <C-E> <C-\><C-n>
 
