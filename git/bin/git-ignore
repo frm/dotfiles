@@ -2,7 +2,7 @@
 
 # TODO: make this support the nearest .gitignore, not the root
 if [ $# -eq 0 ]; then
-  echo "[git]: ERR: git-ignore requires a list of files to add to root .gitgnore"
+  echo "[git]: ERR: git-ignore requires a list of files to add to root .gitignore"
   exit 1
 fi
 
