@@ -1,0 +1,23 @@
+#!/usr/bin/env sh
+
+set -e
+
+if [ $# -eq 0 ]; then
+  echo "[git]: ERR: git-exclude requires a list of files to exclude"
+  exit 1
+fi
+
+dotgit="$(git rev-parse --show-toplevel)/.git"
+exclude="$dotgit/info/exclude"
+
+# ensure .git/info/exclude exists
+mkdir -p $dotgit/info
+touch $exclude
+
+for file in $@; do
+  echo "[git]: adding $file to exclude file..."
+  echo $file >> $dotgit/exclude/info
+done
+
+echo ""
+echo "[git]: files excluded!"

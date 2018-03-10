@@ -54,6 +54,7 @@
   cpr = !git-close-pr
   cr = !git-code-review
   div = !git-divergence
+  exclude = !git-exclude
   ignore = !git-ignore
   mpr = !git-merge-pr
   rbm = !git-rebase-master
