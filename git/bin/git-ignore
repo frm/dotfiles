@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+
+# TODO: make this support the nearest .gitignore, not the root
+if [ $# -eq 0 ]; then
+  echo "[git]: ERR: git-ignore requires a list of files to add to root .gitgnore"
+  exit 1
+fi
+
+root=$(git rev-parse --show-toplevel)
+
+for file in $@; do
+  echo "[git]: adding $file to .gitignore..."
+  echo $file >> $root/.gitignore
+done
+
+echo ""
+echo "[git]: files ignored!"
