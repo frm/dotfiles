@@ -16,7 +16,8 @@ touch $exclude
 
 for file in $@; do
   echo "[git]: adding $file to exclude file..."
-  echo $file >> $dotgit/exclude/info
+
+  echo $file >> $exclude
 done
 
 echo ""
