@@ -49,13 +49,14 @@
   tree = log --graph --pretty=format:'%Cred%h%Creset %an: %s - %Creset %C(yellow)%d%Creset %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
 
   bomb = !git-bomb
+  ch = !git-whatchanged
   cob = !git-checkout-branch
   cpr = !git-close-pr
   cr = !git-code-review
   div = !git-divergence
+  ignore = !git-ignore
   mpr = !git-merge-pr
   rbm = !git-rebase-master
   nuke = !git-nuke
   trump = !git-trump
-  ch = !git-whatchanged
   wip = !git-wip
