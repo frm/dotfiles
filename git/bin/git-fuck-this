@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+
+art="(ノಠ益ಠ)ノ彡┻━┻"
+
+git checkout -- .
+git status -s | cut -d ' ' -f 2 | xargs rm -rf
+echo "."
+echo ".."
+echo "... [git]: $art"

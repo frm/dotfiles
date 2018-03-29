@@ -61,3 +61,4 @@
   nuke = !git-nuke
   trump = !git-trump
   wip = !git-wip
+  fuckthis = !git-fuck-this
