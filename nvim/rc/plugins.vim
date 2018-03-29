@@ -32,8 +32,7 @@ Plug 'janko-m/vim-test'
 
 " Languages & Completions
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-" Plug 'w0rp/ale'
-Plug '~/Developer/ale'
+Plug 'w0rp/ale'
 
 Plug 'elixir-editors/vim-elixir', { 'for': 'elixir' }
 Plug 'slashmili/alchemist.vim', { 'for': 'elixir' }
@@ -181,15 +180,16 @@ function! AddLinterIfFileExists(lang, linter, file, lint, fix)
 
   if filereadable(a:file) && index(l:current, a:linter) == -1
     if a:lint
-      let g:ale_linters[a:lang] = [a:linter]
+      let g:ale_linters[a:lang] = g:ale_linters[a:lang] + [a:linter]
     endif
     if a:fix
-      let g:ale_fixers[a:lang] = [a:linter]
+      let g:ale_fixers[a:lang] = g:ale_fixers[a:lang] + [a:linter]
     end
   endif
 endfunction
 
 call AddLinterIfFileExists('javascript', 'eslint', '.eslintrc.json', 1, 1)
+call AddLinterIfFileExists('javascript', 'eslint', '.eslintrc', 1, 1)
 call AddLinterIfFileExists('javascript', 'standard', 'node_modules/.bin/standard', 1, 1)
 call AddLinterIfFileExists('css', 'stylelint', '.stylelintrc', 1, 0)
 call AddLinterIfFileExists('scss', 'stylelint', '.stylelintrc', 1, 0)
