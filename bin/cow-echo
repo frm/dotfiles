@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+figures=(dragon dragon-and-cow eyes flaming-sheep ghostbusters head-in kitty koala luke-koala meow satanic skeleton stegosaurus three-eyes turtle tux vader vader-koala)
+
+rand=$((RANDOM % 18))
+
+cowsay -f ${figures[rand]} $1

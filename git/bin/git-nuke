@@ -30,9 +30,12 @@ git branch -avv \
   | awk '/: gone\]/ { print $1 }' \
   | xargs git branch -D
 
-if which cowsay &> /dev/null; then
-  (echo "I AM BECOME DEATH,\n\nDESTROYER OF WORLDS") \
-  | cowsay
+line="I AM BECOME DEATH,\n\nDESTROYER OF WORLDS"
+
+if which cow-echo &> /dev/null; then
+  echo $line | cow-echo
+elif which cowsay &> /dev/null; then
+  echo $line | cowsay
 else
-  echo "\n\nI AM BECOME DEATH,\nDESTROYER OF WORLDS"
+  echo "\n\n$line"
 fi
