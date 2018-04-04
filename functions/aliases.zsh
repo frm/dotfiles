@@ -20,6 +20,7 @@ alias m="mix"
 alias r="rails"
 alias rk="bundle exec rake"
 alias b="bundle"
+alias y="yarn"
 
 alias dev="development"
 alias prod="production"
