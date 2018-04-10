@@ -83,33 +83,103 @@ render_timer: false
 custom_cursor_colors: false
 
 # Colors (Hybrid)
+# colors:
+#   # Default colors
+#   primary:
+#     background: '0x27292c'
+#     foreground: '0xd0d2d1'
+#
+#   # Normal colors
+#   normal:
+#     black:   '0x35383b'
+#     red:     '0xb05655'
+#     green:   '0x769972'
+#     yellow:  '0xe1a574'
+#     blue:    '0x7693ac'
+#     magenta: '0x977ba0'
+#     cyan:    '0x749e99'
+#     white:   '0x848b92'
+#
+#   # Bright colors
+#   bright:
+#     black:   '0x484c52'
+#     red:     '0xd27c7b'
+#     green:   '0xdffebe'
+#     yellow:  '0xf0d189'
+#     blue:    '0x96b1c9'
+#     magenta: '0xbfa5c7'
+#     cyan:    '0x9fc9c3'
+#     white:   '0xfcf7e2'
+
+# Base16 Default Dark 256 - alacritty color config
+# Chris Kempson (http://chriskempson.com)
+# colors:
+#   # Default colors
+#   primary:
+#     background: '0x181818'
+#     foreground: '0xd8d8d8'
+#
+#   # Colors the cursor will use if `custom_cursor_colors` is true
+#   cursor:
+#     text: '0x181818'
+#     cursor: '0xd8d8d8'
+#
+#   # Normal colors
+#   normal:
+#     black:   '0x181818'
+#     red:     '0xab4642'
+#     green:   '0xa1b56c'
+#     yellow:  '0xf7ca88'
+#     blue:    '0x7cafc2'
+#     magenta: '0xba8baf'
+#     cyan:    '0x86c1b9'
+#     white:   '0xd8d8d8'
+#
+#   # Bright colors
+#   bright:
+#     black:   '0x585858'
+#     red:     '0xab4642'
+#     green:   '0xa1b56c'
+#     yellow:  '0xf7ca88'
+#     blue:    '0x7cafc2'
+#     magenta: '0xba8baf'
+#     cyan:    '0x86c1b9'
+#     white: '0xd8d8d8'
+
+# Base16 Tomorrow Night 256 - alacritty color config
+# Chris Kempson (http://chriskempson.com)
 colors:
   # Default colors
   primary:
-    background: '0x27292c'
-    foreground: '0xd0d2d1'
+    background: '0x1d1f21'
+    foreground: '0xc5c8c6'
+
+  # Colors the cursor will use if `custom_cursor_colors` is true
+  cursor:
+    text: '0x1d1f21'
+    cursor: '0xc5c8c6'
 
   # Normal colors
   normal:
-    black:   '0x35383b'
-    red:     '0xb05655'
-    green:   '0x769972'
-    yellow:  '0xe1a574'
-    blue:    '0x7693ac'
-    magenta: '0x977ba0'
-    cyan:    '0x749e99'
-    white:   '0x848b92'
+    black:   '0x1d1f21'
+    red:     '0xcc6666'
+    green:   '0xb5bd68'
+    yellow:  '0xf0c674'
+    blue:    '0x81a2be'
+    magenta: '0xb294bb'
+    cyan:    '0x8abeb7'
+    white:   '0xc5c8c6'
 
   # Bright colors
   bright:
-    black:   '0x484c52'
-    red:     '0xd27c7b'
-    green:   '0xdffebe'
-    yellow:  '0xf0d189'
-    blue:    '0x96b1c9'
-    magenta: '0xbfa5c7'
-    cyan:    '0x9fc9c3'
-    white:   '0xfcf7e2'
+    black:   '0x969896'
+    red:     '0xcc6666'
+    green:   '0xb5bd68'
+    yellow:  '0xf0c674'
+    blue:    '0x81a2be'
+    magenta: '0xb294bb'
+    cyan:    '0x8abeb7'
+    white: '0xc5c8c6'
 
 # Visual Bell
 #

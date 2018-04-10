@@ -1,7 +1,7 @@
 let mapleader="\<space>"
 let maplocalleader=','
 
-imap jj <Esc>
+imap jk <Esc>
 set timeoutlen=300
 
 " Better pane movement

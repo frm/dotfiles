@@ -12,11 +12,17 @@ let g:enable_bold_font=1
 let g:enable_italic_font = 1
 
 set background=dark
-colorscheme hybrid_reverse
-let g:hybrid_custom_term_colors = 1
+colorscheme base16-tomorrow-night
+" colorscheme hybrid_reverse
+" let g:hybrid_custom_term_colors = 1
+if filereadable(expand("~/.vimrc_background"))
+  let base16colorspace=256
+  source ~/.vimrc_background
+endif
 
 " Vim Airline
-let g:airline_theme = 'hybrid'
+" let g:airline_theme = 'hybrid'
+let g:airline_theme = 'base16_tomorrow'
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#branch#enabled=1
 let g:airline_powerline_fonts = 1
