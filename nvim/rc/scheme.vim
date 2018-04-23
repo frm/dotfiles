@@ -22,7 +22,7 @@ endif
 
 " Vim Airline
 " let g:airline_theme = 'hybrid'
-let g:airline_theme = 'base16_tomorrow'
+let g:airline_theme = 'base16_eighties'
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#branch#enabled=1
 let g:airline_powerline_fonts = 1
