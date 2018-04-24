@@ -19,6 +19,7 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'kristijanhusak/vim-hybrid-material'
 Plug 'w0ng/vim-hybrid'
 Plug 'chriskempson/base16-vim'
+Plug 'mhinz/vim-startify'
 
 " Formatting
 Plug 'tpope/vim-surround'
