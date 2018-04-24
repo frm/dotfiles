@@ -4,4 +4,4 @@ figures=(dragon dragon-and-cow eyes flaming-sheep ghostbusters head-in kitty koa
 
 rand=$((RANDOM % 18))
 
-cowsay -f ${figures[rand]} $1
+cowsay -f ${figures[rand]} $1 | lolcat
