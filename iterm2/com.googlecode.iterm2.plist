@@ -363,7 +363,7 @@
 	<key>LoadPrefsFromCustomFolder</key>
 	<true/>
 	<key>NSNavLastRootDirectory</key>
-  <string>~/Developer/frm/dotfiles/iterm2/colors</string>
+	<string>~/Developer/dotfiles/iterm2/colors</string>
 	<key>NSNavPanelExpandedSizeForOpenMode</key>
 	<string>{712, 448}</string>
 	<key>NSQuotedKeystrokeBinding</key>
@@ -403,13 +403,13 @@
 		<integer>1</integer>
 	</dict>
 	<key>NSWindow Frame SUUpdateAlert</key>
-	<string>530 494 620 392 0 0 1680 1027 </string>
+	<string>2330 468 620 392 1680 -30 1920 1057 </string>
 	<key>NSWindow Frame SessionsPreferences</key>
 	<string>269 144 606 469 0 0 1680 1050 </string>
 	<key>NSWindow Frame SharedPreferences</key>
-	<string>303 621 918 394 0 0 1680 1050 </string>
+	<string>303 542 796 473 0 0 1680 1027 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>0 24 1920 1033 0 0 1920 1057 </string>
+	<string>515 312 650 429 0 0 1680 1027 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
 	<string>212 144 650 452 0 0 1680 1027 </string>
 	<key>New Bookmarks</key>
@@ -1097,7 +1097,7 @@
 		</dict>
 	</dict>
 	<key>PrefsCustomFolder</key>
-  <string>/Users/frm/Developer/frm/dotfiles/iterm2</string>
+	<string>/Users/frm/Developer/frm/dotfiles/iterm2</string>
 	<key>QuitWhenAllWindowsClosed</key>
 	<true/>
 	<key>SUEnableAutomaticChecks</key>
@@ -1109,7 +1109,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2018-03-05T10:42:47Z</date>
+	<date>2018-04-24T21:43:35Z</date>
 	<key>SUSendProfileInfo</key>
 	<false/>
 	<key>ShowFullScreenTabBar</key>
@@ -1118,6 +1118,8 @@
 	<false/>
 	<key>SmartPlacement</key>
 	<true/>
+	<key>SplitPaneDimmingAmount</key>
+	<real>0.40791266025641026</real>
 	<key>TabStyle</key>
 	<integer>1</integer>
 	<key>UseBorder</key>
