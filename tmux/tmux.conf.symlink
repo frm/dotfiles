@@ -71,19 +71,25 @@ set-option -g status-attr dim
 
 # Border colors
 set -g pane-border-style fg=default
-set -g pane-active-border-style fg=colour6
+set -g pane-active-border-style fg=red
 
 # Window colors
-set-window-option -g window-status-current-fg colour6
-set-window-option -g window-status-current-bg default
-set-window-option -g window-status-fg white
+set-window-option -g window-status-fg "#666666"
 set-window-option -g window-status-bg default
-setw -g window-status-format "  #W  "
-setw -g window-status-current-format "  #W  "
+set-window-option -g window-status-attr default
+set-window-option -g window-status-current-fg red
+set-window-option -g window-status-current-bg default
+set-window-option -g window-status-current-attr default
+setw -g window-status-format " #W "
+setw -g window-status-current-format " > #W "
+
+set-option -g status-fg white
+set-option -g status-bg default
+set-option -g status-attr default
 
 set -g status-justify left
-set -g status-left ""
-set -g status-right "#[fg=white]%l:%M %p"
+set -g status-left " "
+set -g status-right " %H:%M "
 
 # TPM plugins
 set -g @plugin 'tmux-plugins/tpm'
