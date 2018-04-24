@@ -28,6 +28,7 @@ set scrolloff=4
 
 " Highlight current cursor column
 set cursorcolumn
+set cursorline
 
 " Set sane J in normal mode
 set formatoptions+=j
