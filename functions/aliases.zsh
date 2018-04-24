@@ -35,5 +35,6 @@ alias ..2="cd ../.."
 alias ..3="cd ../../.."
 alias ..4="cd ../../../.."
 alias ..5="cd ../../../../.."
+alias ...="cd $(git rev-parse --show-toplevel)"
 
 alias wttr="curl wttr.in/~Braga+Portugal"
