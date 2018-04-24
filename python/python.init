@@ -1,0 +1,4 @@
+CURRENT_PYTHON=$(asdf current python | cut -d ' ' -f 1)
+
+# both yarn and npm install to this directory
+export PATH="$PATH:$HOME/.asdf/installs/python/$CURRENT_PYTHON/bin/"
