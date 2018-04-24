@@ -1,0 +1,12 @@
+{
+  "name": "dotfiles",
+  "version": "1.0.0",
+  "description": "node dependencies for my dotfiles",
+  "repository": "https://github.com/fribmendes/dotfiles",
+  "author": "Fernando Mendes",
+  "license": "MIT",
+  "dependencies": {
+    "ngrok": "^3.0.1",
+    "tldr": "^3.2.1"
+  }
+}

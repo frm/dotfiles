@@ -6,3 +6,5 @@ tmux/plugins/
 
 # Ignore global variables after tracking them
 system/env.init
+
+node_modules/
