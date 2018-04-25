@@ -37,3 +37,4 @@ alias ..4="cd ../../../.."
 alias ..5="cd ../../../../.."
 
 alias wttr="curl wttr.in/~Braga+Portugal"
+alias yeahillhavetheuhhh="brew install"
