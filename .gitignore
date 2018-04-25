@@ -8,3 +8,6 @@ tmux/plugins/
 system/env.init
 
 node_modules/
+
+# rainbowstream history
+completer.hist

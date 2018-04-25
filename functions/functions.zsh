@@ -86,3 +86,16 @@ x() {
 ...() {
   cd $(git rev-parse --show-toplevel)
 }
+
+tw() {
+  if ! tmux has-session -t twttr &>/dev/null; then
+    tmux new -d -s twttr &>/dev/null;
+    tmux send-keys -t twttr:1 rainbowstream ENTER
+  fi
+
+  if [ -n "$TMUX" ]; then
+    tmux switch-client -t twttr
+  else
+    tmux attach -t twttr
+  fi
+}
