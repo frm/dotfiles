@@ -82,3 +82,7 @@ x() {
     echo "'$1' is not a valid file"
   fi
 }
+
+...() {
+  cd $(git rev-parse --show-toplevel)
+}
