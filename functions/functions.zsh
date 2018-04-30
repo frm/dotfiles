@@ -28,15 +28,32 @@ f() {
 
 # Create a tmux session named after the current directory
 t() {
-  if [ $# -eq 0 ]; then
-    SESSION_NAME=$(basename `pwd`)
+  local session_name=$(basename `pwd`)
+  local attach
+  local target_name
+
+  while test $# -gt 0; do
+    case "$1" in
+      -s)
+        shift
+        session_name=$1
+        shift
+        ;;
+      -t)
+        shift
+        attach=true
+        target_name=$1
+        shift
+        ;;
+    esac
+  done
+
+  if [ $attach ]; then
+    tmux new-session -s $session_name -t $target_name
   else
-    SESSION_NAME=$1
+    tmux new-session -s $session_name
   fi
-
-  tmux new -s $SESSION_NAME;
 }
-
 
 # git clone a repo and cd to it
 # This needs to be a function to change the current environment
