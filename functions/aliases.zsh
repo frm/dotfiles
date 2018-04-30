@@ -25,7 +25,9 @@ alias y="yarn"
 alias dev="development"
 alias prod="production"
 alias stag="staging"
+
 alias pg.server="pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log"
+alias lock="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
 
 alias reload="source ~/.zshrc"
 alias :q="exit"
