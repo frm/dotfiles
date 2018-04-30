@@ -407,7 +407,7 @@
 	<key>NSWindow Frame SessionsPreferences</key>
 	<string>269 144 606 469 0 0 1680 1050 </string>
 	<key>NSWindow Frame SharedPreferences</key>
-	<string>303 542 796 473 0 0 1680 1027 </string>
+	<string>303 542 796 473 0 0 1680 1050 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
 	<string>515 312 650 429 0 0 1680 1027 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
@@ -984,7 +984,7 @@
 			<key>Non-ASCII Anti Aliased</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>FiraCode-Retina 14</string>
+			<string>FiraCode-Retina 16</string>
 			<key>Option Key Sends</key>
 			<integer>2</integer>
 			<key>Prompt Before Closing 2</key>
@@ -1109,7 +1109,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2018-04-24T21:43:35Z</date>
+	<date>2018-04-26T12:50:58Z</date>
 	<key>SUSendProfileInfo</key>
 	<false/>
 	<key>ShowFullScreenTabBar</key>
@@ -1129,6 +1129,6 @@
 	<key>WordCharacters</key>
 	<string>/-+\~_.</string>
 	<key>iTerm Version</key>
-	<string>3.1.5</string>
+	<string>3.1.6</string>
 </dict>
 </plist>
