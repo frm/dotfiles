@@ -89,7 +89,7 @@ x() {
 
 tw() {
   if ! tmux has-session -t twttr &>/dev/null; then
-    tmux new -d -s twttr &>/dev/null;
+    tmux new -d -s twttr &>/dev/null
     tmux send-keys -t twttr:1 rainbowstream ENTER
   fi
 
@@ -97,5 +97,18 @@ tw() {
     tmux switch-client -t twttr
   else
     tmux attach -t twttr
+  fi
+}
+
+irc() {
+  if ! tmux has-session -t irc &>/dev/null; then
+    tmux new -d -s irc &>/dev/null
+    tmux send-keys -t irc:1 irssi ENTER
+  fi
+
+  if [ -n "$TMUX" ]; then
+    tmux switch-client -t irc
+  else
+    tmux attach -t irc
   fi
 }
