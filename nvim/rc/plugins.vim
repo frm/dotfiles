@@ -163,6 +163,7 @@ let g:ale_fixers = {
 \   'elixir':  [],
 \   'typescript': ['prettier'],
 \   'javascript': ['prettier'],
+\   'go': ['gofmt'],
 \ }
 
 let g:ale_linters = {
@@ -175,6 +176,7 @@ let g:ale_linters = {
 \   'ruby': [],
 \   'html': [],
 \   'markdown': [],
+\   'go': ['gofmt'],
 \}
 
 function! AddLinterIfFileExists(lang, linter, file, lint, fix)
