@@ -37,9 +37,5 @@ function! Rename()
 endfunction
 map <Leader>r :call Rename()<CR>
 
-" Refresh Chrome
-function ChromeRefresh()
-  silent !chrome.refresh
-  redraw
-endfunction
-nnoremap <localleader>r :call ChromeRefresh()<CR>
+" Refresh the browser
+nnoremap <localleader>r :silent !browser.refresh<CR>

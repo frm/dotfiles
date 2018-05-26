@@ -1,0 +1,47 @@
+#!/usr/bin/osascript
+
+tell application "System Events"
+    set processList to get the name of every process whose background only is false
+    set applicationNameList to {}
+
+    repeat with processName in processList
+      set applicationList to file of (application processes where name is processName)
+
+      repeat with applicationAlias in applicationList
+        set applicationName to (name of applicationAlias) as string
+        set applicationNameList to applicationNameList & applicationName
+      end repeat
+    end repeat
+end tell
+
+set browserLaunched to true
+
+if applicationNameList contains "Firefox Developer Edition.app" then
+  set browser to "Firefox Developer Edition"
+else if applicationNameList contains "Google Chrome.app" then
+  set browser to "Google Chrome"
+else if applicationNameList contains "Firefox.app" then
+  set browser to "Firefox"
+else
+  set browser to "Firefox Developer Edition"
+  set browserLaunched to false
+end if
+
+set numberOfDisplays to (do shell script "system_profiler SPDisplaysDataType -detailLevel | grep -e 'Resolution:' | wc -l | tr -d '[:space:]'") as integer
+
+if browserLaunched and numberOfDisplays > 1 then
+  set browserShouldActivate to false
+else
+  set browserShouldActivate to true
+end if
+
+tell application browser
+  if browserShouldActivate then activate
+end tell
+
+tell application "System Events"
+  tell process browser
+    delay 0.1
+    keystroke "r" using command down
+  end tell
+end tell
