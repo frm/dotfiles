@@ -31,8 +31,7 @@ IEx.configure(
   ],
   default_prompt:
     "#{prompt_color.()}%prefix#{IO.ANSI.reset} " <>
-    "[#{IO.ANSI.light_black}#{prompt_timestamp.()}#{IO.ANSI.reset} " <>
-    "(#{IO.ANSI.light_blue}%counter#{IO.ANSI.reset})] >",
+    "(#{IO.ANSI.light_blue}%counter#{IO.ANSI.reset}) >",
   alive_prompt:
     "#{prompt_color.()}%prefix#{IO.ANSI.reset} " <>
     "(#{IO.ANSI.yellow}%node#{IO.ANSI.reset}) " <>
