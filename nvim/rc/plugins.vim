@@ -51,6 +51,7 @@ Plug 'elzr/vim-json', { 'for': 'json' }
 Plug 'prettier/vim-prettier', {
   \ 'do': 'yarn install',
   \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue']}
+Plug 'mxw/vim-jsx', { 'for': 'javascript.jsx' }
 
 Plug 'shime/vim-livedown', { 'for': 'markdown' }
 
@@ -163,6 +164,9 @@ let g:ale_fixers = {
 \   'elixir':  [],
 \   'typescript': ['prettier'],
 \   'javascript': ['prettier'],
+\   'jsx': [],
+\   'css': [],
+\   'scss': [],
 \   'go': ['gofmt'],
 \ }
 
@@ -195,9 +199,9 @@ endfunction
 call AddLinterIfFileExists('javascript', 'eslint', '.eslintrc.json', 1, 1)
 call AddLinterIfFileExists('javascript', 'eslint', '.eslintrc', 1, 1)
 call AddLinterIfFileExists('javascript', 'standard', 'node_modules/.bin/standard', 1, 1)
-call AddLinterIfFileExists('css', 'stylelint', '.stylelintrc', 1, 0)
-call AddLinterIfFileExists('scss', 'stylelint', '.stylelintrc', 1, 0)
-call AddLinterIfFileExists('scss', 'scss-lint', '.scss-lint.yml', 1, 0)
+call AddLinterIfFileExists('css', 'stylelint', '.stylelintrc', 1, 1)
+call AddLinterIfFileExists('scss', 'stylelint', '.stylelintrc', 1, 1)
+call AddLinterIfFileExists('scss', 'scss-lint', '.scss-lint.yml', 1, 1)
 call AddLinterIfFileExists('ruby', 'rubocop', '.rubocop.yml', 1, 1)
 call AddLinterIfFileExists('elixir', 'credo', 'config/.credo.exs', 1, 0)
 call AddLinterIfFileExists('elixir', 'credo', '.credo.exs', 1, 0)
