@@ -665,9 +665,9 @@
 	<key>NSWindow Frame SessionsPreferences</key>
 	<string>269 144 606 469 0 0 1680 1050 </string>
 	<key>NSWindow Frame SharedPreferences</key>
-	<string>303 593 1018 447 0 0 1680 1050 </string>
+	<string>2065 594 1018 447 1680 -30 1920 1080 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>515 357 650 429 0 0 1680 1028 </string>
+	<string>2315 285 650 429 1680 -30 1920 1080 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
 	<string>212 144 650 452 0 0 1680 1027 </string>
 	<key>New Bookmarks</key>
@@ -1284,7 +1284,7 @@
 			<key>Non-ASCII Anti Aliased</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>FiraCode-Retina 14</string>
+			<string>FiraCode-Regular 14</string>
 			<key>Option Key Sends</key>
 			<integer>2</integer>
 			<key>Prompt Before Closing 2</key>
@@ -1413,7 +1413,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2018-05-07T10:21:23Z</date>
+	<date>2018-05-13T13:07:04Z</date>
 	<key>SUSendProfileInfo</key>
 	<false/>
 	<key>ShowFullScreenTabBar</key>
