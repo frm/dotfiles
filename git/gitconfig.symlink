@@ -37,7 +37,6 @@
   m = merge
   p = push
   pl = pull
-  pr = pull-request
   prs = browse -- 'pulls?q=is:pr is:open -review:approved -author:fribmendes'
   myprs = browse -- 'pulls?q=review-requested:fribmendes'
   pulls = browse -- pulls
@@ -55,10 +54,11 @@
   cr = !git-code-review
   div = !git-divergence
   exclude = !git-exclude
+  fuckthis = !git-fuck-this
   ignore = !git-ignore
   mpr = !git-merge-pr
+  pr = !git-pr
   rbm = !git-rebase-master
   nuke = !git-nuke
   trump = !git-trump
   wip = !git-wip
-  fuckthis = !git-fuck-this
