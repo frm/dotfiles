@@ -6,4 +6,5 @@ git checkout -- .
 git status -s | cut -d ' ' -f 2 | xargs rm -rf
 echo "."
 echo ".."
-echo "... [git]: $art" | lolcat
+printf "... [git]: "
+echo $art | lolcat
