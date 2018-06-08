@@ -112,6 +112,12 @@ let g:AutoPairsOnlyWhitespace = 1
 "    LocalVimRc     "
 """""""""""""""""""""
 let g:localvimrc_ask = 0
+let g:localvimrc_whitelist = $HOME . '/Developer/.*'
+
+" don't run lvimrcs in sandbox for work-related projects
+if expand('%:p:h') =~ g:localvimrc_whitelist . '\(subvisual\|utrust\)'
+  let g:localvimrc_sandbox = 0
+endif
 
 """""""""""""""""""""
 "      NeoTerm      "
