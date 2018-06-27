@@ -1,5 +1,6 @@
-#!/usr/bin/env sh
-# Stolen from garybernhardt's git-divergence: https://github.com/garybernhardt/dotfiles/blob/master/bin/git-divergence
+# Shamelessly burrowed from garybernhardt:
+# https://github.com/garybernhardt/dotfiles/commit/a41396f20f940bea6339b0b4e9c38013c0a810b1
+#!/bin/bash
 
 set -e
 
