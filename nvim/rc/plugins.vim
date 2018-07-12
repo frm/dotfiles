@@ -14,6 +14,8 @@ Plug 'easymotion/vim-easymotion'
 Plug 'embear/vim-localvimrc'
 Plug 'Olical/vim-enmasse'
 Plug 'SirVer/ultisnips'
+Plug 'tpope/vim-projectionist'
+Plug 'tpope/vim-commentary'
 
 " Scheme
 Plug 'vim-airline/vim-airline'
@@ -271,3 +273,8 @@ let g:livedown_browser = "firefox"
 let g:UltiSnipsExpandTrigger="<C-j>"
 let g:UltiSnipsJumpForwardTrigger="<C-j>"
 let g:UltiSnipsJumpBackwardTrigger="<C-k>"
+
+"""""""""""""""""""""
+"   Projectionist   "
+"""""""""""""""""""""
+map <leader>a :A<CR>
