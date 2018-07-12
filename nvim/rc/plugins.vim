@@ -280,4 +280,6 @@ let g:UltiSnipsJumpBackwardTrigger="<C-k>"
 """""""""""""""""""""
 "   Projectionist   "
 """""""""""""""""""""
-map <leader>a :A<CR>
+map <leader>aa :A<CR>
+map <leader>as :AS<CR>
+map <leader>av :AV<CR>
