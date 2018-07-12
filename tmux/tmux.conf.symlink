@@ -41,7 +41,6 @@ bind-key -Tcopy-mode-vi 'y' send -X copy-pipe "pbcopy"
 # Better movement
 bind-key -n C-H previous-window
 bind-key -n C-L next-window
-bind-key -n C-S send-keys -R \; send-keys "Enter"
 
 bind-key -n C-Q resize-pane -Z
 
