@@ -12,6 +12,7 @@ Plug 'tpope/vim-abolish'
 Plug 'chrisbra/Colorizer'
 Plug 'easymotion/vim-easymotion'
 Plug 'embear/vim-localvimrc'
+Plug 'Olical/vim-enmasse'
 
 " Scheme
 Plug 'vim-airline/vim-airline'
@@ -82,7 +83,7 @@ autocmd FileType nerdtree setlocal nolist
 "       fzf         "
 """""""""""""""""""""
 nmap <C-p> :Files<CR>
-nmap <C-f> :Ag<CR>
+nmap <C-f> :Ag<Space>
 
 " Use ripgrep over grep
 if executable('rg')
