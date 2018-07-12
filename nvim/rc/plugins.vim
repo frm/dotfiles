@@ -73,14 +73,17 @@ call plug#end()
 """""""""""""""""""""
 nnoremap <C-n> :NERDTreeToggle<CR>
 nnoremap <Leader>n :NERDTreeFind<CR>
-let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
+let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr', '\.DS_Store']
 let g:NERDTreeDirArrows=1
 let g:NERDTreeMouseMode=2
 let g:NERDTreeShowHidden=1
 let g:NERDTreeWinPos = "right"
 
 " Close NERDTree if it's the only window open
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
+" Note to self: this seems to have been updated, but I'm leaving the previous
+" version in comment in case there are conflicts with other settings
+" autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 " Don't show whitespaces on NERDTree enter
 autocmd FileType nerdtree setlocal nolist
