@@ -22,6 +22,10 @@ nnoremap <localleader><leader> :noh<CR>
 " Mimic Alt-backspace
 inoremap <M-BS> <C-W>
 
+" Ctrl+S save
+nnoremap <C-s> :write<CR>
+inoremap <C-s> <Esc>:write<CR>a
+
 " Remove trailing whitespaces when reading and writing to file
 autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
 
