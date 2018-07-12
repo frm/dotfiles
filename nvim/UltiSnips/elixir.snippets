@@ -1,0 +1,73 @@
+global !p
+from elixir_snippet_helpers import *
+endglobal
+
+snippet defm "defmodule"
+defmodule `!p module_name(path, snip)` do
+  $0
+end
+endsnippet
+
+snippet def "def function"
+def $1($2) do
+  $0
+end
+endsnippet
+
+snippet defp "def private function"
+defp $1($2) do
+  $0
+end
+endsnippet
+
+snippet spd "def function with type spec" do
+@spec $1($2) :: $3
+def $1($4) do
+  $0
+end
+endsnippet
+
+snippet sp "function typespec" do
+@spec $1($2) :: $3
+endsnippet
+
+snippet tp "typespec" do
+@type $1 :: $2
+endsnippet
+
+snippet test "test definition"
+test "$1" do
+  $0
+end
+endsnippet
+
+snippet desc "describe with test" do
+describe "$1" do
+  test "$2" do
+    $0
+  end
+end
+endsnippet
+
+snippet doc "function doc" do
+@doc ~S"""
+$0
+"""
+endsnippet
+
+snippet docm "module doc" do
+@moduledoc ~S"""
+$0
+"""
+endsnippet
+
+snippet doct "method docs with examples" do
+@doc ~S"""
+$1
+
+## Examples
+
+    iex> $2
+"""
+$0
+endsnippet

@@ -13,6 +13,7 @@ Plug 'chrisbra/Colorizer'
 Plug 'easymotion/vim-easymotion'
 Plug 'embear/vim-localvimrc'
 Plug 'Olical/vim-enmasse'
+Plug 'SirVer/ultisnips'
 
 " Scheme
 Plug 'vim-airline/vim-airline'
@@ -37,28 +38,31 @@ Plug 'janko-m/vim-test'
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'w0rp/ale'
 
+" Elixir
 Plug 'elixir-editors/vim-elixir', { 'for': 'elixir' }
 Plug 'slashmili/alchemist.vim', { 'for': 'elixir' }
 Plug 'c-brenn/phoenix.vim', { 'for': 'elixir' }
 Plug 'andyl/vim-textobj-elixir', { 'for': 'elixir' }
 
+" Ruby
 Plug 'vim-ruby/vim-ruby', { 'for': 'ruby' }
 Plug 'tpope/vim-rails', { 'for': 'ruby' }
 Plug 'tpope/vim-bundler', { 'for': 'ruby' }
 Plug 'nelstrom/vim-textobj-rubyblock', { 'for': 'ruby' }
 Plug 'slim-template/vim-slim', { 'for': 'slim' }
 
-Plug 'elzr/vim-json', { 'for': 'json' }
+" JavaScript
 Plug 'prettier/vim-prettier', {
   \ 'do': 'yarn install',
   \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue']}
+
+Plug 'elzr/vim-json', { 'for': 'json' }
 Plug 'mxw/vim-jsx', { 'for': 'javascript.jsx' }
 
+" Other
 Plug 'shime/vim-livedown', { 'for': 'markdown' }
-
 Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'cpp', 'flex'] }
-
-Plug 'junegunn/vader.vim'
+Plug 'junegunn/vader.vim', { 'for': 'vim' }
 
 call plug#end()
 
@@ -259,3 +263,11 @@ let g:livedown_port = 7654
 
 " the browser to use
 let g:livedown_browser = "firefox"
+
+
+"""""""""""""""""""""
+"     UltiSnips     "
+"""""""""""""""""""""
+let g:UltiSnipsExpandTrigger="<C-j>"
+let g:UltiSnipsJumpForwardTrigger="<C-j>"
+let g:UltiSnipsJumpBackwardTrigger="<C-k>"
