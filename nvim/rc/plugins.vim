@@ -249,9 +249,9 @@ let g:colorizer_auto_filetype='css,html,scss,slim,sass,less'
 """""""""""""""""""""
 "    EasyMotion     "
 """""""""""""""""""""
-" s for character search
+" ff for character search
 " fs for character search across buffers
-nmap <localleader>s <Plug>(easymotion-s)
+nmap <localleader>ff <Plug>(easymotion-s)
 nmap <localleader>fs <Plug>(easymotion-overwin-f)
 
 """""""""""""""""""""
