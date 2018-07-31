@@ -1,6 +1,6 @@
 import os
 
-module_path_blacklist = ["apps", "lib", "test", "controllers"]
+module_path_blacklist = ["apps", "lib", "test", "controllers", "views"]
 
 def module_name(path, snip):
     scrubbed_path = scrub_path(path)
