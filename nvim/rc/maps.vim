@@ -27,9 +27,9 @@ nnoremap <C-s> :write<CR>
 inoremap <C-s> <Esc>:write<CR>a
 
 nnoremap <localleader>ss :s/\v
-nnoremap <localleader>sv :Subvert/\v
+nnoremap <localleader>sv :Subvert/
 nnoremap <localleader>sa :%s/\v
-nnoremap <localleader>sd :%Subvert/\v
+nnoremap <localleader>sd :%Subvert/
 
 " Remove trailing whitespaces when reading and writing to file
 autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
