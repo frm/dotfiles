@@ -283,3 +283,8 @@ let g:UltiSnipsJumpBackwardTrigger="<C-k>"
 map <leader>aa :A<CR>
 map <leader>as :AS<CR>
 map <leader>av :AV<CR>
+
+"""""""""""""""""""""
+"      Startify     "
+"""""""""""""""""""""
+ let g:startify_change_to_dir = 0
