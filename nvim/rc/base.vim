@@ -1,5 +1,12 @@
 set wrap
 
+set autoread
+set nobackup
+set noswapfile
+set nowritebackup
+set undodir=~/.config/nvim/undo
+set undofile
+
 set relativenumber
 set number
 
