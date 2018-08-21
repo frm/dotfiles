@@ -92,7 +92,11 @@ autocmd FileType nerdtree setlocal nolist
 "       fzf         "
 """""""""""""""""""""
 nmap <C-p> :Files<CR>
+nmap <C-g><C-p> :GFiles<CR>
 nmap <C-f> :Ag<Space>
+nmap <leader>l :Lines<CR>
+nmap <leader>b :BLines<CR>
+nmap <leader>h :History<CR>
 
 " Use ripgrep over grep
 if executable('rg')
@@ -105,6 +109,16 @@ command! -bang -nargs=* Rg
   \   <bang>0 ? fzf#vim#with_preview('up:60%')
   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
   \   <bang>0)
+
+"""""""""""""""""""""
+"     fugitive      "
+"""""""""""""""""""""
+set diffopt+=vertical
+nmap <localleader>gb :Gblame<CR>
+nmap <localleader>gs :Gstatus<CR>
+nmap <localleader>gd :Gdiff<CR>
+nmap <localleader>gh :Gbrowse<CR>
+nmap <localleader>gc :Gcommit<CR>
 
 """""""""""""""""""""
 "     Deoplete      "
