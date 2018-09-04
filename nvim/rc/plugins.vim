@@ -147,7 +147,7 @@ endif
 "      NeoTerm      "
 """""""""""""""""""""
 let g:neoterm_shell = 'zsh'
-let g:neoterm_position='vertical'
+let g:neoterm_default_mod='vertical'
 let g:neoterm_size=50
 let g:neoterm_fixedsize=50
 let g:neoterm_autoscroll=1
@@ -156,7 +156,7 @@ nnoremap <silent> <localleader>q :Ttoggle<cr>
 tnoremap <silent> <C-E> <C-\><C-n>
 
 function! HorizontalTerm()
-  let g:neoterm_position='horizontal'
+  let g:neoterm_default_mod='horizontal'
   let g:neoterm_size=15
   let g:neoterm_fixed_size=15
   let g:neoterm_autojump=1
@@ -164,7 +164,7 @@ function! HorizontalTerm()
 
   call neoterm#toggle()
 
-  let g:neoterm_position='vertical'
+  let g:neoterm_default_mod='vertical'
   let g:neoterm_size=50
   let g:neoterm_fixedsize=50
 endfunction
