@@ -8,6 +8,7 @@ source $DOTFILES/system/env.init
 source $DOTFILES/zsh/init.zsh
 source $DOTFILES/zsh/theme.zsh
 source $DOTFILES/zsh/completions.zsh
+source $DOTFILES/zsh/zsh-autopair/autopair.zsh
 source $DOTFILES/zsh/keys.zsh
 source $DOTFILES/zsh/keybindings.zsh
 
