@@ -24,6 +24,7 @@ Plug 'kristijanhusak/vim-hybrid-material'
 Plug 'w0ng/vim-hybrid'
 Plug 'chriskempson/base16-vim'
 Plug 'mhinz/vim-startify'
+Plug 'dracula/vim', { 'as': 'dracula' }
 
 " Formatting
 Plug 'tpope/vim-surround'
@@ -61,10 +62,15 @@ Plug 'prettier/vim-prettier', {
 Plug 'elzr/vim-json', { 'for': 'json' }
 Plug 'mxw/vim-jsx', { 'for': 'javascript.jsx' }
 
+Plug 'Quramy/tsuquyomi', { 'for': 'typescript' }
+Plug 'leafgarland/typescript-vim', { 'for': 'typescript' }
+Plug 'Shougo/vimproc.vim', { 'for': 'typescript', 'do': 'make' }
+
 " Other
 Plug 'shime/vim-livedown', { 'for': 'markdown' }
 Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'cpp', 'flex'] }
 Plug 'junegunn/vader.vim', { 'for': 'vim' }
+Plug 'kristijanhusak/vim-carbon-now-sh'
 
 call plug#end()
 
@@ -302,3 +308,8 @@ map <leader>av :AV<CR>
 "      Startify     "
 """""""""""""""""""""
  let g:startify_change_to_dir = 0
+
+"""""""""""""""""""""
+"   carbon.now.sh   "
+"""""""""""""""""""""
+vnoremap <F5> :CarbonNowSh<CR>
