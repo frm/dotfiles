@@ -72,18 +72,18 @@ set-option -g status-attr dim
 
 # Border colors
 set -g pane-border-style fg="#666666"
-set -g pane-active-border-style fg=red
+set -g pane-active-border-style fg="#A593F2"
 
 # Window colors
 set-window-option -g window-status-fg "#666666"
 set-window-option -g window-status-bg default
 set-window-option -g window-status-attr default
-set-window-option -g window-status-current-fg red
+set-window-option -g window-status-current-fg "#B797F3"
 set-window-option -g window-status-current-bg default
 set-window-option -g window-status-current-attr default
 
 setw -g window-status-format " #W "
-setw -g window-status-current-format " > #W "
+setw -g window-status-current-format " ▹ #W "
 
 set-option -g status-fg white
 set-option -g status-bg default
