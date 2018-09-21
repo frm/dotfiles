@@ -5,16 +5,29 @@
 # [ -n "$PS1" ] && [ -s $BASE16_SHELL/profile_helper.sh ] && eval "$($BASE16_SHELL/profile_helper.sh)"
 
 # Customize geometry
+
+geometry_prompt_path_render_override() {
+  echo " \n$var_geometry_colorized_prompt_dir $var_geometry_colorized_prompt_symbol"
+}
+
+geometry_prompt_git_render_override() {
+  local git_prompt="$(prompt_geometry_git_branch) $(prompt_geometry_git_status) $(prompt_geometry_git_symbol)${var_geometry_git_conflicts}"
+
+  echo -e $git_prompt | sed -e 's/^[[:space:]]*//' | sed -e 's/[[:space:]]*$//'
+}
+
 GEOMETRY_COLOR_GIT_DIRTY=9
 GEOMETRY_COLOR_GIT_BRANCH=6
 GEOMETRY_COLOR_EXIT_VALUE=9
 GEOMETRY_COLOR_DIR=242
-GEOMETRY_COLOR_PROMPT=6
-GEOMETRY_SYMBOL_EXIT_VALUE="ƛ"
-GEOMETRY_SYMBOL_PROMPT="ƛ"
+GEOMETRY_COLOR_PROMPT=2
+GEOMETRY_SYMBOL_EXIT_VALUE="⇝"
+GEOMETRY_SYMBOL_PROMPT="⇝"
 GEOMETRY_PROMPT_PATH="%2~"
-GEOMETRY_SYMBOL_GIT_DIRTY="●"
-GEOMETRY_SYMBOL_GIT_CLEAN="●"
+GEOMETRY_SYMBOL_GIT_DIRTY="⑇"
+GEOMETRY_SYMBOL_GIT_CLEAN="⑉"
+GEOMETRY_SYMBOL_GIT_CONFLICTS_SOLVED="⑉"
+GEOMETRY_SYMBOL_GIT_CONFLICTS_UNSOLVED="⑆"
 PROMPT_GEOMETRY_GIT_SHOW_STASHES=false
 GEOMETRY_PROMPT_PLUGINS_PRIMARY=(path)
 GEOMETRY_PROMPT_PLUGINS_SECONDARY=(git)
