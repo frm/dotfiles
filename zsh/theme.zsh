@@ -7,7 +7,8 @@
 # Customize geometry
 
 geometry_prompt_path_render_override() {
-  echo " \n$var_geometry_colorized_prompt_dir $var_geometry_colorized_prompt_symbol"
+  local colorized_prompt_symbol="%$symbol_width{%(?.$GEOMETRY_PROMPT.$GEOMETRY_EXIT_VALUE)%}"
+  echo " \n$var_geometry_colorized_prompt_dir $colorized_prompt_symbol"
 }
 
 geometry_prompt_git_render_override() {
