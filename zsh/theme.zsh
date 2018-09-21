@@ -11,7 +11,9 @@ geometry_prompt_path_render_override() {
 }
 
 geometry_prompt_git_render_override() {
-  local git_prompt="$(prompt_geometry_git_branch) $(prompt_geometry_git_status) $(prompt_geometry_git_symbol)${var_geometry_git_conflicts}"
+  local git_stashes=$(git rev-parse --quiet --verify refs/stash 2>&1 > /dev/null && echo -e "$GEOMETRY_GIT_STASHES")
+  local git_prompt="$(prompt_geometry_git_branch) $(prompt_geometry_git_status) $(prompt_geometry_git_symbol)${var_geometry_git_conflicts} ${git_stashes}"
+
 
   echo -e $git_prompt | sed -e 's/^[[:space:]]*//' | sed -e 's/[[:space:]]*$//'
 }
@@ -28,9 +30,11 @@ GEOMETRY_SYMBOL_GIT_DIRTY="⑇"
 GEOMETRY_SYMBOL_GIT_CLEAN="⑉"
 GEOMETRY_SYMBOL_GIT_CONFLICTS_SOLVED="⑉"
 GEOMETRY_SYMBOL_GIT_CONFLICTS_UNSOLVED="⑆"
-PROMPT_GEOMETRY_GIT_SHOW_STASHES=false
+GEOMETRY_SYMBOL_GIT_STASHES="⑈"
+GEOMETRY_COLOR_GIT_STASHES=5
 GEOMETRY_PROMPT_PLUGINS_PRIMARY=(path)
 GEOMETRY_PROMPT_PLUGINS_SECONDARY=(git)
+PROMPT_GEOMETRY_GIT_SHOW_STASHES=true
 PROMPT_GEOMETRY_GIT_CONFLICTS=true
 
 GEOMETRY_ENV="development"
