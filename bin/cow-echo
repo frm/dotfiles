@@ -1,7 +1,7 @@
-#!/usr/bin/env sh
+#!/usr/bin/env zsh
 
-figures=(dragon dragon-and-cow eyes flaming-sheep ghostbusters head-in kitty koala luke-koala meow satanic skeleton stegosaurus three-eyes turtle tux vader vader-koala)
+figures=(koala luke-koala vader vader-koala default moofasa moose skeleton)
 
-rand=$((RANDOM % 18))
+rand=$((RANDOM % 7))
 
 cowsay -f ${figures[rand]} $1 | lolcat
