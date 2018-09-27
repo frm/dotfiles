@@ -3,17 +3,22 @@
 set -e
 
 _git_merge_pr() {
+  destination=${1:-"master"}
   branch=$(git rev-parse --abbrev-ref HEAD)
 
-  git checkout master
+  git checkout $destination
   git merge $branch
-  git push origin master
+  git push origin $destination
   git push origin :$branch
   git nuke
 }
 
 if [[ $1 == "-f" ]]; then
-  _git_merge_pr
+  shift
+  _git_merge_pr $@
+elif [[ $# -gt 1 ]]; then
+  echo "[git]: error: the -f flag MUST precede the branch"
+  exit 1
 else
-  ci-wait && _git_merge_pr
+  ci-wait && _git_merge_pr $@
 fi
