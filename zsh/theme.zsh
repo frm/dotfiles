@@ -13,7 +13,7 @@ geometry_prompt_path_render_override() {
 
 geometry_prompt_git_render_override() {
   local git_stashes=$(git rev-parse --quiet --verify refs/stash 2>&1 > /dev/null && echo -e "$GEOMETRY_GIT_STASHES")
-  local git_prompt="$(prompt_geometry_git_branch) $(prompt_geometry_git_status) $(prompt_geometry_git_symbol)${var_geometry_git_conflicts} ${git_stashes}"
+  local git_prompt="$(prompt_geometry_git_branch) $(prompt_geometry_git_status) $(prompt_geometry_git_symbol) ${var_geometry_git_conflicts} ${git_stashes}"
 
 
   echo -e $git_prompt | sed -e 's/^[[:space:]]*//' | sed -e 's/[[:space:]]*$//'
