@@ -20,9 +20,15 @@
 [diff]
   tool = nvimdiff
 [difftool]
-  prompt = true
+  prompt = false
 [difftool "nvimdiff"]
   cmd = "nvim -d \"$LOCAL\" \"$REMOTE\""
+[merge]
+  tool = nvimdiff
+[mergetool]
+  prompt = true
+[mergetool "nvimdiff"]
+  cmd = "nvim -d $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'"
 [alias]
   a = add
   b = branch -avv
@@ -35,6 +41,7 @@
   f = fetch
   l = log --oneline --abbrev-commit
   m = merge
+  mt = mergetool
   p = push
   pl = pull
   prs = browse -- 'pulls?q=is:pr is:open -review:approved -author:fribmendes'
