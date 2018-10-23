@@ -1,5 +1,6 @@
 # Blatantly stolen from: https://github.com/holman/dotfiles/blob/master/macos/set-defaults.sh
-# Don't forget to pass the desired hostname as the first parameter
+# This script should only be used by the automated install script.
+# Don't forget to pass the desired hostname as the first parameter.
 
 # Show ~/Library
 chflags nohidden ~/Library
