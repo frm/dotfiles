@@ -1,0 +1,12 @@
+#!/bin/zsh
+
+cd ~/Downloads
+git clone https://github.com/jwilm/alacritty.git
+
+cd alacritty
+rustup override set stable
+rustup update stable
+
+cargo build --release
+make app
+cp -r target/release/osx/Alacritty.app /Applications/
