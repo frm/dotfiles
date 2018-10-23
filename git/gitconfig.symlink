@@ -1,8 +1,8 @@
 [user]
   name = Fernando Mendes
-  email = devfrmendes@gmail.com
+  email = fernando@mendes.codes
 [github]
-  user = fribmendes
+  user = justmendes
 [branch]
   autosetuprebase = always
 [color]
