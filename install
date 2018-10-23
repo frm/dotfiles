@@ -1,0 +1,206 @@
+#!/bin/zsh
+
+GREEN='\033[1;32m'
+BLUE='\033[1;34m'
+RED='\033[1;91m'
+RESET='\033[0m'
+
+WD=$(pwd)
+
+DEV_DOTFILES=~/Developer/frm/dotfiles
+MAC_OS_MOJAVE_HEADERS=/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg
+
+function pp {
+  echo -e "\n$1[$2]: $3${RESET}"
+}
+
+function pp_info {
+  pp $BLUE $1 $2
+}
+
+function pp_success {
+  pp $GREEN $1 $2
+}
+
+function pp_error {
+  pp $RED $1 $2
+}
+
+function dirlink {
+  (cd $HOME && ln -s "$WD/$1" "$2")
+}
+
+pp_info "install" "setting up Developer directory"
+mkdir -p ~/Developer/frm
+git clone --recurse-submodules -j8 https://github.com/justmendes/dotfiles.git $DEV_DOTFILES
+
+cd $DEV_DOTFILES
+
+pp_info "install" "installing brew"
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+pp_info "brew" "bundling apps"
+brew bundle
+
+pp_info "macos" "installing command line tools"
+xcode-select --install
+
+pp_info "macos" "installing macos mojave headers"
+if [ ! -f $MAC_OS_MOJAVE_HEADERS ]; then
+  pp_error "macos" "failed installing Mojave SDK headers"
+  pp_error "macos" "please download them from https://developer.apple.com/download/more/?q=Command%20Line%20Tools"
+  exit 1
+else
+  sudo installer -pkg $MAC_OS_MOJAVE_HEADERS -target /
+fi
+
+pp_info "macos" "accepting developer license"
+sudo xcodebuild -license accept
+
+pp_info "macos" "setting up system configs"
+read_hostname=$(pp "macos" "enter your desired hostname (default: da3mon) ")
+read -r "hostname?$read_hostname"
+hostname=${hostname:-da3mon}
+
+./macos/setup "$hostname"
+
+pp_info "install" "checking if gnu ln is available"
+if which gln > /dev/null; then
+  pp_info "install" "found gln, using it"
+else
+  pp_error "install" "gnu ln not found"
+  pp_error "install" "can't create symlinks without gln"
+  pp_error "install" "please install coreutils and try again"
+
+  exit 1
+fi
+
+pp_info "brew" "installing mpv"
+brew cask install mpv
+
+pp_info "mpv" "setting up config"
+mkdir -p ~/.config/mpv
+gln -srf mpv/mpv.conf.symlink ~/.config/mpv/mpv.conf
+
+pp_info "asdf" "setting up environment"
+gln -srf asdf/asdfrc.symlink ~/.asdfrc
+
+read -r "asdf_version?$(pp "asdf" "asdf version to install? (default: 0.6.0)") "
+asdf_version=${asdf_version:-0.6.0}
+
+pp_info "asdf" "installing asdf $asdf_version"
+git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v$asdf_version
+
+pp_info "asdf" "resourcing environment"
+source ~/.asdf/asdf.sh
+
+pp_info "asdf" "adding plugins"
+asdf plugin-add elixir
+asdf plugin-add erlang
+asdf plugin-add ruby
+asdf plugin-add rust
+asdf plugin-add python
+asdf plugin-add nodejs
+
+pp_info "asdf" "importing nodejs release team keyring"
+bash ~/.asdf/plugins/nodejs/bin/import-release-team-keyring
+
+asdf_check=$(pp "asdf" "check if the asdf/tool-versions.symlink file contains the desired language versions and press ENTER when ready ")
+read -r "_unused?$asdf_check"
+
+gln -srf asdf/tool-versions.symlink ~/.tool-versions
+(cd $HOME && asdf install)
+
+pp_info "elixir" "setting up iex"
+gln -srf elixir/iex.exs.symlink ~/.iex.exs
+
+pp_info "ruby" "installing gems"
+gem install bundler
+cat ruby/gems | xargs -I {} gem install {}
+
+pp_info "node" "installing packages"
+npm install -g node
+
+pp_info "python" "upgrading pip"
+pip install --upgrade pip
+
+pp_info "python" "installing packages"
+pip install -r python/requirements.txt
+
+pp_info "zsh" "replacing system zsh with brew version"
+sudo sh -c "echo $(which zsh) >> /etc/shells"
+chsh -S $(which zsh)
+
+pp_info "zsh" "setting up environment"
+dirlink . ~/.dotfiles
+
+pp_info "zsh" "replacing current zshrc"
+rm ~/.zshrc
+gln -srf zsh/zshrc.symlink ~/.zshrc
+
+pp_info "zsh" "installing geometry"
+GEOMETRY=~/Developer/geometry
+
+mkdir -p $GEOMETRY
+git clone https://github.com/geometry-zsh/geometry.git $GEOMETRY/development
+
+# we must redownload due to symlinks breaking
+git clone https://github.com/geometry-zsh/geometry.git $GEOMETRY/production
+
+pp_info "tmux" "installing plugins"
+mkdir -p ~/.tmux/plugins/
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+gln -srf ./tmux/tmux.conf.symlink "$HOME/.tmux.conf"
+~/.tmux/plugins/tpm/bin/install_plugins
+
+pp_info "git" "setting up environment"
+gln -srf git/gitconfig.symlink ~/.gitconfig
+gln -srf git/gitignore_global.symlink ~/.gitignore_global
+gln -srf git/gitattributes.symlink ~/.gitattributes
+dirlink $WD/git/git_template .git_template
+
+pp_info "nvim" "setting up environment"
+mkdir ~/.config
+dirlink nvim ~/.config/
+
+pp_info "nvim" "installing system python 2.7 for compatibility purposes"
+brew install python@2
+
+pp_info "nvim" "installing language libs"
+/usr/local/bin/pip2 install neovim
+pip install neovim
+gem install neovim
+yarn global add neovim
+
+pp_info "nvim" "installing vim-plug"
+curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+pp_info "nvim" "installing remaining plugins"
+nvim -u nvim/rc/plugins.vim +PlugInstall +qall
+
+pp_info "nvim" "updating remote plugins"
+nvim +UpdateRemotePlugins +qall
+
+pp_info "alacritty" "setting up environment"
+dirlink alacritty ~/.config
+
+pp_info "alacritty" "installing from source"
+./alacritty/source_install
+
+pp_info "iterm2" "installing dracula"
+DRACULA_PATH=$DOTFILES/iterm2/colors/Dracula.itermcolors
+curl -o $DRACULA_PATH https://raw.githubusercontent.com/dracula/iterm/master/Dracula.itermcolors
+chmod +x $DRACULA_PATH
+
+pp_info "iterm2" "installing fira code"
+cd ~/Downloads && git clone https://github.com/tonsky/FiraCode
+mv FiraCode/distr/ttf/*.ttf ~/Library/Fonts
+cd $WD
+
+pp_success "install" "automatic config done!"
+pp_success "install" "you now need to config iterm2"
+pp_success "install" "to do that, open preferences and do the following steps:
+             1. in the general pane, select 'Load preferences from custom folder' and enter $DOTFILES/iterm2
+             2. in the same pane, select 'Save changes to folder when iterm2 quits'
+             3. restart iterm2"
