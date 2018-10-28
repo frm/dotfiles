@@ -67,6 +67,7 @@ Plug 'leafgarland/typescript-vim', { 'for': 'typescript' }
 Plug 'Shougo/vimproc.vim', { 'for': 'typescript', 'do': 'make' }
 
 " Other
+Plug 'rhysd/vim-crystal'
 Plug 'shime/vim-livedown', { 'for': 'markdown' }
 Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'cpp', 'flex'] }
 Plug 'junegunn/vader.vim', { 'for': 'vim' }
