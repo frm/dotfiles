@@ -101,6 +101,7 @@ asdf plugin-add ruby
 asdf plugin-add rust
 asdf plugin-add python
 asdf plugin-add nodejs
+asdf plugin-add crystal
 
 pp_info "asdf" "importing nodejs release team keyring"
 bash ~/.asdf/plugins/nodejs/bin/import-release-team-keyring
