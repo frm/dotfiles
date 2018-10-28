@@ -47,7 +47,7 @@
   prs = browse -- 'pulls?q=is:pr is:open -review:approved -author:fribmendes'
   myprs = browse -- 'pulls?q=review-requested:fribmendes'
   pulls = browse -- pulls
-  pr = pull-request
+  ppr = pull-request
   pt = push origin --tags
   rb = rebase
   rbc = rebase --continue
