@@ -19,3 +19,13 @@ class `!p class_name(path, snip)` < ${1:ApplicationRecord}
   $0
 end
 endsnippet
+
+snippet minit "minitest test class"
+require "test_helper"
+
+class `!p class_name(path, snip)` < ${1:ActionDispatch::IntegrationTest}
+  test "$2" do
+    $0
+  end
+end
+endsnippet
