@@ -2,7 +2,7 @@
   "name": "dotfiles",
   "version": "1.0.0",
   "description": "node dependencies for my dotfiles",
-  "repository": "https://github.com/fribmendes/dotfiles",
+  "repository": "https://github.com/justmendes/dotfiles",
   "author": "Fernando Mendes",
   "license": "MIT",
   "dependencies": {
