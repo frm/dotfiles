@@ -1,0 +1,21 @@
+global !p
+from ruby_snippet_helpers import *
+endglobal
+
+snippet cl "class"
+class `!p class_name(path, snip)`
+  $0
+end
+endsnippet
+
+snippet cc "controller class"
+class `!p class_name(path, snip)` < ApplicationController
+  $0
+end
+endsnippet
+
+snippet mc "model class"
+class `!p class_name(path, snip)` < ApplicationRecord
+  $0
+end
+endsnippet
