@@ -7,6 +7,14 @@ get_param() {
     | sed -n 's,^.*"'"$2"'": "*\([^",]*\).*,\1,p'
 }
 
+print_img() {
+  if [ -z "$TMUX" ]; then
+    imgcat $@
+  else
+    imgcat_tmux $@
+  fi
+}
+
 xkcd() {
   local img=$(get_param "$info" "img" \
     | sed 's/\\\//\//g')
@@ -21,13 +29,13 @@ xkcd() {
   local month=$(get_param "$info" "month")
   local day=$(get_param "$info" "day")
 
-  curl -s $img | imgcat
+  curl -s $img | print_img
 
   echo "Title: $title"
   echo "alt: $alt"
   echo "$year/$month/$day"
   echo "link: http://xkcd.com/$num"
-  echo "click if you're dumb: http://explainxkcd.com/$num"
+  echo "click if you're feeling dumdum: http://explainxkcd.com/$num"
 }
 
 xkcd
