@@ -44,8 +44,8 @@
   mt = mergetool
   p = push
   pl = pull
-  prs = browse -- 'pulls?q=is:pr is:open -review:approved -author:fribmendes'
-  myprs = browse -- 'pulls?q=review-requested:fribmendes'
+  prs = browse -- 'pulls?q=is:pr is:open -review:approved -author:justmendes'
+  myprs = browse -- 'pulls?q=review-requested:justmendes'
   pulls = browse -- pulls
   ppr = pull-request
   pt = push origin --tags
