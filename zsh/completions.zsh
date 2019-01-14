@@ -1,7 +1,7 @@
 autoload -Uz compinit
 
 # Smarter compinit load
-if [ $(date +'%j') != $(stat -f '%Sm' -t '%j' ~/.zcompdump) ]; then
+if [ $(date +'%j') != $(/usr/bin/stat -f '%Sm' -t '%j' ~/.zcompdump) ]; then
   compinit
 else
   compinit -C
