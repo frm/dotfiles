@@ -155,8 +155,8 @@ endif
 """""""""""""""""""""
 let g:neoterm_shell = 'zsh'
 let g:neoterm_default_mod='vertical'
-let g:neoterm_size=50
-let g:neoterm_fixedsize=50
+let g:neoterm_size=70
+let g:neoterm_fixedsize=70
 let g:neoterm_autoscroll=1
 nnoremap <silent> <localleader>l :Tclear<cr>
 nnoremap <silent> <localleader>q :Ttoggle<cr>
@@ -172,8 +172,8 @@ function! HorizontalTerm()
   call neoterm#toggle()
 
   let g:neoterm_default_mod='vertical'
-  let g:neoterm_size=50
-  let g:neoterm_fixedsize=50
+  let g:neoterm_size=70
+  let g:neoterm_fixedsize=70
 endfunction
 
 nnoremap <silent> <localleader>T :call HorizontalTerm()<cr>
@@ -283,12 +283,8 @@ let g:livedown_autorun = 0
 
 " should the browser window pop-up upon previewing
 let g:livedown_open = 1
-
-" the port on which Livedown server will run
 let g:livedown_port = 7654
-
-" the browser to use
-let g:livedown_browser = "firefox"
+let g:livedown_browser = "chrome"
 
 
 """""""""""""""""""""
