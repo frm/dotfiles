@@ -2,6 +2,6 @@
 
 figures=(koala luke-koala vader vader-koala default moofasa moose skeleton)
 
-rand=$((RANDOM % 7))
+rand=$((1 + ((RANDOM % 8))))
 
 cowsay -f ${figures[rand]} $1 | lolcat
