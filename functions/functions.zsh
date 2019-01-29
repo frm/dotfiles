@@ -129,3 +129,13 @@ irc() {
     tmux attach -t irc
   fi
 }
+
+mutilate() {
+  ps aux \
+    | ag $1 \
+    | ag -v "ag $1" \
+    | tr -s " " \
+    | cut -d ' ' -f 2 \
+    | tee >(awk '{ print "mutilating " $0 }' > /dev/tty) \
+    | xargs kill -9
+}
