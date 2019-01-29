@@ -34,6 +34,14 @@ nnoremap <localleader>sd :%Subvert/
 " Remove trailing whitespaces when reading and writing to file
 autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
 
+function! Lock()
+  let lock = '/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend'
+  exec ':silent !' . lock
+endfunction
+
+nnoremap <leader>L :call Lock()<CR>
+
+
 " Rename the current file
 function! Rename()
   let current = expand('%')
