@@ -18,7 +18,6 @@ alias s="bin/server"
 
 alias m="mix"
 alias r="rails"
-alias rk="bundle exec rake"
 alias b="bundle"
 alias y="yarn"
 
