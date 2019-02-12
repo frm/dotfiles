@@ -68,6 +68,7 @@ Plug 'Shougo/vimproc.vim', { 'for': 'typescript', 'do': 'make' }
 
 " Other
 Plug 'rhysd/vim-crystal'
+Plug 'sentient-lang/vim-sentient'
 Plug 'justmendes/vim-livedown', { 'for': ['markdown'] }
 Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'cpp', 'flex'] }
 Plug 'junegunn/vader.vim', { 'for': 'vim' }
