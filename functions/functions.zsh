@@ -153,6 +153,15 @@ rk() {
   fi
 }
 
+party() {
+  if _mnds_not_installed "curl"; then
+    _mnds_pp_error "party" "to party you must install curl"
+    return 1
+  fi
+
+  curl parrot.live
+}
+
 # private functions ahead, only used by personal scripts
 _COLOR_BLUE='\033[1;34m'
 _COLOR_GREEN='\033[1;32m'
