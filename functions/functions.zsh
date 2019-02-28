@@ -153,6 +153,15 @@ rk() {
   fi
 }
 
+phx() {
+  if _mnds_not_installed "mix"; then
+    _mnds_pp_error "phx" "mix not installed"
+    return 1
+  fi
+
+  mix phx."$@"
+}
+
 party() {
   if _mnds_not_installed "curl"; then
     _mnds_pp_error "party" "to party you must install curl"
