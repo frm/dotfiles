@@ -291,7 +291,6 @@ let g:livedown_browser = "chrome"
 
 nmap <localleader>l :LivedownToggle<CR>
 
-
 """""""""""""""""""""
 "     UltiSnips     "
 """""""""""""""""""""
