@@ -23,6 +23,7 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'kristijanhusak/vim-hybrid-material'
 Plug 'w0ng/vim-hybrid'
 Plug 'chriskempson/base16-vim'
+Plug 'ayu-theme/ayu-vim'
 Plug 'mhinz/vim-startify'
 Plug 'dracula/vim', { 'as': 'dracula' }
 
@@ -70,6 +71,7 @@ Plug 'Shougo/vimproc.vim', { 'for': 'typescript', 'do': 'make' }
 Plug 'rhysd/vim-crystal'
 Plug 'sentient-lang/vim-sentient'
 Plug 'justmendes/vim-livedown', { 'for': ['markdown'] }
+Plug 'junegunn/goyo.vim', { 'for': ['markdown'] }
 Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'cpp', 'flex'] }
 Plug 'junegunn/vader.vim', { 'for': 'vim' }
 Plug 'kristijanhusak/vim-carbon-now-sh'
@@ -156,7 +158,7 @@ endif
 """""""""""""""""""""
 let g:neoterm_shell = 'zsh'
 let g:neoterm_default_mod='vertical'
-let g:neoterm_size=70
+let g:neoterm_size=60
 let g:neoterm_fixedsize=1
 let g:neoterm_autoscroll=1
 nnoremap <silent> <localleader>l :Tclear<cr>
@@ -290,6 +292,56 @@ let g:livedown_port = 7654
 let g:livedown_browser = "chrome"
 
 nmap <localleader>l :LivedownToggle<CR>
+
+"""""""""""""""""""""
+"      VimRoom      "
+"""""""""""""""""""""
+function! s:start_write_mode()
+  execute "normal \<c-w>l"
+  execute "normal 60\<c-w>>"
+
+  let b:quitting = 0
+  let b:quitting_bang = 0
+  autocmd QuitPre <buffer> let b:quitting = 1
+  cabbrev <buffer> q! let b:quitting_bang = 1 <bar> q!
+
+  silent !tmux set status off
+  silent !tmux list-panes -F '\#F' | grep -q Z || tmux resize-pane -Z
+
+  syntax on
+
+  setlocal nonumber
+  setlocal norelativenumber
+
+  set background=light
+
+  let g:ayucolor="light"
+  colorscheme ayu
+endfunction
+
+function! s:end_write_mode()
+  set number
+  set relativenumber
+  set background=dark
+
+  silent !tmux set status on
+  silent !tmux list-panes -F '\#F' | grep -q Z && tmux resize-pane -Z
+
+  " Quit Vim if this is the only remaining buffer
+  if b:quitting && len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) == 1
+    if b:quitting_bang
+      qa!
+    else
+      qa
+    endif
+  endif
+
+endfunction
+
+autocmd! User GoyoEnter nested call <SID>start_write_mode()
+autocmd! User GoyoLeave nested call <SID>end_write_mode()
+
+nmap <leader>w :Goyo<CR>
 
 """""""""""""""""""""
 "     UltiSnips     "
