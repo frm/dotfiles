@@ -11,24 +11,19 @@ endif
 let g:enable_bold_font=1
 let g:enable_italic_font = 1
 
-set background=dark
-color dracula
+let g:mnds_theme=$MNDS_THEME
 
-" colorscheme base16-tomorrow-night
-" colorscheme hybrid_reverse
-" let g:hybrid_custom_term_colors = 1
-" if filereadable(expand("~/.vimrc_background"))
-"   let base16colorspace=256
-"   source ~/.vimrc_background
-" endif
+if g:mnds_theme == "light"
+  so ~/.config/nvim/rc/schemes/light.vim
+else
+  so ~/.config/nvim/rc/schemes/dark.vim
+endif
+
 
 " Vim Airline
-" let g:airline_theme = 'hybrid'
-let g:airline_theme = 'dracula'
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#branch#enabled=1
 let g:airline_powerline_fonts = 1
 
-" Hybrid uses a different vertical separator
-" Reset it to equal every other colorscheme
+" Force the correct separator on all vim themes
 set fillchars+=vert:│

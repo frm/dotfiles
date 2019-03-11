@@ -171,6 +171,11 @@ party() {
   curl parrot.live
 }
 
+theme() {
+  export MNDS_THEME=$1
+  echo -e "\033]50;SetProfile=$1\a"
+}
+
 # private functions ahead, only used by personal scripts
 _COLOR_BLUE='\033[1;34m'
 _COLOR_GREEN='\033[1;32m'
