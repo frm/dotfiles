@@ -334,19 +334,19 @@ function! s:start_write_mode()
 
   syntax on
 
+  so ~/.config/nvim/rc/schemes/light.vim
+
   setlocal nonumber
   setlocal norelativenumber
-
-  set background=light
-
-  let g:ayucolor="light"
-  colorscheme ayu
 endfunction
 
 function! s:end_write_mode()
   set number
   set relativenumber
-  set background=dark
+
+  so ~/.config/nvim/rc/scheme.vim
+
+  call airline#load_theme()
 
   silent !tmux set status on
   silent !tmux list-panes -F '\#F' | grep -q Z && tmux resize-pane -Z
