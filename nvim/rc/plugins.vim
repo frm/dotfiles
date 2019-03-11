@@ -297,9 +297,6 @@ nmap <localleader>l :LivedownToggle<CR>
 "      VimRoom      "
 """""""""""""""""""""
 function! s:start_write_mode()
-  execute "normal \<c-w>l"
-  execute "normal 60\<c-w>>"
-
   let b:quitting = 0
   let b:quitting_bang = 0
   autocmd QuitPre <buffer> let b:quitting = 1

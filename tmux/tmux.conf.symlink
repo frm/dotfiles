@@ -65,34 +65,18 @@ bind -n M-9 select-window -t 9
 # Status bar config
 set-option -g status on
 set-option -g status-position bottom
-
-set-option -g status-bg default
-set-option -g status-fg colour12
 set-option -g status-attr dim
-
-# Border colors
-set -g pane-border-style fg="#666666"
-set -g pane-active-border-style fg="#A593F2"
-
-# Window colors
-set-window-option -g window-status-fg "#666666"
-set-window-option -g window-status-bg default
-set-window-option -g window-status-attr default
-set-window-option -g window-status-current-fg "#B797F3"
-set-window-option -g window-status-current-bg default
-set-window-option -g window-status-current-attr default
 
 setw -g window-status-format " #W "
 setw -g window-status-current-format " ▹ #W "
-
-set-option -g status-fg white
-set-option -g status-bg default
-set-option -g status-attr default
 
 set -g status-justify left
 set -g status-left " "
 # set -g status-right " %H:%M "
 set -g status-right " "
+
+if '[[ "$MNDS_THEME" =~ dark ]]' 'source ~/.dotfiles/tmux/themes/dark.tmux.conf'
+if '[[ "$MNDS_THEME" =~ light ]]' 'source ~/.dotfiles/tmux/themes/light.tmux.conf'
 
 # TPM plugins
 set -g @plugin 'tmux-plugins/tpm'

@@ -6,43 +6,73 @@
 
 # Customize geometry
 
-geometry_prompt_path_render_override() {
-  local colorized_prompt_symbol="%$symbol_width{%(?.$GEOMETRY_PROMPT.$GEOMETRY_EXIT_VALUE)%}"
-  echo " \n$var_geometry_colorized_prompt_dir $colorized_prompt_symbol"
-}
+# geometry_prompt_path_render_override() {
+#   local colorized_prompt_symbol="%$symbol_width{%(?.$GEOMETRY_PROMPT.$GEOMETRY_EXIT_VALUE)%}"
+#   echo " \n$var_geometry_colorized_prompt_dir $colorized_prompt_symbol"
+# }
 
-geometry_prompt_git_render_override() {
-  local git_stashes=$(git rev-parse --quiet --verify refs/stash 2>&1 > /dev/null && echo -e "$GEOMETRY_GIT_STASHES")
-  local git_prompt="$(prompt_geometry_git_branch) $(prompt_geometry_git_status) $(prompt_geometry_git_symbol) ${var_geometry_git_conflicts} ${git_stashes}"
+# geometry_prompt_git_render_override() {
+#   local git_stashes=$(git rev-parse --quiet --verify refs/stash 2>&1 > /dev/null && echo -e "$GEOMETRY_GIT_STASHES")
+#   local git_prompt="$(prompt_geometry_git_branch) $(prompt_geometry_git_status) $(prompt_geometry_git_symbol) ${var_geometry_git_conflicts} ${git_stashes}"
 
+
+#   echo -e $git_prompt \
+#     | sed -e 's/^[[:space:]]*//' \
+#     | sed -e 's/[[:space:]]*$//' \
+#     | sed -e 's/[[:space:]][[:space:]]*/ /g'
+# }
+
+# git config
+GEOMETRY_GIT_COLOR_DIRTY=1
+GEOMETRY_GIT_COLOR_BRANCH=6
+GEOMETRY_GIT_COLOR_STASHES=5
+GEOMETRY_GIT_SYMBOL_DIRTY="⑇"
+GEOMETRY_GIT_SYMBOL_CLEAN="⑉"
+GEOMETRY_GIT_SYMBOL_CONFLICTS_SOLVED="⑉"
+GEOMETRY_GIT_SYMBOL_CONFLICTS_UNSOLVED="⑆"
+GEOMETRY_GIT_SYMBOL_STASHES="⑈"
+GEOMETRY_GIT_SYMBOL_BARE="⑊"
+GEOMETRY_GIT_SYMBOL_REBASE="\uE0A0"
+GEOMETRY_GIT_SHOW_STASHES=true
+GEOMETRY_GIT_SHOW_CONFLICTS=true
+
+GEOMETRY_PATH_SYMBOL_HOME="%2~"
+GEOMETRY_PATH_COLOR=242
+
+GEOMETRY_STATUS_SYMBOL="\n|⇝"
+GEOMETRY_STATUS_SYMBOL_ERROR="\n⑊"
+GEOMETRY_STATUS_SYMBOL_ROOT="\n|⇏"
+GEOMETRY_STATUS_SYMBOL_ROOT_ERROR="\n|⇏"
+GEOMETRY_STATUS_COLOR=2
+GEOMETRY_STATUS_COLOR_ERROR=9
+GEOMETRY_STATUS_COLOR_ROOT=207
+GEOMETRY_STATUS_COLOR_ROOT_ERROR=9
+
+GEOMETRY_TIME_COLOR_LONG=1
+GEOMETRY_TIME_COLOR_NEUTRAL=15
+GEOMETRY_TIME_COLOR_SHORT=2
+
+geometry_git_override() {
+  local git_prompt="$(_branch) $(_status) $(_symbol) $(_conflicts) $(_stashes)"
 
   echo -e $git_prompt \
     | sed -e 's/^[[:space:]]*//' \
     | sed -e 's/[[:space:]]*$//' \
     | sed -e 's/[[:space:]][[:space:]]*/ /g'
 }
+#
+# GEOMETRY_PROMPT_PLUGINS_PRIMARY=(path)
+# GEOMETRY_PROMPT_PLUGINS_SECONDARY=(git)
 
-GEOMETRY_COLOR_GIT_DIRTY=9
-GEOMETRY_COLOR_GIT_BRANCH=6
-GEOMETRY_COLOR_EXIT_VALUE=9
-GEOMETRY_COLOR_DIR=242
-GEOMETRY_COLOR_PROMPT=2
-GEOMETRY_SYMBOL_EXIT_VALUE="⇝"
-GEOMETRY_SYMBOL_PROMPT="⇝"
-GEOMETRY_PROMPT_PATH="%2~"
-GEOMETRY_SYMBOL_GIT_DIRTY="⑇"
-GEOMETRY_SYMBOL_GIT_CLEAN="⑉"
-GEOMETRY_SYMBOL_GIT_CONFLICTS_SOLVED="⑉"
-GEOMETRY_SYMBOL_GIT_CONFLICTS_UNSOLVED="⑆"
-GEOMETRY_SYMBOL_GIT_STASHES="⑈"
-GEOMETRY_COLOR_GIT_STASHES=5
-GEOMETRY_PROMPT_PLUGINS_PRIMARY=(path)
-GEOMETRY_PROMPT_PLUGINS_SECONDARY=(git)
-PROMPT_GEOMETRY_GIT_SHOW_STASHES=true
-PROMPT_GEOMETRY_GIT_CONFLICTS=true
+# GEOMETRY_ENV="development"
+# source $HOME/Developer/geometry/$GEOMETRY_ENV/geometry.zsh
 
-GEOMETRY_ENV="development"
+GEOMETRY_ENV="jedahan"
 source $HOME/Developer/geometry/$GEOMETRY_ENV/geometry.zsh
 
 BREW_ZSH_HIGHLIGHTERS=/usr/local/share/zsh-syntax-highlighting/
 source $BREW_ZSH_HIGHLIGHTERS/zsh-syntax-highlighting.zsh
+
+export MNDS_THEME="light"
+# Change the iterm2 profile
+echo -e "\033]50;SetProfile=$MNDS_THEME\a"
