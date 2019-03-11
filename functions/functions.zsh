@@ -174,6 +174,9 @@ party() {
 theme() {
   export MNDS_THEME=$1
   echo -e "\033]50;SetProfile=$1\a"
+
+  # fzf needs to be manually resourced to re-export the colors
+  source $DOTFILES/system/fzf.init
 }
 
 # private functions ahead, only used by personal scripts

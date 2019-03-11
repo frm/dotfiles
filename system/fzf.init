@@ -1,3 +1,9 @@
 export FZF_DEFAULT_COMMAND="rg --files --hidden --follow --ignore-file $DOTFILES/ripgrep/ignore"
 
+if [[ "$MNDS_THEME" == "light" ]]; then
+  export FZF_DEFAULT_OPTS="--color light,bg+:#FAFAFA"
+elif [[ "$MNDS_THEME" == "dark" ]]; then
+  export FZF_DEFAULT_OPTS="--color bg+:#282A36"
+fi
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
