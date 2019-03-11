@@ -73,6 +73,13 @@ source $HOME/Developer/geometry/$GEOMETRY_ENV/geometry.zsh
 BREW_ZSH_HIGHLIGHTERS=/usr/local/share/zsh-syntax-highlighting/
 source $BREW_ZSH_HIGHLIGHTERS/zsh-syntax-highlighting.zsh
 
-export MNDS_THEME="light"
-# Change the iterm2 profile
+# Change the iterm2 profile automatically
+export MNDS_THEME_CHANGE_HOUR="18"
+
+if [ $(date +"%H") -lt $MNDS_THEME_CHANGE_HOUR ]; then
+  export MNDS_THEME="light"
+else
+  export MNDS_THEME="dark"
+fi
+
 echo -e "\033]50;SetProfile=$MNDS_THEME\a"
