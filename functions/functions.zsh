@@ -159,7 +159,11 @@ phx() {
     return 1
   fi
 
-  mix phx."$@"
+  if [ $# -eq 0 ]; then
+    mix phx
+  else
+    mix phx."$@"
+  fi
 }
 
 party() {
