@@ -21,9 +21,7 @@ end
 endsnippet
 
 snippet mod "module"
-module `!p class_name(path, snip)`
-  $0
-end
+`!p open_module(path, snip)`$0`!p close_module(path, snip)`
 endsnippet
 
 snippet minit "minitest test class"
