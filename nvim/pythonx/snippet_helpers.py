@@ -1,10 +1,14 @@
 import os
 
-def name_from_file(path, separator = ".", blacklist = []):
+def name_components_from_file(path, blacklist = []):
     scrubbed_path = scrub_path(path, blacklist)
-    mod_name = separator.join([camelize(p) for p in scrubbed_path])
 
-    return mod_name
+    return [camelize(p) for p in scrubbed_path]
+
+def name_from_file(path, separator = ".", blacklist = []):
+    name_components = name_components_from_file(path, blacklist)
+
+    return separator.join(name_components)
 
 def scrub_path(path, blacklist):
     path_without_ext = os.path.splitext(path)[0]
