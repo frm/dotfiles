@@ -10,6 +10,9 @@ set undofile
 set relativenumber
 set number
 
+set incsearch
+set inccommand=nosplit
+
 " 1 tab = 2 cols
 set tabstop=2
 set softtabstop=2
