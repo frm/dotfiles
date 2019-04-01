@@ -40,7 +40,8 @@ Plug 'janko-m/vim-test'
 
 " Languages & Completions
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-Plug 'w0rp/ale'
+" Plug 'w0rp/ale'
+Plug '~/Developer/frm/ale'
 
 " Elixir
 Plug 'elixir-editors/vim-elixir', { 'for': 'elixir' }
@@ -176,7 +177,7 @@ let g:localvimrc_ask = 0
 let g:localvimrc_whitelist = $HOME . '/Developer/.*'
 
 " don't run lvimrcs in sandbox for work-related projects
-if expand('%:p:h') =~ g:localvimrc_whitelist . '\(subvisual\|utrust\)'
+if expand('%:p:h') =~ g:localvimrc_whitelist . '\(subvisual\|utrust\|frm\)'
   let g:localvimrc_sandbox = 0
 endif
 
@@ -226,6 +227,7 @@ let g:ale_completion_enabled = 1
 let g:ale_virtualtext_cursor = 1
 let g:ale_sign_error = '→'
 let g:ale_sign_warning = '→'
+let g:ale_virtualtext_prefix = ''
 
 let g:ale_fixers = {
 \   'ruby':  [],
@@ -299,6 +301,7 @@ call LoadNearestFormatter()
 "     Colorizer     "
 """""""""""""""""""""
 let g:colorizer_auto_filetype='css,html,scss,slim,sass,less'
+let g:colorizer_skip_comments=1
 
 """""""""""""""""""""
 "    EasyMotion     "
