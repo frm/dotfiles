@@ -75,11 +75,12 @@ source $BREW_ZSH_HIGHLIGHTERS/zsh-syntax-highlighting.zsh
 
 # Change the iterm2 profile automatically
 export MNDS_THEME_CHANGE_HOUR="18"
+export MNDS_THEME="tranquility"
 
-if [ $(date +"%H") -lt $MNDS_THEME_CHANGE_HOUR ]; then
-  export MNDS_THEME="light"
-else
-  export MNDS_THEME="dark"
-fi
+# if [ $(date +"%H") -lt $MNDS_THEME_CHANGE_HOUR ]; then
+#   export MNDS_THEME="light"
+# else
+#   export MNDS_THEME="dark"
+# fi
 
 echo -e "\033]50;SetProfile=$MNDS_THEME\a"
