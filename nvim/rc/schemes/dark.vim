@@ -1,7 +1,8 @@
 set background=dark
 
-color dracula
-let g:airline_theme = 'dracula'
+let g:airline_theme = 'tranquility'
+" color dracula
+color tranquility
 
 " Base16 Tomorrow Night settings:
 " colorscheme base16-tomorrow-night
