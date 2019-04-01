@@ -1,4 +1,24 @@
 " Tranquility Theme: {{{
+"
+" https://github.com/justmendes/tranquility.vim
+"
+" Copyright 2019, All rights reserved
+"
+" @author Fernando Mendes <fernando@mendes.codes>
+"
+" Based on Dracula theme, with minor code changes:
+"
+" https://github.com/zenorocha/dracula-theme
+"
+" Copyright 2016, All rights reserved
+"
+" Code licensed under the MIT license
+" http://zenorocha.mit-license.org
+"
+" @author Trevor Heins <@heinst>
+" @author Éverton Ribeiro <nuxlli@gmail.com>
+" @author Derek Sifford <dereksifford@gmail.com>
+" @author Zeno Rocha <hi@zenorocha.com>
 scriptencoding utf8
 " }}}
 
