@@ -36,83 +36,83 @@ endfunc
 
 let g:airline#themes#tranquility#palette = {
 \   'normal': s:color_map(
-\       ['bg', 'purple'],
-\       ['fg', 'cyan'],
-\       ['fg', 'selection'],
+\       ['bg', 'beige'],
+\       ['fg', 'darkbrown'],
+\       ['fg', 'bglight'],
 \       {
-\         'airline_warning': s:clr('bg', 'orange'),
+\         'airline_warning': s:clr('bg', 'lightbrown'),
 \         'airline_error': s:clr('bg', 'red'),
 \       },
 \     ),
 \   'normal_modified': s:color_map(
-\       ['bg', 'purple'],
-\       ['fg', 'cyan'],
-\       ['fg', 'bgdark'],
+\       ['bg', 'beige'],
+\       ['fg', 'darkbrown'],
+\       ['fg', 'bglight'],
 \       {
-\         'airline_warning': s:clr('bg', 'orange'),
+\         'airline_warning': s:clr('bg', 'lightbrown'),
 \         'airline_error': s:clr('bg', 'red'),
 \       },
 \     ),
 \   'insert': s:color_map(
-\       ['bg', 'green'],
-\       ['fg', 'cyan'],
-\       ['fg', 'selection'],
+\       ['bg', 'orange'],
+\       ['fg', 'darkbrown'],
+\       ['fg', 'bglight'],
 \       {
-\         'airline_warning': s:clr('bg', 'orange'),
+\         'airline_warning': s:clr('bg', 'lightbrown'),
 \         'airline_error': s:clr('bg', 'red'),
 \       },
 \     ),
 \   'insert_modified': s:color_map(
-\       ['bg', 'green'],
-\       ['fg', 'cyan'],
-\       ['fg', 'bgdark'],
+\       ['bg', 'orange'],
+\       ['fg', 'darkbrown'],
+\       ['fg', 'bglight'],
 \       {
-\         'airline_warning': s:clr('bg', 'orange'),
+\         'airline_warning': s:clr('bg', 'lightbrown'),
 \         'airline_error': s:clr('bg', 'red'),
 \       },
 \     ),
 \   'replace': s:color_map(
-\       ['bg', 'orange'],
-\       ['fg', 'cyan'],
-\       ['fg', 'selection'],
+\       ['bg', 'lightbrown'],
+\       ['fg', 'darkbrown'],
+\       ['fg', 'bglight'],
 \       {
-\         'airline_warning': s:clr('bg', 'orange'),
+\         'airline_warning': s:clr('bg', 'lightbrown'),
 \         'airline_error': s:clr('bg', 'red'),
 \       },
 \     ),
 \   'replace_modified': s:color_map(
-\       ['bg', 'orange'],
-\       ['fg', 'cyan'],
-\       ['fg', 'bgdark'],
+\       ['bg', 'lightbrown'],
+\       ['fg', 'darkbrown'],
+\       ['fg', 'bglight'],
 \       {
-\         'airline_warning': s:clr('bg', 'orange'),
+\         'airline_warning': s:clr('bg', 'lightbrown'),
 \         'airline_error': s:clr('bg', 'red'),
 \       },
 \     ),
 \   'visual': s:color_map(
-\       ['bg', 'yellow'],
-\       ['fg', 'cyan'],
-\       ['fg', 'selection'],
+\       ['bg', 'lightgray'],
+\       ['fg', 'darkbrown'],
+\       ['fg', 'bglight'],
 \       {
-\         'airline_warning': s:clr('bg', 'orange'),
+\         'airline_warning': s:clr('bg', 'lightbrown'),
 \         'airline_error': s:clr('bg', 'red'),
 \       },
 \     ),
 \   'visual_modified': s:color_map(
-\       ['bg', 'yellow'],
-\       ['fg', 'cyan'],
-\       ['fg', 'bgdark'],
+\       ['bg', 'lightgray'],
+\       ['fg', 'darkbrown'],
+\       ['fg', 'bglight'],
 \       {
-\         'airline_warning': s:clr('bg', 'orange'),
+\         'airline_warning': s:clr('bg', 'lightbrown'),
 \         'airline_error': s:clr('bg', 'red'),
 \       },
 \     ),
 \   'inactive': s:color_map(
-\       ['fg', 'selection'],
-\       ['fg', 'selection'],
-\       ['fg', 'selection'],
+\       ['fg', 'bglight'],
+\       ['fg', 'bglight'],
+\       ['fg', 'bglight'],
 \       {
-\         'airline_warning': s:clr('bg', 'orange'),
+\         'airline_warning': s:clr('bg', 'lightbrown'),
 \         'airline_error': s:clr('bg', 'red'),
 \       },
 \     ),
@@ -124,22 +124,22 @@ if get(g:, 'airline#extensions#tabline#enabled', 0)
   let g:airline#themes#tranquility#palette.tabline = {
         \ 'airline_tabfill': s:clr('bg', 'bglight'),
         \
-        \ 'airline_tab': s:clr('comment', 'bg'),
-        \ 'airline_tabsel': s:clr('bg', 'purple'),
-        \ 'airline_tabmod': s:clr('green', 'bg'),
+        \ 'airline_tab': s:clr('fg', 'bglight'),
+        \ 'airline_tabsel': s:clr('bg', 'beige'),
+        \ 'airline_tabmod': s:clr('orange', 'bg'),
         \
-        \ 'airline_tab_right': s:clr('comment', 'bg'),
+        \ 'airline_tab_right': s:clr('fg', 'bglight'),
         \ 'airline_tabsel_right': s:clr('fg', 'bg', ),
-        \ 'airline_tabmod_right': s:clr('green', 'bg'),
+        \ 'airline_tabmod_right': s:clr('orange', 'bg'),
         \}
 endif
 "}}}
 " CtrlP: {{{2
 if exists('g:loaded_ctrlp')
   let g:airline#themes#tranquility#palette.ctrlp = airline#extensions#ctrlp#generate_color_map(
-        \ s:clr('fg', 'selection'),
+        \ s:clr('fg', 'bglight'),
         \ s:clr('fg', 'comment'),
-        \ s:clr('fg', 'purple'),
+        \ s:clr('fg', 'beige'),
         \)
 endif
 "}}}2

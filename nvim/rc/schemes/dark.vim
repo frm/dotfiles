@@ -1,7 +1,6 @@
 set background=dark
 
 let g:airline_theme = 'tranquility'
-" color dracula
 color tranquility
 
 " Base16 Tomorrow Night settings:
