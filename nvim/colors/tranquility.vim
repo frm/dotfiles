@@ -19,73 +19,70 @@ endif
 
 " Palette: {{{2
 
-let s:fg        = ['#f2eae1', 255]
+let s:fg          = ['#F2EAE1', 254]
 
-let s:bglighter = ['#574830', 238]
-let s:bglight   = ['#33302B', 237]
-let s:bg        = ['#0b0906', 236]
-let s:bgdark    = ['#33302B', 235]
-let s:bgdarker  = ['#574830', 234]
+let s:bglighter   = ['#574830',   3]
+let s:bglight     = ['#33302B',   4]
+let s:bg          = ['#0B0906',   0]
 
-let s:subtle    = ['#33302B', 238]
+let s:subtle      = ['#33302B', 238]
 
-let s:selection = ['#44475A', 239]
-let s:comment   = ['#6272A4',  61]
-let s:cyan      = ['#995D81', 117]
-let s:green     = ['#d7a467',  84]
-let s:orange    = ['#d4b490', 215]
-let s:pink      = ['#ff8e72', 212]
-let s:purple    = ['#ebcfab', 141]
-let s:red       = ['#aa8d67', 203]
-let s:yellow    = ['#b3a08b', 228]
+let s:selection   = ['#44475A', 239]
+let s:comment     = ['#6272A4',  61]
+let s:purple      = ['#995D81', 125]
+let s:green       = ['#6A8D73',   2]
+let s:orange      = ['#D7A467', 137]
+let s:lightbrown  = ['#D4B490',  12]
+let s:red         = ['#FF8E72', 203]
+let s:beige       = ['#EBCFAB',   5]
+let s:darkbrown   = ['#AA8D67',  11]
+let s:lightgray   = ['#B3A08B', 180]
 
-let s:none      = ['NONE', 'NONE']
+let s:none        = ['NONE', 'NONE']
 
 let g:tranquility_palette = {
       \ 'fg': s:fg,
       \ 'bg': s:bg,
       \ 'selection': s:selection,
       \ 'comment': s:comment,
-      \ 'cyan': s:cyan,
-      \ 'green': s:green,
-      \ 'orange': s:orange,
-      \ 'pink': s:pink,
       \ 'purple': s:purple,
+      \ 'orange': s:orange,
+      \ 'lightbrown': s:lightbrown,
       \ 'red': s:red,
-      \ 'yellow': s:yellow,
+      \ 'beige': s:beige,
+      \ 'darkbrown': s:darkbrown,
+      \ 'lightgray': s:lightgray,
       \
       \ 'bglighter': s:bglighter,
       \ 'bglight': s:bglight,
-      \ 'bgdark': s:bgdark,
-      \ 'bgdarker': s:bgdarker,
       \ 'subtle': s:subtle,
       \}
 
 if has('nvim')
-  let g:terminal_color_0  = '#21222C'
-  let g:terminal_color_1  = '#FF5555'
-  let g:terminal_color_2  = '#50FA7B'
-  let g:terminal_color_3  = '#F1FA8C'
-  let g:terminal_color_4  = '#BD93F9'
-  let g:terminal_color_5  = '#FF79C6'
-  let g:terminal_color_6  = '#8BE9FD'
-  let g:terminal_color_7  = '#F8F8F2'
+  let g:terminal_color_0  = '#33302B'
+  let g:terminal_color_1  = '#AA8D67'
+  let g:terminal_color_2  = '#6A8D73'
+  let g:terminal_color_3  = '#B3A08B'
+  let g:terminal_color_4  = '#EBCFAB'
+  let g:terminal_color_5  = '#FF8E72'
+  let g:terminal_color_6  = '#995D81'
+  let g:terminal_color_7  = '#F2EAE1'
   let g:terminal_color_8  = '#6272A4'
-  let g:terminal_color_9  = '#FF6E6E'
-  let g:terminal_color_10 = '#69FF94'
-  let g:terminal_color_11 = '#FFFFA5'
-  let g:terminal_color_12 = '#D6ACFF'
-  let g:terminal_color_13 = '#FF92DF'
-  let g:terminal_color_14 = '#A4FFFF'
+  let g:terminal_color_9  = '#C4A781'
+  let g:terminal_color_10 = '#84A78D'
+  let g:terminal_color_11 = '#CDBAA5'
+  let g:terminal_color_12 = '#FFE9C5'
+  let g:terminal_color_13 = '#FFA88C'
+  let g:terminal_color_14 = '#B3779B'
   let g:terminal_color_15 = '#FFFFFF'
 endif
 
 if has('terminal')
   let g:terminal_ansi_colors = [
-      \ '#21222C', '#FF5555', '#50FA7B', '#F1FA8C',
-      \ '#BD93F9', '#FF79C6', '#8BE9FD', '#F8F8F2',
-      \ '#6272A4', '#FF6E6E', '#69FF94', '#FFFFA5',
-      \ '#D6ACFF', '#FF92DF', '#A4FFFF', '#FFFFFF'
+      \ '#33302B', '#AA8D67', '#6A8D73', '#B3A08B',
+      \ '#EBCFAB', '#FF8E72', '#995D81', '#F2EAE1',
+      \ '#6272A4', '#C4A781', '#84A78D', '#CDBAA5',
+      \ '#FFE9C5', '#FFA88C', '#B3779B', '#FFFFFF'
       \]
 endif
 
@@ -166,8 +163,6 @@ endfunction
 
 call s:h('TranquilityBgLight', s:none, s:bglight)
 call s:h('TranquilityBgLighter', s:none, s:bglighter)
-call s:h('TranquilityBgDark', s:none, s:bgdark)
-call s:h('TranquilityBgDarker', s:none, s:bgdarker)
 
 call s:h('TranquilityFg', s:fg)
 call s:h('TranquilityFgUnderline', s:fg, s:none, [s:attrs.underline])
@@ -180,47 +175,49 @@ call s:h('TranquilitySelection', s:none, s:selection)
 
 call s:h('TranquilitySubtle', s:subtle)
 
-call s:h('TranquilityCyan', s:cyan)
-call s:h('TranquilityCyanItalic', s:cyan, s:none, [s:attrs.italic])
+call s:h('TranquilityPurple', s:purple)
+call s:h('TranquilityPurpleItalic', s:purple, s:none, [s:attrs.italic])
 
 call s:h('TranquilityGreen', s:green)
-call s:h('TranquilityGreenBold', s:green, s:none, [s:attrs.bold])
-call s:h('TranquilityGreenItalic', s:green, s:none, [s:attrs.italic])
-call s:h('TranquilityGreenItalicUnderline', s:green, s:none, [s:attrs.italic, s:attrs.underline])
-
 call s:h('TranquilityOrange', s:orange)
 call s:h('TranquilityOrangeBold', s:orange, s:none, [s:attrs.bold])
 call s:h('TranquilityOrangeItalic', s:orange, s:none, [s:attrs.italic])
-call s:h('TranquilityOrangeBoldItalic', s:orange, s:none, [s:attrs.bold, s:attrs.italic])
-call s:h('TranquilityOrangeInverse', s:bg, s:orange)
+call s:h('TranquilityOrangeItalicUnderline', s:orange, s:none, [s:attrs.italic, s:attrs.underline])
 
-call s:h('TranquilityPink', s:pink)
-call s:h('TranquilityPinkItalic', s:pink, s:none, [s:attrs.italic])
-
-call s:h('TranquilityPurple', s:purple)
-call s:h('TranquilityPurpleBold', s:purple, s:none, [s:attrs.bold])
-call s:h('TranquilityPurpleItalic', s:purple, s:none, [s:attrs.italic])
+call s:h('TranquilityLightBrown', s:lightbrown)
+call s:h('TranquilityLightBrownBold', s:lightbrown, s:none, [s:attrs.bold])
+call s:h('TranquilityLightBrownItalic', s:lightbrown, s:none, [s:attrs.italic])
+call s:h('TranquilityLightBrownBoldItalic', s:lightbrown, s:none, [s:attrs.bold, s:attrs.italic])
+call s:h('TranquilityLightBrownInverse', s:bg, s:lightbrown)
 
 call s:h('TranquilityRed', s:red)
-call s:h('TranquilityRedInverse', s:fg, s:red)
+call s:h('TranquilityRedItalic', s:red, s:none, [s:attrs.italic])
 
-call s:h('TranquilityYellow', s:yellow)
-call s:h('TranquilityYellowItalic', s:yellow, s:none, [s:attrs.italic])
+call s:h('TranquilityBeige', s:beige)
+call s:h('TranquilityBeigeBold', s:beige, s:none, [s:attrs.bold])
+call s:h('TranquilityBeigeItalic', s:beige, s:none, [s:attrs.italic])
+
+call s:h('TranquilityDarkBrown', s:darkbrown)
+call s:h('TranquilityDarkBrownInverse', s:fg, s:darkbrown)
+
+call s:h('TranquilityLightGray', s:lightgray)
+call s:h('TranquilityLightGrayItalic', s:lightgray, s:none, [s:attrs.italic])
 
 call s:h('TranquilityError', s:red, s:none, [], s:red)
 
 call s:h('TranquilityErrorLine', s:none, s:none, [s:attrs.undercurl], s:red)
-call s:h('TranquilityWarnLine', s:none, s:none, [s:attrs.undercurl], s:orange)
-call s:h('TranquilityInfoLine', s:none, s:none, [s:attrs.undercurl], s:cyan)
+call s:h('TranquilityWarnLine', s:none, s:none, [s:attrs.undercurl], s:lightbrown)
+call s:h('TranquilityInfoLine', s:none, s:none, [s:attrs.undercurl], s:purple)
 
-call s:h('TranquilityTodo', s:cyan, s:none, [s:attrs.bold, s:attrs.inverse])
-call s:h('TranquilitySearch', s:green, s:none, [s:attrs.inverse])
-call s:h('TranquilityBoundary', s:comment, s:bgdark)
-call s:h('TranquilityLink', s:cyan, s:none, [s:attrs.underline])
+call s:h('TranquilityTodo', s:purple, s:none, [s:attrs.bold, s:attrs.inverse])
+call s:h('TranquilitySearch', s:orange, s:none, [s:attrs.inverse])
+call s:h('TranquilityBoundary', s:comment, s:bglight)
+call s:h('TranquilityLink', s:purple, s:none, [s:attrs.underline])
 
-call s:h('TranquilityDiffChange', s:orange, s:none)
-call s:h('TranquilityDiffText', s:bg, s:orange)
-call s:h('TranquilityDiffDelete', s:red, s:bgdark)
+call s:h('TranquilityDiffChange', s:lightbrown, s:none)
+call s:h('TranquilityDiffText', s:bg, s:lightbrown)
+call s:h('TranquilityDiffDelete', s:red, s:bglight)
+call s:h('TranquilityDiffAdd', s:green, s:bglight)
 
 " }}}2
 
@@ -235,47 +232,47 @@ call s:h('StatusLine', s:none, s:bglighter, [s:attrs.bold])
 call s:h('StatusLineNC', s:none, s:bglight)
 call s:h('StatusLineTerm', s:none, s:bglighter, [s:attrs.bold])
 call s:h('StatusLineTermNC', s:none, s:bglight)
-call s:h('WildMenu', s:bg, s:purple, [s:attrs.bold])
+call s:h('WildMenu', s:bg, s:beige, [s:attrs.bold])
 call s:h('CursorLine', s:none, s:subtle)
 
-hi! link ColorColumn  TranquilityBgDark
-hi! link CursorColumn TranquilityBgDark
-hi! link CursorLineNr TranquilityYellow
-hi! link DiffAdd      TranquilityGreen
+hi! link ColorColumn  TranquilityBgLight
+hi! link CursorColumn TranquilityBgLight
+hi! link CursorLineNr TranquilityLightGray
+hi! link DiffAdd      TranquilityDifAdd
 hi! link DiffAdded    DiffAdd
 hi! link DiffChange   TranquilityDiffChange
 hi! link DiffDelete   TranquilityDiffDelete
 hi! link DiffRemoved  DiffDelete
 hi! link DiffText     TranquilityDiffText
-hi! link Directory    TranquilityPurpleBold
-hi! link ErrorMsg     TranquilityRedInverse
+hi! link Directory    TranquilityBeigeBold
+hi! link ErrorMsg     TranquilityDarkBrownInverse
 hi! link FoldColumn   TranquilitySubtle
 hi! link Folded       TranquilityBoundary
-hi! link IncSearch    TranquilityOrangeInverse
-hi! link LineNr       TranquilityOrange
+hi! link IncSearch    TranquilityLightBrownInverse
+hi! link LineNr       TranquilityLightBrown
 hi! link MoreMsg      TranquilityFgBold
 hi! link NonText      TranquilitySubtle
-hi! link Pmenu        TranquilityBgDark
-hi! link PmenuSbar    TranquilityBgDark
+hi! link Pmenu        TranquilityBgLight
+hi! link PmenuSbar    TranquilityBgLight
 hi! link PmenuSel     TranquilitySelection
 hi! link PmenuThumb   TranquilitySelection
 hi! link Question     TranquilityFgBold
 hi! link Search       TranquilitySearch
 hi! link SignColumn   TranquilityComment
 hi! link TabLine      TranquilityBoundary
-hi! link TabLineFill  TranquilityBgDarker
+hi! link TabLineFill  TranquilityBgLighter
 hi! link TabLineSel   Normal
-hi! link Title        TranquilityGreenBold
+hi! link Title        TranquilityOrangeBold
 hi! link VertSplit    TranquilityBoundary
 hi! link Visual       TranquilitySelection
 hi! link VisualNOS    Visual
-hi! link WarningMsg   TranquilityOrangeInverse
+hi! link WarningMsg   TranquilityLightBrownInverse
 
 " }}}
 " Syntax: {{{
 
 " Required as some plugins will overwrite
-call s:h('MatchParen', s:green, s:none, [s:attrs.underline])
+call s:h('MatchParen', s:orange, s:none, [s:attrs.underline])
 call s:h('Conceal', s:comment, s:bglight)
 
 " Neovim uses SpecialKey for escape characters only. Vim uses it for that, plus whitespace.
@@ -295,43 +292,43 @@ hi! link SpellLocal TranquilityWarnLine
 hi! link SpellCap TranquilityInfoLine
 hi! link SpellRare TranquilityInfoLine
 
-hi! link Constant TranquilityPurple
-hi! link String TranquilityYellow
-hi! link Character TranquilityPink
+hi! link Constant TranquilityBeige
+hi! link String TranquilityLightGray
+hi! link Character TranquilityRed
 hi! link Number Constant
 hi! link Boolean Constant
 hi! link Float Constant
 
 hi! link Identifier TranquilityFg
-hi! link Function TranquilityGreen
+hi! link Function TranquilityOrange
 
-hi! link Statement TranquilityPink
-hi! link Conditional TranquilityPink
-hi! link Repeat TranquilityPink
-hi! link Label TranquilityPink
-hi! link Operator TranquilityPink
-hi! link Keyword TranquilityPink
-hi! link Exception TranquilityPink
+hi! link Statement TranquilityRed
+hi! link Conditional TranquilityRed
+hi! link Repeat TranquilityRed
+hi! link Label TranquilityRed
+hi! link Operator TranquilityRed
+hi! link Keyword TranquilityRed
+hi! link Exception TranquilityRed
 
-hi! link PreProc TranquilityPink
-hi! link Include TranquilityPink
-hi! link Define TranquilityPink
-hi! link Macro TranquilityPink
-hi! link PreCondit TranquilityPink
-hi! link StorageClass TranquilityPink
-hi! link Structure TranquilityPink
-hi! link Typedef TranquilityPink
+hi! link PreProc TranquilityRed
+hi! link Include TranquilityRed
+hi! link Define TranquilityRed
+hi! link Macro TranquilityRed
+hi! link PreCondit TranquilityRed
+hi! link StorageClass TranquilityRed
+hi! link Structure TranquilityRed
+hi! link Typedef TranquilityRed
 
-hi! link Type TranquilityCyanItalic
+hi! link Type TranquilityPurpleItalic
 
 hi! link Delimiter TranquilityFg
 
-hi! link Special TranquilityPink
-hi! link SpecialComment TranquilityCyanItalic
-hi! link Tag TranquilityCyan
+hi! link Special TranquilityRed
+hi! link SpecialComment TranquilityPurpleItalic
+hi! link Tag TranquilityPurple
 hi! link helpHyperTextJump TranquilityLink
-hi! link helpCommand TranquilityPurple
-hi! link helpExample TranquilityGreen
+hi! link helpCommand TranquilityBeige
+hi! link helpExample TranquilityOrange
 hi! link helpBacktick Special
 
 "}}}
