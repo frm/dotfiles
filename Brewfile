@@ -1,5 +1,6 @@
 tap 'eddieantonio/eddieantonio'
 
+brew 'asciinema'
 brew 'autoconf'
 brew 'coreutils'
 brew 'cowsay'
