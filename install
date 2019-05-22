@@ -51,7 +51,7 @@ MAC_OS_VERSION=$(sw_vers -productVersion)
 if [[ $MAC_OS_VERSION =~ "10.14" ]]; then
   pp_info "macos" "installing macos mojave headers"
 
-  if [ -f $MAC_OS_MOJAVE_HEADERS ]; then
+  if [ ! -f $MAC_OS_MOJAVE_HEADERS ]; then
     pp_error "macos" "failed installing Mojave SDK headers"
     pp_error "macos" "please download them from https://developer.apple.com/download/more/?q=Command%20Line%20Tools"
     exit 1
