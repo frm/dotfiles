@@ -65,15 +65,15 @@ bind -n M-9 select-window -t 9
 # Status bar config
 set-option -g status on
 set-option -g status-position bottom
-set-option -g status-attr dim
+set-option -g status-style dim
 
 setw -g window-status-format " #W "
 setw -g window-status-current-format " ▹ #W "
 
 set -g status-justify left
-set -g status-left " "
-# set -g status-right " %H:%M "
-set -g status-right " "
+set -g status-left-style " "
+# set -g status-right-style " %H:%M "
+set -g status-right-style " "
 
 if '[[ "$MNDS_THEME" =~ dark ]]' 'source ~/.dotfiles/tmux/themes/dark.tmux.conf'
 if '[[ "$MNDS_THEME" =~ light ]]' 'source ~/.dotfiles/tmux/themes/light.tmux.conf'
