@@ -1,0 +1,33 @@
+#!/usr/bin/env sh
+
+source $DOTFILES/functions/helpers.zsh
+
+CSS_OVERRIDE=$DOTFILES/scripts/asana/overrides.css
+
+if _mnds_not_installed "npm"; then
+  _mnds_pp_error "asana" "npm is required, please install it first."
+  exit 1
+fi
+
+if _mnds_not_installed "nativefier"; then
+  _mnds_pp_info "asana" "nativefier not installed. installing..."
+  npm install -g nativefier
+fi
+
+_mnds_pp_info "asana" "building custom version of Asana..."
+
+nativefier "https://asana.com" \
+  --title-bar-style 'hiddenInset' \
+  --name "Asana" \
+  --platform "mac" \
+  --arch "x64" \
+  --inject $CSS_OVERRIDE
+
+_mnds_pp_info "asana" "moving generated .app to /Applications"
+
+mv Asana-darwin-x64/Asana.app /Applications
+
+_mnds_pp_info "asana" "cleaning up..."
+rm -rf Asana-darwin-x64
+
+_mnds_pp_success "asana" "great success!"
