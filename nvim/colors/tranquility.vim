@@ -41,14 +41,14 @@ endif
 
 let s:fg          = ['#F2EAE1', 254]
 
-let s:bglighter   = ['#574830',   3]
-let s:bglight     = ['#33302B',   4]
+let s:bglighter   = ['#33302B',   3]
+let s:bglight     = ['#161616',   4]
 let s:bg          = ['#0B0906',   0]
 
-let s:subtle      = ['#33302B', 238]
+let s:subtle      = ['#161616', 238]
 
 let s:selection   = ['#44475A', 239]
-let s:comment     = ['#6272A4',  61]
+let s:comment     = ['#314542',  61]
 let s:purple      = ['#995D81', 125]
 let s:green       = ['#6A8D73',   2]
 let s:orange      = ['#D7A467', 137]
@@ -248,14 +248,14 @@ set background=dark
 
 " Required as some plugins will overwrite
 call s:h('Normal', s:fg, s:Background())
-call s:h('StatusLine', s:none, s:bglighter, [s:attrs.bold])
-call s:h('StatusLineNC', s:none, s:bglight)
-call s:h('StatusLineTerm', s:none, s:bglighter, [s:attrs.bold])
-call s:h('StatusLineTermNC', s:none, s:bglight)
+call s:h('StatusLine', s:lightbrown, s:bg, [s:attrs.bold])
+call s:h('StatusLineNC', s:none, s:bg)
+call s:h('StatusLineTerm', s:none, s:bg, [s:attrs.bold])
+call s:h('StatusLineTermNC', s:none, s:bg)
 call s:h('WildMenu', s:bg, s:beige, [s:attrs.bold])
 call s:h('CursorLine', s:none, s:subtle)
 
-hi! link ColorColumn  TranquilityBgLight
+hi! link ColorColumn  TranquilityBg
 hi! link CursorColumn TranquilityBgLight
 hi! link CursorLineNr TranquilityLightGray
 hi! link DiffAdd      TranquilityDifAdd
@@ -283,7 +283,7 @@ hi! link TabLine      TranquilityBoundary
 hi! link TabLineFill  TranquilityBgLighter
 hi! link TabLineSel   Normal
 hi! link Title        TranquilityOrangeBold
-hi! link VertSplit    TranquilityBoundary
+hi! link VertSplit    TranquilityLightBrown
 hi! link Visual       TranquilitySelection
 hi! link VisualNOS    Visual
 hi! link WarningMsg   TranquilityLightBrownInverse

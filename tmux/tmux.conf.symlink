@@ -64,7 +64,7 @@ bind -n M-9 select-window -t 9
 
 # Status bar config
 set-option -g status on
-set-option -g status-position bottom
+set-option -g status-position top
 set-option -g status-style dim
 
 setw -g window-status-format "   #W"

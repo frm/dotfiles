@@ -18,8 +18,6 @@ Plug 'tpope/vim-projectionist'
 Plug 'tpope/vim-commentary'
 
 " Scheme
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
 Plug 'kristijanhusak/vim-hybrid-material'
 Plug 'w0ng/vim-hybrid'
 Plug 'chriskempson/base16-vim'
@@ -40,8 +38,7 @@ Plug 'janko-m/vim-test'
 
 " Languages & Completions
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-" Plug 'w0rp/ale'
-Plug '~/Developer/frm/ale'
+Plug 'w0rp/ale'
 
 " Elixir
 Plug 'elixir-editors/vim-elixir', { 'for': 'elixir' }
@@ -221,7 +218,6 @@ nnoremap <silent> <localleader><localleader> :TestLast<cr>
 """""""""""""""""""""
 "        Ale        "
 """""""""""""""""""""
-let g:airline#extensions#ale#enabled = 1
 let g:ale_fix_on_save = 1
 let g:ale_completion_enabled = 1
 let g:ale_virtualtext_cursor = 1
@@ -349,8 +345,6 @@ function! s:end_write_mode()
   set relativenumber
 
   so ~/.config/nvim/rc/scheme.vim
-
-  call airline#load_theme()
 
   silent !tmux set status on
   silent !tmux list-panes -F '\#F' | grep -q Z && tmux resize-pane -Z
