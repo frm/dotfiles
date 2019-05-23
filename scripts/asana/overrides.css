@@ -1,0 +1,14 @@
+/* Show when you first open the app and are presented with the landing page */
+.siteHeader {
+  padding-top: 25px;
+}
+
+/* Sidebar after you login */
+.Sidebar {
+  padding-top: 20px;
+}
+
+/* Main page after you login, there was some overlap with the collapsed sidebar */
+.page-topbar {
+  padding-top: 15px !important;
+}
