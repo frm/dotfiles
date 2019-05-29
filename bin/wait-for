@@ -1,0 +1,26 @@
+#!/usr/bin/env sh
+
+source $DOTFILES/functions/helpers.zsh
+
+WAIT_FOR_TIMEOUT=${WAIT_FOR_TIMEOUT:-30}
+
+if [ $# -ne 1 ]; then
+  _mnds_pp_error "wait-for" "you need to specify a process to wait for"
+  exit 1
+fi
+
+function wait_for() {
+  if [ $2 -eq $WAIT_FOR_TIMEOUT ]; then
+    _mnds_pp_error "wait-for" "timing out after ${WAIT_FOR_TIMEOUT}s of waiting for $1"
+    exit 1
+  fi
+
+  if ! (pgrep "$1" > /dev/null); then
+    sleep 1
+    wait_for "$1" $(($2+1))
+  else
+    _mnds_pp_success "wait-for" "$1 is up, continuing"
+  fi
+}
+
+wait_for "$1" 0
