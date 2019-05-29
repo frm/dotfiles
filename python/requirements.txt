@@ -1,3 +1,4 @@
 rtv
 haxor-news
 rainbowstream
+jq
