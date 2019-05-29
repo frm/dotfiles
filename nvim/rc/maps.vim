@@ -41,7 +41,6 @@ endfunction
 
 nnoremap <leader>L :call Lock()<CR>
 
-
 " Rename the current file
 function! Rename()
   let current = expand('%')
@@ -56,3 +55,13 @@ map <Leader>r :call Rename()<CR>
 
 " Refresh the browser
 nnoremap <localleader>r :silent !browser.refresh<CR>
+
+function! MakeExecutable()
+  let confirmation = confirm("Make this file executable?", "&Yes\n&No")
+
+  if confirmation
+    exec '!chmod +x %'
+    redraw!
+  endif
+endfunction
+nnoremap <C-x> :call MakeExecutable()<CR>
