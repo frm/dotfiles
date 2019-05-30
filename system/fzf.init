@@ -4,6 +4,8 @@ if [[ "$MNDS_THEME" == "light" ]]; then
   export FZF_DEFAULT_OPTS="--color light,bg+:#FAFAFA"
 elif [[ "$MNDS_THEME" == "dark" ]]; then
   export FZF_DEFAULT_OPTS="--color bg+:#282A36"
+elif [[ "$MNDS_THEME" == "tranquility" ]]; then
+  export FZF_DEFAULT_OPTS="--color bg+:#0B0906"
 fi
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
