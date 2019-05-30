@@ -134,7 +134,7 @@ autocmd! User FzfStatusLine call <SID>fzf_statusline()
 
 " Use ripgrep over grep
 if executable('rg')
-  set grepprg="rg --color never --no-heading"
+  set grepprg="rg --color=always --no-heading"
 endif
 
 command! -bang -nargs=* Rg
