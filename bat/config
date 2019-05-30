@@ -1,4 +1,4 @@
 --theme="tranquility"
 --style="numbers,changes,header"
---italic-text=always
+--italic-text=never
 --map-syntax .ignore:.gitignore
