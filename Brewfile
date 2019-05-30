@@ -2,6 +2,7 @@ tap 'eddieantonio/eddieantonio'
 
 brew 'asciinema'
 brew 'autoconf'
+brew 'bat'
 brew 'coreutils'
 brew 'cowsay'
 brew 'ctags'
