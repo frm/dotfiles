@@ -199,6 +199,13 @@ dirlink alacritty ~/.config
 pp_info "alacritty" "installing from source"
 ./alacritty/source_install
 
+pp_info "bat" "installing custom theme"
+mkdir -p "$(bat --config-dir)/themes/tranquility"
+mkdir -p "$(bat --cache-dir)"
+gln -sfr bat/tranquility.tmTheme "$(bat --config-dir)/themes/tranquility"
+
+bat cache --build
+
 pp_info "iterm2" "installing dracula"
 DRACULA_PATH=$DOTFILES/iterm2/colors/Dracula.itermcolors
 curl -o $DRACULA_PATH https://raw.githubusercontent.com/dracula/iterm/master/Dracula.itermcolors
