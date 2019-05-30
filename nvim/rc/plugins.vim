@@ -101,23 +101,10 @@ autocmd FileType nerdtree setlocal nolist
 """""""""""""""""""""
 nmap <C-p> :Files<CR>
 nmap <C-g><C-p> :GFiles<CR>
-nmap <C-f> :Ag<Space>
+nmap <C-f> :Rg<Space>
 nmap <leader>l :Lines<CR>
 nmap <leader>b :BLines<CR>
 nmap <leader>h :History<CR>
-
-" Use ripgrep over grep
-if executable('rg')
-  set grepprg="rg --color never --no-heading"
-endif
-
-command! -bang -nargs=* Rg
-  \ call fzf#vim#grep(
-  \   'rg --column --line-number --no-heading --color=always '.shellescape(<q-args>), 1,
-  \   <bang>0 ? fzf#vim#with_preview('up:60%')
-  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
-  \   <bang>0)
-
 
 " Make fzf match the vim colorscheme colors
 let g:fzf_colors =
@@ -144,6 +131,21 @@ function! s:fzf_statusline()
 endfunction
 
 autocmd! User FzfStatusLine call <SID>fzf_statusline()
+
+" Use ripgrep over grep
+if executable('rg')
+  set grepprg="rg --color never --no-heading"
+endif
+
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1,
+  \   <bang>1 ? fzf#vim#with_preview('up:60%:wrap')
+  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+  \   <bang>1)
+
+command! -bang -nargs=? -complete=dir Files
+  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview('up:60%:wrap'), <bang>1)
 
 """""""""""""""""""""
 "     fugitive      "
