@@ -39,7 +39,8 @@ function check_ci() {
   fi
 }
 
-function TRAPUSR1() { wait $ASYNC_PROC
+function TRAPUSR1() {
+  wait $ASYNC_PROC
   CI_STATUS=$?
   CI_PASSED=1
 }
