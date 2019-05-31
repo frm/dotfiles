@@ -385,6 +385,7 @@ map <leader>av :AV<CR>
 "      Startify     "
 """""""""""""""""""""
  let g:startify_change_to_dir = 0
+ let g:startify_custom_header = 'startify#fortune#boxed()'
 
 """""""""""""""""""""
 "   carbon.now.sh   "
