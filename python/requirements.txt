@@ -2,3 +2,4 @@ rtv
 haxor-news
 rainbowstream
 jq
+python-language-server

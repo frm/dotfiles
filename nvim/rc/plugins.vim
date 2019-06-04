@@ -224,7 +224,8 @@ function! InstallDeps(info)
           \ 'coc-tsserver',
           \ 'coc-json',
           \ 'coc-emoji',
-          \ 'coc-solargraph'
+          \ 'coc-solargraph',
+          \ 'coc-python'
           \ ]
     call coc#util#install()
     call coc#util#install_extension(extensions)
