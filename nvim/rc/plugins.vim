@@ -364,7 +364,7 @@ let g:livedown_autorun = 0
 " should the browser window pop-up upon previewing
 let g:livedown_open = 1
 let g:livedown_port = 7654
-let g:livedown_browser = "chrome"
+let g:livedown_browser = "'Firefox Developer Edition'"
 
 nmap <localleader>l :LivedownToggle<CR>
 
