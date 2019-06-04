@@ -37,14 +37,14 @@ Plug 'kassio/neoterm'
 Plug 'janko-m/vim-test'
 
 " Languages & Completions
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { info -> InstallDeps(info) } }
 Plug 'w0rp/ale'
 
 " Elixir
 Plug 'elixir-editors/vim-elixir', { 'for': 'elixir' }
-Plug 'slashmili/alchemist.vim', { 'for': 'elixir' }
 Plug 'c-brenn/phoenix.vim', { 'for': 'elixir' }
 Plug 'andyl/vim-textobj-elixir', { 'for': 'elixir' }
+Plug 'JakeBecker/elixir-ls', { 'do': { -> g:elixirls.compile() } }
 
 " Ruby
 Plug 'vim-ruby/vim-ruby', { 'for': 'ruby' }
@@ -158,12 +158,6 @@ nmap <localleader>gh :Gbrowse<CR>
 nmap <localleader>gc :Gcommit<CR>
 
 """""""""""""""""""""
-"     Deoplete      "
-"""""""""""""""""""""
-set runtimepath+=~/.local/shared/nvim/plugged/deoplete.nvim/
-let g:deoplete#enable_at_startup = 1
-
-"""""""""""""""""""""
 "    AutoPairs      "
 """""""""""""""""""""
 let g:AutoPairsMultilineClose = 0
@@ -218,6 +212,56 @@ nnoremap <silent> <localleader>f :TestFile<cr>
 nnoremap <silent> <localleader><localleader> :TestLast<cr>
 
 """""""""""""""""""""
+"     coc.nvim      "
+"""""""""""""""""""""
+let g:elixirls = {
+  \ 'path': printf('%s/%s', stdpath('data'), 'plugged/elixir-ls'),
+  \ }
+
+let g:elixirls.lsp = printf(
+  \ '%s/%s',
+  \ g:elixirls.path,
+  \ 'release/language_server.sh')
+
+function! g:elixirls.compile(...)
+  let l:commands = join([
+    \ 'mix local.hex --force',
+    \ 'mix local.rebar --force',
+    \ 'mix deps.get',
+    \ 'mix compile',
+    \ 'mix elixir_ls.release'
+    \ ], '&&')
+
+  echom '>>> Compiling elixirls'
+  silent call system(l:commands)
+  echom '>>> elixirls compiled'
+endfunction
+
+call coc#config('languageserver', {
+  \ 'elixir': {
+  \   'command': g:elixirls.lsp,
+  \   'filetypes': ['elixir', 'eelixir']
+  \ }
+  \})
+
+function! InstallDeps(info)
+  if a:info.status == 'installed' || a:info.force
+    let extensions = [
+          \ 'coc-emmet',
+          \ 'coc-highlight',
+          \ 'coc-css',
+          \ 'coc-yaml',
+          \ 'coc-ultisnips',
+          \ 'coc-tsserver',
+          \ 'coc-json',
+          \ 'coc-emoji'
+          \ ]
+    call coc#util#install()
+    call coc#util#install_extension(extensions)
+  endif
+endfunction
+
+"""""""""""""""""""""
 "        Ale        "
 """""""""""""""""""""
 let g:ale_fix_on_save = 1
@@ -228,26 +272,14 @@ let g:ale_sign_warning = '→'
 let g:ale_virtualtext_prefix = ''
 
 let g:ale_fixers = {
+\   'elixir': [],
 \   'ruby':  [],
-\   'elixir':  [],
-\   'typescript': ['prettier'],
-\   'javascript': ['prettier'],
-\   'jsx': [],
-\   'css': [],
-\   'scss': [],
 \   'go': ['gofmt'],
 \ }
 
 let g:ale_linters = {
-\   'javascript': ['prettier'],
-\   'typescript': ['prettier'],
-\   'jsx': [],
-\   'css': [],
-\   'scss': [],
 \   'elixir': [],
 \   'ruby': [],
-\   'html': [],
-\   'markdown': [],
 \   'go': ['gofmt'],
 \}
 
@@ -264,14 +296,6 @@ function! AddLinterIfFileExists(lang, linter, file, lint, fix)
   endif
 endfunction
 
-call AddLinterIfFileExists('javascript', 'eslint', '.eslintrc.json', 1, 1)
-call AddLinterIfFileExists('javascript', 'eslint', '.eslintrc', 1, 1)
-call AddLinterIfFileExists('javascript', 'standard', 'node_modules/.bin/standard', 1, 1)
-call AddLinterIfFileExists('css', 'stylelint', '.stylelintrc', 1, 1)
-call AddLinterIfFileExists('scss', 'stylelint', '.stylelintrc', 1, 1)
-call AddLinterIfFileExists('css', 'stylelint', '.stylelintrc.json', 1, 1)
-call AddLinterIfFileExists('scss', 'stylelint', '.stylelintrc.json', 1, 1)
-call AddLinterIfFileExists('scss', 'scss-lint', '.scss-lint.yml', 1, 1)
 call AddLinterIfFileExists('ruby', 'rubocop', '.rubocop.yml', 1, 1)
 call AddLinterIfFileExists('elixir', 'credo', 'config/.credo.exs', 1, 0)
 call AddLinterIfFileExists('elixir', 'credo', '.credo.exs', 1, 0)
@@ -286,7 +310,7 @@ function! LoadNearestFormatter()
 
   call reverse(l:formatters)
 
-  let g:ale_fixers['elixir'] = ['mix_format']
+  let g:ale_fixers['elixir'] = g:ale_fixers['elixir'] + ['mix_format']
 
   if len(l:formatters) > 0
     let g:ale_elixir_mix_format_options = "--dot-formatter " . l:formatters[0]
