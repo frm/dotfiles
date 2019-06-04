@@ -221,6 +221,7 @@ function! InstallDeps(info)
           \ 'coc-css',
           \ 'coc-yaml',
           \ 'coc-ultisnips',
+          \ 'coc-snippets',
           \ 'coc-tsserver',
           \ 'coc-json',
           \ 'coc-emoji',
@@ -283,6 +284,19 @@ nnoremap <silent> <leader>lr <Plug>(coc-rename)
 nnoremap <silent> <leader>lf <Plug>(coc-fix-current)
 " Show documentation in preview window
 nnoremap <silent> H :call <SID>show_documentation()<CR>
+
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? coc#_select_confirm() :
+      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+let g:coc_snippet_next = '<c-j>'
 
 """""""""""""""""""""
 "        Ale        "
