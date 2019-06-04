@@ -102,8 +102,6 @@ autocmd FileType nerdtree setlocal nolist
 nmap <C-p> :Files<CR>
 nmap <C-g><C-p> :GFiles<CR>
 nmap <C-f> :Rg<Space>
-nmap <leader>l :Lines<CR>
-nmap <leader>b :BLines<CR>
 nmap <leader>h :History<CR>
 
 " Make fzf match the vim colorscheme colors
@@ -214,6 +212,24 @@ nnoremap <silent> <localleader><localleader> :TestLast<cr>
 """""""""""""""""""""
 "     coc.nvim      "
 """""""""""""""""""""
+
+function! InstallDeps(info)
+  if a:info.status == 'installed' || a:info.force
+    let extensions = [
+          \ 'coc-emmet',
+          \ 'coc-highlight',
+          \ 'coc-css',
+          \ 'coc-yaml',
+          \ 'coc-ultisnips',
+          \ 'coc-tsserver',
+          \ 'coc-json',
+          \ 'coc-emoji'
+          \ ]
+    call coc#util#install()
+    call coc#util#install_extension(extensions)
+  endif
+endfunction
+
 let g:elixirls = {
   \ 'path': printf('%s/%s', stdpath('data'), 'plugged/elixir-ls'),
   \ }
@@ -244,22 +260,27 @@ call coc#config('languageserver', {
   \ }
   \})
 
-function! InstallDeps(info)
-  if a:info.status == 'installed' || a:info.force
-    let extensions = [
-          \ 'coc-emmet',
-          \ 'coc-highlight',
-          \ 'coc-css',
-          \ 'coc-yaml',
-          \ 'coc-ultisnips',
-          \ 'coc-tsserver',
-          \ 'coc-json',
-          \ 'coc-emoji'
-          \ ]
-    call coc#util#install()
-    call coc#util#install_extension(extensions)
+function! s:show_documentation()
+  if &filetype == 'vim'
+    execute 'h '. expand('<cword>')
+  else
+    call CocAction('doHover')
   endif
 endfunction
+
+" Remap keys for gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gt <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+nnoremap <silent> <leader>ld :<C-u>CocList diagnostics<cr>
+" Rename current word
+nnoremap <silent> <leader>lr <Plug>(coc-rename)
+" Fix autofix problem of current line
+nnoremap <silent> <leader>lf <Plug>(coc-fix-current)
+" Show documentation in preview window
+nnoremap <silent> H :call <SID>show_documentation()<CR>
 
 """""""""""""""""""""
 "        Ale        "

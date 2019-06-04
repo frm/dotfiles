@@ -1,7 +1,7 @@
 {
  "suggest.noselect": false,
  "suggest.preferCompleteThanJumpPlaceholder": true,
- "diagnostic.enableMessage": "never",
+ "diagnostic.enableMessage": "jump",
  "diagnostic.virtualText": true,
  "diagnostic.errorSign": "→",
  "diagnostic.warningSign": "→",
