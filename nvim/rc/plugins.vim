@@ -223,7 +223,8 @@ function! InstallDeps(info)
           \ 'coc-ultisnips',
           \ 'coc-tsserver',
           \ 'coc-json',
-          \ 'coc-emoji'
+          \ 'coc-emoji',
+          \ 'coc-solargraph'
           \ ]
     call coc#util#install()
     call coc#util#install_extension(extensions)
