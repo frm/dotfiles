@@ -193,6 +193,9 @@ nvim -u nvim/rc/plugins.vim +PlugInstall +qall
 pp_info "nvim" "updating remote plugins"
 nvim +UpdateRemotePlugins +qall
 
+pp_info "nvim" "fixing C-h bug"
+$DEV_DOTFILES/scripts/fix-nvim-c-h
+
 pp_info "alacritty" "setting up environment"
 dirlink alacritty ~/.config
 
