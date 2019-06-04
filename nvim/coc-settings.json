@@ -1,0 +1,10 @@
+{
+ "suggest.noselect": false,
+ "suggest.preferCompleteThanJumpPlaceholder": true,
+ "diagnostic.enableMessage": "never",
+ "diagnostic.virtualText": true,
+ "diagnostic.errorSign": "→",
+ "diagnostic.warningSign": "→",
+ "diagnostic.infoSign": ">>",
+ "diagnostic.hintSign": ">>"
+}
