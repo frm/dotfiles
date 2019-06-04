@@ -68,7 +68,7 @@ Plug 'Shougo/vimproc.vim', { 'for': 'typescript', 'do': 'make' }
 " Other
 Plug 'rhysd/vim-crystal'
 Plug 'sentient-lang/vim-sentient'
-Plug 'justmendes/vim-livedown', { 'for': ['markdown'] }
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install', 'for': ['markdown']  }
 Plug 'junegunn/goyo.vim', { 'for': ['markdown'] }
 Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'cpp', 'flex'] }
 Plug 'junegunn/vader.vim', { 'for': 'vim' }
@@ -371,17 +371,17 @@ nmap <localleader>ff <Plug>(easymotion-s)
 nmap <localleader>fs <Plug>(easymotion-overwin-f)
 
 """""""""""""""""""""
-"     LiveDown      "
+"  MarkdownPreview  "
 """""""""""""""""""""
-" should markdown preview get shown automatically upon opening markdown buffer
-let g:livedown_autorun = 0
+let g:mkdp_auto_start = 0
+let g:mkdp_auto_close = 1
+let g:mkdp_refresh_slow = 0
+let g:mkdp_command_for_global = 0
+let g:mkdp_open_to_the_world = 0
+let g:mkdp_browser = 'Firefox Developer Edition'
+let g:mkdp_page_title = '${name}'
 
-" should the browser window pop-up upon previewing
-let g:livedown_open = 1
-let g:livedown_port = 7654
-let g:livedown_browser = "'Firefox Developer Edition'"
-
-nmap <localleader>l :LivedownToggle<CR>
+nmap <localleader>l <Plug>MarkdownPreviewToggle
 
 """""""""""""""""""""
 "      VimRoom      "
@@ -401,6 +401,10 @@ function! s:start_write_mode()
 
   setlocal nonumber
   setlocal norelativenumber
+
+  silent redraw!
+
+  MarkdownPreview
 endfunction
 
 function! s:end_write_mode()
@@ -411,6 +415,10 @@ function! s:end_write_mode()
 
   silent !tmux set status on
   silent !tmux list-panes -F '\#F' | grep -q Z && tmux resize-pane -Z
+
+  silent redraw!
+
+  MarkdownPreviewStop
 
   " Quit Vim if this is the only remaining buffer
   if b:quitting && len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) == 1
