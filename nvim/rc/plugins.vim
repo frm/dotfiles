@@ -173,13 +173,23 @@ if expand('%:p:h') =~ g:localvimrc_whitelist . '\(subvisual\|utrust\|frm\)'
 endif
 
 """""""""""""""""""""
+"      VimTest      "
+"""""""""""""""""""""
+let test#strategy = "neoterm"
+nnoremap <silent> <localleader>a :TestSuite<cr>
+nnoremap <silent> <localleader>c :TestNearest<cr>
+nnoremap <silent> <localleader>f :TestFile<cr>
+nnoremap <silent> <localleader><localleader> :TestLast<cr>
+
+"""""""""""""""""""""
 "      NeoTerm      "
 """""""""""""""""""""
-let g:neoterm_shell = 'zsh'
-let g:neoterm_default_mod='vertical'
-let g:neoterm_size=60
-let g:neoterm_fixedsize=1
+let g:neoterm_shell = "zsh"
+let g:neoterm_default_mod="vertical"
+let g:neoterm_size=40
+let g:neoterm_fixedsize=40
 let g:neoterm_autoscroll=1
+let g:neoterm_autojump=1
 nnoremap <silent> <localleader>l :Tclear<cr>
 nnoremap <silent> <localleader>q :Ttoggle<cr>
 tnoremap <silent> <C-E> <C-\><C-n>
@@ -194,20 +204,12 @@ function! HorizontalTerm()
   call neoterm#toggle()
 
   let g:neoterm_default_mod='vertical'
-  let g:neoterm_size=70
-  let g:neoterm_fixedsize=70
+  let g:neoterm_size=40
+  let g:neoterm_fixedsize=40
 endfunction
 
 nnoremap <silent> <localleader>T :call HorizontalTerm()<cr>
 
-"""""""""""""""""""""
-"      VimTest      "
-"""""""""""""""""""""
-let test#strategy = "neoterm"
-nnoremap <silent> <localleader>a :TestSuite<cr>
-nnoremap <silent> <localleader>c :TestNearest<cr>
-nnoremap <silent> <localleader>f :TestFile<cr>
-nnoremap <silent> <localleader><localleader> :TestLast<cr>
 
 """""""""""""""""""""
 "     coc.nvim      "
