@@ -1,9 +1,5 @@
 #!/usr/bin/env zsh
 
-loud_mode() {
-  [[ $# -eq 1 && $1 == "--loud" ]]
-}
-
 ci_result() {
   _result=$(ci-wait)
 
@@ -29,7 +25,4 @@ notify_of() {
 msg=$(ci_result)
 
 notify_of $msg
-
-if loud_mode $@; then
-  say "CI $msg"
-fi
+say "CI $msg"
