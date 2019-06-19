@@ -71,9 +71,23 @@ setw -g window-status-format "   #W"
 setw -g window-status-current-format " ▹ #W"
 
 set -g status-justify left
-# set -g status-right-style " %H:%M "
-set -g status-right "#h: #T"
 set -g status-left '[#S] '
+set -g status-right "#(~/.dotfiles/tmux/bin/tmux_ci_status) #{battery_color_bg}#{battery_icon} #{battery_percentage}#[#(tmux show-option -gv status-right-style)] #h: #T"
+
+set -g @batt_icon_status_charged '▲'
+set -g @batt_icon_status_charging '▲'
+set -g @batt_icon_status_discharging '▼'
+set -g @batt_icon_charged '▲'
+set -g @batt_icon_charging '▲'
+set -g @batt_icon_discharging '▼'
+set -g @batt_icon_charge_tier8 '▼'
+set -g @batt_icon_charge_tier7 '▼'
+set -g @batt_icon_charge_tier6 '▼'
+set -g @batt_icon_charge_tier5 '▼'
+set -g @batt_icon_charge_tier4 '▼'
+set -g @batt_icon_charge_tier3 '▼'
+set -g @batt_icon_charge_tier2 '▼'
+set -g @batt_icon_charge_tier1 '▼'
 
 if '[[ "$MNDS_THEME" =~ dark ]]' 'source ~/.dotfiles/tmux/themes/dark.tmux.conf'
 if '[[ "$MNDS_THEME" =~ light ]]' 'source ~/.dotfiles/tmux/themes/light.tmux.conf'
@@ -81,8 +95,9 @@ if '[[ "$MNDS_THEME" =~ tranquility ]]' 'source ~/.dotfiles/tmux/themes/tranquil
 
 # TPM plugins
 set -g @plugin 'tmux-plugins/tpm'
-set -g @plugin 'tmux-plugins/tmux-sensible'
+set -g @plugin 'tmux-plugins/tmux-battery'
 set -g @plugin 'tmux-plugins/tmux-copycat'
+set -g @plugin 'tmux-plugins/tmux-sensible'
 set -g @plugin 'tmux-plugins/tmux-yank'
 set -g @plugin 'christoomey/vim-tmux-navigator'
 

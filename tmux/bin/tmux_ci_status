@@ -1,0 +1,67 @@
+#!/usr/bin/env zsh
+
+CI_STATUS=""
+CI_LOOP=1
+CI_WAIT_SEC=5
+
+tmux_ci_status_success="green"
+tmux_ci_status_failure="red"
+tmux_ci_status_neutral="black"
+tmux_ci_status_info="blue"
+tmux_ci_status_warning="yellow"
+
+function get_tmux_option() {
+  local default=${(P)$(echo "$1")}
+  local theme_option=$(tmux show-option -gqv "@$1")
+
+  if [ -z "$theme_option" ]; then
+    echo "$default";
+  else
+    echo "$theme_option";
+  fi
+}
+
+function check_ci() {
+  case "$(hub ci-status)" in
+    success)
+      CI_STATUS="ci passed"
+      CI_STATUS_COLOR=$(get_tmux_option "tmux_ci_status_success")
+      ;;
+    failure)
+      CI_STATUS="ci failed"
+      CI_STATUS_COLOR=$(get_tmux_option "tmux_ci_status_failure")
+      ;;
+    neutral)
+      CI_STATUS="ci yet to run"
+      CI_STATUS_COLOR=$(get_tmux_option "tmux_ci_status_neutral")
+      ;;
+    error)
+      CI_STATUS="ci errored"
+      CI_STATUS_COLOR=$(get_tmux_option "tmux_ci_status_failure")
+      ;;
+    cancelled)
+      CI_STATUS="ci cancelled"
+      CI_STATUS_COLOR=$(get_tmux_option "tmux_ci_status_failure")
+      ;;
+    action_required)
+      CI_STATUS="ci requires action"
+      CI_STATUS_COLOR=$(get_tmux_option "tmux_ci_status_warning")
+      ;;
+    pending)
+      CI_STATUS="ci running"
+      CI_STATUS_COLOR=$(get_tmux_option "tmux_ci_status_info")
+      ;;
+    timed_out)
+      CI_STATUS="ci timed out"
+      CI_STATUS_COLOR=$(get_tmux_option "tmux_ci_status_failure")
+      ;;
+    *)
+      CI_STATUS="no ci"
+      CI_STATUS_COLOR=$(get_tmux_option "tmux_ci_status_neutral")
+      CI_LOOP=0
+      ;;
+  esac
+}
+
+check_ci
+echo "#[fg=$CI_STATUS_COLOR]$CI_STATUS#[fg=default]"
