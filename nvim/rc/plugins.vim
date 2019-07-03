@@ -33,8 +33,7 @@ Plug 'kana/vim-textobj-user'
 Plug 'AndrewRadev/splitjoin.vim'
 
 " Testing
-" Plug 'kassio/neoterm'
-Plug 'justmendes/neoterm'
+Plug 'kassio/neoterm'
 Plug 'janko-m/vim-test'
 
 " Languages & Completions
