@@ -54,6 +54,7 @@
   s = status -s
   sts = stash save -u
   tree = log --graph --pretty=format:'%Cred%h%Creset %an: %s - %Creset %C(yellow)%d%Creset %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+  untrack = update-index --assume-unchanged
 
   ch = !git-whatchanged
   cob = !git-checkout-branch
