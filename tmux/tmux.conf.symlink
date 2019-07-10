@@ -71,7 +71,7 @@ setw -g window-status-format "   #W"
 setw -g window-status-current-format " ▹ #W"
 
 set -g status-justify left
-set -g status-left '[#S] '
+set -g status-left '[#{=8:session_name}] '
 set -g status-right "#(~/.dotfiles/tmux/bin/tmux_ci_status) #{battery_color_bg}#{battery_icon} #{battery_percentage}#[#(tmux show-option -gv status-right-style)] #h: #T"
 
 set -g @batt_icon_status_charged '▲'
