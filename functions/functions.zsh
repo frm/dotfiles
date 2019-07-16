@@ -46,6 +46,10 @@ t() {
         target_name=$1
         shift
         ;;
+      *)
+        _mnds_pp_error "t" "invalid flags. use: -t [target] | -s [name]"
+        return 1
+        ;;
     esac
   done
 
