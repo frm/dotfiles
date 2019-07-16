@@ -1,0 +1,33 @@
+#!/usr/bin/env sh
+
+source $DOTFILES/functions/helpers.zsh
+
+CSS_OVERRIDE=$DOTFILES/scripts/gcal/overrides.css
+
+if _mnds_not_installed "npm"; then
+  _mnds_pp_error "gcal" "npm is required, please install it first."
+  exit 1
+fi
+
+if _mnds_not_installed "nativefier"; then
+  _mnds_pp_info "gcal" "nativefier not installed. installing..."
+  npm install -g nativefier
+fi
+
+_mnds_pp_info "gcal" "building custom version of Google Calendar..."
+
+nativefier "https://calendar.google.com/calendar/r/" \
+  --title-bar-style 'hiddenInset' \
+  --name "Google Calendar" \
+  --platform "mac" \
+  --arch "x64" \
+  --inject $CSS_OVERRIDE
+
+_mnds_pp_info "gcal" "moving generated .app to /Applications"
+
+mv 'Google Calendar-darwin-x64'/'Google Calendar.app' /Applications
+
+_mnds_pp_info "gcal" "cleaning up..."
+rm -rf 'Google Calendar-darwin-x64'
+
+_mnds_pp_success "gcal" "great success!"
