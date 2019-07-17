@@ -1,15 +1,12 @@
 syntax enable
 
-" Neovim runs in true color mode,
-" which means iTerm2 falls back to default pallette.
-" See https://github.com/chriskempson/base16-vim/issues/69
-" and https://github.com/chriskempson/base16-vim/issues/111
-if has("termguicolors")
-  set termguicolors
-endif
+set termguicolors
 
 let g:enable_bold_font=1
 let g:enable_italic_font = 1
+
+let g:tranquility_bold = 1
+let g:tranquility_italic = 0
 
 let g:mnds_theme=$MNDS_THEME
 
