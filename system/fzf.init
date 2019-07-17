@@ -1,4 +1,5 @@
 export FZF_DEFAULT_COMMAND="rg --files --hidden --follow --ignore-file $DOTFILES/ripgrep/ignore"
+export FZF_PREVIEW_COMMAND="bat --theme=$MNDS_THEME --style=numbers,changes,header --map-syntax=.ignore:.gitignore --color=always {}"
 
 if [[ "$MNDS_THEME" == "light" ]]; then
   export FZF_DEFAULT_OPTS="--color light,bg+:#FAFAFA"
