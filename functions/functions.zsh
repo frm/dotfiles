@@ -18,14 +18,6 @@ mkcd() {
   mkdir -p $@
   cd $@
 }
-# Search the tree for files and open them in $EDITOR
-f() {
-  file=$(fzf)
-
-  if [ ! -z $file ]; then
-    $EDITOR $file
-  fi
-}
 
 # Create a tmux session named after the current directory
 t() {
@@ -186,4 +178,23 @@ theme() {
 
   # fzf needs to be manually resourced to re-export the colors
   source $DOTFILES/system/fzf.init
+}
+
+#
+# fzf related functions
+#
+
+
+# Live preview of rg
+ff() {
+  echo '' | fzf --print-query --preview 'rg -U {q}'
+}
+
+# Search the tree for files and open them in $EDITOR
+f() {
+  file=$(fzf --preview-window=right:60% --preview='bat --color "always" {}')
+
+  if [ ! -z $file ]; then
+    $EDITOR $file
+  fi
 }
