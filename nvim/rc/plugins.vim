@@ -132,12 +132,12 @@ autocmd! User FzfStatusLine call <SID>fzf_statusline()
 
 " Use ripgrep over grep
 if executable('rg')
-  set grepprg="rg --color=always --no-heading"
+  set grepprg="rg --vimgrep --color=always --no-heading"
 endif
 
 command! -bang -nargs=* Rg
   \ call fzf#vim#grep(
-  \   'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1,
+  \   'rg --vimgrep --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1,
   \   <bang>1 ? fzf#vim#with_preview('up:60%:wrap')
   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
   \   <bang>1)
