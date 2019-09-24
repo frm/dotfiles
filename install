@@ -145,6 +145,7 @@ chsh -s $(which zsh)
 
 pp_info "zsh" "setting up environment"
 dirlink . ~/.dotfiles
+cp ./system/env.init ./system/globalenv.init
 
 pp_info "zsh" "replacing current zshrc"
 rm ~/.zshrc
