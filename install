@@ -89,6 +89,7 @@ brew cask install mpv
 pp_info "mpv" "setting up config"
 mkdir -p ~/.config/mpv
 gln -srf mpv/mpv.conf.symlink ~/.config/mpv/mpv.conf
+gln -srf mpv/input.conf.symlink ~/.config/mpv/input.conf
 
 pp_info "asdf" "setting up environment"
 gln -srf asdf/asdfrc.symlink ~/.asdfrc
