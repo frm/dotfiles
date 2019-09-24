@@ -1,4 +1,5 @@
 alias ls="exa --group-directories-first"
+alias cat="bat"
 
 alias v="nvim"
 alias vim="nvim"
