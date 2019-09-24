@@ -5,7 +5,7 @@ iterm2/vendor/
 tmux/plugins/
 
 # Ignore global variables after tracking them
-system/env.init
+system/global_env.init
 
 node_modules/
 
