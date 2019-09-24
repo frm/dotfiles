@@ -228,7 +228,8 @@ function! InstallDeps(info)
           \ 'coc-json',
           \ 'coc-emoji',
           \ 'coc-solargraph',
-          \ 'coc-python'
+          \ 'coc-python',
+          \ 'https://github.com/gabrielpoca/coc-octobox'
           \ ]
     call coc#util#install()
     call coc#util#install_extension(extensions)
@@ -299,6 +300,8 @@ function! s:check_back_space() abort
 endfunction
 
 let g:coc_snippet_next = '<c-j>'
+
+nnoremap <Leader>gn :CocList octobox<CR>
 
 """""""""""""""""""""
 "        Ale        "
