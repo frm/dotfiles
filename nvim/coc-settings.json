@@ -6,5 +6,7 @@
  "diagnostic.errorSign": "→",
  "diagnostic.warningSign": "→",
  "diagnostic.infoSign": ">>",
- "diagnostic.hintSign": ">>"
+ "diagnostic.hintSign": ">>",
+ "octobox.showInStatusBar": true,
+ "octobox.iconForStatusBar": "☀︎"
 }
