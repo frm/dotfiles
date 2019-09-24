@@ -9,13 +9,14 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
 Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-abolish'
-Plug 'chrisbra/Colorizer'
+Plug 'RRethy/vim-hexokinase', { 'do': 'make hexokinase' }
 Plug 'easymotion/vim-easymotion'
 Plug 'embear/vim-localvimrc'
 Plug 'Olical/vim-enmasse'
 Plug 'SirVer/ultisnips'
 Plug 'tpope/vim-projectionist'
 Plug 'tpope/vim-commentary'
+Plug 'ryanoasis/vim-devicons'
 
 " Scheme
 Plug 'kristijanhusak/vim-hybrid-material'
@@ -96,12 +97,16 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
 " Don't show whitespaces on NERDTree enter
 autocmd FileType nerdtree setlocal nolist
 
+" disable cursorcolumn and cursorline in nerdtree
+au FileType nerdtree set nocursorline
+au FileType nerdtree set nocursorcolumn
+
+
 """""""""""""""""""""
 "       fzf         "
 """""""""""""""""""""
 nmap <C-p> :Files<CR>
-nmap <C-g><C-p> :GFiles<CR>
-nmap <C-f> :Rg<Space>
+nmap <C-f> :Rg<CR>
 nmap <leader>h :History<CR>
 
 " Make fzf match the vim colorscheme colors
@@ -120,30 +125,73 @@ let g:fzf_colors =
   \ 'spinner': ['fg', 'Label'],
   \ 'header':  ['fg', 'Comment'] }
 
+" Enable this if you want fzf statusline
 " make fzf status line use the vim theme colors
-function! s:fzf_statusline()
-  highlight fzf1 ctermfg=161 ctermbg=251
-  highlight fzf2 ctermfg=23 ctermbg=251
-  highlight fzf3 ctermfg=237 ctermbg=251
-  setlocal statusline=%#fzf1#\ >\ %#fzf2#fz%#fzf3#f
-endfunction
+" function! s:fzf_statusline()
+"   highlight fzf1 ctermfg=161 ctermbg=251
+"   highlight fzf2 ctermfg=23 ctermbg=251
+"   highlight fzf3 ctermfg=237 ctermbg=251
+"   setlocal statusline=%#fzf1#\ >\ %#fzf2#fz%#fzf3#f
+" endfunction
 
-autocmd! User FzfStatusLine call <SID>fzf_statusline()
+" autocmd! User FzfStatusLine call <SID>fzf_statusline()
+
+ " hide status line inside fzf
+autocmd! FileType fzf
+autocmd  FileType fzf set laststatus=0 noshowmode noruler
+  \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
 
 " Use ripgrep over grep
 if executable('rg')
   set grepprg="rg --vimgrep --color=always --no-heading"
 endif
 
-command! -bang -nargs=* Rg
-  \ call fzf#vim#grep(
-  \   'rg --vimgrep --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1,
-  \   <bang>1 ? fzf#vim#with_preview('up:60%:wrap')
-  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
-  \   <bang>1)
+" Enable this if you want a preview window when searching for files/regexes
+" command! -bang -nargs=* Rg
+"   \ call fzf#vim#grep(
+"   \   'rg --vimgrep --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1,
+"   \   <bang>1 ? fzf#vim#with_preview('up:60%:wrap')
+"   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+"   \   <bang>1)
 
-command! -bang -nargs=? -complete=dir Files
-  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview('up:60%:wrap'), <bang>1)
+" command! -bang -nargs=? -complete=dir Files
+"   \ call fzf#vim#files(<q-args>, fzf#vim#with_preview('up:60%:wrap'), <bang>1)
+
+function! OpenFloatingWin()
+  let height = &lines - 3
+  let width = float2nr(&columns - (&columns * 2 / 10))
+  let col = float2nr((&columns - width) / 2)
+
+  "Set the position, size, etc. of the floating window.
+  "The size configuration here may not be so flexible, and there's room for further improvement.
+  let opts = {
+        \ 'relative': 'editor',
+        \ 'row': height * 0.3,
+        \ 'col': col + 20,
+        \ 'width': width ,
+        \ 'height': height / 2
+        \ }
+
+  let buf = nvim_create_buf(v:false, v:true)
+  let win = nvim_open_win(buf, v:true, opts)
+
+  "Set Floating Window Highlighting
+  call setwinvar(win, '&winhl', 'Normal:Pmenu')
+
+  setlocal
+        \ buftype=nofile
+        \ nobuflisted
+        \ bufhidden=hide
+        \ nonumber
+        \ norelativenumber
+        \ signcolumn=no
+endfunction
+
+"Let the input go up and the search list go down
+let $FZF_DEFAULT_OPTS = '--layout=reverse'
+
+"Open FZF and choose floating window
+let g:fzf_layout = { 'window': 'call OpenFloatingWin()' }
 
 """""""""""""""""""""
 "     fugitive      "
@@ -360,12 +408,6 @@ function! LoadNearestFormatter()
 endfunction
 
 call LoadNearestFormatter()
-
-"""""""""""""""""""""
-"     Colorizer     "
-"""""""""""""""""""""
-let g:colorizer_auto_filetype='css,html,scss,slim,sass,less'
-let g:colorizer_skip_comments=1
 
 """""""""""""""""""""
 "    EasyMotion     "
