@@ -1,4 +1,4 @@
-alias ls="gls --color -h -F --group-directories-first"
+alias ls="exa --group-directories-first"
 
 alias v="nvim"
 alias vim="nvim"
