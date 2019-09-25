@@ -23,7 +23,7 @@ Plug 'kristijanhusak/vim-hybrid-material'
 Plug 'w0ng/vim-hybrid'
 Plug 'chriskempson/base16-vim'
 Plug 'ayu-theme/ayu-vim'
-Plug 'mhinz/vim-startify'
+Plug 'frm/vim-startify'
 Plug 'dracula/vim', { 'as': 'dracula' }
 
 " Formatting
@@ -514,6 +514,8 @@ map <leader>av :AV<CR>
 """""""""""""""""""""
  let g:startify_change_to_dir = 0
  let g:startify_custom_header = ''
+ let g:startify_padding_left = winwidth('%') / 2 - 30
+ let g:startify_padding_top = winheight('%') / 2 - 15
 
 """""""""""""""""""""
 "   carbon.now.sh   "
