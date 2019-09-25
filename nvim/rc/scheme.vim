@@ -6,7 +6,7 @@ let g:enable_bold_font=1
 let g:enable_italic_font = 1
 
 let g:tranquility_bold = 1
-let g:tranquility_italic = 0
+let g:tranquility_italic = 1
 
 let g:mnds_theme=$MNDS_THEME
 
