@@ -277,7 +277,7 @@ function! InstallDeps(info)
           \ 'coc-emoji',
           \ 'coc-solargraph',
           \ 'coc-python',
-          \ 'https://github.com/gabrielpoca/coc-octobox'
+          \ 'coc-octobox'
           \ ]
     call coc#util#install()
     call coc#util#install_extension(extensions)
