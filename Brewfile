@@ -1,5 +1,6 @@
 tap 'eddieantonio/eddieantonio'
 
+brew 'ansible'
 brew 'asciinema'
 brew 'autoconf'
 brew 'bat'
