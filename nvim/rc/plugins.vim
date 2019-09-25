@@ -105,9 +105,21 @@ au FileType nerdtree set nocursorcolumn
 """""""""""""""""""""
 "       fzf         "
 """""""""""""""""""""
-nmap <C-p> :Files<CR>
-nmap <C-f> :Rg<CR>
-nmap <leader>h :History<CR>
+nmap <C-p> :call CloseStartifyAndRun("Files")<CR>
+nmap <C-f> :call CloseStartifyAndRun("Rg")<CR>
+nmap <leader>h :call CloseStartifyAndRun("History")<CR>
+
+function! CloseStartifyAndRun(command)
+  let l:buffer_vars = getbufinfo()[0]['variables']
+  let l:cmd = ':' . a:command
+
+  if has_key(l:buffer_vars, 'startify')
+    execute ':enew'
+  endif
+
+  echo l:cmd
+  execute l:cmd
+endfunction
 
 " Make fzf match the vim colorscheme colors
 let g:fzf_colors =
@@ -501,7 +513,7 @@ map <leader>av :AV<CR>
 "      Startify     "
 """""""""""""""""""""
  let g:startify_change_to_dir = 0
- let g:startify_custom_header = 'startify#fortune#boxed()'
+ let g:startify_custom_header = ''
 
 """""""""""""""""""""
 "   carbon.now.sh   "
