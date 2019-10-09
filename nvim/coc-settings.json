@@ -1,12 +1,22 @@
 {
- "suggest.noselect": false,
- "suggest.preferCompleteThanJumpPlaceholder": true,
- "diagnostic.enableMessage": "jump",
- "diagnostic.virtualText": true,
- "diagnostic.errorSign": "→",
- "diagnostic.warningSign": "→",
- "diagnostic.infoSign": ">>",
- "diagnostic.hintSign": ">>",
- "octobox.showInStatusBar": true,
- "octobox.iconForStatusBar": "☀︎"
+  "coc.preferences.formatOnSaveFiletypes": [
+    "elixir",
+    "javascript",
+    "javascriptreact",
+    "rust",
+    "typescript"
+  ],
+  "diagnostic.displayByAle": false,
+  "diagnostic.enableMessage": "always",
+  "diagnostic.errorSign": "→",
+  "diagnostic.hintSign": ">>",
+  "diagnostic.infoSign": ">>",
+  "diagnostic.virtualText": false,
+  "diagnostic.warningSign": "→",
+  "octobox.iconForStatusBar": "☀︎",
+  "octobox.showInStatusBar": true,
+  "signature.hideOnTextChange": true,
+  "suggest.floatEnable": false,
+  "suggest.noselect": false,
+  "suggest.preferCompleteThanJumpPlaceholder": true
 }

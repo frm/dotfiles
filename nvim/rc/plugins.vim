@@ -278,18 +278,20 @@ nnoremap <silent> <localleader>T :call HorizontalTerm()<cr>
 function! InstallDeps(info)
   if a:info.status == 'installed' || a:info.force
     let extensions = [
-          \ 'coc-emmet',
-          \ 'coc-highlight',
           \ 'coc-css',
-          \ 'coc-yaml',
-          \ 'coc-ultisnips',
-          \ 'coc-snippets',
-          \ 'coc-tsserver',
-          \ 'coc-json',
+          \ 'coc-emmet',
           \ 'coc-emoji',
-          \ 'coc-solargraph',
+          \ 'coc-highlight',
+          \ 'coc-json',
+          \ 'coc-octobox',
+          \ 'coc-prettier',
           \ 'coc-python',
-          \ 'coc-octobox'
+          \ 'coc-rls',
+          \ 'coc-snippets',
+          \ 'coc-solargraph',
+          \ 'coc-tsserver',
+          \ 'coc-ultisnips',
+          \ 'coc-yaml'
           \ ]
     call coc#util#install()
     call coc#util#install_extension(extensions)
