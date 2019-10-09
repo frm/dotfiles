@@ -20,14 +20,19 @@ function! s:git_branch_comp(ArgLead, CmdLine, CursorPos)
 endfunction
 
 " Custom git wrappers
-
 command! -nargs=* -complete=customlist,s:git_branch_comp Gco :call s:wrap_git_command("checkout", <f-args>)
 command! -nargs=* -complete=customlist,s:git_branch_comp Gcheckout :call s:wrap_git_command("checkout", <f-args>)
 
 command! -nargs=* Gbranch :call s:wrap_git_command("branch", <f-args>)
 command! -nargs=* Gb :call s:wrap_git_command("branch", <f-args>)
 
-" Fugitive aliases
+command! -nargs=* Ga :call s:wrap_git_command("add", <f-args>)
+command! -nargs=+ Gcp :call s:wrap_git_command("cherry-pick", <f-args>)
+command! -nargs=0 Gconf :call s:wrap_git_command("conf", <f-args>)
 
+" Fugitive aliases
 command! -nargs=* Gc Gcommit
+command! -nargs=* Gd Gdiff
+command! -nargs=* Gf Gfetch
+command! -nargs=* Gm Gmerge
 command! -nargs=* Gs Gstatus
