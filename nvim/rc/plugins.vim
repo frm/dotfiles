@@ -41,6 +41,7 @@ Plug 'janko-m/vim-test'
 " Languages & Completions
 Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { info -> InstallDeps(info) } }
 Plug 'w0rp/ale'
+Plug 'cespare/vim-toml', { 'for': 'toml' }
 
 " Elixir
 Plug 'elixir-editors/vim-elixir', { 'for': 'elixir' }
