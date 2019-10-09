@@ -29,4 +29,5 @@ command! -nargs=* Gb :call s:wrap_git_command("branch", <f-args>)
 
 " Fugitive aliases
 
+command! -nargs=* Gc Gcommit
 command! -nargs=* Gs Gstatus
