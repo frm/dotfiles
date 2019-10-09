@@ -16,7 +16,7 @@ else
   so ~/.config/nvim/rc/schemes/dark.vim
 endif
 
-function! LinterStatus() abort
+function! StatusLineLinter() abort
    let l:counts = ale#statusline#Count(bufnr(''))
    let l:all_errors = l:counts.error + l:counts.style_error
    let l:all_non_errors = l:counts.total - l:all_errors
@@ -26,6 +26,15 @@ function! LinterStatus() abort
    \ l:all_errors
    \)
  endfunction
+
+function! StatusLineBranch()
+  let l:branch = FugitiveHead()
+
+  return printf(
+    \ ' (%s)',
+    \ l:branch
+    \ )
+endfunction
 
 " Don't show the tabline on top
 set showtabline=0
@@ -38,7 +47,8 @@ set statusline+=%f " Path to the file in the buffer, as typed or relative to cur
 set statusline+=%{&modified?'\ +':''}
 set statusline+=%{&readonly?'\ ':''}
 set statusline+=%= " Separation point between left and right aligned items
-set statusline+=\ %{LinterStatus()}, " Show errors and warnings from ALE
+set statusline+=%{StatusLineBranch()} " Git branch
+set statusline+=\ %{StatusLineLinter()}, " Show errors and warnings from ALE
 set statusline+=\ col:\ %c
 set statusline+=\ \ \  " Empty space
 
