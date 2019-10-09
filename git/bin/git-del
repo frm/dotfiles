@@ -1,0 +1,23 @@
+#!/usr/bin/env sh
+# Deletes local and remote branch
+
+if [ $# -eq 0 ]; then
+  echo "[git]: ERR: git-del requires a branch to delete"
+  exit 1
+fi
+
+if ! (git rev-parse --verify "$1" > /dev/null 2>& 1); then
+  echo "[git]: branch $1 does not exist locally"
+else
+  git branch -d "$1"
+  echo "[git]: branch $1 deleted locally"
+fi
+
+remote=$(git remote get-url origin)
+
+if [ "$(git ls-remote --heads "$remote" "$1" | wc -l)" -eq "0" ]; then
+  echo "[git]: remote branch $1 does not exist"
+else
+  git push origin :"$1"
+  echo "[git]: remote branch $1 deleted"
+fi
