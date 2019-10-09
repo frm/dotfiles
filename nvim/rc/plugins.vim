@@ -7,6 +7,7 @@ Plug 'junegunn/fzf.vim'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
+Plug 'jreybert/vimagit'
 Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-abolish'
 Plug 'RRethy/vim-hexokinase', { 'do': 'make hexokinase' }
