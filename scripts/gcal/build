@@ -2,8 +2,6 @@
 
 source $DOTFILES/functions/helpers.zsh
 
-CSS_OVERRIDE=$DOTFILES/scripts/gcal/overrides.css
-
 if _mnds_not_installed "npm"; then
   _mnds_pp_error "gcal" "npm is required, please install it first."
   exit 1
@@ -17,11 +15,12 @@ fi
 _mnds_pp_info "gcal" "building custom version of Google Calendar..."
 
 nativefier "https://calendar.google.com/calendar/r/" \
+  --single-instance \
   --title-bar-style 'hiddenInset' \
   --name "Google Calendar" \
   --platform "mac" \
   --arch "x64" \
-  --inject $CSS_OVERRIDE
+  --inject overrides.js
 
 _mnds_pp_info "gcal" "moving generated .app to /Applications"
 
