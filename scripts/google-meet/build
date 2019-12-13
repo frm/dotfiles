@@ -1,0 +1,32 @@
+#!/usr/bin/env sh
+
+source $DOTFILES/functions/helpers.zsh
+
+if _mnds_not_installed "npm"; then
+  _mnds_pp_error "meet" "npm is required, please install it first."
+  exit 1
+fi
+
+if _mnds_not_installed "nativefier"; then
+  _mnds_pp_info "meet" "nativefier not installed. installing..."
+  npm install -g nativefier
+fi
+
+_mnds_pp_info "meet" "building custom version of Google Meet..."
+
+nativefier "https://meet.google.com" \
+  --single-instance \
+  --title-bar-style 'hiddenInset' \
+  --name "Google Meet" \
+  --platform "mac" \
+  --arch "x64" \
+  --inject overrides.js
+
+_mnds_pp_info "meet" "moving generated .app to /Applications"
+
+mv 'Google Meet-darwin-x64'/'Google Meet.app' /Applications
+
+_mnds_pp_info "meet" "cleaning up..."
+rm -rf 'Google Meet-darwin-x64'
+
+_mnds_pp_success "meet" "great success!"
