@@ -1,0 +1,32 @@
+#!/usr/bin/env sh
+
+source $DOTFILES/functions/helpers.zsh
+
+if _mnds_not_installed "npm"; then
+  _mnds_pp_error "hangouts" "npm is required, please install it first."
+  exit 1
+fi
+
+if _mnds_not_installed "nativefier"; then
+  _mnds_pp_info "hangouts" "nativefier not installed. installing..."
+  npm install -g nativefier
+fi
+
+_mnds_pp_info "hangouts" "building custom version of Google Hangouts..."
+
+nativefier "https://hangouts.google.com" \
+  --single-instance \
+  --title-bar-style 'hiddenInset' \
+  --name "Google Hangouts" \
+  --platform "mac" \
+  --arch "x64" \
+  --inject overrides.js
+
+_mnds_pp_info "hangouts" "moving generated .app to /Applications"
+
+mv 'Google Hangouts-darwin-x64'/'Google Hangouts.app' /Applications
+
+_mnds_pp_info "hangouts" "cleaning up..."
+rm -rf 'Google Hangouts-darwin-x64'
+
+_mnds_pp_success "hangouts" "great success!"
