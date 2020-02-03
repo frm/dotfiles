@@ -164,6 +164,7 @@ pp_info "tmux" "installing plugins"
 mkdir -p ~/.tmux/plugins/
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 gln -srf ./tmux/tmux.conf.symlink "$HOME/.tmux.conf"
+gln -srf ./tmux/tmate.conf.symlink "$HOME/.tmate.conf"
 ~/.tmux/plugins/tpm/bin/install_plugins
 
 pp_info "git" "setting up environment"
