@@ -1,4 +1,4 @@
-alias ls="exa --group-directories-first"
+alias ls="exa --group-directories-first --icons --git --time-style=long-iso --level=1"
 alias cat="bat"
 
 alias v="nvim"
