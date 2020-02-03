@@ -18,13 +18,13 @@ Plug 'SirVer/ultisnips'
 Plug 'tpope/vim-projectionist'
 Plug 'tpope/vim-commentary'
 Plug 'ryanoasis/vim-devicons'
+Plug 'glacambre/firenvim', { 'do': function('firenvim#install') }
 
 " Scheme
 Plug 'kristijanhusak/vim-hybrid-material'
 Plug 'w0ng/vim-hybrid'
 Plug 'chriskempson/base16-vim'
 Plug 'ayu-theme/ayu-vim'
-Plug 'frm/vim-startify'
 Plug 'dracula/vim', { 'as': 'dracula' }
 
 " Formatting
@@ -107,21 +107,9 @@ au FileType nerdtree set nocursorcolumn
 """""""""""""""""""""
 "       fzf         "
 """""""""""""""""""""
-nmap <C-p> :call CloseStartifyAndRun("Files")<CR>
-nmap <C-f> :call CloseStartifyAndRun("Rg")<CR>
-nmap <leader>h :call CloseStartifyAndRun("History")<CR>
-
-function! CloseStartifyAndRun(command)
-  let l:buffer_vars = getbufinfo()[0]['variables']
-  let l:cmd = ':' . a:command
-
-  if has_key(l:buffer_vars, 'startify')
-    execute ':enew'
-  endif
-
-  echo l:cmd
-  execute l:cmd
-endfunction
+nmap <C-p> :Files<CR>
+nmap <C-f> :Rg<CR>
+nmap <leader>h :History<CR>
 
 " Make fzf match the vim colorscheme colors
 let g:fzf_colors =
@@ -288,6 +276,7 @@ function! InstallDeps(info)
           \ 'coc-octobox',
           \ 'coc-prettier',
           \ 'coc-python',
+          \ 'coc-ruby',
           \ 'coc-rls',
           \ 'coc-snippets',
           \ 'coc-solargraph',
@@ -441,7 +430,7 @@ let g:mkdp_auto_close = 1
 let g:mkdp_refresh_slow = 0
 let g:mkdp_command_for_global = 0
 let g:mkdp_open_to_the_world = 0
-let g:mkdp_browser = 'Firefox Developer Edition'
+let g:mkdp_browser = 'Firefox'
 let g:mkdp_page_title = '${name}'
 
 nmap <localleader>l <Plug>MarkdownPreviewToggle
@@ -512,14 +501,6 @@ let g:UltiSnipsJumpBackwardTrigger="<C-k>"
 map <leader>aa :A<CR>
 map <leader>as :AS<CR>
 map <leader>av :AV<CR>
-
-"""""""""""""""""""""
-"      Startify     "
-"""""""""""""""""""""
- let g:startify_change_to_dir = 0
- let g:startify_custom_header = ''
- let g:startify_padding_left = max([winwidth('%') / 2 - 30, 0])
- let g:startify_padding_top = max([winheight('%') / 2 - 15, 0])
 
 """""""""""""""""""""
 "   carbon.now.sh   "
