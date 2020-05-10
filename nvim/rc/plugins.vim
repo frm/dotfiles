@@ -18,7 +18,6 @@ Plug 'SirVer/ultisnips'
 Plug 'tpope/vim-projectionist'
 Plug 'tpope/vim-commentary'
 Plug 'ryanoasis/vim-devicons'
-Plug 'glacambre/firenvim', { 'do': function('firenvim#install') }
 
 " Scheme
 Plug 'kristijanhusak/vim-hybrid-material'
