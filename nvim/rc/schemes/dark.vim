@@ -1,7 +1,7 @@
 set background=dark
 
 let g:airline_theme = 'tranquility'
-color tranquility
+color tranquility_eighties
 
 " Base16 Tomorrow Night settings:
 " colorscheme base16-tomorrow-night
