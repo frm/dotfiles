@@ -2,7 +2,7 @@
   name = Fernando Mendes
   email = fernando@mendes.codes
 [github]
-  user = justmendes
+  user = frm
 [branch]
   autosetuprebase = always
 [color]
@@ -63,3 +63,5 @@
   div = !git-divergence
   mpr = !git-merge-pr
   rbm = !git-rebase-master
+[protocol "keybase"]
+	allow = always
