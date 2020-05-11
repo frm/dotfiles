@@ -167,10 +167,10 @@ function! OpenFloatingWin()
   "The size configuration here may not be so flexible, and there's room for further improvement.
   let opts = {
         \ 'relative': 'editor',
-        \ 'row': height * 0.3,
-        \ 'col': col + 20,
+        \ 'row': height,
+        \ 'col': col,
         \ 'width': width ,
-        \ 'height': height / 2
+        \ 'height': height
         \ }
 
   let buf = nvim_create_buf(v:false, v:true)
