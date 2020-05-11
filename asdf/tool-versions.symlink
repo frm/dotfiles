@@ -1,7 +1,7 @@
 ruby 2.5.0
-elixir 1.8.0-otp-21
+erlang 22.2.8
+elixir 1.10.2-otp-22
 nodejs 10.16.0
-erlang 21.1.2
 rust 1.37.0
 python 3.7.3
 crystal 0.26.1
