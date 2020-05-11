@@ -38,7 +38,7 @@ Plug 'kassio/neoterm'
 Plug 'janko-m/vim-test'
 
 " Languages & Completions
-Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { info -> InstallDeps(info) } }
+Plug 'neoclide/coc.nvim', {'branch': 'release', 'do': { info -> InstallDeps(info) }}
 Plug 'w0rp/ale'
 Plug 'cespare/vim-toml', { 'for': 'toml' }
 
@@ -263,6 +263,9 @@ nnoremap <silent> <localleader>T :call HorizontalTerm()<cr>
 """""""""""""""""""""
 "     coc.nvim      "
 """""""""""""""""""""
+"
+" NOTE: these functions only install the dependencies
+" actual config is available at plugins/coc.vim
 
 function! InstallDeps(info)
   if a:info.status == 'installed' || a:info.force
@@ -272,7 +275,6 @@ function! InstallDeps(info)
           \ 'coc-emoji',
           \ 'coc-highlight',
           \ 'coc-json',
-          \ 'coc-octobox',
           \ 'coc-prettier',
           \ 'coc-python',
           \ 'coc-ruby',
@@ -318,42 +320,7 @@ call coc#config('languageserver', {
   \ }
   \})
 
-function! s:show_documentation()
-  if &filetype == 'vim'
-    execute 'h '. expand('<cword>')
-  else
-    call CocAction('doHover')
-  endif
-endfunction
-
-" Remap keys for gotos
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gt <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-
-nnoremap <silent> <leader>ld :<C-u>CocList diagnostics<cr>
-" Rename current word
-nnoremap <silent> <leader>lr <Plug>(coc-rename)
-" Fix autofix problem of current line
-nnoremap <silent> <leader>lf <Plug>(coc-fix-current)
-" Show documentation in preview window
-nnoremap <silent> H :call <SID>show_documentation()<CR>
-
-inoremap <silent><expr> <TAB>
-      \ pumvisible() ? coc#_select_confirm() :
-      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
-
-let g:coc_snippet_next = '<c-j>'
-
-nnoremap <Leader>gn :CocList octobox<CR>
+so ~/.config/nvim/rc/plugins/coc.vim
 
 """""""""""""""""""""
 "        Ale        "
