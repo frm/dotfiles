@@ -56,7 +56,7 @@ let s:orange      = ['#D7A467', 137]
 let s:lightbrown  = ['#D4B490',  12]
 let s:red         = ['#FF8E72', 203]
 let s:beige       = ['#EBCFAB',   5]
-let s:teal        = ['#4D7C8A',  29]
+let s:teal        = ['#4D7C8A',  37]
 let s:darkbrown   = ['#AA8D67',  11]
 let s:lightgray   = ['#B3A08B', 180]
 
