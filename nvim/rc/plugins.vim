@@ -170,7 +170,7 @@ function! OpenFloatingWin()
         \ 'relative': 'editor',
         \ 'row': height,
         \ 'col': col,
-        \ 'width': width ,
+        \ 'width': width,
         \ 'height': height
         \ }
 
@@ -187,10 +187,11 @@ function! OpenFloatingWin()
         \ nonumber
         \ norelativenumber
         \ signcolumn=no
+        \ termguicolors
 endfunction
 
 "Let the input go up and the search list go down
-let $FZF_DEFAULT_OPTS = '--layout=reverse'
+let $FZF_DEFAULT_OPTS = $FZF_DEFAULT_OPTS . ' --layout=reverse'
 
 "Open FZF and choose floating window
 let g:fzf_layout = { 'window': 'call OpenFloatingWin()' }

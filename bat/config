@@ -1,4 +1,4 @@
---theme="tranquility"
+--theme="tranquility_eighties"
 --style="numbers,changes,header"
 --italic-text=never
 --map-syntax=.ignore:.gitignore
