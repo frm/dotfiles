@@ -65,3 +65,7 @@ function! MakeExecutable()
   endif
 endfunction
 nnoremap <C-x> :call MakeExecutable()<CR>
+
+function! ColourTest()
+  exec 'so $VIMRUNTIME/syntax/hitest.vim'
+endfunction

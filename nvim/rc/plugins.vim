@@ -47,7 +47,7 @@ Plug 'cespare/vim-toml', { 'for': 'toml' }
 Plug 'elixir-editors/vim-elixir', { 'for': 'elixir' }
 Plug 'c-brenn/phoenix.vim', { 'for': 'elixir' }
 Plug 'andyl/vim-textobj-elixir', { 'for': 'elixir' }
-Plug 'JakeBecker/elixir-ls', { 'do': { -> g:elixirls.compile() } }
+Plug 'elixir-lsp/elixir-ls', { 'do': { -> g:elixirls.compile() } }
 
 " Ruby
 Plug 'vim-ruby/vim-ruby', { 'for': 'ruby' }
