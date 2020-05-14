@@ -213,6 +213,7 @@ call s:h('TranquilityLightBrownBold', s:lightbrown, s:none, [s:attrs.bold])
 call s:h('TranquilityLightBrownItalic', s:lightbrown, s:none, [s:attrs.italic])
 call s:h('TranquilityLightBrownBoldItalic', s:lightbrown, s:none, [s:attrs.bold, s:attrs.italic])
 call s:h('TranquilityLightBrownInverse', s:bg, s:lightbrown)
+call s:h('TranquilityLightBrownInverseBold', s:bg, s:lightbrown, [s:attrs.bold])
 
 call s:h('TranquilityRed', s:red)
 call s:h('TranquilityRedItalic', s:red, s:none, [s:attrs.italic])
@@ -222,7 +223,8 @@ call s:h('TranquilityBeigeBold', s:beige, s:none, [s:attrs.bold])
 call s:h('TranquilityBeigeItalic', s:beige, s:none, [s:attrs.italic])
 
 call s:h('TranquilityDarkBrown', s:darkbrown)
-call s:h('TranquilityDarkBrownInverse', s:fg, s:darkbrown)
+call s:h('TranquilityDarkBrownInverse', s:bg, s:darkbrown)
+call s:h('TranquilityDarkBrownInverseBold', s:bg, s:darkbrown, [s:attrs.bold])
 
 call s:h('TranquilityLightGray', s:lightgray)
 call s:h('TranquilityLightGrayItalic', s:lightgray, s:none, [s:attrs.italic])
@@ -242,6 +244,17 @@ call s:h('TranquilityDiffChange', s:lightbrown, s:none)
 call s:h('TranquilityDiffText', s:bg, s:lightbrown)
 call s:h('TranquilityDiffDelete', s:red, s:bglight)
 call s:h('TranquilityDiffAdd', s:green, s:bglight)
+
+call s:h('TranquilityStatusLineBg', s:fg, s:bglight)
+call s:h('TranquilityStatusLineError', s:red, s:bg)
+call s:h('TranquilityStatusLineErrorBold', s:red, s:bg, [s:attrs.bold])
+call s:h('TranquilityStatusLineWarning', s:teal, s:bg)
+call s:h('TranquilityStatusLineWarningBold', s:teal, s:bg, [s:attrs.bold])
+call s:h('TranquilityStatusLineEntry', s:bg, s:lightbrown)
+call s:h('TranquilityStatusLineEntryBold', s:bg, s:lightbrown, [s:attrs.bold])
+call s:h('TranquilityStatusLineEntryInverted', s:lightbrown, s:bg)
+call s:h('TranquilityStatusLineEntryInvertedBold', s:lightbrown, s:bg, [s:attrs.bold])
+call s:h('TranquilityStatusLineError', s:lightbrown, s:bg)
 
 " }}}2
 

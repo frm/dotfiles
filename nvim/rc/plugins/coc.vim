@@ -53,6 +53,8 @@ nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
 
 nnoremap <silent> <leader>ld :<C-u>CocList diagnostics<cr>
+nmap <silent> <Leader>j <Plug>(coc-diagnostic-next)
+nmap <silent> <Leader>k <Plug>(coc-diagnostic-prev)
 
 " Fix autofix problem of current line
 nnoremap <silent> <leader>lf <Plug>(coc-fix-current)
