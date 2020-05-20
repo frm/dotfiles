@@ -16,6 +16,7 @@ alias gh="hub browse"
 
 alias l="bin/lint"
 alias s="bin/server"
+alias c="bin/console"
 
 alias m="mix"
 alias r="rails"
