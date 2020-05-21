@@ -81,7 +81,9 @@ set statusline+=\  " Empty space
 set statusline+=%#TranquilityStatusLineErrorBold#%{StatusLineErrors()}%#TranquilityStatusLineEntryInverted#
 set statusline+=%#TranquilityStatusLineWarningBold#%{StatusLineWarnings()}%#TranquilityStatusLineEntryInverted#
 " set statusline+=%#TranquilityStatusLineBg#
-" set statusline+=%= " Separation point between left and right aligned items
+set statusline+=%= " Separation point between left and right aligned items
+set statusline+=%#TranquilityStatusLineEntryInverted#
+set statusline+=\ c:\ %c
 
 " Force the correct separator on all vim themes
 set fillchars+=vert:│
