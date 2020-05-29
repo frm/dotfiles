@@ -39,7 +39,7 @@
   d = diff
   dt = difftool
   f = fetch
-  l = log --oneline --abbrev-commit
+  l = log --color --graph --pretty=format:'%C(yellow)%d%Creset %Cgreen(%cr)%Creset %C(bold blue)[%an]%Creset %s %Cred(%h)%Creset' --abbrev-commit
   m = merge
   mt = mergetool
   p = push
