@@ -173,6 +173,10 @@ gln -srf git/gitignore_global.symlink ~/.gitignore_global
 gln -srf git/gitattributes.symlink ~/.gitattributes
 dirlink git/git_template .git_template
 
+pp_info "gnupg" "setting up gpg config"
+mkdir -p ~/.gnupg
+gln -srf gnupg/gpg-agent.conf.symlink ~/.gnupg/gpg-agent.conf
+
 pp_info "nvim" "setting up environment"
 mkdir ~/.config
 dirlink nvim ~/.config/
