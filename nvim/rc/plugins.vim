@@ -71,6 +71,7 @@ Plug 'Shougo/vimproc.vim', { 'for': 'typescript', 'do': 'make' }
 " Other
 Plug 'rhysd/vim-crystal'
 Plug 'sentient-lang/vim-sentient'
+Plug 'itchyny/calendar.vim'
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install', 'for': ['markdown']  }
 Plug 'junegunn/goyo.vim', { 'for': ['markdown'] }
 Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'cpp', 'flex'] }
@@ -483,3 +484,11 @@ let g:splitjoin_join_mapping = ''
 
 nmap sj :SplitjoinSplit<cr>
 nmap sk :SplitjoinJoin<cr>
+
+"""""""""""""""""""""
+"   calendar.vim    "
+"""""""""""""""""""""
+let g:calendar_google_calendar = 1
+let g:calendar_google_api_key = $CALENDAR_VIM_API_KEY
+let g:calendar_google_client_id = $CALENDAR_VIM_CLIENT_ID
+let g:calendar_google_client_secret = $CALENDAR_VIM_CLIENT_SECRET
