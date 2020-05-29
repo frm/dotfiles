@@ -1,12 +1,15 @@
 [user]
   name = Fernando Mendes
   email = fernando@mendes.codes
+  signingkey = 45CE4B6B02238E3A
 [github]
   user = frm
 [branch]
   autosetuprebase = always
 [color]
   ui = true
+[commit]
+  gpgsign = true
 [core]
   editor = nvim -f
   pager = diff-so-fancy | less --tabs=4 -RFX
@@ -64,4 +67,6 @@
   mpr = !git-merge-pr
   rbm = !git-rebase-master
 [protocol "keybase"]
-	allow = always
+  allow = always
+[gpg]
+	program = /usr/local/bin/gpg
