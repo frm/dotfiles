@@ -1,0 +1,27 @@
+global !p
+from javascript_snippet_helpers import *
+endglobal
+
+snippet ir "import react"
+import React from "react";
+
+$0
+endsnippet
+
+snippet is "import style"
+import "./style.${1:css}";
+
+$0
+endsnippet
+
+snippet edf "export default function component"
+const `!p component_name(path, snip)` = ($2) => {
+  return (
+    <${1:div} className="`!p component_name(path, snip)`">
+      $0
+    </$1>
+  );
+};
+
+export default `!p component_name(path, snip)`;
+endsnippet
