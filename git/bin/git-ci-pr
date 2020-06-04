@@ -2,6 +2,8 @@
 
 git add . && git commit -m "Pass the build. Stop, having it be failed"
 
+echo ""
+
 description=`cat <<TXT
 Pass the build. Stop, having it be failed.
 
@@ -15,7 +17,6 @@ TXT
 
 git push -u
 
-hub pull-request -m "$description"
-
 echo ""
-echo "$description"
+
+hub pull-request -m "$description"
