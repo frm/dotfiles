@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+git add . && git commit -m "Pass the build. Stop, having it be failed"
