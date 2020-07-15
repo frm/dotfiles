@@ -14,13 +14,11 @@ GEOMETRY_STATUS_SYMBOL="⇝"
 GEOMETRY_STATUS_COLOR="green"
 GEOMETRY_STATUS_SYMBOL_ERROR="⑊"
 
-# geometry custom functions
-geometry_path_override() {
-  ansi 237 "[%2~]"
-}
+GEOMETRY_PATH_SYMBOL_HOME="%2~"
+GEOMETRY_PATH_COLOR="237"
 
 # geometry prompt definitions
-GEOMETRY_PROMPT=(geometry_newline geometry_path_override geometry_status)
+GEOMETRY_PROMPT=(geometry_newline geometry_path geometry_status)
 
 GEOMETRY_ENV="production"
 source $HOME/Developer/geometry/$GEOMETRY_ENV/geometry.zsh
