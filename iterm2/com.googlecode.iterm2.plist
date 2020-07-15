@@ -1957,7 +1957,7 @@
 	<key>NSWindow Frame SharedPreferences</key>
 	<string>-1340 512 796 486 -1920 -150 1920 1200 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>275 193 1130 684 0 0 1680 1027 </string>
+	<string>395 187 1130 684 0 0 1680 1027 </string>
 	<key>New Bookmarks</key>
 	<array>
 		<dict>
@@ -4842,13 +4842,14 @@
 		<string>3.3.6</string>
 		<string>3.3.8</string>
 		<string>3.3.4</string>
+		<string>3.3.11</string>
 		<string>3.3.1</string>
 		<string>3.3.3</string>
 		<string>3.3.5</string>
 		<string>3.3.7</string>
 		<string>3.3.9</string>
-		<string>3.3.0</string>
 		<string>3.2.9</string>
+		<string>3.3.0</string>
 		<string>3.3.2</string>
 	</array>
 	<key>NoSyncBFPRecents</key>
@@ -4879,7 +4880,7 @@
 	<key>NoSyncInstallationId</key>
 	<string>0BC41DBE-DE0C-46D2-8D24-9EBA548DCC58</string>
 	<key>NoSyncLaunchExperienceControllerRunCount</key>
-	<integer>217</integer>
+	<integer>245</integer>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile</key>
 	<true/>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile_selection</key>
@@ -5649,6 +5650,8 @@
 	</dict>
 	<key>PrefsCustomFolder</key>
 	<string>/Users/frm/Developer/frm/dotfiles/iterm2</string>
+	<key>PreventEscapeSequenceFromChangingProfile</key>
+	<true/>
 	<key>Print In Black And White</key>
 	<true/>
 	<key>QuitWhenAllWindowsClosed</key>
@@ -5664,7 +5667,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2020-05-12T18:45:35Z</date>
+	<date>2020-06-09T16:41:40Z</date>
 	<key>SUSendProfileInfo</key>
 	<false/>
 	<key>SUUpdateRelaunchingMarker</key>
@@ -6574,7 +6577,7 @@
 	<key>findMode_iTerm</key>
 	<integer>0</integer>
 	<key>iTerm Version</key>
-	<string>3.3.9</string>
+	<string>3.3.11</string>
 	<key>kCPKSelectionViewPreferredModeKey</key>
 	<integer>0</integer>
 	<key>kCPKSelectionViewShowHSBTextFieldsKey</key>
