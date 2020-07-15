@@ -32,7 +32,8 @@ Plug 'tpope/vim-surround'
 Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-endwise'
 Plug 'kana/vim-textobj-user'
-Plug 'AndrewRadev/splitjoin.vim'
+" Plug 'AndrewRadev/splitjoin.vim'
+Plug '/Users/frm/Developer/frm/splitjoin.vim'
 
 " Testing
 Plug 'kassio/neoterm'
@@ -276,14 +277,17 @@ function! InstallDeps(info)
           \ 'coc-css',
           \ 'coc-emmet',
           \ 'coc-emoji',
+          \ 'coc-eslint',
           \ 'coc-highlight',
           \ 'coc-json',
           \ 'coc-prettier',
           \ 'coc-python',
-          \ 'coc-ruby',
           \ 'coc-rls',
+          \ 'coc-ruby',
           \ 'coc-snippets',
           \ 'coc-solargraph',
+          \ 'coc-tslint',
+          \ 'coc-tslint-plugin',
           \ 'coc-tsserver',
           \ 'coc-ultisnips',
           \ 'coc-yaml'
@@ -337,12 +341,14 @@ let g:ale_virtualtext_prefix = ''
 
 let g:ale_fixers = {
 \   'elixir': [],
+\   'javascript': [],
 \   'ruby':  [],
 \   'go': ['gofmt'],
 \ }
 
 let g:ale_linters = {
 \   'elixir': [],
+\   'javascript': [],
 \   'ruby': [],
 \   'go': ['gofmt'],
 \}
