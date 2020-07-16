@@ -19,6 +19,7 @@ Plug 'SirVer/ultisnips'
 Plug 'tpope/vim-projectionist'
 Plug 'tpope/vim-commentary'
 Plug 'ryanoasis/vim-devicons'
+Plug 'psliwka/vim-smoothie'
 
 " Scheme
 Plug 'kristijanhusak/vim-hybrid-material'
