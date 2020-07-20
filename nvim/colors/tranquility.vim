@@ -1,8 +1,8 @@
 " Tranquility Theme: {{{
 "
-" https://github.com/justmendes/tranquility.vim
+" https://github.com/frm/tranquility.vim
 "
-" Copyright 2019, All rights reserved
+" Copyright 2020, All rights reserved
 "
 " @author Fernando Mendes <fernando@mendes.codes>
 "
