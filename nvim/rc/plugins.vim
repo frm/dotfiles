@@ -5,6 +5,7 @@ Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
 Plug 'Xuyuanp/nerdtree-git-plugin', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
+Plug 'antoinemadec/coc-fzf'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
@@ -281,6 +282,7 @@ function! InstallDeps(info)
           \ 'coc-eslint',
           \ 'coc-highlight',
           \ 'coc-json',
+          \ 'coc-markdownlint',
           \ 'coc-prettier',
           \ 'coc-python',
           \ 'coc-rls',
