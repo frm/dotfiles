@@ -34,8 +34,7 @@ Plug 'tpope/vim-surround'
 Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-endwise'
 Plug 'kana/vim-textobj-user'
-" Plug 'AndrewRadev/splitjoin.vim'
-Plug '/Users/frm/Developer/frm/splitjoin.vim'
+Plug 'AndrewRadev/splitjoin.vim'
 
 " Testing
 Plug 'kassio/neoterm'
