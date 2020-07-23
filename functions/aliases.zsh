@@ -17,6 +17,8 @@ alias gh="hub browse"
 
 alias l="bin/lint"
 alias s="bin/server"
+alias se="bin/setup"
+alias te="bin/test"
 alias c="bin/console"
 
 alias m="mix"
