@@ -76,6 +76,7 @@ Plug 'sentient-lang/vim-sentient'
 Plug 'itchyny/calendar.vim'
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install', 'for': ['markdown']  }
 Plug 'junegunn/goyo.vim', { 'for': ['markdown'] }
+Plug 'junegunn/limelight.vim', { 'for': ['markdown'] }
 Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'cpp', 'flex'] }
 Plug 'junegunn/vader.vim', { 'for': 'vim' }
 Plug 'kristijanhusak/vim-carbon-now-sh'
@@ -424,6 +425,10 @@ function! s:start_write_mode()
   silent !tmux set status off
   silent !tmux list-panes -F '\#F' | grep -q Z || tmux resize-pane -Z
 
+  set noshowmode
+  set noshowcmd
+  set scrolloff=999
+
   syntax on
 
   so ~/.config/nvim/rc/schemes/light.vim
@@ -433,6 +438,7 @@ function! s:start_write_mode()
 
   silent redraw!
 
+  Limelight
   MarkdownPreview
 endfunction
 
@@ -447,6 +453,11 @@ function! s:end_write_mode()
 
   silent redraw!
 
+  set showmode
+  set showcmd
+  set scrolloff=4
+
+  Limelight!
   MarkdownPreviewStop
 
   " Quit Vim if this is the only remaining buffer
@@ -457,8 +468,9 @@ function! s:end_write_mode()
       qa
     endif
   endif
-
 endfunction
+
+let g:goyo_width=90
 
 autocmd! User GoyoEnter nested call <SID>start_write_mode()
 autocmd! User GoyoLeave nested call <SID>end_write_mode()
