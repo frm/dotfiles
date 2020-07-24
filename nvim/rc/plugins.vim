@@ -351,6 +351,7 @@ let g:ale_fixers = {
 
 let g:ale_linters = {
 \   'elixir': [],
+\   'md': ['proselint', 'languagetool'],
 \   'javascript': [],
 \   'ruby': [],
 \   'go': ['gofmt'],
