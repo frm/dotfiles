@@ -128,7 +128,7 @@ gln -srf elixir/iex.exs.symlink ~/.iex.exs
 
 pp_info "ruby" "installing gems"
 gem install bundler
-cat ruby/gems | xargs -I {} gem install {}
+cat ruby/gems | xargs gem install
 
 pp_info "node" "installing packages"
 npm install -g node
