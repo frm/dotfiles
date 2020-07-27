@@ -11,3 +11,5 @@ node_modules/
 
 # rainbowstream history
 completer.hist
+
+*.pyc
