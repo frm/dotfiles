@@ -4,3 +4,4 @@ rainbowstream
 jq
 python-language-server
 proselint
+neovim
