@@ -226,6 +226,11 @@ cd ~/Downloads && git clone https://github.com/tonsky/FiraCode
 mv FiraCode/distr/ttf/*.ttf ~/Library/Fonts
 cd $WD
 
+source $DOTFILES/spicetify/spicetify.init
+git clone https://github.com/morpheusthewhite/spicetify-themes $SPICETIFY_CONFIG/Themes
+
+$DOTFILES/spicetify/apply
+
 pp_success "install" "automatic config done!"
 pp_success "install" "you now need to config iterm2"
 pp_success "install" "to do that, open preferences and do the following steps:

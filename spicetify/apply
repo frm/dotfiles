@@ -1,0 +1,12 @@
+source "$DOTFILES/spicetify/spicetify.init"
+
+spicetify backup
+
+spicetify config current_theme Lovelace
+spicetify config extensions bookmark.js
+spicetify config extensions fullAppDisplay.js
+spicetify config extensions keyboardShortcut.js
+spicetify config extensions queueAll.js
+spicetify config extensions trashbin.js
+
+spicetify apply

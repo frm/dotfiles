@@ -1,0 +1,1 @@
+export SPICETIFY_CONFIG="$HOME/.config/spicetify"
