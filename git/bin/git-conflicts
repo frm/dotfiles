@@ -1,0 +1,28 @@
+#!/usr/bin/env zsh
+
+source "$DOTFILES/functions/helpers.zsh"
+
+conflicts=`git diff --name-only --diff-filter=U`
+total_files="${(w)#conflicts}"
+
+raw_conflicts="$(rg -c '^=======$' "${(f)conflicts}")"
+raw_total=$(echo $raw_conflicts | cut -d ':' -f2 | paste -sd+ - | bc)
+total_conflicts=${raw_total##*(  )}
+
+if [ "$total_files" = "0" ] || [ -z "$total_conflicts" ]; then
+  _mnds_pp_success "git" "no conflicts found"
+  exit 0
+fi
+
+_mnds_pp_error "git" "found a total of $total_conflicts conflict(s) in $total_files file(s)\n"
+
+# List conflicts
+for file in $(echo "$conflicts"); do
+  nr_conflicts=$(rg -c '^=======$' $file || echo "0")
+
+  if [ "$nr_conflicts" = "0" ]; then
+    _mnds_pp_success "git" "$file has no more conflicts"
+  else
+    _mnds_pp_error "git" "$file has $nr_conflicts conflict(s)"
+  fi
+done

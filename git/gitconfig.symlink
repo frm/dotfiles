@@ -38,7 +38,6 @@
   c = commit
   co = checkout
   cp = cherry-pick
-  conf = diff --name-only --diff-filter=U
   d = diff
   dt = difftool
   f = fetch
@@ -61,6 +60,7 @@
 
   ch = !git-whatchanged
   cob = !git-checkout-branch
+  conf = !git-conflicts
   cpr = !git-close-pr
   cr = !git-code-review
   div = !git-divergence
