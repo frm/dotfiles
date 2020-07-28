@@ -1,5 +1,6 @@
 tap 'eddieantonio/eddieantonio'
 
+
 brew 'ansible'
 brew 'asciinema'
 brew 'autoconf'
@@ -29,6 +30,7 @@ brew 'readline'
 brew 'ripgrep'
 brew 'rtv'
 brew 'spark'
+brew 'khanhas/tap/spicetify-cli'
 brew 'the_silver_searcher'
 brew 'tmate'
 brew 'tmux'
