@@ -96,8 +96,8 @@ gln -srf mpv/input.conf.symlink ~/.config/mpv/input.conf
 pp_info "asdf" "setting up environment"
 gln -srf asdf/asdfrc.symlink ~/.asdfrc
 
-read -r "asdf_version?$(pp $RESET "asdf" "asdf version to install? (default: 0.7.2)") "
-asdf_version=${asdf_version:-0.7.2}
+read -r "asdf_version?$(pp $RESET "asdf" "asdf version to install? (default: 0.7.8)") "
+asdf_version=${asdf_version:-0.7.8}
 
 pp_info "asdf" "installing asdf $asdf_version"
 git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v$asdf_version
