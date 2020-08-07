@@ -289,9 +289,6 @@ function! InstallDeps(info)
           \ 'coc-ruby',
           \ 'coc-snippets',
           \ 'coc-solargraph',
-          \ 'coc-tslint',
-          \ 'coc-tslint-plugin',
-          \ 'coc-tsserver',
           \ 'coc-ultisnips',
           \ 'coc-yaml'
           \ ]
