@@ -32,7 +32,7 @@ function dirlink {
 
 pp_info "install" "setting up Developer directory"
 mkdir -p ~/Developer/frm
-git clone --recurse-submodules -j8 https://github.com/justmendes/dotfiles.git $DEV_DOTFILES
+git clone --recurse-submodules -j8 https://github.com/frm/dotfiles.git $DEV_DOTFILES
 
 cd $DEV_DOTFILES
 
@@ -203,11 +203,11 @@ nvim +UpdateRemotePlugins +qall
 pp_info "nvim" "fixing C-h bug"
 $DEV_DOTFILES/scripts/fix-nvim-c-h
 
-pp_info "alacritty" "setting up environment"
-dirlink alacritty ~/.config
+# pp_info "alacritty" "setting up environment"
+# dirlink alacritty ~/.config
 
-pp_info "alacritty" "installing from source"
-./alacritty/source_install
+# pp_info "alacritty" "installing from source"
+# ./alacritty/source_install
 
 pp_info "bat" "installing custom theme"
 mkdir -p "$(bat --config-dir)/themes/tranquility"
@@ -216,20 +216,15 @@ gln -sfr bat/tranquility.tmTheme "$(bat --config-dir)/themes/tranquility"
 
 bat cache --build
 
-pp_info "iterm2" "installing dracula"
-DRACULA_PATH=$DOTFILES/iterm2/colors/Dracula.itermcolors
-curl -o $DRACULA_PATH https://raw.githubusercontent.com/dracula/iterm/master/Dracula.itermcolors
-chmod +x $DRACULA_PATH
+# pp_info "iterm2" "installing dracula"
+# DRACULA_PATH=$DOTFILES/iterm2/colors/Dracula.itermcolors
+# curl -o $DRACULA_PATH https://raw.githubusercontent.com/dracula/iterm/master/Dracula.itermcolors
+# chmod +x $DRACULA_PATH
 
 pp_info "iterm2" "installing fira code"
 cd ~/Downloads && git clone https://github.com/tonsky/FiraCode
 mv FiraCode/distr/ttf/*.ttf ~/Library/Fonts
 cd $WD
-
-source $DOTFILES/spicetify/spicetify.init
-git clone https://github.com/morpheusthewhite/spicetify-themes $SPICETIFY_CONFIG/Themes
-
-$DOTFILES/spicetify/apply
 
 pp_success "install" "automatic config done!"
 pp_success "install" "you now need to config iterm2"
