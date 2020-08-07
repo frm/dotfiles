@@ -88,7 +88,7 @@ call plug#end()
 """""""""""""""""""""
 nnoremap <C-n> :NERDTreeToggle<CR>
 nnoremap <Leader>n :NERDTreeFind<CR>
-let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr', '\.DS_Store']
+let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git$', '\.hg', '\.svn', '\.bzr', '\.DS_Store']
 let g:NERDTreeDirArrows=1
 let g:NERDTreeMouseMode=2
 let g:NERDTreeShowHidden=1
