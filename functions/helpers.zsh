@@ -7,7 +7,7 @@ _COLOR_RED='\033[1;91m'
 _COLOR_RESET='\033[0m'
 
 _mnds_pp() {
-  echo "$1[$2]: $3${_COLOR_RESET}\n"
+  echo "$1[$2]: $3${_COLOR_RESET}"
 }
 
 _mnds_pp_info() {
