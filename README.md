@@ -8,4 +8,4 @@ TODO
 
 ## Install
 
-`zsh <(curl -s https://raw.githubusercontent.com/justmendes/dotfiles/master/install)`
+`zsh <(curl -s https://raw.githubusercontent.com/frm/dotfiles/master/install)`
