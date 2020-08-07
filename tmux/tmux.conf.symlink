@@ -63,7 +63,8 @@ bind -n M-8 select-window -t 8
 bind -n M-9 select-window -t 9
 
 # Status bar config
-set-option -g status on
+set-option -g status 2
+set-option -g status-format[1] ""
 set-option -g status-position top
 set-option -g status-style dim
 
