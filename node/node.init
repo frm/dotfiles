@@ -1,4 +1,4 @@
 CURRENT_NODE=$(asdf current nodejs | cut -d ' ' -f 1)
 
 # both yarn and npm install to this directory
-export PATH="$PATH:$HOME/.asdf/installs/nodejs/$CURRENT_NODE/.npm/bin/:$HOME/.dotfiles/node/node_modules/.bin/"
+export PATH="$HOME/.asdf/installs/nodejs/$CURRENT_NODE/.npm/bin/:$HOME/.dotfiles/node/node_modules/.bin/:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
