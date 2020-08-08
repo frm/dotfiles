@@ -1,3 +1,14 @@
 #!/usr/bin/env sh
 
-git add . && git commit -m "Pass the build. Stop, having it be failed"
+description=`cat <<TXT
+Pass the build. Stop, having it be failed.
+
+Knock knock. It's the @frm. With huge builds. And fixes. Fixed builds.
+
+> _Pass the build. Stop, having it be failed._
+
+said the @frm.
+TXT
+`
+
+git add . && git commit -m "$description"
