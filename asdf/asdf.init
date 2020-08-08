@@ -1,5 +1,5 @@
 . $HOME/.asdf/asdf.sh
 
-. $HOME/.asdf/completions/asdf.bash
+export fpath=(${HOME}/.asdf/completions $fpath)
 
 export PATH="$PATH:$HOME/.asdf/shims"
