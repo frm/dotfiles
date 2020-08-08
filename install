@@ -225,8 +225,20 @@ bat cache --build
 # chmod +x $DRACULA_PATH
 
 pp_info "iterm2" "installing fira code"
-cd ~/Downloads && git clone https://github.com/tonsky/FiraCode
-mv FiraCode/distr/ttf/*.ttf ~/Library/Fonts
+
+cd ~/Downloads
+mkdir fonts
+cd fonts
+
+font_types="Light Retina Regular Medium Bold"
+
+for type in $font_types; do
+  wget -O "FiraCode $type Nerd Font Complete Mono.ttf" "https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/FiraCode/$type/complete/Fira%20Code%20$type%20Nerd%20Font%20Complete%20Mono.ttf?raw=true"
+
+  wget -O "FiraCode $type Nerd Font Complete.ttf" "https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/FiraCode/$type/complete/Fira%20Code%20$type%20Nerd%20Font%20Complete.ttf?raw=true"
+done
+
+mv ./*.ttf ~/Library/Fonts/
 cd $WD
 
 pp_success "install" "automatic config done!"
