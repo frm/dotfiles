@@ -272,7 +272,7 @@
   "Scrollback Lines" : 1000,
   "Send Code When Idle" : false,
   "Close Sessions On End" : true,
-  "Terminal Type" : "xterm-256color",
+  "Terminal Type" : "screen-256color",
   "Visual Bell" : true,
   "Flashing Bell" : false,
   "Silence Bell" : false,
