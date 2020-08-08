@@ -1,7 +1,5 @@
 #!/bin/zsh
 
-set -e
-
 GREEN='\033[1;32m'
 BLUE='\033[1;34m'
 RED='\033[1;91m'
@@ -45,7 +43,6 @@ pp_info "brew" "bundling apps"
 brew bundle
 
 pp_info "macos" "installing command line tools"
-
 xcode-select --install
 
 MAC_OS_VERSION=$(sw_vers -productVersion)
@@ -148,10 +145,13 @@ chsh -s $(which zsh)
 
 pp_info "zsh" "setting up environment"
 dirlink . ~/.dotfiles
-cp ./system/env.init ./system/globalenv.init
+cp ./system/env.init ./system/global_env.init
 
 pp_info "zsh" "replacing current zshrc"
-rm ~/.zshrc
+if [ -f ~/.zshrc ]; then
+  rm ~/.zshrc
+fi
+
 gln -srf zsh/zshrc.symlink ~/.zshrc
 
 pp_info "zsh" "installing geometry"
@@ -174,7 +174,7 @@ pp_info "git" "setting up environment"
 gln -srf git/gitconfig.symlink ~/.gitconfig
 gln -srf git/gitignore_global.symlink ~/.gitignore_global
 gln -srf git/gitattributes.symlink ~/.gitattributes
-dirlink git/git_template .git_template
+dirlink git/git_template ~/.git_template
 
 pp_info "gnupg" "setting up gpg config"
 mkdir -p ~/.gnupg
