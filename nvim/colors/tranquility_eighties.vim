@@ -113,29 +113,12 @@ endif
 " }}}2
 " User Configuration: {{{2
 
-if !exists('g:tranquility_bold')
-  let g:tranquility_bold = 1
-endif
-
-if !exists('g:tranquility_italic')
-  let g:tranquility_italic = 1
-endif
-
-if !exists('g:tranquility_underline')
-  let g:tranquility_underline = 1
-endif
-
-if !exists('g:tranquility_undercurl') && g:tranquility_underline != 0
-  let g:tranquility_undercurl = 1
-endif
-
-if !exists('g:tranquility_inverse')
-  let g:tranquility_inverse = 1
-endif
-
-if !exists('g:tranquility_colorterm')
-  let g:tranquility_colorterm = 1
-endif
+let g:tranquility_bold = 1
+let g:tranquility_italic = 0
+let g:tranquility_underline = 1
+let g:tranquility_undercurl = 1
+let g:tranquility_inverse = 1
+let g:tranquility_colorterm = 1
 
 "}}}2
 " Script Helpers: {{{2
