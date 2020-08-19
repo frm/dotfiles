@@ -307,7 +307,15 @@ let g:elixirls.lsp = printf(
   \ 'release/language_server.sh')
 
 function! g:elixirls.compile(...)
+  let l:cd = printf('cd %s', g:elixirls.path)
+
+  let l:precommands = join([
+    \ l:cd,
+    \ 'mv .tool-versions tool-versions'
+    \ ], '&&')
+
   let l:commands = join([
+    \ l:cd,
     \ 'mix local.hex --force',
     \ 'mix local.rebar --force',
     \ 'mix deps.get',
@@ -315,8 +323,15 @@ function! g:elixirls.compile(...)
     \ 'mix elixir_ls.release'
     \ ], '&&')
 
+  let l:postcommands = join([
+    \ l:cd,
+    \ 'mv tool-versions .tool-versions'
+    \ ], '&&')
+
   echom '>>> Compiling elixirls'
+  silent call system(l:precommands)
   silent call system(l:commands)
+  silent call system(l:postcommands)
   echom '>>> elixirls compiled'
 endfunction
 
