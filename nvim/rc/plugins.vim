@@ -58,11 +58,6 @@ Plug 'tpope/vim-bundler', { 'for': 'ruby' }
 Plug 'nelstrom/vim-textobj-rubyblock', { 'for': 'ruby' }
 Plug 'slim-template/vim-slim', { 'for': 'slim' }
 
-" JavaScript
-Plug 'prettier/vim-prettier', {
-  \ 'do': 'yarn install',
-  \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue']}
-
 Plug 'elzr/vim-json', { 'for': 'json' }
 Plug 'mxw/vim-jsx', { 'for': 'javascript.jsx' }
 
@@ -277,8 +272,7 @@ function! InstallDeps(info)
   if a:info.status == 'installed' || a:info.force
     let extensions = [
           \ 'coc-css',
-          \ 'coc-emmet',
-          \ 'coc-emoji',
+          \ 'coc-elixir',
           \ 'coc-eslint',
           \ 'coc-highlight',
           \ 'coc-json',
