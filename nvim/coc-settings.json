@@ -13,10 +13,8 @@
   "diagnostic.infoSign": ">>",
   "diagnostic.virtualText": false,
   "diagnostic.warningSign": "→",
-  "octobox.iconForStatusBar": "☀︎",
-  "octobox.showInStatusBar": true,
   "signature.hideOnTextChange": true,
   "suggest.floatEnable": false,
-  "suggest.noselect": false,
+  "suggest.noselect": true,
   "suggest.preferCompleteThanJumpPlaceholder": true
 }
