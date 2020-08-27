@@ -206,6 +206,12 @@ nvim +UpdateRemotePlugins +qall
 pp_info "nvim" "fixing C-h bug"
 $DEV_DOTFILES/scripts/fix-nvim-c-h
 
+pp_info "ctags" "installing elixir ctags"
+wget https://raw.githubusercontent.com/mmorearty/elixir-ctags/master/.ctags -q -O ctags/elixir.ctags
+
+pp_info "ctags" "setting up ctags environment"
+dirlink ctags ~/.ctags.d
+
 # pp_info "alacritty" "setting up environment"
 # dirlink alacritty ~/.config
 
