@@ -1,0 +1,15 @@
+#!/usr/bin/env zsh
+#
+# Start a new git project
+#
+
+set -e
+
+read -r "origin?Origin url: "
+
+git init
+git remote add origin $origin
+
+git add .
+git commit -m ":sunrise:"
+git push -u
