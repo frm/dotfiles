@@ -21,6 +21,7 @@ Plug 'tpope/vim-projectionist'
 Plug 'tpope/vim-commentary'
 Plug 'ryanoasis/vim-devicons'
 Plug 'psliwka/vim-smoothie'
+Plug 'nvim-treesitter/nvim-treesitter'
 
 " Scheme
 Plug 'kristijanhusak/vim-hybrid-material'
