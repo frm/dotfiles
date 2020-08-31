@@ -222,6 +222,7 @@ pp_info "bat" "installing custom theme"
 mkdir -p "$(bat --config-dir)/themes/tranquility"
 mkdir -p "$(bat --cache-dir)"
 gln -sfr bat/tranquility.tmTheme "$(bat --config-dir)/themes/tranquility"
+gln -sfr bat/tranquility_eighties.tmTheme "$(bat --config-dir)/themes/tranquility"
 
 bat cache --build
 
