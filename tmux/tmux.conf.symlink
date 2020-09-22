@@ -93,6 +93,7 @@ set -g @batt_icon_charge_tier1 '▼'
 if '[[ "$MNDS_THEME" =~ dark ]]' 'source ~/.dotfiles/tmux/themes/dark.tmux.conf'
 if '[[ "$MNDS_THEME" =~ light ]]' 'source ~/.dotfiles/tmux/themes/light.tmux.conf'
 if '[[ "$MNDS_THEME" =~ tranquility ]]' 'source ~/.dotfiles/tmux/themes/tranquility.tmux.conf'
+if '[[ "$MNDS_THEME" =~ mountaineer ]]' 'source ~/.dotfiles/tmux/themes/mountaineer.tmux.conf'
 
 # TPM plugins
 set -g @plugin 'tmux-plugins/tpm'
