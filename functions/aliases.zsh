@@ -13,7 +13,7 @@ alias mux="tmuxinator"
 
 alias git="hub"
 alias g="hub"
-alias gh="hub browse"
+alias gb="hub browse"
 
 alias l="bin/lint"
 alias s="bin/server"
