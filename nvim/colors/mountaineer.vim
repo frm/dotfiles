@@ -54,22 +54,22 @@ let s:cterm0F        = "14"
 
 " Neovim terminal colours
 if has("nvim")
-  let g:terminal_color_0 =  "#1D1F21"
-  let g:terminal_color_1 =  "#CC6666"
-  let g:terminal_color_2 =  "#B5BD68"
-  let g:terminal_color_3 =  "#F0C674"
-  let g:terminal_color_4 =  "#81A2BE"
-  let g:terminal_color_5 =  "#B294BB"
-  let g:terminal_color_6 =  "#8ABEB7"
-  let g:terminal_color_7 =  "#C5C8C6"
-  let g:terminal_color_8 =  "#969896"
-  let g:terminal_color_9 =  "#CC6666"
-  let g:terminal_color_10 = "#B5BD68"
-  let g:terminal_color_11 = "#F0C674"
-  let g:terminal_color_12 = "#81A2BE"
-  let g:terminal_color_13 = "#B294BB"
-  let g:terminal_color_14 = "#8ABEB7"
-  let g:terminal_color_15 = "#FFFFFF"
+  let g:terminal_color_0 =  "#050505"
+  let g:terminal_color_1 =  "#AC8A8C"
+  let g:terminal_color_2 =  "#8AAC8B"
+  let g:terminal_color_3 =  "#ACA98A"
+  let g:terminal_color_4 =  "#8F8AAC"
+  let g:terminal_color_5 =  "#AC8AAC"
+  let g:terminal_color_6 =  "#8AABAC"
+  let g:terminal_color_7 =  "#E7E7E7"
+  let g:terminal_color_8 =  "#4C4C4C"
+  let g:terminal_color_9 =  "#AC8A8C"
+  let g:terminal_color_10 = "#8AAC8B"
+  let g:terminal_color_11 = "#ACA98A"
+  let g:terminal_color_12 = "#8F8AAC"
+  let g:terminal_color_13 = "#AC8AAC"
+  let g:terminal_color_14 = "#8AABAC"
+  let g:terminal_color_15 = "#FCFCFC"
   let g:terminal_color_background = g:terminal_color_0
   let g:terminal_color_foreground = g:terminal_color_5
 
@@ -80,22 +80,22 @@ if has("nvim")
 
 elseif has("terminal")
   let g:terminal_ansi_colors = [
-        \ "#1D1F21",
-        \ "#CC6666",
-        \ "#8ABEB7",
-        \ "#B5BD68",
-        \ "#F0C674",
-        \ "#81A2BE",
-        \ "#B294BB",
-        \ "#C5C8C6",
-        \ "#969896",
-        \ "#CC6666",
-        \ "#B5BD68",
-        \ "#F0C674",
-        \ "#81A2BE",
-        \ "#B294BB",
-        \ "#8ABEB7",
-        \ "#FFFFFF",
+        \ "#050505",
+        \ "#AC8A8C",
+        \ "#8AAC8B",
+        \ "#ACA98A",
+        \ "#8F8AAC",
+        \ "#AC8AAC",
+        \ "#8AABAC",
+        \ "#E7E7E7",
+        \ "#4C4C4C",
+        \ "#AC8A8C",
+        \ "#8AAC8B",
+        \ "#ACA98A",
+        \ "#8F8AAC",
+        \ "#AC8AAC",
+        \ "#8AABAC",
+        \ "#FCFCFC",
         \ ]
 endif
 
