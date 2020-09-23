@@ -361,6 +361,14 @@ call <sid>hi("StartifySpecial",  s:gui03, "", s:cterm03, "", "", "")
 " Java highlighting
 call <sid>hi("javaOperator",     s:gui0D, "", s:cterm0D, "", "", "")
 
+" Statusline highlighting
+call <sid>hi("StatusLineEntry",  s:gui01, s:gui04, s:cterm01, s:cterm04, "", "")
+call <sid>hi("StatusLineEntryBold",  s:gui01, s:gui04, s:cterm01, s:cterm01, "bold", "")
+call <sid>hi("StatusLineEntryInverted",  s:gui04, "", s:cterm04, "", "", "")
+call <sid>hi("StatusLineEntryBoldInverted",  s:gui04, "", s:cterm04, "", "bold", "")
+call <sid>hi("StatusLineErrorBold",  s:gui04, "", s:cterm01, "", "bold", "")
+call <sid>hi("StatusLineWarningBold",  s:gui0A, "", s:cterm01, "", "bold", "")
+
 " Remove functions
 delf <sid>hi
 
