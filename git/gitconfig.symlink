@@ -49,7 +49,6 @@
   prs = browse -- 'pulls?q=is:pr is:open -review:approved -author:justmendes'
   myprs = browse -- 'pulls?q=review-requested:justmendes'
   pulls = browse -- pulls
-  ppr = pull-request
   pt = push origin --tags
   rb = rebase
   rbc = rebase --continue
@@ -65,6 +64,7 @@
   cr = !git-code-review
   div = !git-divergence
   mpr = !git-merge-pr
+  ppr = !git-push-pr
   rbm = !git-rebase-master
 [protocol "keybase"]
   allow = always

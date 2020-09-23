@@ -1,0 +1,100 @@
+#!/usr/bin/env zsh
+
+set -e
+
+source $DOTFILES/functions/helpers.zsh
+
+_git_push_pr_ensure_git_root() {
+  if [ ! -d .git ]; then
+    _mnds_pp_error "git" "this script must be run on the root of a git repo. Exiting..."
+    exit 1
+  fi
+}
+
+_git_push_pr_reviewers_file() {
+  if [ ! -f .git/safe/reviewers ]; then
+    _mnds_pp_info "git" "no reviewers file found, creating..."
+
+    read -r "reviewers?enter a comma-separated list of reviewers: "
+    reviewers=${reviewers:gs/ /}
+
+    mkdir -p .git/safe
+
+    echo "$reviewers" >> .git/safe/reviewers
+
+    echo ""
+  fi
+}
+
+_git_push_pr_get_reviewers() {
+  if [ -z "$1" ]; then
+    _mnds_pp_info "git" "retrieving list of reviewers...\n"
+    reviewers=$(cat .git/safe/reviewers)
+  else
+    reviewers="$1"
+  fi
+
+  if [ ! -z "$2" ]; then
+    reviewers="$reviewers,$2"
+  fi
+
+  echo "$reviewers"
+}
+
+_git_push_pr_rebase_if_needed() {
+  nr_changes=$(git log --left-right --graph --cherry-pick --oneline HEAD..."$1" \
+    | grep '^<' \
+    | wc -l)
+
+  nr_changes=${nr_changes:gs/ /}
+
+  if [ $nr_changes -eq 1 ]; then
+    _mnds_pp_info "git" "fast rebasing off of $1..."
+    GIT_EDITOR="vim -u NONE +wq" git rebase -i "$1"
+    echo ""
+  elif [ $nr_changes -gt 1 ]; then
+    _mnds_pp_info "git" "rebasing off of $1..."
+    git rebase -i "$1"
+    echo ""
+  else
+    _mnds_pp_info "git" "no rebase needed, skipping..."
+  fi
+}
+
+_git_push_pr() {
+  _mnds_pp_info "git" "force pushing changes..."
+
+  git push -u -f
+
+  echo ""
+  _mnds_pp_info "git" "creating pull request to branch $1..."
+
+  if [ -z "$2" ]; then
+    hub pull-request "$1"
+  else
+    hub pull-request "$1" -r "$2"
+  fi
+}
+
+#
+# main script
+#
+
+zparseopts -D -E -- r:=reviewers a:=extra_reviewers b:=destination
+
+reviewers=${(@)reviewers:#-r}
+extra_reviewers=${(@)extra_reviewers:#-a}
+destination=${(@)destination:#-b}
+
+_git_push_pr_ensure_git_root
+
+if [ -z "$reviewers" ]; then
+  _git_push_pr_reviewers_file
+fi
+
+reviewers=$(_git_push_pr_get_reviewers "$reviewers" "$extra_reviewers")
+destination=${destination:-master}
+
+_git_push_pr_rebase_if_needed "$destination"
+
+_git_push_pr "$destination" "$reviewers"
