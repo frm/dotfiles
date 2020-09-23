@@ -64,25 +64,45 @@ endfunction
 set showtabline=0
 
 set laststatus=2
+" set statusline=
+" set statusline+=%#TranquilityStatusLineEntryBold#
+" set statusline+=\ \  " Empty space
+" set statusline+=%< " Where to truncate line
+" set statusline+=\ %f " Path to the file in the buffer, as typed or relative to current directory
+" set statusline+=%#TranquilityStatusLineEntry#
+" set statusline+=\ on
+" set statusline+=%#TranquilityStatusLineEntryBold#
+" set statusline+=%{StatusLineBranch()} " Git branch
+" set statusline+=%#TranquilityStatusLineEntry#
+" set statusline+=%{&modified?'+':'\ '}
+" set statusline+=%{&readonly?'':'\ '}
+" set statusline+=%#TranquilityStatusLineEntryInverted#
+" set statusline+=\  " Empty space
+" set statusline+=%#TranquilityStatusLineErrorBold#%{StatusLineErrors()}%#TranquilityStatusLineEntryInverted#
+" set statusline+=%#TranquilityStatusLineWarningBold#%{StatusLineWarnings()}%#TranquilityStatusLineEntryInverted#
+" " set statusline+=%#TranquilityStatusLineBg#
+" set statusline+=%= " Separation point between left and right aligned items
+" set statusline+=%#TranquilityStatusLineEntryInverted#
+" set statusline+=\ c:\ %c
+
 set statusline=
-set statusline+=%#TranquilityStatusLineEntryBold#
+set statusline+=%#StatusLineEntryBold#
 set statusline+=\ \  " Empty space
 set statusline+=%< " Where to truncate line
 set statusline+=\ %f " Path to the file in the buffer, as typed or relative to current directory
-set statusline+=%#TranquilityStatusLineEntry#
+set statusline+=%#StatusLineEntry#
 set statusline+=\ on
-set statusline+=%#TranquilityStatusLineEntryBold#
+set statusline+=%#StatusLineEntryBold#
 set statusline+=%{StatusLineBranch()} " Git branch
-set statusline+=%#TranquilityStatusLineEntry#
+set statusline+=%#StatusLineEntry#
 set statusline+=%{&modified?'+':'\ '}
 set statusline+=%{&readonly?'':'\ '}
-set statusline+=%#TranquilityStatusLineEntryInverted#
+set statusline+=%#StatusLineEntryInverted#
 set statusline+=\  " Empty space
-set statusline+=%#TranquilityStatusLineErrorBold#%{StatusLineErrors()}%#TranquilityStatusLineEntryInverted#
-set statusline+=%#TranquilityStatusLineWarningBold#%{StatusLineWarnings()}%#TranquilityStatusLineEntryInverted#
-" set statusline+=%#TranquilityStatusLineBg#
+set statusline+=%#StatusLineErrorBold#%{StatusLineErrors()}%#StatusLineEntryInverted#
+set statusline+=%#StatusLineWarningBold#%{StatusLineWarnings()}%#StatusLineEntryInverted#
 set statusline+=%= " Separation point between left and right aligned items
-set statusline+=%#TranquilityStatusLineEntryInverted#
+set statusline+=%#StatusLineEntryBoldInverted#
 set statusline+=\ c:\ %c
 
 " Force the correct separator on all vim themes
