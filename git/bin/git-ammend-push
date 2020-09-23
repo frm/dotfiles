@@ -1,0 +1,19 @@
+#!/usr/bin/env zsh
+
+################
+# >> BEWARE << #
+################
+#
+# This script force pushes
+
+set -e
+
+if [ "$#" -gt 0 ]; then
+  git add "$@"
+else
+  git add .
+fi
+
+GIT_EDITOR="vim -u NONE +wq" git commit --amend
+
+git push -f
