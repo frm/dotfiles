@@ -16,11 +16,12 @@ nnoremap <M-j> <C-w>J
 nnoremap <M-k> <C-w>K
 nnoremap <M-l> <C-w>L
 
+" Swap lines
+nnoremap mj :m +1<CR>
+nnoremap mk :m -2<CR>
+
 " Clear search results
 nnoremap <localleader><leader> :noh<CR>
-
-" Mimic Alt-backspace
-inoremap <M-BS> <C-W>
 
 " Ctrl+S save
 nnoremap <C-s> :write<CR>
