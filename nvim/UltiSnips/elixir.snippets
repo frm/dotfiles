@@ -8,6 +8,43 @@ defmodule `!p module_name(path, snip)` do
 end
 endsnippet
 
+snippet deft "define test module"
+defmodule `!p module_name(path, snip)` do
+  use ${1:`!p test_case(path, snip)`}
+
+  alias `!p module_name(path, snip, "Test")`
+
+  $0
+end
+endsnippet
+
+snippet defsch "define schema"
+defmodule `!p module_name(path, snip)` do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "${1:`!p schema_name(path, snip)`s}" do
+    $2
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(`!p schema_name(path, snip)`, attrs) do
+    `!p schema_name(path, snip)`
+    |> cast(attrs, [$0])
+  end
+end
+endsnippet
+
+snippet defc "define controller"
+defmodule `!p module_name(path, snip)` do
+  use `!p app_name(path, snip)`, :controller
+
+  $0
+end
+endsnippet
+
 snippet def "def function"
 def $1($2) do
   $0
