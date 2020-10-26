@@ -70,7 +70,7 @@ Plug 'Shougo/vimproc.vim', { 'for': 'typescript', 'do': 'make' }
 Plug 'rhysd/vim-crystal'
 Plug 'sentient-lang/vim-sentient'
 Plug 'itchyny/calendar.vim'
-Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install', 'for': ['markdown']  }
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
 Plug 'junegunn/goyo.vim', { 'for': ['markdown'] }
 Plug 'junegunn/limelight.vim', { 'for': ['markdown'] }
 Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'cpp', 'flex'] }
@@ -416,7 +416,7 @@ let g:mkdp_auto_close = 1
 let g:mkdp_refresh_slow = 0
 let g:mkdp_command_for_global = 0
 let g:mkdp_open_to_the_world = 0
-let g:mkdp_browser = 'Brave Browser'
+let g:mkdp_browser = 'Firefox'
 let g:mkdp_page_title = '${name}'
 
 nmap <localleader>l <Plug>MarkdownPreviewToggle
