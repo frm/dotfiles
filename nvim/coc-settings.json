@@ -6,15 +6,20 @@
     "rust",
     "typescript"
   ],
+  "codeLens.enable": true,
   "diagnostic.displayByAle": false,
+  "diagnostic.enable": true,
   "diagnostic.enableMessage": "always",
   "diagnostic.errorSign": "→",
   "diagnostic.hintSign": ">>",
   "diagnostic.infoSign": ">>",
-  "diagnostic.virtualText": false,
   "diagnostic.warningSign": "→",
+  "diagnostic.virtualText": true,
   "signature.hideOnTextChange": true,
   "suggest.floatEnable": false,
   "suggest.noselect": true,
-  "suggest.preferCompleteThanJumpPlaceholder": true
+  "suggest.preferCompleteThanJumpPlaceholder": true,
+  "emmet.includeLanguages": {
+    "html-eex": "html"
+  }
 }
