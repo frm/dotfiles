@@ -50,6 +50,10 @@ set shortmess+=c
 set signcolumn=yes
 set updatetime=300
 
+" Allow manual folding
+set foldlevel=99
+set foldmethod=syntax
+
 " Set python locations
 let g:python_host_prog = "/usr/local/bin/python2.7"
 let g:python3_host_prog = "/Users/frm/.asdf/shims/python3.7"
