@@ -1,0 +1,11 @@
+[package]
+disabled = true
+
+[cmd_duration]
+disabled = true
+
+[elixir]
+disabled = true
+
+[git_status]
+diverged = "⇡⇣"

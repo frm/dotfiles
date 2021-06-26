@@ -4,9 +4,16 @@
     "javascript",
     "javascriptreact",
     "rust",
-    "typescript"
+    "typescript",
+    "typescriptreact",
+    "c",
+    "markdown"
   ],
-  "codeLens.enable": true,
+  "coc.preferences.currentFunctionSymbolAutoUpdate": true,
+  "coc.preferences.colorSupport": true,
+  "coc.preferences.rootPatterns": [".git", "package.json"],
+
+  "codeLens.enable": false,
   "diagnostic.displayByAle": false,
   "diagnostic.enable": true,
   "diagnostic.enableMessage": "always",
@@ -21,5 +28,12 @@
   "suggest.preferCompleteThanJumpPlaceholder": true,
   "emmet.includeLanguages": {
     "html-eex": "html"
-  }
+  },
+
+  "eslint.enable": true,
+  "eslint.run": "onSave",
+  "eslint.options": { "cache": true },
+  "eslint.autoFixOnSave": true,
+  "git.command": "hub",
+  "git.addGBlameToVirtualText": false
 }

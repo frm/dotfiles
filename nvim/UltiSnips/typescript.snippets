@@ -15,11 +15,11 @@ $0
 endsnippet
 
 snippet efc "export default function component"
-const `!p component_name(path, snip)` = ($2) => {
+const `!p component_name(path, snip)`: React.FC<$1> = ($2) => {
   return (
-    <${1:div} className="`!p component_name(path, snip)`">
+    <${3:div} className="`!p component_name(path, snip)`">
       $0
-    </$1>
+    </$3>
   );
 };
 
@@ -29,11 +29,11 @@ endsnippet
 snippet rfc "React functional component"
 import React from "React";
 
-const `!p component_name(name, snip)` = ($2) => {
+const `!p component_name(path, snip)`: React.FC<$1> = ($2) => {
   return (
-    <${1:div} className="`!p component_name(path, snip)`">
+    <${3:div} className="`!p component_name(path, snip)`">
       $0
-    </$1>
+    </$3>
   );
 };
 

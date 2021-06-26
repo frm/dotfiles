@@ -28,8 +28,7 @@ _git_push_pr_reviewers_file() {
 
 _git_push_pr_get_reviewers() {
   if [ -z "$1" ]; then
-    _mnds_pp_info "git" "retrieving list of reviewers...\n"
-    reviewers=$(cat .git/safe/reviewers)
+    reviewers=$(/bin/cat .git/safe/reviewers)
   else
     reviewers="$1"
   fi
@@ -38,7 +37,7 @@ _git_push_pr_get_reviewers() {
     reviewers="$reviewers,$2"
   fi
 
-  echo "$reviewers"
+  echo "${reviewers// /}"
 }
 
 _git_push_pr_rebase_if_needed() {
@@ -67,11 +66,14 @@ _git_push_pr() {
   git push -u -f
 
   echo ""
-  _mnds_pp_info "git" "creating pull request to branch $1..."
 
   if [ -z "$2" ]; then
+    _mnds_pp_info "git" "creating pull request to branch $1..."
+
     hub pull-request "$1"
   else
+    _mnds_pp_info "git" "creating pull request to branch $1 with reviewers $2..."
+
     hub pull-request "$1" -r "$2"
   fi
 }

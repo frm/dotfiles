@@ -5,8 +5,8 @@ set -g prefix C-a
 setw -g xterm-keys on
 
 # 256 colourspace
-set -g default-terminal "screen-256color"
-set -g terminal-overrides ',screen-256color:RGB'
+set -g default-terminal "xterm-256color"
+set -g terminal-overrides ',xterm-256color:RGB'
 
 # Fix cursor change in nvim
 set -g -a terminal-overrides ',*:Ss=\E[%p1%d q:Se=\E[2 q'
@@ -15,7 +15,7 @@ set -g -a terminal-overrides ',*:Ss=\E[%p1%d q:Se=\E[2 q'
 bind-key s split-window -h -c '#{pane_current_path}'
 bind-key S split-window -v -c '#{pane_current_path}'
 
-# C-A R to reload config
+# C-A r to reload config
 unbind r
 bind r source-file ~/.tmux.conf
 
@@ -73,7 +73,7 @@ setw -g window-status-current-format " ▹ #W"
 
 set -g status-justify left
 set -g status-left ''
-set -g status-right "#(~/.dotfiles/tmux/bin/tmux_ci_status) #{battery_color_bg}#{battery_icon} #{battery_percentage}#[#(tmux show-option -gv status-right-style)] #h: #T"
+set -g status-right "#{battery_color_bg}#{battery_icon} #{battery_percentage} #[fg=#4C4C4C]#(spotify_info)"
 
 set -g @batt_icon_status_charged '▲'
 set -g @batt_icon_status_charging '▲'
@@ -90,10 +90,7 @@ set -g @batt_icon_charge_tier3 '▼'
 set -g @batt_icon_charge_tier2 '▼'
 set -g @batt_icon_charge_tier1 '▼'
 
-if '[[ "$MNDS_THEME" =~ dark ]]' 'source ~/.dotfiles/tmux/themes/dark.tmux.conf'
-if '[[ "$MNDS_THEME" =~ light ]]' 'source ~/.dotfiles/tmux/themes/light.tmux.conf'
-if '[[ "$MNDS_THEME" =~ tranquility ]]' 'source ~/.dotfiles/tmux/themes/tranquility.tmux.conf'
-if '[[ "$MNDS_THEME" =~ mountaineer ]]' 'source ~/.dotfiles/tmux/themes/mountaineer.tmux.conf'
+source ~/.dotfiles/tmux/themes/mountaineer.tmux.conf
 
 # TPM plugins
 set -g @plugin 'tmux-plugins/tpm'
@@ -102,6 +99,7 @@ set -g @plugin 'tmux-plugins/tmux-copycat'
 set -g @plugin 'tmux-plugins/tmux-sensible'
 set -g @plugin 'tmux-plugins/tmux-yank'
 set -g @plugin 'christoomey/vim-tmux-navigator'
+set -g @plugin 'robhurring/tmux-spotify'
 
 # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
 run '~/.tmux/plugins/tpm/tpm'

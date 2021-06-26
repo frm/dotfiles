@@ -3,32 +3,39 @@ call plug#begin('~/.local/share/nvim/plugged')
 " IDE-style features
 Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
 Plug 'Xuyuanp/nerdtree-git-plugin', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
+Plug 'ryanoasis/vim-devicons'
+Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
-Plug 'antoinemadec/coc-fzf'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
-Plug 'jreybert/vimagit'
-Plug 'airblade/vim-gitgutter'
-Plug 'tpope/vim-abolish'
 Plug 'RRethy/vim-hexokinase', { 'do': 'make hexokinase' }
+Plug 'tpope/vim-abolish'
 Plug 'easymotion/vim-easymotion'
+Plug 'rhysd/clever-f.vim'
+Plug 'pechorin/any-jump.vim'
 Plug 'embear/vim-localvimrc'
-Plug 'Olical/vim-enmasse'
+Plug 'stefandtw/quickfix-reflector.vim'
 Plug 'SirVer/ultisnips'
 Plug 'tpope/vim-projectionist'
 Plug 'tpope/vim-commentary'
-Plug 'ryanoasis/vim-devicons'
-Plug 'psliwka/vim-smoothie'
 Plug 'nvim-treesitter/nvim-treesitter'
+Plug 'derekprior/vim-trimmer'
+Plug 'wincent/terminus'
+Plug 'farmergreg/vim-lastplace'
 
 " Scheme
-Plug 'kristijanhusak/vim-hybrid-material'
-Plug 'w0ng/vim-hybrid'
-Plug 'chriskempson/base16-vim'
-Plug 'ayu-theme/ayu-vim'
-Plug 'dracula/vim', { 'as': 'dracula' }
+" commented themes aren't being used right now but kept as reference
+" Plug 'kristijanhusak/vim-hybrid-material'
+" Plug 'w0ng/vim-hybrid'
+" Plug 'chriskempson/base16-vim'
+" Plug 'ayu-theme/ayu-vim'
+" Plug 'dracula/vim', { 'as': 'dracula' }
+" Plug 'embark-theme/vim'
+" Plug 'AlessandroYorba/Sierra'
+" Plug 'challenger-deep-theme/vim', { 'as': 'challenger-deep' }
+Plug 'morhetz/gruvbox'
 
 " Formatting
 Plug 'tpope/vim-surround'
@@ -41,40 +48,40 @@ Plug 'AndrewRadev/splitjoin.vim'
 Plug 'kassio/neoterm'
 Plug 'janko-m/vim-test'
 
+" coc.nvim
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'neoclide/coc-highlight', {'do': 'yarn install --frozen-lockfile'}
+Plug 'neoclide/coc-lists', {'do': 'yarn install --frozen-lockfile'}
+Plug 'neoclide/coc-snippets', {'do': 'yarn install --frozen-lockfile'}
+Plug 'neoclide/coc-json', {'do': 'yarn install --frozen-lockfile'}
+Plug 'neoclide/coc-prettier', {'do': 'yarn install --frozen-lockfile'}
+Plug 'neoclide/coc-tsserver', {'do': 'yarn install --frozen-lockfile'}
+Plug 'amiralies/coc-elixir', {'do': 'yarn install --frozen-lockfile && yarn prepack'}
+Plug 'neoclide/coc-git', {'do': 'yarn install --frozen-lockfile && yarn prepack'}
+Plug 'antoinemadec/coc-fzf'
+
 " Languages & Completions
-Plug 'neoclide/coc.nvim', {'branch': 'release', 'do': { info -> InstallDeps(info) }}
-Plug 'w0rp/ale'
-Plug 'cespare/vim-toml', { 'for': 'toml' }
+Plug 'sheerun/vim-polyglot'
+
+" Random Languages
+Plug 'sentient-lang/vim-sentient'
 
 " Elixir
-Plug 'elixir-editors/vim-elixir', { 'for': 'elixir' }
 Plug 'c-brenn/phoenix.vim', { 'for': 'elixir' }
 Plug 'andyl/vim-textobj-elixir', { 'for': 'elixir' }
-Plug 'elixir-lsp/elixir-ls', { 'do': { -> g:elixirls.compile() } }
 
 " Ruby
-Plug 'vim-ruby/vim-ruby', { 'for': 'ruby' }
 Plug 'tpope/vim-rails', { 'for': 'ruby' }
-Plug 'tpope/vim-bundler', { 'for': 'ruby' }
 Plug 'nelstrom/vim-textobj-rubyblock', { 'for': 'ruby' }
-Plug 'slim-template/vim-slim', { 'for': 'slim' }
 
-Plug 'elzr/vim-json', { 'for': 'json' }
-Plug 'mxw/vim-jsx', { 'for': 'javascript.jsx' }
-
-Plug 'Quramy/tsuquyomi', { 'for': 'typescript' }
-Plug 'leafgarland/typescript-vim', { 'for': 'typescript' }
-Plug 'Shougo/vimproc.vim', { 'for': 'typescript', 'do': 'make' }
-
-" Other
-Plug 'rhysd/vim-crystal'
-Plug 'sentient-lang/vim-sentient'
-Plug 'itchyny/calendar.vim'
+" Markdown
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
 Plug 'junegunn/goyo.vim', { 'for': ['markdown'] }
 Plug 'junegunn/limelight.vim', { 'for': ['markdown'] }
-Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'cpp', 'flex'] }
-Plug 'junegunn/vader.vim', { 'for': 'vim' }
+Plug 'reedes/vim-pencil', { 'for': ['markdown'] }
+
+" Other
+Plug 'itchyny/calendar.vim'
 Plug 'kristijanhusak/vim-carbon-now-sh'
 
 call plug#end()
@@ -82,8 +89,8 @@ call plug#end()
 """""""""""""""""""""
 "     NERDTree      "
 """""""""""""""""""""
-nnoremap <C-n> :NERDTreeToggle<CR>
-nnoremap <Leader>n :NERDTreeFind<CR>
+nnoremap <leader>n :NERDTreeToggle<CR>
+nnoremap <leader>N :NERDTreeFind<CR>
 let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git$', '\.hg', '\.svn', '\.bzr', '\.DS_Store']
 let g:NERDTreeDirArrows=1
 let g:NERDTreeMouseMode=2
@@ -265,77 +272,6 @@ nnoremap <silent> <localleader>T :call HorizontalTerm()<cr>
 """""""""""""""""""""
 "     coc.nvim      "
 """""""""""""""""""""
-"
-" NOTE: these functions only install the dependencies
-" actual config is available at plugins/coc.vim
-
-function! InstallDeps(info)
-  if a:info.status == 'installed' || a:info.force
-    let extensions = [
-          \ 'coc-css',
-          \ 'coc-elixir',
-          \ 'coc-eslint',
-          \ 'coc-highlight',
-          \ 'coc-json',
-          \ 'coc-markdownlint',
-          \ 'coc-prettier',
-          \ 'coc-python',
-          \ 'coc-rls',
-          \ 'coc-ruby',
-          \ 'coc-snippets',
-          \ 'coc-solargraph',
-          \ 'coc-ultisnips',
-          \ 'coc-yaml'
-          \ ]
-    call coc#util#install()
-    call coc#util#install_extension(extensions)
-  endif
-endfunction
-
-let g:elixirls = {
-  \ 'path': printf('%s/%s', stdpath('data'), 'plugged/elixir-ls'),
-  \ }
-
-let g:elixirls.lsp = printf(
-  \ '%s/%s',
-  \ g:elixirls.path,
-  \ 'release/language_server.sh')
-
-function! g:elixirls.compile(...)
-  let l:cd = printf('cd %s', g:elixirls.path)
-
-  let l:precommands = join([
-    \ l:cd,
-    \ 'mv .tool-versions tool-versions'
-    \ ], '&&')
-
-  let l:commands = join([
-    \ l:cd,
-    \ 'mix local.hex --force',
-    \ 'mix local.rebar --force',
-    \ 'mix deps.get',
-    \ 'mix compile',
-    \ 'mix elixir_ls.release'
-    \ ], '&&')
-
-  let l:postcommands = join([
-    \ l:cd,
-    \ 'mv tool-versions .tool-versions'
-    \ ], '&&')
-
-  echom '>>> Compiling elixirls'
-  silent call system(l:precommands)
-  silent call system(l:commands)
-  silent call system(l:postcommands)
-  echom '>>> elixirls compiled'
-endfunction
-
-call coc#config('languageserver', {
-  \ 'elixir': {
-  \   'command': g:elixirls.lsp,
-  \   'filetypes': ['elixir', 'eelixir']
-  \ }
-  \})
 
 so ~/.config/nvim/rc/plugins/coc.vim
 
@@ -520,3 +456,7 @@ let g:calendar_google_calendar = 1
 let g:calendar_google_api_key = $CALENDAR_VIM_API_KEY
 let g:calendar_google_client_id = $CALENDAR_VIM_CLIENT_ID
 let g:calendar_google_client_secret = $CALENDAR_VIM_CLIENT_SECRET
+let g:calendar_first_day = "monday"
+let g:calendar_date_month_name = 1
+let g:calendar_views = ["year", "month", "day"]
+let g:calendar_time_zone = "+0"
