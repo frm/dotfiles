@@ -52,7 +52,7 @@ set updatetime=300
 
 " Allow manual folding
 set foldlevel=99
-set foldmethod=syntax
+set foldmethod=indent
 
 " Set python locations
 let g:python_host_prog = "/usr/local/bin/python2.7"

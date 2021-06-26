@@ -6,7 +6,8 @@ blacklist = [
     "pages",
     "lib",
     "components",
-    "index"
+    "index",
+    "screens"
 ]
 
 def component_name(path, snip):

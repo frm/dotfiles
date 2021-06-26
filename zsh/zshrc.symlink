@@ -13,6 +13,7 @@ source $DOTFILES/zsh/keybindings.zsh
 
 source $DOTFILES/asdf/asdf.init
 source $DOTFILES/bat/bat.init
+source $DOTFILES/broot/broot.init
 
 source $DOTFILES/functions/aliases.zsh
 source $DOTFILES/functions/functions.zsh
@@ -20,6 +21,7 @@ source $DOTFILES/functions/functions.zsh
 source $DOTFILES/git/init.zsh
 
 source $DOTFILES/elixir/erl.init
+source $DOTFILES/rust/cargo.init
 source $DOTFILES/python/python.init
 source $DOTFILES/node/node.init
 source $DOTFILES/go/go.init
@@ -28,3 +30,6 @@ source $DOTFILES/system/direnv.init
 source $DOTFILES/system/fzf.init
 source $DOTFILES/system/z.init
 source $DOTFILES/zsh/completions.zsh
+
+eval "$(starship init zsh)"
+eval "$(mcfly init zsh)"

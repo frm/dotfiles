@@ -6,6 +6,7 @@
   "author": "Fernando Mendes",
   "license": "MIT",
   "dependencies": {
+    "gtop": "^1.1.1",
     "ngrok": "^3.0.1",
     "tldr": "^3.2.1"
   }

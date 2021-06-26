@@ -25,6 +25,20 @@ set hidden
 " Give more space for displaying messages.
 set cmdheight=2
 
+nmap <silent> <localleader>cd <Plug>(coc-definition)
+nmap <silent> <localleader>cr <Plug>(coc-references)
+nmap <silent> <localleader>cs <Plug>(coc-codelens-action)
+nmap <silent> <localleader>cn <Plug>(coc-rename)
+nnoremap <silent> <localleader>co  :<C-u>CocFzfList outline<CR>
+nnoremap <silent> <localleader>ce  :<C-u>CocFzfList diagnostics<CR>
+nnoremap <silent> <localleader>cl  :<C-u>CocFzfList locations<CR>
+nnoremap <silent> <localleader>cc  :<C-u>CocFzfListResume<CR>
+nnoremap <silent> <localleader>cb  :<C-u>CocFzfList branches<CR>
+nnoremap <silent> <localleader>ci  :<C-u>CocFzfList issues<CR>
+
+nmap gs <Plug>(coc-git-chunkinfo)
+" Important: gb is reserved for toggling git blame
+
 function! s:check_back_space() abort
   let col = col('.') - 1
   return !col || getline('.')[col - 1]  =~# '\s'
@@ -46,28 +60,8 @@ inoremap <silent><expr> <c-space> coc#refresh()
 " coc only does snippet and additional edit on confirm.
 inoremap <expr> <TAB> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 
-" Remap keys for gotos
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gt <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-
-nnoremap <silent> <leader>ld :<C-u>CocList diagnostics<cr>
-nmap <silent> <Leader>j <Plug>(coc-diagnostic-next)
-nmap <silent> <Leader>k <Plug>(coc-diagnostic-prev)
-
-" Fix autofix problem of current line
-nnoremap <silent> <leader>lf <Plug>(coc-fix-current)
-
-" Symbol renaming.
-nmap <leader>rn <Plug>(coc-rename)
-
-" Formatting selected code.
-xmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
-
-" Show documentation in preview window
-nnoremap <silent> H :call <SID>show_documentation()<CR>
+" Show documentation in floating window
+nnoremap <silent> K :call <SID>show_documentation()<CR>
 
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
@@ -77,23 +71,22 @@ function! s:show_documentation()
   endif
 endfunction
 
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
+" Toggle CodeLens layer
+nnoremap <silent> L :call <SID>toggle_code_lens()<CR>
+
+function! s:toggle_code_lens()
+  let l:codelens = CocAction("getConfig", "codeLens")
+  let l:toggled = !(l:codelens['enable'])
+
+  call CocAction("updateConfig", "codeLens.enable", l:toggled)
 endfunction
 
-let g:coc_snippet_next = '<c-j>'
+" Toggle Git Blame Layer
+nnoremap <silent> gb :call <SID>toggle_git_blame()<CR>
 
-" Add `:Format` command to format current buffer.
-command! -nargs=0 Format :call CocAction('format')
+function! s:toggle_git_blame()
+  let l:git_config = CocAction("getConfig", "git")
+  let l:toggled = !(l:git_config["addGBlameToVirtualText"])
 
-" Add `:Fold` command to fold current buffer.
-command! -nargs=? Fold :call     CocAction('fold', <f-args>)
-
-" Add `:OR` command for organize imports of the current buffer.
-command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
-
-" Add (Neo)Vim's native statusline support.
-" NOTE: Please see `:h coc-status` for integrations with external plugins that
-" provide custom statusline: lightline.vim, vim-airline.
-set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+  call CocAction("updateConfig", "git.addGBlameToVirtualText", l:toggled)
+endfunction

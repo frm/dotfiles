@@ -27,10 +27,15 @@ nnoremap <localleader><leader> :noh<CR>
 nnoremap <C-s> :write<CR>
 inoremap <C-s> <Esc>:write<CR>a
 
-nnoremap <localleader>ss :s/\v
-nnoremap <localleader>sv :Subvert/
-nnoremap <localleader>sa :%s/\v
-nnoremap <localleader>sd :%Subvert/
+nnoremap <localleader>s :s/\v
+nnoremap <localleader>ss :%s/\v
+nnoremap <localleader>S :S/
+nnoremap <localleader>SS :%S/
+
+vnoremap <localleader>s "hy:s/\v<C-r>h/
+vnoremap <localleader>ss "hy:s/\v<C-r>h/
+vnoremap <localleader>S "hy:S/<C-r>h/
+vnoremap <localleader>SS "hy:%S/<C-r>h/
 
 " Remove trailing whitespaces when reading and writing to file
 autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
@@ -69,4 +74,25 @@ nnoremap <C-x> :call MakeExecutable()<CR>
 
 function! ColourTest()
   exec 'so $VIMRUNTIME/syntax/hitest.vim'
+endfunction
+
+let g:hidden_line_numbers=1
+nnoremap <localleader>n :call SetNumber()<CR>
+
+function! SetNumber()
+  if g:hidden_line_numbers
+    exec "hi CursorLineNr guifg=" . g:terminal_color_1
+    exec "hi CursorLineNr guibg=" . g:terminal_color_0
+    exec "hi LineNr guifg=" . g:terminal_color_8
+    exec "hi LineNr guibg=" . g:terminal_color_0
+
+    let g:hidden_line_numbers=0
+  else
+    exec "hi CursorLineNr guifg=" . g:terminal_color_0
+    exec "hi CursorLineNr guibg=" . g:terminal_color_0
+    exec "hi LineNr guifg=" . g:terminal_color_0
+    exec "hi LineNr guibg=" . g:terminal_color_0
+
+    let g:hidden_line_numbers=1
+  endif
 endfunction
