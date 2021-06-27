@@ -32,4 +32,3 @@ source $DOTFILES/system/z.init
 source $DOTFILES/zsh/completions.zsh
 
 eval "$(starship init zsh)"
-eval "$(mcfly init zsh)"
