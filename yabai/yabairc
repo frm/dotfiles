@@ -58,8 +58,12 @@ yabai -m rule --add app="^System Information$" sticky=on layer=above manage=off
 yabai -m rule --add app="^Activity Monitor$" sticky=on layer=above manage=off
 yabai -m rule --add app="^Spotify$" manage=off
 yabai -m rule --add app="^TextEdit$" manage=off
-yabai -m rule --add app="^iTerm2$" manage=off
+yabai -m rule --add app="^Telegram$" manage=off
 yabai -m rule --add app="^Flux$" manage=off
+# Firefox system pop us (e.g. Save As)
+yabai -m rule --add app="^Firefox$" title="^Opening .*$" manage=off
+# Firefox Developer Edition system pop us (e.g. Save As)
+yabai -m rule --add app="^Firefox Developer.*$" title="^Opening .*$" manage=off
 
 # Limelight: (Kill it and start it each time Yabai starts)
 killall limelight &>/dev/null
