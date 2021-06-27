@@ -83,16 +83,16 @@ cmd + ctrl - k : yabai -m window --focus north
 cmd + ctrl - l : yabai -m window --focus east
 
 # Move focused window
-cmd + ctrl - u : yabai -m window --warp west
-cmd + ctrl - i : yabai -m window --warp south
-cmd + ctrl - o : yabai -m window --warp north
-cmd + ctrl - p : yabai -m window --warp east
+cmd + ctrl - n : yabai -m window --warp west
+cmd + ctrl - m : yabai -m window --warp south
+cmd + ctrl - 0x2B : yabai -m window --warp north # comma
+cmd + ctrl - 0x2F : yabai -m window --warp east # period
 
 # Increase/decrease window size
-cmd + ctrl + shift - l : yabai -m window --resize right:20:0
-cmd + ctrl + shift - k : yabai -m window --resize top:0:-20
-cmd + ctrl + shift - h : yabai -m window --resize right:-20:0
-cmd + ctrl + shift - j : yabai -m window --resize top:0:20
+cmd + ctrl + shift - l : yabai -m window --resize right:20:0 ; yabai -m window --resize left:20:0
+cmd + ctrl + shift - k : yabai -m window --resize top:0:-20 ; yabai -m window --resize bottom:0:-20
+cmd + ctrl + shift - h : yabai -m window --resize left:-20:0 ; yabai -m window --resize right:-20:0
+cmd + ctrl + shift - j : yabai -m window --resize bottom:0:20 ; yabai -m window --resize top:0:20
 
 # Fullscreen window
 cmd + ctrl - return : yabai -m window --toggle zoom-fullscreen
