@@ -122,6 +122,9 @@ ctrl + alt - 1  : yabai -m display --focus 1
 ctrl + alt - 2  : yabai -m display --focus 2
 ctrl + alt - 3  : yabai -m display --focus 3
 
+# Toggle yabai
+cmd + ctrl - y : /Users/frm/.dotfiles/yabai/scripts/toggle-yabai.sh
+
 # make floating window fill screen
 # shift + alt - up     : yabai -m window --grid 1:1:0:0:1:1
 
