@@ -1,0 +1,68 @@
+#!/usr/bin/env sh
+
+yabai -m config layout bsp
+yabai -m config top_padding 5
+yabai -m config bottom_padding 5
+yabai -m config left_padding 5
+yabai -m config right_padding 5
+yabai -m config window_gap 5
+
+# New window spawns to the right if vertical split, or bottom if horizontal split
+yabai -m config window_placement second_child
+yabai -m config window_topmost off
+
+#yabai -m config window_shadow float
+
+yabai -m config window_opacity off
+yabai -m config window_opacity_duration 0.00
+yabai -m config active_window_opacity 1.0
+
+#yabai -m config normal_window_opacity        0.97
+#yabai -m config window_border                on | off
+
+# Limelight provides this due to SIP being enabled
+yabai -m config window_border off
+
+# yabai -m config split_ratio 0.50
+
+#yabai -m config focus_follows_mouse          autoraise
+#yabai -m config focus_follows_mouse          on
+
+# set mouse interaction modifier key (default: fn)
+# yabai -m config mouse_modifier ctrl
+
+# set modifier + right-click drag to resize window (default: resize)
+yabai -m config mouse_action2 resize
+
+# set modifier + left-click drag to resize window (default: move)
+yabai -m config mouse_action1 move
+
+# Provide labels to the workspaces for scripting
+yabai -m space 1 --label one
+yabai -m space 2 --label two
+yabai -m space 3 --label three
+yabai -m space 4 --label four
+yabai -m space 5 --label five
+yabai -m space 6 --label six
+yabai -m space 7 --label seven
+yabai -m space 8 --label eight
+yabai -m space 9 --label nine
+
+# Disable Yabai from managing most of these apps
+yabai -m rule --add app="^System Preferences$" sticky=on layer=above manage=off
+yabai -m rule --add app="^Finder$" sticky=on layer=above manage=off
+yabai -m rule --add app="^Alfred Preferences$" sticky=on layer=above manage=off
+yabai -m rule --add app="^BetterTouchTool$" sticky=on layer=above manage=off
+yabai -m rule --add app="^Disk Utility$" sticky=on layer=above manage=off
+yabai -m rule --add app="^System Information$" sticky=on layer=above manage=off
+yabai -m rule --add app="^Activity Monitor$" sticky=on layer=above manage=off
+yabai -m rule --add app="^Spotify$" manage=off
+yabai -m rule --add app="^TextEdit$" manage=off
+yabai -m rule --add app="^iTerm2$" manage=off
+yabai -m rule --add app="^Flux$" manage=off
+
+# Limelight: (Kill it and start it each time Yabai starts)
+killall limelight &>/dev/null
+$HOME/.bin/limelight &>/dev/null &
+
+echo "yabai configuration loaded.."
