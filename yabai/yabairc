@@ -59,6 +59,7 @@ yabai -m rule --add app="^Activity Monitor$" sticky=on layer=above manage=off
 yabai -m rule --add app="^Spotify$" manage=off
 yabai -m rule --add app="^TextEdit$" manage=off
 yabai -m rule --add app="^Telegram$" manage=off
+yabai -m rule --add app="^Vimac$" manage=off
 yabai -m rule --add app="^Flux$" manage=off
 # Firefox system pop us (e.g. Save As)
 yabai -m rule --add app="^Firefox$" title="^Opening .*$" manage=off
