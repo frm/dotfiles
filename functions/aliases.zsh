@@ -31,6 +31,8 @@ alias stag="staging"
 alias pg.server="pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log"
 alias lock="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
 
+alias cht="cheat"
+
 alias reload="source ~/.zshrc"
 alias :q="exit"
 
