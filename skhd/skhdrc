@@ -95,7 +95,7 @@ cmd + ctrl + shift - h : yabai -m window --resize left:-20:0 ; yabai -m window -
 cmd + ctrl + shift - j : yabai -m window --resize bottom:0:20 ; yabai -m window --resize top:0:20
 
 # Fullscreen window
-cmd + ctrl - return : yabai -m window --toggle zoom-fullscreen
+cmd + ctrl - return : /Users/frm/.dotfiles/skhd/scripts/zoom-fullscreen.sh
 
 # Rotate workspace tree 90deg
 cmd + ctrl - r : yabai -m space --rotate 90
@@ -107,7 +107,7 @@ cmd + ctrl - 0 : yabai -m space --balance
 cmd + ctrl - d : yabai -m window --space next || yabai -m window --space prev
 
 # Send window to next workspace and follow focus
-cmd + ctrl - tab : /Users/frm/.dotfiles/yabai/scripts/send_to_next_workspace.sh
+cmd + ctrl - tab : /Users/frm/.dotfiles/skhd/scripts/send_to_next_workspace.sh
 
 # Send window to next monitor and follow focus
 cmd + ctrl + shift - tab : yabai -m window --display next || yabai -m window --display prev; \
@@ -123,7 +123,7 @@ ctrl + alt - 2  : yabai -m display --focus 2
 ctrl + alt - 3  : yabai -m display --focus 3
 
 # Toggle yabai
-cmd + ctrl - y : /Users/frm/.dotfiles/yabai/scripts/toggle-yabai.sh
+cmd + ctrl - y : /Users/frm/.dotfiles/skhd/scripts/toggle-yabai.sh
 
 # make floating window fill screen
 # shift + alt - up     : yabai -m window --grid 1:1:0:0:1:1
