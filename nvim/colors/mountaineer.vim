@@ -329,6 +329,9 @@ call <sid>hi("rubyRegexp",                  s:gui0C, "", s:cterm0C, "", "", "")
 call <sid>hi("rubySymbol",                  s:gui0B, "", s:cterm0B, "", "", "")
 call <sid>hi("rubyStringDelimiter",         s:gui0B, "", s:cterm0B, "", "", "")
 
+" Elixir highlighting using treesitter
+call <sid>hi("elixirTSParameter", s:gui07, "", s:cterm07, "", "", "")
+
 " SASS highlighting
 call <sid>hi("sassidChar",     s:gui08, "", s:cterm08, "", "", "")
 call <sid>hi("sassClassChar",  s:gui09, "", s:cterm09, "", "", "")

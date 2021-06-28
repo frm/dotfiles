@@ -32,3 +32,5 @@ source $DOTFILES/system/z.init
 source $DOTFILES/zsh/completions.zsh
 
 eval "$(starship init zsh)"
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
