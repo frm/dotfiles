@@ -1,5 +1,6 @@
 export ASDF_GEM_DEFAULT_PACKAGES_FILE="$DOTFILES/ruby/default-gems"
 export ASDF_NPM_DEFAULT_PACKAGES_FILE="$DOTFILES/node/default-npm-packages"
+export ASDF_PYTHON_DEFAULT_PACKAGES_FILE="$DOTFILES/python/requirements.txt"
 
 . $HOME/.asdf/asdf.sh
 
