@@ -3,6 +3,7 @@ call plug#begin('~/.local/share/nvim/plugged')
 " IDE-style features
 Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
 Plug 'Xuyuanp/nerdtree-git-plugin', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
+" Plug 'Shougo/defx.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'ryanoasis/vim-devicons'
 Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
@@ -20,7 +21,8 @@ Plug 'stefandtw/quickfix-reflector.vim'
 Plug 'SirVer/ultisnips'
 Plug 'tpope/vim-projectionist'
 Plug 'tpope/vim-commentary'
-Plug 'nvim-treesitter/nvim-treesitter'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'nvim-treesitter/playground' " Debug highlights for themes with TSHighlightCapturesUnderCursor
 Plug 'derekprior/vim-trimmer'
 Plug 'wincent/terminus'
 Plug 'farmergreg/vim-lastplace'
@@ -35,7 +37,7 @@ Plug 'farmergreg/vim-lastplace'
 " Plug 'embark-theme/vim'
 " Plug 'AlessandroYorba/Sierra'
 " Plug 'challenger-deep-theme/vim', { 'as': 'challenger-deep' }
-Plug 'morhetz/gruvbox'
+" Plug 'morhetz/gruvbox'
 
 " Formatting
 Plug 'tpope/vim-surround'
@@ -109,7 +111,6 @@ autocmd FileType nerdtree setlocal nolist
 " disable cursorcolumn and cursorline in nerdtree
 au FileType nerdtree set nocursorline
 au FileType nerdtree set nocursorcolumn
-
 
 """""""""""""""""""""
 "       fzf         "
@@ -202,6 +203,21 @@ let $FZF_DEFAULT_OPTS = $FZF_DEFAULT_OPTS . ' --layout=reverse'
 
 "Open FZF and choose floating window
 let g:fzf_layout = { 'window': 'call OpenFloatingWin()' }
+
+"""""""""""""""""""""
+"     TreeSitter     "
+"""""""""""""""""""""
+
+lua <<EOF
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = "maintained",
+  ignore_install = {}, -- List of parsers to ignore installing
+  highlight = {
+    enable = true,              -- false will disable the whole extension
+    disable = { 'elixir' },  -- list of language that will be disabled
+  },
+}
+EOF
 
 """""""""""""""""""""
 "     fugitive      "
