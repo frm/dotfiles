@@ -1,17 +1,16 @@
 call plug#begin('~/.local/share/nvim/plugged')
 
 " IDE-style features
+" TODO: Replace with defx
 Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
 Plug 'Xuyuanp/nerdtree-git-plugin', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
 " Plug 'Shougo/defx.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'ryanoasis/vim-devicons'
-Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'christoomey/vim-tmux-navigator'
-Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-rhubarb'
 Plug 'RRethy/vim-hexokinase', { 'do': 'make hexokinase' }
+Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-abolish'
 Plug 'easymotion/vim-easymotion'
 Plug 'rhysd/clever-f.vim'
@@ -21,8 +20,9 @@ Plug 'stefandtw/quickfix-reflector.vim'
 Plug 'SirVer/ultisnips'
 Plug 'tpope/vim-projectionist'
 Plug 'tpope/vim-commentary'
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-Plug 'nvim-treesitter/playground' " Debug highlights for themes with TSHighlightCapturesUnderCursor
+Plug 'sheerun/vim-polyglot' " Remove when treesitter is working properly
+" Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+" Plug 'nvim-treesitter/playground' " Debug highlights for themes with TSHighlightCapturesUnderCursor
 Plug 'derekprior/vim-trimmer'
 Plug 'wincent/terminus'
 Plug 'farmergreg/vim-lastplace'
@@ -62,11 +62,9 @@ Plug 'amiralies/coc-elixir', {'do': 'yarn install --frozen-lockfile && yarn prep
 Plug 'neoclide/coc-git', {'do': 'yarn install --frozen-lockfile && yarn prepack'}
 Plug 'antoinemadec/coc-fzf'
 
-" Languages & Completions
-Plug 'sheerun/vim-polyglot'
-
 " Random Languages
 Plug 'sentient-lang/vim-sentient'
+Plug 'tomlion/vim-solidity'
 
 " Elixir
 Plug 'c-brenn/phoenix.vim', { 'for': 'elixir' }
@@ -83,7 +81,6 @@ Plug 'junegunn/limelight.vim', { 'for': ['markdown'] }
 Plug 'reedes/vim-pencil', { 'for': ['markdown'] }
 
 " Other
-Plug 'itchyny/calendar.vim'
 Plug 'kristijanhusak/vim-carbon-now-sh'
 
 call plug#end()
@@ -208,16 +205,16 @@ let g:fzf_layout = { 'window': 'call OpenFloatingWin()' }
 "     TreeSitter     "
 """""""""""""""""""""
 
-lua <<EOF
-require'nvim-treesitter.configs'.setup {
-  ensure_installed = "maintained",
-  ignore_install = {}, -- List of parsers to ignore installing
-  highlight = {
-    enable = true,              -- false will disable the whole extension
-    disable = { 'elixir' },  -- list of language that will be disabled
-  },
-}
-EOF
+" lua <<EOF
+" require'nvim-treesitter.configs'.setup {
+"   ensure_installed = "maintained",
+"   ignore_install = {}, -- List of parsers to ignore installing
+"   highlight = {
+"     enable = true,              -- false will disable the whole extension
+"     disable = { 'elixir' },  -- list of language that will be disabled
+"   },
+" }
+" EOF
 
 """""""""""""""""""""
 "     fugitive      "
@@ -242,7 +239,7 @@ let g:localvimrc_ask = 0
 let g:localvimrc_whitelist = $HOME . '/Developer/.*'
 
 " don't run lvimrcs in sandbox for work-related projects
-if expand('%:p:h') =~ g:localvimrc_whitelist . '\(subvisual\|utrust\|frm\)'
+if expand('%:p:h') =~ g:localvimrc_whitelist . '\(subvisual\|frm\)'
   let g:localvimrc_sandbox = 0
 endif
 
@@ -374,8 +371,11 @@ let g:mkdp_page_title = '${name}'
 nmap <localleader>l <Plug>MarkdownPreviewToggle
 
 """""""""""""""""""""
-"      VimRoom      "
+"      Writing      "
 """""""""""""""""""""
+
+let g:limelight_conceal_guifg = "#4c4c4c"
+
 function! s:start_write_mode()
   let b:quitting = 0
   let b:quitting_bang = 0
