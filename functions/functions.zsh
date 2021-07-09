@@ -1,7 +1,6 @@
 #!/bin/env zsh
 
 source $DOTFILES/functions/helpers.zsh
-
 # cd to a directory and ls
 cdl() {
     if [ "$#" -eq "0" ]; then
@@ -112,6 +111,15 @@ tw() {
   else
     tmux attach -t twttr
   fi
+}
+
+twcd() {
+  if [[ -z $TMUX ]]; then
+    _mnds_pp_error "tcd" "error: not in tmux"
+    return 1
+  fi
+
+  tmux command -I "attach -c $PWD"
 }
 
 irc() {
