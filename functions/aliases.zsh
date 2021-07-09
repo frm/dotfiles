@@ -17,12 +17,12 @@ alias l="bin/lint"
 alias s="bin/server"
 alias se="bin/setup"
 alias te="bin/test"
-alias c="bin/console"
 
 alias m="mix"
 alias r="rails"
 alias b="bundle"
 alias y="yarn"
+alias c="cargo"
 
 alias dev="development"
 alias prod="production"
