@@ -2,7 +2,7 @@ ruby 3.0.1
 erlang 23.2
 elixir 1.11.2-otp-23
 nodejs 14.15.4
-rust 1.53.0
+rust nightly
 python 3.7.3
 crystal 0.26.1
 golang 1.12
