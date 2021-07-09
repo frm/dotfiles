@@ -56,6 +56,8 @@ yabai -m rule --add app="^BetterTouchTool$" sticky=on layer=above manage=off
 yabai -m rule --add app="^Disk Utility$" sticky=on layer=above manage=off
 yabai -m rule --add app="^System Information$" sticky=on layer=above manage=off
 yabai -m rule --add app="^Activity Monitor$" sticky=on layer=above manage=off
+yabai -m rule --add app="^1Password 7$" sticky=on layer=above manage=off
+yabai -m rule --add app="^Bitwarden$" sticky=on layer=above manage=off
 yabai -m rule --add app="^Spotify$" manage=off
 yabai -m rule --add app="^TextEdit$" manage=off
 yabai -m rule --add app="^Telegram$" manage=off
