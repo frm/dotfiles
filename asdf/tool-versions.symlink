@@ -3,6 +3,6 @@ erlang 23.2
 elixir 1.11.2-otp-23
 nodejs 14.15.4
 rust nightly
-python 3.7.3
+python 3.7.3 2.7.18
 crystal 0.26.1
 golang 1.12
