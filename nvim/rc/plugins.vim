@@ -26,6 +26,7 @@ Plug 'sheerun/vim-polyglot' " Remove when treesitter is working properly
 Plug 'derekprior/vim-trimmer'
 Plug 'wincent/terminus'
 Plug 'farmergreg/vim-lastplace'
+Plug 'RRethy/vim-illuminate'
 
 " Scheme
 " commented themes aren't being used right now but kept as reference
