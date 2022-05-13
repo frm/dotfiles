@@ -46,6 +46,7 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-endwise'
 Plug 'kana/vim-textobj-user'
 Plug 'AndrewRadev/splitjoin.vim'
+Plug 'alvan/vim-closetag'
 
 " Testing
 Plug 'kassio/neoterm'
@@ -304,6 +305,7 @@ let g:ale_fixers = {
 \   'javascript': [],
 \   'ruby':  [],
 \   'go': ['gofmt'],
+\   'solidity': ['solhint'],
 \ }
 
 let g:ale_linters = {
@@ -312,6 +314,7 @@ let g:ale_linters = {
 \   'javascript': [],
 \   'ruby': [],
 \   'go': ['gofmt'],
+\   'solidity': ['solhint'],
 \}
 
 function! AddLinterIfFileExists(lang, linter, file, lint, fix)
