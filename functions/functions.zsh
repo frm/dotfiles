@@ -56,13 +56,11 @@ t() {
 alias gcl="git-clone-cd"
 
 git-clone-cd() {
-  if which hub &> /dev/null; then
-    git="hub"
+  if which gh &> /dev/null; then
+    gh repo clone $@
   else
-    git="git"
+    git clone
   fi
-
-  $git clone $@
 
   if [[ $? -eq 0 ]]; then
     repo=$(echo $@ | awk -F / '{ print $NF }' | sed 's/.git//g')

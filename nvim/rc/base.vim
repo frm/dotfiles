@@ -56,4 +56,5 @@ set foldmethod=indent
 
 " Set python locations
 let g:python_host_prog = "/usr/local/bin/python2.7"
-let g:python3_host_prog = "/Users/frm/.asdf/shims/python3.7"
+let g:python3_host_prog = "/Users/frm/.asdf/shims/python3.9"
+let g:loaded_perl_provider = 0

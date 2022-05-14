@@ -6,6 +6,10 @@
   user = frm
 [branch]
   autosetuprebase = always
+[pull]
+	rebase = true
+[push]
+  default = current
 [color]
   ui = true
 [commit]
@@ -18,8 +22,6 @@
   helper = osxkeychain
 [init]
   templatedir = ~/.git_template
-[push]
-  default = current
 [diff]
   tool = nvimdiff
 [difftool]
@@ -71,6 +73,6 @@
 [protocol "keybase"]
   allow = always
 [gpg]
-	program = /usr/local/bin/gpg
-[pull]
-	rebase = true
+	program = /opt/homebrew/bin/gpg
+[hub]
+	protocol = ssh
