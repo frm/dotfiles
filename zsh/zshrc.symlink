@@ -13,7 +13,7 @@ source $DOTFILES/zsh/keybindings.zsh
 
 source $DOTFILES/asdf/asdf.init
 source $DOTFILES/bat/bat.init
-source $DOTFILES/broot/broot.init
+# source $DOTFILES/broot/broot.init
 
 source $DOTFILES/functions/aliases.zsh
 source $DOTFILES/functions/functions.zsh
