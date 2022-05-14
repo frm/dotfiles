@@ -1,0 +1,88 @@
+{
+    "editor.minimap.enabled": false,
+    "editor.lineNumbers": "relative",
+    "terminal.integrated.tabs.enabled": false,
+    "workbench.colorTheme": "Base16 Tomorrow Dark",
+    "workbench.activityBar.visible": false,
+    "vim.leader": ",",
+    "vim.easymotion": true,
+    "vim.surround": true,
+    "vim.hlsearch": true,
+    "vim.insertModeKeyBindings": [
+        {
+            "before": ["j", "k"],
+            "after": ["<esc>"]
+        }
+   ],
+   "vim.normalModeKeyBindings": [
+        {
+            "before": ["<S-h>"],
+            "commands": [
+                "workbench.action.previousEditorInGroup",
+            ],
+            "silent": true
+        },
+        {
+            "before": ["<S-l>"],
+            "commands": [
+                "workbench.action.nextEditorInGroup",
+            ],
+            "silent": true
+        },
+        {
+            "before": ["<leader>", "g", "b"],
+            "commands": [
+                "gitlens.toggleFileBlame",
+            ],
+            "when": "editorTextFocus && gitlens:activeFileStatus =~ /blameable/"
+        },
+        {
+            "before": ["m", "j"],
+            "commands": [
+                "editor.action.moveLinesDownAction",
+            ],
+            "when": "editorTextFocus && !editorReadonly",
+        },
+        {
+            "before": ["m", "k"],
+            "commands": [
+                "editor.action.moveLinesUpAction",
+            ],
+            "when": "editorTextFocus && !editorReadonly",
+        },
+        {
+            "before": [" ", "n"],
+            "commands": [
+                "workbench.files.action.showActiveFileInExplorer",
+            ],
+            "silent": true
+        },
+        {
+            "before": ["<C-k>"],
+            "commands": [
+                "workbench.action.navigateUp"
+            ],
+        },
+        {
+            "before": ["<C-j>"],
+            "commands": [
+                "workbench.action.navigateDown"
+            ],
+        },
+        {
+            "before": ["<C-h>"],
+            "commands": [
+                "workbench.action.navigateLeft"
+            ],
+        },
+        {
+            "before": ["<C-l>"],
+            "commands": [
+                "workbench.action.navigateRight"
+            ],
+        },
+    ],
+    "editor.inlineSuggest.enabled": true,
+    "editor.fontFamily": "'FiraCode Nerd Font', Menlo, Monaco, 'Courier New', monospace",
+    "workbench.startupEditor": "none",
+}
