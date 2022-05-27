@@ -11,7 +11,7 @@ alias mux="tmuxinator"
 
 alias git="hub"
 alias g="hub"
-alias gb="hub browse"
+alias gb="gh browse"
 
 alias l="bin/lint"
 alias s="bin/server"
@@ -28,7 +28,7 @@ alias dev="development"
 alias prod="production"
 alias stag="staging"
 
-alias pg.server="pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log"
+alias pg.server="pg_ctl -D /opt/homebrew/var/postgres -l /opt/homebrew/var/postgres/server.log"
 alias lock="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
 
 alias cht="cheat"
