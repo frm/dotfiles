@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-figures=(koala luke-koala vader vader-koala default moofasa moose skeleton)
+figures=(blowfish bong daemon dragon dragin-and-cow eyes flaming-sheep ghostbusters koala luke-koala meow satanic stegosaurus vader vader-koala default moofasa moose skeleton)
 
 rand=$((1 + ((RANDOM % 8))))
 
