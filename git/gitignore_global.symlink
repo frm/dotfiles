@@ -63,3 +63,6 @@ Temporary Items
 
 # elixir-ls files
 .elixir_ls/
+
+# eslint
+.eslintcache
