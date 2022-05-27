@@ -6,7 +6,7 @@ setw -g xterm-keys on
 
 # 256 colourspace
 set -g default-terminal "xterm-256color"
-set -g terminal-overrides ',tmux-256color:RGB'
+set -g terminal-overrides ',xterm-256color:Tc'
 
 # Fix cursor change in nvim
 set -g -a terminal-overrides ',*:Ss=\E[%p1%d q:Se=\E[2 q'
