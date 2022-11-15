@@ -1,220 +1,132 @@
 {
-    "editor.fontFamily": "'FiraCode Nerd Font', Menlo, Monaco, 'Courier New', monospace",
-    "editor.formatOnSave": true,
-    "editor.inlineSuggest.enabled": true,
-    "editor.lineNumbers": "relative",
-    "editor.minimap.enabled": false,
-    "terminal.integrated.tabs.enabled": false,
-    "workbench.activityBar.visible": false,
-    "workbench.colorTheme": "Base16 Tomorrow Dark",
-    "workbench.startupEditor": "none",
-    "vim.leader": ",",
-    "vim.easymotion": true,
-    "vim.surround": true,
-    "vim.hlsearch": true,
-    "vim.handleKeys": {
-        "<C-w>": true
+  "editor.fontFamily": "'FiraCode Nerd Font', Menlo, Monaco, 'Courier New', monospace",
+  "editor.formatOnSave": true,
+  "editor.inlineSuggest.enabled": true,
+  "editor.lineNumbers": "relative",
+  "editor.minimap.enabled": false,
+  "terminal.integrated.tabs.enabled": false,
+  "workbench.activityBar.visible": false,
+  "workbench.colorTheme": "Base16 Tomorrow Dark",
+  "workbench.startupEditor": "none",
+  "vim.leader": ",",
+  "vim.easymotion": true,
+  "vim.surround": true,
+  "vim.hlsearch": true,
+  "vim.handleKeys": {
+    "<C-w>": true
+  },
+  "vim.insertModeKeyBindings": [
+    {
+      "before": ["j", "k"],
+      "after": ["<esc>"]
+    }
+  ],
+  "vim.normalModeKeyBindings": [
+    {
+      "before": ["<leader>", "<space>"],
+      "commands": [":noh"]
     },
-    "vim.insertModeKeyBindings": [
+    {
+      "before": ["<S-h>"],
+      "commands": ["workbench.action.previousEditorInGroup"],
+      "silent": true
+    },
+    {
+      "before": ["<S-l>"],
+      "commands": ["workbench.action.nextEditorInGroup"],
+      "silent": true
+    },
+    {
+      "before": ["<leader>", "g", "b"],
+      "commands": ["gitlens.toggleFileBlame"],
+      "when": "editorTextFocus && gitlens:activeFileStatus =~ /blameable/"
+    },
+    {
+      "before": ["m", "j"],
+      "commands": ["editor.action.moveLinesDownAction"],
+      "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+      "before": ["m", "k"],
+      "commands": ["editor.action.moveLinesUpAction"],
+      "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+      "before": [" ", "n"],
+      "commands": ["workbench.files.action.showActiveFileInExplorer"],
+      "silent": true
+    },
+    {
+      "before": ["<C-k>"],
+      "commands": ["workbench.action.navigateUp"]
+    },
+    {
+      "before": ["<C-j>"],
+      "commands": ["workbench.action.navigateDown"]
+    },
+    {
+      "before": ["<C-h>"],
+      "commands": ["workbench.action.navigateLeft"]
+    },
+    {
+      "before": ["<C-l>"],
+      "commands": ["workbench.action.navigateRight"]
+    },
+    {
+      "before": ["<leader>", "c"],
+      "commands": ["testing.runAtCursor"],
+      "when": "editorLangId != elixir"
+    },
+    {
+      "before": ["<leader>", "c"],
+      "commands": [
         {
-            "before": [
-                "j",
-                "k"
-            ],
-            "after": [
-                "<esc>"
-            ]
-        },
-    ],
-    "vim.normalModeKeyBindings": [
+          "command": "workbench.action.tasks.runTask",
+          "args": "Run test under cursor"
+        }
+      ],
+      "when": "editorLangId == elixir"
+    },
+    {
+      "before": ["<leader>", "f"],
+      "commands": ["testing.runCurrentFile"],
+      "when": "editorLangId != elixir"
+    },
+    {
+      "before": ["<leader>", "f"],
+      "commands": [
         {
-            "before": [
-                "<leader>",
-                "<space>"
-            ],
-            "commands": [
-                ":noh"
-            ]
-        },
+          "command": "workbench.action.tasks.runTask",
+          "args": "Run current file tests"
+        }
+      ],
+      "when": "editorLangId == elixir"
+    },
+    {
+      "before": ["<leader>", "a"],
+      "commands": ["testing.runAll"],
+      "when": "editorLangId != elixir"
+    },
+    {
+      "before": ["<leader>", "a"],
+      "commands": [
         {
-            "before": [
-                "<S-h>"
-            ],
-            "commands": [
-                "workbench.action.previousEditorInGroup",
-            ],
-            "silent": true
-        },
-        {
-            "before": [
-                "<S-l>"
-            ],
-            "commands": [
-                "workbench.action.nextEditorInGroup",
-            ],
-            "silent": true
-        },
-        {
-            "before": [
-                "<leader>",
-                "g",
-                "b"
-            ],
-            "commands": [
-                "gitlens.toggleFileBlame",
-            ],
-            "when": "editorTextFocus && gitlens:activeFileStatus =~ /blameable/"
-        },
-        {
-            "before": [
-                "m",
-                "j"
-            ],
-            "commands": [
-                "editor.action.moveLinesDownAction",
-            ],
-            "when": "editorTextFocus && !editorReadonly",
-        },
-        {
-            "before": [
-                "m",
-                "k"
-            ],
-            "commands": [
-                "editor.action.moveLinesUpAction",
-            ],
-            "when": "editorTextFocus && !editorReadonly",
-        },
-        {
-            "before": [
-                " ",
-                "n"
-            ],
-            "commands": [
-                "workbench.files.action.showActiveFileInExplorer",
-            ],
-            "silent": true
-        },
-        {
-            "before": [
-                "<C-k>"
-            ],
-            "commands": [
-                "workbench.action.navigateUp"
-            ],
-        },
-        {
-            "before": [
-                "<C-j>"
-            ],
-            "commands": [
-                "workbench.action.navigateDown"
-            ],
-        },
-        {
-            "before": [
-                "<C-h>"
-            ],
-            "commands": [
-                "workbench.action.navigateLeft"
-            ],
-        },
-        {
-            "before": [
-                "<C-l>"
-            ],
-            "commands": [
-                "workbench.action.navigateRight"
-            ],
-        },
-        {
-            "before": [
-                "<leader>",
-                "c"
-            ],
-            "commands": [
-                "testing.runAtCursor"
-            ],
-            "when": "editorLangId != elixir",
-        },
-        {
-            "before": [
-                "<leader>",
-                "c"
-            ],
-            "commands": [
-                {
-                    "command": "workbench.action.tasks.runTask",
-                    "args": "Run test under cursor",
-                },
-            ],
-            "when": "editorLangId == elixir",
-        },
-        {
-            "before": [
-                "<leader>",
-                "f"
-            ],
-            "commands": [
-                "testing.runCurrentFile"
-            ],
-            "when": "editorLangId != elixir",
-        },
-        {
-            "before": [
-                "<leader>",
-                "f"
-            ],
-            "commands": [
-                {
-                    "command": "workbench.action.tasks.runTask",
-                    "args": "Run current file tests",
-                },
-            ],
-            "when": "editorLangId == elixir",
-        },
-        {
-            "before": [
-                "<leader>",
-                "a"
-            ],
-            "commands": [
-                "testing.runAll"
-            ],
-            "when": "editorLangId != elixir",
-        },
-        {
-            "before": [
-                "<leader>",
-                "a"
-            ],
-            "commands": [
-                {
-                    "command": "workbench.action.tasks.runTask",
-                    "args": "Run all tests",
-                },
-            ],
-            "when": "editorLangId == elixir",
-        },
-        {
-            "before": [
-                "<leader>",
-                "r"
-            ],
-            "commands": [
-                "testing.reRunLastRun"
-            ],
-            "when": "editorLangId != elixir",
-        },
-        {
-            "before": [
-                "<leader>",
-                "r"
-            ],
-            "commands": [
-                "workbench.action.tasks.reRunTask",
-            ],
-            "when": "editorLangId == elixir",
-        },
-    ]
+          "command": "workbench.action.tasks.runTask",
+          "args": "Run all tests"
+        }
+      ],
+      "when": "editorLangId == elixir"
+    },
+    {
+      "before": ["<leader>", "r"],
+      "commands": ["testing.reRunLastRun"],
+      "when": "editorLangId != elixir"
+    },
+    {
+      "before": ["<leader>", "r"],
+      "commands": ["workbench.action.tasks.reRunTask"],
+      "when": "editorLangId == elixir"
+    }
+  ],
+  "javascript.updateImportsOnFileMove.enabled": "always"
 }
