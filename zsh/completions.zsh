@@ -1,3 +1,6 @@
+export FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+export FPATH=~/.zsh/completions:$FPATH
+
 autoload -Uz compinit
 
 # Smarter compinit load
