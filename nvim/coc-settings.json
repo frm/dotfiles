@@ -35,5 +35,6 @@
   "eslint.options": { "cache": true },
   "eslint.autoFixOnSave": true,
   "git.command": "hub",
-  "git.addGBlameToVirtualText": false
+  "git.addGBlameToVirtualText": false,
+  "elixir.pathToElixirLS": "~/.local/share/nvim/plugged/elixir-ls/dist/language_server.sh"
 }
