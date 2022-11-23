@@ -70,11 +70,11 @@ _git_push_pr() {
   if [ -z "$2" ]; then
     _mnds_pp_info "git" "creating pull request to branch $1..."
 
-    hub pull-request "$1"
+    gh pr create --fill --base "$1"
   else
     _mnds_pp_info "git" "creating pull request to branch $1 with reviewers $2..."
 
-    hub pull-request "$1" -r "$2"
+    gh pr create --fill --base "$1" --reviewer "$2"
   fi
 }
 
