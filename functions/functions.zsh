@@ -1,6 +1,7 @@
 #!/bin/env zsh
 
 source $DOTFILES/functions/helpers.zsh
+
 # cd to a directory and ls
 cdl() {
     if [ "$#" -eq "0" ]; then
@@ -16,6 +17,11 @@ cdl() {
 mkcd() {
   mkdir -p $@
   cd $@
+}
+
+# cd to Downloads
+downl() {
+  cd $HOME/Downloads
 }
 
 # Create a tmux session named after the current directory
