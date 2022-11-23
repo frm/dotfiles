@@ -95,7 +95,7 @@ if [ -z "$reviewers" ]; then
 fi
 
 reviewers=$(_git_push_pr_get_reviewers "$reviewers" "$extra_reviewers")
-destination=${destination:-master}
+destination=${destination:-main}
 
 _git_push_pr_rebase_if_needed "$destination"
 
