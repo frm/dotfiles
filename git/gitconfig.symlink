@@ -69,7 +69,7 @@
   div = !git-divergence
   mpr = !git-merge-pr
   ppr = !git-push-pr
-  rbm = !git-rebase-master
+  rbm = !git-rebase-main
 [protocol "keybase"]
   allow = always
 [gpg]
