@@ -68,6 +68,7 @@
   cr = !git-code-review
   div = !git-divergence
   mpr = !git-merge-pr
+  nk = !git-nuke
   ppr = !git-push-pr
   rbm = !git-rebase-main
 [protocol "keybase"]
