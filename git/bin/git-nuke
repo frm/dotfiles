@@ -20,7 +20,7 @@ git fetch --prune
 # Delete merged branches
 echo "[git]: deleting merged branches..."
 git branch --merged \
-  | grep -v master \
+  | grep -v main \
   | grep -v '^\*' \
   | xargs git branch -d
 

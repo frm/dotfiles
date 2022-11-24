@@ -3,7 +3,7 @@
 set -e
 
 _git_merge_pr() {
-  destination=${1:-"master"}
+  destination=${1:-"main"}
   branch=$(git rev-parse --abbrev-ref HEAD)
 
   git checkout $destination
