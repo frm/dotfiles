@@ -3,7 +3,7 @@
 # CAUTION: BEWARE OF THIS SCRIPT! #
 # # # # # # # # # # # # # # # # # #
 #
-# Delete local branches that were already merged into master
+# Delete local branches that were already merged into main
 # To see the full version of this script check bin/git-nuke
 
 # Prune origin
@@ -12,7 +12,7 @@ git fetch --prune
 
 # Delete merged branches
 echo "[git]: deleting merged branches..."
-git branch --merged | grep -v master | grep -v '^\*' | xargs git branch -d
+git branch --merged | grep -v main | grep -v '^\*' | xargs git branch -d
 
 line="THE EAGLE HAS LANDED.\n\nI REPEAT, THE EAGLE HAS LANDED"
 
