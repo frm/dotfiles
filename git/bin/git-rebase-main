@@ -1,7 +1,5 @@
 #!/usr/bin/env zsh
 
-# TODO: check when there is nothing to update
-
 git_prefix="[git]:"
 destination=${1:-main}
 branch=$(git rev-parse --abbrev-ref HEAD)
