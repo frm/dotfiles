@@ -3,7 +3,7 @@
 # TODO: check when there is nothing to update
 
 git_prefix="[git]:"
-destination=${1:-master}
+destination=${1:-main}
 branch=$(git rev-parse --abbrev-ref HEAD)
 
 _echo() {
@@ -12,7 +12,6 @@ _echo() {
 
 _echo "fetching origin/$destination..."
 git fetch origin $destination
-
 
 _echo "rebasing $destination..."
 git checkout $destination || exit "couldn't checkout $destination"
