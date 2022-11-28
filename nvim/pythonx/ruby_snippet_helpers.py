@@ -1,6 +1,6 @@
 import snippet_helpers
 
-class_path_blacklist = [
+class_path_disallowlist = [
         "app",
         "models",
         "controllers",
@@ -15,10 +15,10 @@ class_path_blacklist = [
 ]
 
 def class_name(path, snip):
-    snip.rv = snippet_helpers.name_from_file(path, "::", class_path_blacklist)
+    snip.rv = snippet_helpers.name_from_file(path, "::", class_path_disallowlist)
 
 def open_module(path, snip):
-    mods = snippet_helpers.name_components_from_file(path, class_path_blacklist)
+    mods = snippet_helpers.name_components_from_file(path, class_path_disallowlist)
 
     for idx, mod in enumerate(mods):
         snip.rv += ("  " * idx) + "module " + mod + "\n"
@@ -27,7 +27,7 @@ def open_module(path, snip):
     snip.rv += "  " * len(mods)
 
 def close_module(path, snip):
-    mods = snippet_helpers.name_components_from_file(path, class_path_blacklist)
+    mods = snippet_helpers.name_components_from_file(path, class_path_disallowlist)
     length = len(mods) - 1
 
     for idx, _ in enumerate(mods):
