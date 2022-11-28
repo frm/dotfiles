@@ -1,6 +1,6 @@
 import snippet_helpers
 
-blacklist = [
+disallowlist = [
     "src",
     "sections",
     "pages",
@@ -11,6 +11,6 @@ blacklist = [
 ]
 
 def component_name(path, snip):
-    path_components = snippet_helpers.scrub_path(path, blacklist)
+    path_components = snippet_helpers.scrub_path(path, disallowlist)
     name = ".".join(path_components)
     snip.rv = name
