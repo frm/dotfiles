@@ -17,6 +17,11 @@ function! AddUmbrellaProjections()
             \ "skeleton": "mod",
             \ "alternate": l:app . "/test/{}_test.exs"
             \ }
+
+      let l:projections[l:app . '/test/*_test.exs'] = {
+            \ "skeleton": "mod",
+            \ "alternate": l:app . "/lib/{}.ex"
+            \ }
     endfor
 
     call projectionist#append(getcwd(), l:projections)
@@ -27,7 +32,7 @@ function! GenerateProjectionsJSON()
   let l:apps=split(globpath('apps', '*'), '\n')
 
   if filereadable("mix.exs") && isdirectory("apps")
-    let l:projections=[]
+    let l:projections = []
 
     for l:app in l:apps
       let l:entry = '"' . l:app . '/lib/*.ex": {
@@ -36,6 +41,11 @@ function! GenerateProjectionsJSON()
             \}'
 
       call add(l:projections, l:entry)
+
+      let l:entry = '"' . l:app . '/test/*_.exs": {
+            \  "skeleton": "mod",
+            \  "alternate": "' . l:app . '/lib/{}.ex"
+            \}'
     endfor
 
     let l:projections = '{' . join(l:projections, ",") . '}'
