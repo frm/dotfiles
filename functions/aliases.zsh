@@ -15,6 +15,7 @@ alias gb="gh browse"
 
 alias l="bin/lint"
 alias s="bin/server"
+alias cs="bin/console"
 alias se="bin/setup"
 alias te="bin/test"
 
