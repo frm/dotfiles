@@ -14,6 +14,6 @@ else
   git add .
 fi
 
-GIT_EDITOR="vim -u NONE +wq" git commit --amend
+git commit --amend --no-edit
 
 git push -f
