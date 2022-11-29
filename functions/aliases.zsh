@@ -23,6 +23,7 @@ alias r="rails"
 alias b="bundle"
 alias y="yarn"
 alias c="cargo"
+alias i="iex"
 
 alias dev="development"
 alias prod="production"
