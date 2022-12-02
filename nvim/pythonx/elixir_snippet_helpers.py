@@ -14,6 +14,7 @@ capitalizations = [
     "json",
     "rest",
     "toml",
+    "url",
     "yaml"
 ]
 
