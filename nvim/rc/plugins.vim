@@ -28,6 +28,10 @@ Plug 'wincent/terminus'
 Plug 'farmergreg/vim-lastplace'
 Plug 'RRethy/vim-illuminate'
 
+" Next-level AI shit
+Plug 'github/copilot.vim'
+Plug 'naps62/pair-gpt.nvim', { 'do': 'cargo install --git https://github.com/naps62/pair-gpt.nvim' }
+
 " Scheme
 " commented themes aren't being used right now but kept as reference
 " Plug 'kristijanhusak/vim-hybrid-material'
@@ -481,3 +485,13 @@ let g:calendar_first_day = "monday"
 let g:calendar_date_month_name = 1
 let g:calendar_views = ["year", "month", "day"]
 let g:calendar_time_zone = "+0"
+
+"""""""""""""""""""""
+"     pair-gpt      "
+"""""""""""""""""""""
+
+vnoremap <localleader>gw :PairGPTWrite<CR>
+vnoremap <localleader>ge :PairGPTExplain<CR>
+vnoremap <localleader>gr :PairGPTRefactor<CR>
+
+so ~/.config/nvim/rc/plugins/pair-gpt.lua.vim
