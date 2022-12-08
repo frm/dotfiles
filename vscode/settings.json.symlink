@@ -128,5 +128,6 @@
       "when": "editorLangId == elixir"
     }
   ],
-  "javascript.updateImportsOnFileMove.enabled": "always"
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "explorer.confirmDragAndDrop": false
 }
