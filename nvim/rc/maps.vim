@@ -33,7 +33,7 @@ nnoremap <localleader>S :S/
 nnoremap <localleader>SS :%S/
 
 vnoremap <localleader>s "hy:s/\v<C-r>h/
-vnoremap <localleader>ss "hy:s/\v<C-r>h/
+vnoremap <localleader>ss "hy:%s/\v<C-r>h/
 vnoremap <localleader>S "hy:S/<C-r>h/
 vnoremap <localleader>SS "hy:%S/<C-r>h/
 
