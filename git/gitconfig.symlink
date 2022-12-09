@@ -38,7 +38,7 @@
   a = add
   b = branch -avv
   c = commit
-  cam = commit --amend --no-edit
+  cam = commit -a --amend --no-edit
   co = checkout
   cp = cherry-pick
   d = diff
