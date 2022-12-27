@@ -1,0 +1,6 @@
+require("base")
+require("keybindings")
+require("plugins")
+require("setups")
+require("lsp")
+require("colours")

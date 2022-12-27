@@ -1,6 +1,8 @@
 #!/usr/bin/env sh
-# run this everytime you buils neovim
+#
+# run this everytime you build neovim
 # see https://github.com/neovim/neovim/issues/2048#issuecomment-78045837
+#
 
 source $DOTFILES/functions/helpers.zsh
 
