@@ -120,7 +120,7 @@ require("nvim-tree").setup({
     disable_netrw = true,
     sort_by = "case_sensitive",
     view = {
-        adaptive_size = true,
+        preserve_window_proportions = true,
         side = "right",
     },
 })
