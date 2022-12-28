@@ -217,6 +217,7 @@ vim.g.floaterm_autohide = true
 
 map('n', '<localleader>t', ':FloatermToggle<CR>', { silent = true })
 map('t', '<Esc>', '<C-\\><C-n>', { silent = true })
+map('t', '<C-e>', '<C-\\><C-n>', { silent = true })
 map('t', '<C-d>', '<C-\\><C-n>:FloatermToggle<CR>', { silent = true })
 
 -----------------------------------------------------------------
@@ -231,17 +232,71 @@ map('v', '<localleader>gr', ':PairGPTRefactor<CR>')
 -- VimTest
 -----------------------------------------------------------------
 
-local custom_floaterm = function(cmd)
-    vim.cmd("FloatermNew --autoclose=0 --autohide=0 --width=0.4 --wintype=vsplit --disposable=false --name=test " .. cmd )
+local floaterm_new_bg = function()
+    vim.cmd("FloatermNew! --autoclose=2 --width=0.3 --wintype=vsplit --name=test")
+    vim.cmd("stopinsert")
+    vim.cmd("wincmd p")
 end
 
-vim.g['test#custom_strategies'] = { splitft = custom_floaterm }
-vim.g['test#strategy'] = "splitft"
+local floaterm_show_bg = function()
+    vim.cmd("FloatermShow test")
+    vim.cmd("stopinsert")
+    vim.cmd("wincmd p")
+end
+
+local floaterm_new_or_show_bg = function()
+    local bufnr = vim.fn['floaterm#terminal#get_bufnr']("test")
+    local bufvar = vim.fn.getbufvar(bufnr, "floaterm_winid", -1)
+    local test_term_exists = bufvar ~= -1
+
+    if not test_term_exists then
+        floaterm_new_bg()
+    else
+        local bufnr = bufnr or vim.fn['floaterm#terminal#get_bufnr']("test")
+        local bufwinnr = vim.fn.bufwinnr(bufnr)
+        local test_term_is_open = bufwinnr > -1
+
+        if not test_term_is_open then
+            floaterm_show_bg()
+        end
+    end
+end
+
+function _G.floaterm_test_toggle()
+    local bufnr = vim.fn['floaterm#terminal#get_bufnr']("test")
+    local bufvar = vim.fn.getbufvar(bufnr, "floaterm_winid", -1)
+    local test_term_exists = bufvar ~= -1
+
+    if not test_term_exists then
+        floaterm_new_bg()
+    else
+        local bufnr = bufnr or vim.fn['floaterm#terminal#get_bufnr']("test")
+        local bufwinnr = vim.fn.bufwinnr(bufnr)
+        local test_term_is_open = bufwinnr > -1
+
+        if test_term_is_open then
+            vim.cmd("FloatermHide test")
+        else
+            floaterm_show_bg()
+        end
+    end
+end
+
+local vim_test_floaterm = function(cmd)
+    floaterm_new_or_show_bg()
+    vim.cmd("FloatermSend! --name=test " .. cmd )
+end
+
+vim.g['test#custom_strategies'] = { vim_test_floaterm = vim_test_floaterm }
+vim.g['test#strategy'] = "vim_test_floaterm"
+vim.g['test#preserve_screen'] = 1
+
 map('n', '<localleader>a', ':TestSuite<CR>', { silent = true })
 map('n', '<localleader>c', ':TestNearest<CR>', { silent = true })
 map('n', '<localleader>f', ':TestFile<CR>', { silent = true })
 map('n', '<localleader><localleader>', ':TestLast<CR>', { silent = true })
-map('n', '<localleader>q', ':FloatermToggle test<CR>', { silent = true })
+-- map('n', '<localleader>q', ':FloatermToggle test<CR>', { silent = true })
+map('n', '<localleader>q', ':call v:lua.floaterm_test_toggle()<CR>')
 
 -----------------------------------------------------------------
 -- UltiSnips
