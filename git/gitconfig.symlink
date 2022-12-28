@@ -7,7 +7,7 @@
 [branch]
   autosetuprebase = always
 [pull]
-	rebase = true
+  rebase = true
 [push]
   default = current
 [color]
@@ -22,6 +22,7 @@
   helper = osxkeychain
 [init]
   templatedir = ~/.git_template
+  defaultBranch = main
 [diff]
   tool = nvimdiff
 [difftool]
@@ -34,6 +35,14 @@
   prompt = true
 [mergetool "nvimdiff"]
   cmd = "nvim -d $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'"
+[protocol "keybase"]
+  allow = always
+[gpg]
+  program = /opt/homebrew/bin/gpg
+[hub]
+  protocol = ssh
+[advice]
+  skippedCherryPicks = false
 [alias]
   a = add
   b = branch -avv
@@ -71,11 +80,3 @@
   nk = !git-nuke
   ppr = !git-push-pr
   rbm = !git-rebase-main
-[protocol "keybase"]
-  allow = always
-[gpg]
-	program = /opt/homebrew/bin/gpg
-[hub]
-	protocol = ssh
-[advice]
-	skippedCherryPicks = false
