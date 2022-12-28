@@ -114,7 +114,8 @@ map('n', '<leader>6', ':BufferGoto 6<CR>', { silent = true })
 map('n', '<leader>7', ':BufferGoto 7<CR>', { silent = true })
 map('n', '<leader>8', ':BufferGoto 8<CR>', { silent = true })
 map('n', '<leader>9', ':BufferGoto 9<CR>', { silent = true })
-map('n', '<leader>0', ':BufferLast<CR>', { silent = true })
+map('n', '<leader>0', ':BufferLast<CR>',   { silent = true })
+map('n', '<leader>w', ':BufferClose<CR>',  { silent = true })
 
 -----------------------------------------------------------------
 -- NvimTree
@@ -205,16 +206,18 @@ vim.keymap.set('', 'T', function()
 end, { remap=true })
 
 -----------------------------------------------------------------
--- FloatTerm
+-- Floaterm
 -----------------------------------------------------------------
 
 vim.g.floaterm_width = 0.9
 vim.g.floaterm_height = 0.9
 vim.g.floaterm_title = ''
-vim.g.floaterm_autoinsert = false
+vim.g.floaterm_autoinsert = true
 vim.g.floaterm_autohide = true
 
 map('n', '<localleader>t', ':FloatermToggle<CR>', { silent = true })
+map('t', '<Esc>', '<C-\\><C-n>', { silent = true })
+map('t', '<C-d>', '<C-\\><C-n>:FloatermToggle<CR>', { silent = true })
 
 -----------------------------------------------------------------
 -- PairGPT
