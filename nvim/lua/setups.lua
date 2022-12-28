@@ -41,8 +41,6 @@ require("mason-lspconfig").setup {
 
 local telescope_actions = require('telescope.actions')
 local telescope = require('telescope.builtin')
-vim.keymap.set('n', '<C-p>', telescope.find_files, {})
-vim.keymap.set('n', '<C-f>', telescope.live_grep, {})
 
 require('telescope').setup {
     defaults = {
@@ -69,6 +67,13 @@ require('telescope').setup {
 }
 
 require('telescope').load_extension('fzf')
+require('telescope').load_extension('gh')
+
+map('n', '<C-p>', ':Telescope find_files<CR>')
+map('n', '<C-f>', ':Telescope live_grep<CR>')
+map('n', '<localleader>ghi', ':Telescope gh issues<CR>')
+map('n', '<localleader>ghp', ':Telescope gh pull_request<CR>')
+map('n', '<localleader>ghw', ':Telescope gh run<CR>')
 
 -----------------------------------------------------------------
 -- Lualine
