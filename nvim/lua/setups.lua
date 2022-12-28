@@ -247,9 +247,9 @@ map('n', '<localleader>q', ':FloatermToggle test<CR>', { silent = true })
 -- UltiSnips
 -----------------------------------------------------------------
 
-vim.g.UltiSnipsExpandTrigger = "<tab>"
-vim.g.UltiSnipsJumpForwardTrigger = "<tab>"
-vim.g.UltiSnipsJumpBackwardTrigger = "<s-tab>"
+vim.g.UltiSnipsExpandTrigger = "<C-j>"
+vim.g.UltiSnipsJumpForwardTrigger = "<C-j>"
+vim.g.UltiSnipsJumpBackwardTrigger = "<C-k>"
 
 -----------------------------------------------------------------
 -- Projectionist
