@@ -15,6 +15,8 @@ local function map(mode, combo, mapping, opts)
     vim.api.nvim_set_keymap(mode, combo, mapping, options)
 end
 
+local autocmd = vim.api.nvim_create_autocmd
+
 -----------------------------------------------------------------
 -- Mason
 -----------------------------------------------------------------
@@ -26,14 +28,21 @@ require("mason-lspconfig").setup {
         "elixirls",
         "tsserver",
         "rust_analyzer",
-        "sumneko_lua",
-        "jsonls",
-        "remark_ls",
-        "solang",
         "vimls",
     },
     automatic_installation = true,
 }
+
+-----------------------------------------------------------------
+-- Replacer
+-----------------------------------------------------------------
+
+-- autocmd('FileType', {
+--     pattern = 'qf',
+--     command = 'lua require("replacer").run()'
+-- })
+
+-- map("n", "<localleader>qf", ':lua require("replacer").run()<cr>', {silent = true})
 
 -----------------------------------------------------------------
 -- Telescope
@@ -69,11 +78,64 @@ require('telescope').setup {
 require('telescope').load_extension('fzf')
 require('telescope').load_extension('gh')
 
-map('n', '<C-p>', ':Telescope find_files<CR>')
-map('n', '<C-f>', ':Telescope live_grep<CR>')
 map('n', '<localleader>ghi', ':Telescope gh issues<CR>')
 map('n', '<localleader>ghp', ':Telescope gh pull_request<CR>')
 map('n', '<localleader>ghw', ':Telescope gh run<CR>')
+
+
+-----------------------------------------------------------------
+-- FZF
+-----------------------------------------------------------------
+
+map('n', '<C-p>', ':Files<CR>')
+map('n', '<C-f>', ':Rg<CR>')
+map('n', '<leader>h', ':History<CR>')
+
+-- Make fzf match the vim colorscheme colors
+vim.g.fzf_colors = {
+    fg = { 'fg', 'Normal' },
+    bg = { 'bg', 'Normal' },
+    hl = { 'fg', 'Comment' },
+    ['fg+'] = { 'fg', 'CursorLine', 'CursorColumn', 'Normal' },
+    ['bg+'] = { 'bg', 'CursorLine', 'CursorColumn' },
+    ['hl+'] = { 'fg', 'Statement' },
+    info = { 'fg', 'PreProc' },
+    border = { 'fg', 'Ignore' },
+    prompt = { 'fg', 'Conditional' },
+    pointer = { 'fg', 'Exception' },
+    marker = { 'fg', 'Keyword' },
+    spinner = { 'fg', 'Label' },
+    header = { 'fg', 'Comment' }
+}
+
+-- Enable this if you want fzf statusline
+-- make fzf status line use the vim theme colors
+-- function! s:fzf_statusline()
+--   highlight fzf1 ctermfg=161 ctermbg=251
+--   highlight fzf2 ctermfg=23 ctermbg=251
+--   highlight fzf3 ctermfg=237 ctermbg=251
+--   setlocal statusline=%#fzf1#\ >\ %#fzf2#fz%#fzf3#f
+-- endfunction
+
+-- autocmd! User FzfStatusLine call <SID>fzf_statusline()
+
+-- hide status line inside fzf
+vim.cmd("autocmd! FileType fzf")
+vim.cmd("autocmd  FileType fzf set laststatus=0 noshowmode noruler | autocmd BufLeave <buffer> set laststatus=2 showmode ruler")
+
+-- Use ripgrep over grep
+vim.opt.grepprg="rg --vimgrep --color=always --no-heading"
+
+-- Enable this if you want a preview window when searching for files/regexes
+-- command! -bang -nargs=* Rg
+--   \ call fzf#vim#grep(
+--   \   'rg --vimgrep --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1,
+--   \   <bang>1 ? fzf#vim#with_preview('up:60%:wrap')
+--   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+--   \   <bang>1)
+
+-- command! -bang -nargs=? -complete=dir Files
+--   \ call fzf#vim#files(<q-args>, fzf#vim#with_preview('up:60%:wrap'), <bang>1)
 
 -----------------------------------------------------------------
 -- Lualine
@@ -133,7 +195,7 @@ require("nvim-tree").setup({
 
 
 map('n', '<leader>n', ':NvimTreeToggle<CR>', { silent = true })
-map('n', '<leader>N', ':NvimTreeFindFileToggle<CR>', { silent = true })
+map('n', '<leader>N', ':NvimTreeFindFile<CR>', { silent = true })
 
 vim.cmd("autocmd FileType NvimTree setlocal winhighlight=Normal:NvimTreeBg")
 
@@ -215,10 +277,10 @@ vim.g.floaterm_title = ''
 vim.g.floaterm_autoinsert = true
 vim.g.floaterm_autohide = true
 
-map('n', '<localleader>t', ':FloatermToggle<CR>', { silent = true })
+map('n', '<localleader>t', ':FloatermToggle term<CR>', { silent = true })
 map('t', '<Esc>', '<C-\\><C-n>', { silent = true })
 map('t', '<C-e>', '<C-\\><C-n>', { silent = true })
-map('t', '<C-d>', '<C-\\><C-n>:FloatermToggle<CR>', { silent = true })
+map('t', '<C-d>', '<C-\\><C-n>:FloatermToggle term<CR>', { silent = true })
 
 -----------------------------------------------------------------
 -- PairGPT

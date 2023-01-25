@@ -6,7 +6,8 @@ def name_components_from_file(path, disallowlist = []):
     return [camelize(p) for p in scrubbed_path]
 
 def name_from_file(path, separator = ".", disallowlist = []):
-    name_components = name_components_from_file(path, disallowlist)
+    relpath = os.path.relpath(path)
+    name_components = name_components_from_file(relpath, disallowlist)
 
     return separator.join(name_components)
 
@@ -16,7 +17,7 @@ def scrub_path(path, disallowlist):
 
     scrubbed_path = []
     for p in split_path:
-        if p not in disallowlist and p not in scrubbed_path:
+        if p not in disallowlist and p not in scrubbed_path and p != "":
             scrubbed_path.append(p)
 
     return scrubbed_path
