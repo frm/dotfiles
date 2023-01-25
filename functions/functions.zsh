@@ -141,8 +141,8 @@ irc() {
 
 mutilate() {
   ps aux \
-    | ag $1 \
-    | ag -v "ag $1" \
+    | rg $1 \
+    | rg -v "rg $1" \
     | tr -s " " \
     | cut -d ' ' -f 2 \
     | tee >(awk '{ print "mutilating " $0 }' > /dev/tty) \
@@ -182,4 +182,21 @@ party() {
   fi
 
   curl parrot.live
+}
+
+pgw() {
+  if _mnds_not_installed "pgweb"; then
+    _mnds_pp_error "pgw" "pgweb not installed"
+    return 1
+  fi
+
+  db="$PGW_DB"
+  user=${PGW_USER:-postgres}
+  host=${PGW_HOST:-localhost}
+
+  if [ -z "$db" ]; then
+    db="$(basename $(pwd))_dev"
+  fi
+
+  pgweb --host "$host" --user "$user" --db "$db"
 }
