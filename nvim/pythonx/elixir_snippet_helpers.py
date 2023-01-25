@@ -6,6 +6,7 @@ module_path_disallowlist = ["apps", "lib", "test", "controllers", "views", "supp
 capitalizations = [
     "abi",
     "api",
+    "aws",
     "csv",
     "ens",
     "html",
@@ -13,6 +14,9 @@ capitalizations = [
     "https",
     "json",
     "rest",
+    "rpc",
+    "sns",
+    "sqs",
     "toml",
     "url",
     "yaml"

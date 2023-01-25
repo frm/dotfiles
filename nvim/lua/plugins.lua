@@ -42,12 +42,14 @@ require('packer', {git = {clone_timeout = 120}}).startup(function()
   use 'vim-test/vim-test'
   use 'voldikss/vim-floaterm'
   use 'wincent/terminus'
-  use 'gabrielpoca/replacer.nvim'
+  -- use 'gabrielpoca/replacer.nvim'
+  use 'stefandtw/quickfix-reflector.vim'
   use {'mg979/vim-visual-multi', branch = 'master'}
   use 'RRethy/vim-hexokinase'
 
   use {'junegunn/fzf', run = './install --all'}
   use 'junegunn/fzf.vim'
+
   use {'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
 
   use {
