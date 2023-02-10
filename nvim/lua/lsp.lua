@@ -41,7 +41,7 @@ local luaformat = {
 }
 
 local prettier = {
-    formatCommand = 'npx prettierd "${INPUT}"',
+    formatCommand = 'npx prettier --stdin-filepath ${INPUT}',
     formatStdin = true,
 }
 
