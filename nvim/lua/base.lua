@@ -8,7 +8,7 @@ vim.opt.autoread = true
 vim.opt.backup = false
 vim.opt.writebackup = false
 vim.opt.swapfile = false
-vim.opt.undodir = "~/.config/nvim/undo"
+vim.opt.undodir = vim.fn.expand("$HOME/.config/nvim/undo")
 vim.opt.undofile = true
 
 vim.opt.relativenumber = true
