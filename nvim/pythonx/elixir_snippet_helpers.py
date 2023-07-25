@@ -19,6 +19,7 @@ capitalizations = [
     "sqs",
     "toml",
     "url",
+    "wip",
     "yaml"
 ]
 
