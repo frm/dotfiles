@@ -30,7 +30,6 @@ alias dev="development"
 alias prod="production"
 alias stag="staging"
 
-alias pg.server="pg_ctl -D /opt/homebrew/var/postgres -l /opt/homebrew/var/postgres/server.log"
 alias lock="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
 
 alias cht="cheat"

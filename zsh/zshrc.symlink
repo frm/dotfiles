@@ -22,6 +22,7 @@ source $DOTFILES/starship/starship.init
 source $DOTFILES/functions/aliases.zsh
 source $DOTFILES/functions/functions.zsh
 
+source $DOTFILES/postgres/pg.init
 source $DOTFILES/elixir/erl.init
 source $DOTFILES/rust/cargo.init
 source $DOTFILES/python/python.init
