@@ -1,0 +1,10 @@
+#! /usr/bin/env sh
+
+pg_server() {
+  pg_version=$(pg_ctl --version | cut -d ' ' -f3)
+  pg_dir="$HOME/.asdf/installs/postgres/$pg_version/data"
+
+  pg_ctl -D $pg_dir -l "$pg_dir/server.log" "$@"
+}
+
+alias pg.server="pg_server"
