@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+
+set -e
+
+if [ $# -eq 0 ]; then
+  echo "[git]: ERR: git-untrack requires a list of files to exclude"
+  exit 1
+fi
+
+for file in $@; do
+  echo "[git]: stopping the tracking of $file..."
+
+  git update-index --skip-worktree $file
+done
+
+echo ""
+echo "[git]: stopped tracking the given files!"
