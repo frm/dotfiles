@@ -45,7 +45,7 @@ require('packer', {git = {clone_timeout = 120}}).startup(function()
   -- use 'gabrielpoca/replacer.nvim'
   use 'stefandtw/quickfix-reflector.vim'
   use {'mg979/vim-visual-multi', branch = 'master'}
-  use 'RRethy/vim-hexokinase'
+  use {'RRethy/vim-hexokinase', run = 'make hexokinase'}
 
   use {'junegunn/fzf', run = './install --all'}
   use 'junegunn/fzf.vim'
