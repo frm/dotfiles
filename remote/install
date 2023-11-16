@@ -1,0 +1,40 @@
+#!/bin/zsh
+
+GREEN='\033[1;32m'
+BLUE='\033[1;34m'
+RED='\033[1;91m'
+RESET='\033[0m'
+
+DEV_DOTFILES=~/Developer/frm/dotfiles
+
+function pp {
+  echo -e "\n$1[$2]: $3${RESET}"
+}
+
+function pp_info {
+  pp $BLUE $1 $2
+}
+
+function pp_success {
+  pp $GREEN $1 $2
+}
+
+function pp_error {
+  pp $RED $1 $2
+}
+
+pp_info "remote" "installing package deps"
+brew bundle --file=$DEV_DOTFILES/remote/Brewfile
+
+pp_info "remote" "installing asdf plugins"
+
+asdf plugin add elixir
+asdf plugin add erlang
+asdf plugin add nodejs
+asdf plugin add postgres
+asdf plugin add redis
+
+pp_info "remote" "running softwareupdate"
+softwareupdate --install-rosetta
+
+pp_success "remote" "all done!"
