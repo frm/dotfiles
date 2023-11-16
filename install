@@ -9,6 +9,7 @@ WD=$(pwd)
 
 DEV_DOTFILES=~/Developer/frm/dotfiles
 MAC_OS_MOJAVE_HEADERS=/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg
+DEFAULT_ASDF_VERSION=0.13.1
 
 function pp {
   echo -e "\n$1[$2]: $3${RESET}"
@@ -38,6 +39,8 @@ cd $DEV_DOTFILES
 
 pp_info "install" "installing brew"
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+
+PATH="$PATH:/opt/homebrew/bin"
 
 pp_info "brew" "bundling apps"
 brew bundle
@@ -93,8 +96,8 @@ gln -srf mpv/input.conf.symlink ~/.config/mpv/input.conf
 pp_info "asdf" "setting up environment"
 gln -srf asdf/asdfrc.symlink ~/.asdfrc
 
-read -r "asdf_version?$(pp $RESET "asdf" "asdf version to install? (default: 0.7.8)") "
-asdf_version=${asdf_version:-0.7.8}
+read -r "asdf_version?$(pp $RESET "asdf" "asdf version to install? (default: $DEFAULT_ASDF_VERSION)") "
+asdf_version=${asdf_version:-$DEFAULT_ASDF_VERSION}
 
 pp_info "asdf" "installing asdf $asdf_version"
 git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v$asdf_version
@@ -184,11 +187,6 @@ pp_info "nvim" "setting up environment"
 mkdir ~/.config
 dirlink nvim ~/.config/
 
-pp_info "nvim" "installing system python 2.7 for compatibility purposes"
-brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/86a44a0a552c673a05f11018459c9f5faae3becc/Formula/python@2.rb
-
-pp_info "nvim" "installing language libs"
-/usr/local/bin/pip2 install neovim
 pip install neovim
 gem install neovim
 yarn global add neovim
@@ -212,8 +210,8 @@ wget https://raw.githubusercontent.com/mmorearty/elixir-ctags/master/.ctags -q -
 pp_info "ctags" "setting up ctags environment"
 dirlink ctags ~/.ctags.d
 
-# pp_info "alacritty" "setting up environment"
-# dirlink alacritty ~/.config
+pp_info "alacritty" "setting up environment"
+dirlink alacritty ~/.config
 
 # pp_info "alacritty" "installing from source"
 # ./alacritty/source_install
