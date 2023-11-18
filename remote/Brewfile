@@ -1,1 +1,3 @@
+brew '1password-cli'
+brew 'pdftk-java'
 brew 'wkhtmltopdf'
