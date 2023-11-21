@@ -31,6 +31,7 @@ require('packer', {git = {clone_timeout = 120}}).startup(function()
 
   -- Functionality
   use 'tpope/vim-fugitive'
+  use 'tpope/vim-rhubarb'
   use 'tpope/vim-projectionist'
   use 'kristijanhusak/any-jump.vim'
   use {'phaazon/hop.nvim', config = function() require('hop').setup() end}
