@@ -200,3 +200,36 @@ pgw() {
 
   pgweb --host "$host" --user "$user" --db "$db"
 }
+
+s() {
+  if [ -f bin/server ]; then
+    bin/server
+  elif [ -f mix.exs ]; then
+    _mnds_pp_info "s" "starting phx.server..."
+    iex -S mix phx.server
+  elif [ -f bin/rails ]; then
+    _mnds_pp_info "s" "starting rails server..."
+    bin/rails s
+  elif [ -f Gemfile ]; then
+    _mnds_pp_info "s" "starting rails server..."
+    bundle exec rails s
+  elif [ -f next.config.js ]; then
+    _mnds_pp_info "s" "starting next.js server..."
+    yarn dev
+  elif [ -f package.json ]; then
+    _mnds_pp_info "s" "running npm start..."
+    npm start
+  elif [ -f Cargo.toml ]; then
+    _mnds_pp_info "s" "running cargo..."
+    cargo run
+  elif [ -f go.mod ]; then
+    _mnds_pp_info "s" "running go..."
+    go run .
+  elif [ -f main.go ]; then
+    _mnds_pp_info "s" "running go..."
+    go run main.go
+  else
+    _mnds_pp_error "s" "no server found"
+    return 1
+  fi
+}
