@@ -1,5 +1,5 @@
 export FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
-export FPATH=~/.zsh/completions:$FPATH
+export FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
 
 autoload -Uz compinit
 
