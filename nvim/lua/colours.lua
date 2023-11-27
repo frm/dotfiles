@@ -17,4 +17,4 @@ vim.cmd [[colorscheme everforest]]
 
 vim.opt.showtabline = 0
 vim.opt.laststatus = 2
-vim.opt.fillchars:append("vert:|")
+vim.opt.fillchars:append("vert:│")
