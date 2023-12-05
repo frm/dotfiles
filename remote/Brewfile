@@ -1,3 +1,5 @@
 brew '1password-cli'
 brew 'pdftk-java'
 brew 'wkhtmltopdf'
+brew 'awscli'
+brew 'gimme-aws-creds'

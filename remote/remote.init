@@ -1,0 +1,3 @@
+compdef remotectl
+compdef _remotectl remotectl
+source <(remotectl completion zsh)
