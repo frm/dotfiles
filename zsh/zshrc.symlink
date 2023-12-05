@@ -36,4 +36,4 @@ source $DOTFILES/system/direnv.init
 source $DOTFILES/system/fzf.init
 source $DOTFILES/system/z.init
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+source $DOTFILES/remote/remote.init
