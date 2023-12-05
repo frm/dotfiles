@@ -237,6 +237,45 @@ require('nvim-treesitter.configs').setup {
     endwise = {
         enable = true,
     },
+    highlight = {
+        enable = true,
+    },
+    ensure_installed = {
+        'awk',
+        'bash',
+        'c',
+        'css',
+        'dockerfile',
+        'eex',
+        'elixir',
+        'erlang',
+        'git_rebase',
+        'gitattributes',
+        'gitcommit',
+        'gitignore',
+        'go',
+        'graphql',
+        'haskell',
+        'html',
+        'javascript',
+        'jq',
+        'json',
+        'lua',
+        'make',
+        'markdown',
+        'markdown_inline',
+        'python',
+        'regex',
+        'ruby',
+        'rust',
+        'scss',
+        'solidity',
+        'sql',
+        'toml',
+        'typescript',
+        'vim',
+        'yaml'
+    }
 }
 
 -----------------------------------------------------------------
