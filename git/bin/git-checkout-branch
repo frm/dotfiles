@@ -1,8 +1,18 @@
 #!/usr/bin/env sh
 # Checkout a new branch based on main
 
+if [ -z "$destination" ]; then
+  if $(git branch-check main); then
+    destination="main"
+  elif $(git branch-check master); then
+    destination="master"
+  else
+    echo "couldn't infer destination branch. main and master not here. exiting..."
+    exit 1
+  fi
+fi
 echo "[git]: checking out main..."
-git checkout main
+git checkout $destination
 
 echo "[git]: updating..."
 git pull origin main
