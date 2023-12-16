@@ -1,0 +1,6 @@
+#!/usr/bin/env zsh
+
+# Copies the description of the last git commit
+
+git log -1 --pretty=%B | copy \
+  && echo "[git]: saved last commit's comment to clipboard"
