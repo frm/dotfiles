@@ -1,0 +1,37 @@
+#!/usr/bin/env zsh
+
+# Filters all git branches starting with my usual git prefix
+# (you can also set the GIT_BRANCH_PREFIX env var globally).
+#
+# Options:
+#
+# -s,--select
+#              opens fzf with a git diff preview window
+#
+# --short
+#              provided alongside --select
+#              use git-log in a short format for the preview command
+
+GIT_BRANCH_PREFIX=${GIT_BRANCH_PREFIX:-"frm/"}
+
+zparseopts -- {s,-select}=select -short=short
+
+if [[ "$short" ]]; then
+  git_preview_command="git log --raw --no-merges --color=always {+1} {+1}^"
+else
+  git_preview_command="git show --color=always {+1}"
+fi
+
+filtered_branches=$(
+  git branch \
+  | rg --color never "^[ *]*$GIT_BRANCH_PREFIX"
+)
+
+if [[ "$select" ]]; then
+  echo $filtered_branches \
+  | sort \
+  | fzf --cycle --no-sort --color --preview=$git_preview_command \
+  | xargs -I {} git checkout {}
+else
+  echo $filtered_branches
+fi
