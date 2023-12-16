@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+
+# Overrides git-whatchanged with git-log options
+
+rev=${@:-"HEAD"}
+
+git log --raw --no-merges --color=always "$rev" "$rev"^
