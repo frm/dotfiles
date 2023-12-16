@@ -57,6 +57,7 @@ Temporary Items
 
 .env
 .envrc
+.bin
 
 # elixir-ls files
 .elixir_ls/
