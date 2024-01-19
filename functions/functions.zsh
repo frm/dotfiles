@@ -233,3 +233,33 @@ s() {
     return 1
   fi
 }
+
+l() {
+  if [ -f bin/lint ]; then
+    bin/lint
+  elif [ -f mix.exs ]; then
+    _mnds_pp_info "l" "running mix lint..."
+    iex -S mix lint
+  else
+    _mnds_pp_error "l" "no valid linters found"
+    return 1
+  fi
+}
+
+cs() {
+  if [ -f bin/console ]; then
+    bin/console
+  elif [ -f mix.exs ]; then
+    _mnds_pp_info "cs" "starting iex console..."
+    iex -S mix
+  elif [ -f Gemfile ]; then
+    _mnds_pp_info "cs" "starting pry console..."
+    pry
+  elif [ -f package.json ]; then
+    _mnds_pp_info "cs" "running node console..."
+    node
+  else
+    _mnds_pp_error "cs" "no console found"
+    return 1
+  fi
+}
