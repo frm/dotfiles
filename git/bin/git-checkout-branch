@@ -11,11 +11,11 @@ if [ -z "$destination" ]; then
     exit 1
   fi
 fi
-echo "[git]: checking out main..."
+echo "[git]: checking out $destination..."
 git checkout $destination
 
 echo "[git]: updating..."
-git pull origin main
+git pull origin $destination
 
 echo "[git]: creating a new branch..."
 git checkout -b $1
