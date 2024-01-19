@@ -425,3 +425,14 @@ require('term_find').setup({
     keymap_mapping = 'gf',
     callback = function() vim.cmd("FloatermHide") end
 })
+
+-----------------------------------------------------------------
+-- Diagflow
+-----------------------------------------------------------------
+
+-- vim.diagnostic.config({ virtual_lines = false })
+
+require('diagflow').setup({
+    scope = 'line',
+    toggle_event = { 'InsertEnter' }
+})
