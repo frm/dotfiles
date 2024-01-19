@@ -88,13 +88,22 @@ require('packer', {git = {clone_timeout = 120}}).startup(function()
         require("nvim-lsp-installer").setup {automatic_installation = true}
     end
   }
+
+  -- Currently trying out diagflow.nvim, might re-enable this in the future
+  -- use {
+  --     "https://git.sr.ht/~whynothugo/lsp_lines.nvim",
+  --     config = function()
+  --         vim.diagnostic.config({virtual_text = true})
+  --         require("lsp_lines").setup()
+  --     end
+  -- }
+
   use {
-      "https://git.sr.ht/~whynothugo/lsp_lines.nvim",
-      config = function()
-          vim.diagnostic.config({virtual_text = false})
-          require("lsp_lines").setup()
-      end
-  }
+    'dgagn/diagflow.nvim',
+    config = function()
+      require('diagflow').setup()
+    end
+}
 
 
   use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'}
