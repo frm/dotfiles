@@ -13,8 +13,6 @@ alias git="hub"
 alias g="hub"
 alias gb="gh browse"
 
-alias l="bin/lint"
-alias cs="bin/console"
 alias se="bin/setup"
 alias te="bin/test"
 
