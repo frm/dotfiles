@@ -30,6 +30,12 @@ require("lazy").setup({
   'SirVer/ultisnips',
   'RRethy/vim-illuminate',
   'RRethy/nvim-treesitter-endwise',
+  {
+    'anuvyklack/pretty-fold.nvim',
+     config = function()
+       require('pretty-fold').setup()
+     end
+  },
 
   -- Functionality
   'tpope/vim-fugitive',
