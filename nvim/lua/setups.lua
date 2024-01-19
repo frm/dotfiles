@@ -51,6 +51,9 @@ require("mason-lspconfig").setup {
 local telescope_actions = require('telescope.actions')
 local telescope = require('telescope.builtin')
 
+require('telescope').load_extension('fzf')
+require('telescope').load_extension('gh')
+
 require('telescope').setup {
     defaults = {
         file_ignore_patterns = {
@@ -74,9 +77,6 @@ require('telescope').setup {
         }
     }
 }
-
-require('telescope').load_extension('fzf')
-require('telescope').load_extension('gh')
 
 map('n', '<localleader>ghi', ':Telescope gh issues<CR>')
 map('n', '<localleader>ghp', ':Telescope gh pull_request<CR>')

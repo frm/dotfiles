@@ -1,3 +1,4 @@
+require("pkgmngr")
 require("base")
 require("keybindings")
 require("plugins")

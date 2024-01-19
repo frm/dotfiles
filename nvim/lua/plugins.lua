@@ -1,67 +1,70 @@
-require('packer', {git = {clone_timeout = 120}}).startup(function()
-  use 'wbthomason/packer.nvim'
+-- Make sure to set `mapleader` before lazy so your mappings are correct
+vim.g.mapleader = " "
 
+require("lazy").setup({
   -----------------------------------------------------------------
   -- IDE-style features
   -----------------------------------------------------------------
 
   -- GUI
-  use 'christoomey/vim-tmux-navigator'
+  'christoomey/vim-tmux-navigator',
   -- use 'vimpostor/vim-tpipeline'
-  use {
+  {
     'nvim-lualine/lualine.nvim',
-    requires = { 'kyazdani42/nvim-web-devicons' }
-  }
-  use {'romgrk/barbar.nvim', requires = {'kyazdani42/nvim-web-devicons'}}
+    dependencies = { 'kyazdani42/nvim-web-devicons' }
+  },
 
-  use {
+  {'romgrk/barbar.nvim', dependencies = {'kyazdani42/nvim-web-devicons'}},
+
+  {
     'nvim-tree/nvim-tree.lua',
-    requires = {'nvim-tree/nvim-web-devicons'},
+    dependencies = {'nvim-tree/nvim-web-devicons'},
     tag = 'nightly'
-  }
+  },
 
   -- Behaviour
-  use 'AndrewRadev/splitjoin.vim'
-  use 'derekprior/vim-trimmer'
-  use 'farmergreg/vim-lastplace'
-  use 'gabrielpoca/term_find.nvim'
-  use 'SirVer/ultisnips'
-  use 'RRethy/vim-illuminate'
-  use 'RRethy/nvim-treesitter-endwise'
+  'AndrewRadev/splitjoin.vim',
+  'derekprior/vim-trimmer',
+  'farmergreg/vim-lastplace',
+  'gabrielpoca/term_find.nvim',
+  'SirVer/ultisnips',
+  'RRethy/vim-illuminate',
+  'RRethy/nvim-treesitter-endwise',
 
   -- Functionality
-  use 'tpope/vim-fugitive'
-  use 'tpope/vim-rhubarb'
-  use 'tpope/vim-projectionist'
-  use 'kristijanhusak/any-jump.vim'
-  use {'phaazon/hop.nvim', config = function() require('hop').setup() end}
-  use 'embear/vim-localvimrc'
-  use 'gcmt/wildfire.vim'
-  use 'tpope/vim-abolish'
-  use 'tpope/vim-commentary'
-  use 'tpope/vim-surround'
-  use 'vim-test/vim-test'
-  use 'voldikss/vim-floaterm'
-  use 'wincent/terminus'
+  'tpope/vim-fugitive',
+  'tpope/vim-rhubarb',
+  'tpope/vim-projectionist',
+  'kristijanhusak/any-jump.vim',
+  {'phaazon/hop.nvim', config = function() require('hop').setup() end},
+  'embear/vim-localvimrc',
+  'gcmt/wildfire.vim',
+  'tpope/vim-abolish',
+  'tpope/vim-commentary',
+  'tpope/vim-surround',
+  'vim-test/vim-test',
+  'voldikss/vim-floaterm',
+  'wincent/terminus',
   -- use 'gabrielpoca/replacer.nvim'
-  use 'stefandtw/quickfix-reflector.vim'
-  use {'mg979/vim-visual-multi', branch = 'master'}
-  use {'RRethy/vim-hexokinase', run = 'make hexokinase'}
+  'stefandtw/quickfix-reflector.vim',
+  {'mg979/vim-visual-multi', branch = 'master'},
+  {'RRethy/vim-hexokinase', make = 'make hexokinase'},
 
-  use {'junegunn/fzf', run = './install --all'}
-  use 'junegunn/fzf.vim'
+  {'junegunn/fzf', make = 'install --all'},
+  'junegunn/fzf.vim',
 
-  use {'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
+  {'nvim-telescope/telescope-fzf-native.nvim', make = 'make' },
 
-  use {
+  {
       'nvim-telescope/telescope.nvim',
-      requires = {
+      dependencies = {
         'nvim-lua/popup.nvim',
         'nvim-lua/plenary.nvim',
         'nvim-telescope/telescope-github.nvim',
         'nvim-telescope/telescope-ui-select.nvim',
+        'nvim-telescope/telescope-fzf-native.nvim'
       },
-  }
+  },
 
   -----------------------------------------------------------------
   -- Language support
@@ -69,25 +72,26 @@ require('packer', {git = {clone_timeout = 120}}).startup(function()
 
   -- Languages
 
-  use 'sheerun/vim-polyglot'
-  use 'elixir-editors/vim-elixir'
-  use 'tjdevries/nlua.nvim'
-  use {'andyl/vim-textobj-elixir', requires = 'kana/vim-textobj-user'}
+  'kana/vim-textobj-user',
+  'sheerun/vim-polyglot',
+  'elixir-editors/vim-elixir',
+  'tjdevries/nlua.nvim',
+  { 'andyl/vim-textobj-elixir', dependencies = {'kana/vim-textobj-user'} },
 
   -- AI Pair programming
 
-  use 'github/copilot.vim'
-  use {'naps62/pair-gpt.nvim', run = 'cargo install --git https://github.com/naps62/pair-gpt.nvim' }
+  'github/copilot.vim',
+  {'naps62/pair-gpt.nvim', make = 'cargo install --git https://github.com/naps62/pair-gpt.nvim' },
 
   -- LSP & Treesitter
 
-  use {
+  {
     'neovim/nvim-lspconfig',
-    requires = {'williamboman/nvim-lsp-installer'},
+    dependencies = {'williamboman/nvim-lsp-installer'},
     config = function()
         require("nvim-lsp-installer").setup {automatic_installation = true}
     end
-  }
+  },
 
   -- Currently trying out diagflow.nvim, might re-enable this in the future
   -- use {
@@ -98,52 +102,43 @@ require('packer', {git = {clone_timeout = 120}}).startup(function()
   --     end
   -- }
 
-  use {
+  {
     'dgagn/diagflow.nvim',
     config = function()
       require('diagflow').setup()
     end
-}
+  },
 
 
-  use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'}
+  {'nvim-treesitter/nvim-treesitter', make = ':TSUpdate'},
 
-  use {
+  {
     "williamboman/mason.nvim",
     "williamboman/mason-lspconfig.nvim",
-  }
+  },
 
-  use 'folke/which-key.nvim'
+  'folke/which-key.nvim',
 
-  use {
-      'JoosepAlviste/nvim-ts-context-commentstring',
-      config = function()
-          require('nvim-treesitter.configs').setup {
-              ensure_installed = {"elixir", "javascript", "typescript", "rust"},
-              highlight = {enable = true},
-              context_commentstring = {enable = true}
-          }
-      end
-  }
+  { 'JoosepAlviste/nvim-ts-context-commentstring' },
 
-  use {'ms-jpq/coq_nvim', branch = 'coq'}
-  use {'ms-jpq/coq.artifacts', branch = 'artifacts'}
+  {'ms-jpq/coq_nvim', branch = 'coq'},
+  {'ms-jpq/coq.artifacts', branch = 'artifacts'},
 
-  use {
+  {
       'ms-jpq/coq.thirdparty',
-      requires = {'ms-jpq/coq_nvim'},
+      dependencies = {'ms-jpq/coq_nvim'},
       config = function()
           require("coq_3p") {
               {src = "nvimlua", short_name = "nLUA"},
               {src = "copilot", short_name = "COP", accept_key = "<c-f>"}
           }
       end
-  }
+  },
 
   -----------------------------------------------------------------
   -- Colours
   -----------------------------------------------------------------
 
-  use 'sainnhe/gruvbox-material'
-  use 'sainnhe/everforest'
-end)
+  'sainnhe/gruvbox-material',
+  'sainnhe/everforest'
+})
