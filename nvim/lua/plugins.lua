@@ -82,7 +82,11 @@ require("lazy").setup({
   'sheerun/vim-polyglot',
   'elixir-editors/vim-elixir',
   'tjdevries/nlua.nvim',
-  { 'andyl/vim-textobj-elixir', dependencies = {'kana/vim-textobj-user'} },
+  {
+    'andyl/vim-textobj-elixir',
+    dependencies = {'kana/vim-textobj-user'},
+    ft = { 'elixir' },
+  },
 
   -- AI Pair programming
 
