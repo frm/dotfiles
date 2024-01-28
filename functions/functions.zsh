@@ -69,8 +69,8 @@ git-clone-cd() {
   fi
 
   if [[ $? -eq 0 ]]; then
-    repo=$(echo $@ | awk -F / '{ print $NF }' | sed 's/.git//g')
-    cd $repo
+    dir=$(echo "$@" | awk -F / '{ print $NF }' | sed 's/.git//g' | cut -d ' ' -f 2)
+    cd $dir
   fi
 }
 
