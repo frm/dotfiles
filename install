@@ -85,14 +85,6 @@ else
   exit 1
 fi
 
-pp_info "brew" "installing mpv"
-brew cask install mpv
-
-pp_info "mpv" "setting up config"
-mkdir -p ~/.config/mpv
-gln -srf mpv/mpv.conf.symlink ~/.config/mpv/mpv.conf
-gln -srf mpv/input.conf.symlink ~/.config/mpv/input.conf
-
 pp_info "asdf" "setting up environment"
 gln -srf asdf/asdfrc.symlink ~/.asdfrc
 
@@ -114,15 +106,25 @@ asdf plugin-add python
 asdf plugin-add nodejs
 asdf plugin-add crystal
 asdf plugin-add golang
-
-pp_info "asdf" "importing nodejs release team keyring"
-bash ~/.asdf/plugins/nodejs/bin/import-release-team-keyring
+asdf plugin-add postgres
+asdf plugin-add kubectl
 
 asdf_check=$(pp $RESET "asdf" "check if the asdf/tool-versions.symlink file contains the desired language versions and press ENTER when ready ")
 read -r "_unused?$asdf_check"
 
 gln -srf asdf/tool-versions.symlink ~/.tool-versions
-(cd $HOME && asdf install)
+
+# Ensure postgres is configured
+export POSTGRES_EXTRA_CONFIGURE_OPTIONS="
+  --with-lz4
+  --with-uuid=e2fs
+  --with-libraries=/usr/local/lib:$(brew --prefix openssl@1.1)/lib
+  --with-includes=/usr/local/include:$(brew --prefix openssl@1.1)/include"
+
+brew install icu4c
+brew link icu4c --force
+
+asdf install
 
 source $HOME/.asdf/shims
 
@@ -157,15 +159,6 @@ fi
 
 gln -srf zsh/zshrc.symlink ~/.zshrc
 
-pp_info "zsh" "installing geometry"
-GEOMETRY=~/Developer/geometry
-
-mkdir -p $GEOMETRY
-git clone https://github.com/geometry-zsh/geometry.git $GEOMETRY/development
-
-# we must redownload due to symlinks breaking
-git clone https://github.com/geometry-zsh/geometry.git $GEOMETRY/production
-
 pp_info "tmux" "installing plugins"
 mkdir -p ~/.tmux/plugins/
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
@@ -183,6 +176,9 @@ pp_info "gnupg" "setting up gpg config"
 mkdir -p ~/.gnupg
 gln -srf gnupg/gpg-agent.conf.symlink ~/.gnupg/gpg-agent.conf
 
+pp_info "fzf" "setting up fzf"
+$(brew --prefix)/opt/fzf/install
+
 pp_info "nvim" "setting up environment"
 mkdir ~/.config
 dirlink nvim ~/.config/
@@ -190,16 +186,6 @@ dirlink nvim ~/.config/
 pip install neovim
 gem install neovim
 yarn global add neovim
-
-pp_info "nvim" "installing vim-plug"
-git clone --depth 1 https://github.com/wbthomason/packer.nvim\
-   ~/.local/share/nvim/site/pack/packer/start/packer.nvim
-
-pp_info "nvim" "installing remaining plugins"
-nvim -u nvim/rc/plugins.vim +PlugInstall +qall
-
-pp_info "nvim" "updating remote plugins"
-nvim +UpdateRemotePlugins +qall
 
 pp_info "nvim" "fixing C-h bug"
 $DEV_DOTFILES/scripts/fix-nvim-c-h
@@ -210,17 +196,15 @@ wget https://raw.githubusercontent.com/mmorearty/elixir-ctags/master/.ctags -q -
 pp_info "ctags" "setting up ctags environment"
 dirlink ctags ~/.ctags.d
 
-pp_info "alacritty" "setting up environment"
-dirlink alacritty ~/.config
-
-# pp_info "alacritty" "installing from source"
-# ./alacritty/source_install
-
 pp_info "bat" "installing custom theme"
 mkdir -p "$(bat --config-dir)/themes/tranquility"
+mkdir -p "$(bat --config-dir)/themes/mountaineer"
+mkdir -p "$(bat --config-dir)/themes/dracula"
 mkdir -p "$(bat --cache-dir)"
 gln -sfr bat/tranquility.tmTheme "$(bat --config-dir)/themes/tranquility"
 gln -sfr bat/tranquility_eighties.tmTheme "$(bat --config-dir)/themes/tranquility"
+gln -sfr bat/mountaineer.tmTheme "$(bat --config-dir)/themes/mountaineer"
+curl -o "$(bat --config-dir)/themes/dracula/dracula.tmTheme" https://raw.githubusercontent.com/dracula/sublime/master/Dracula.tmTheme
 
 bat cache --build
 
@@ -235,12 +219,9 @@ cd ~/Downloads
 mkdir fonts
 cd fonts
 
-font_types="Light Retina Regular Medium Bold"
-
-for type in $font_types; do
-  wget -O "FiraCode $type Nerd Font Complete Mono.ttf" "https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/FiraCode/$type/complete/Fira%20Code%20$type%20Nerd%20Font%20Complete%20Mono.ttf?raw=true"
-
-  wget -O "FiraCode $type Nerd Font Complete.ttf" "https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/FiraCode/$type/complete/Fira%20Code%20$type%20Nerd%20Font%20Complete.ttf?raw=true"
+for type in Light Retina Regular Medium Bold SemiBold; do
+  wget -O "FiraCode $type Nerd Font Complete Mono.ttf" "https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/FiraCode/$type/FiraCodeNerdFontMono-$type.ttf?raw=true"
+  wget -O "FiraCode $type Nerd Font Complete Mono.ttf" "https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/FiraCode/$type/FiraCodeNerdFont-$type.ttf?raw=true"
 done
 
 mv ./*.ttf ~/Library/Fonts/

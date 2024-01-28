@@ -13,7 +13,7 @@ vim.g.everforest_disable_italic_comment = 1
 vim.g.everforest_transparent_background = 1
 vim.g.everforest_current_word = "grey background"
 
-vim.cmd [[colorscheme everforest]]
+vim.cmd [[colorscheme dracula]]
 
 vim.opt.showtabline = 0
 vim.opt.laststatus = 2

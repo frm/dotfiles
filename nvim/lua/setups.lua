@@ -141,27 +141,8 @@ vim.opt.grepprg="rg --vimgrep --color=always --no-heading"
 -- Lualine
 -----------------------------------------------------------------
 
-require('lualine').setup({
-    options = {
-        disabled_filetypes = { 'packer', 'NvimTree' }
-    },
-    sections = {
-        lualine_a = {'mode'},
-        lualine_b = {'branch', 'diff', 'diagnostics'},
-        lualine_c = {'filename'},
-        lualine_x = {'encoding', 'filetype'},
-        lualine_y = {'progress'},
-        lualine_z = {'location'}
-    },
-    inactive_sections = {
-        lualine_a = {},
-        lualine_b = {},
-        lualine_c = {'filename'},
-        lualine_x = {'location'},
-        lualine_y = {},
-        lualine_z = {}
-    },
-})
+-- require("lualine/evil")
+require("lualine/bubbles")
 
 -----------------------------------------------------------------
 -- Barbar

@@ -1,6 +1,6 @@
-ruby 3.0.1
+ruby 3.3.0
 erlang 26.0.1
-elixir 1.15.2
+elixir 1.16.0
 nodejs 20.9.0
 rust nightly
 python 3.9.9
