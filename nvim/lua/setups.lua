@@ -23,14 +23,183 @@ local autocmd = vim.api.nvim_create_autocmd
 
 require("mason").setup()
 
+-----------
+--  DAPs --
+-----------
+
 require("mason-lspconfig").setup {
     ensure_installed = {
-        "elixirls",
-        "tsserver",
+        "elixirls", -- TODO: disable when lexical is working
+        "jsonls",
+        "rubocop",
         "rust_analyzer",
+        "tsserver",
         "vimls",
     },
     automatic_installation = true,
+}
+
+require("mason-nvim-dap").setup({
+    ensure_installed = {
+        "chrome",
+        "elixir",
+        "js",
+        "node2",
+        "python",
+    },
+    automatic_installation = true,
+})
+
+require("neodev").setup({
+  library = { plugins = { "nvim-dap-ui" }, types = true },
+})
+
+
+local dap = require('dap')
+
+dap.adapters.mix_task = {
+  type = 'executable',
+  command = '/Users/frm/.bin/lexical/bin/debug_shell.sh',
+  args = {}
+}
+
+require("dapui").setup()
+
+require("nvim-dap-virtual-text").setup()
+
+map('n', '<localleader>db', ':lua require("dap").toggle_breakpoint()<CR>')
+map('n', '<localleader>dc', ':lua require("dap").continue()<CR>')
+map('n', '<localleader>do', ':lua require("dap").step_over()<CR>')
+map('n', '<localleader>di', ':lua require("dap").step_into()<CR>')
+map('n', '<localleader>dx', ':lua require("dap").step_out()<CR>')
+map('n', '<localleader>dr', ':lua require("dap").repl.open()<CR>')
+
+---------------------------
+--  Linters & Formatters --
+---------------------------
+
+-- See: https://github.com/nvimtools/none-ls.nvim/wiki/Formatting-on-save
+
+local async_formatting = function(bufnr)
+    bufnr = bufnr or vim.api.nvim_get_current_buf()
+
+    vim.lsp.buf_request(
+        bufnr,
+        "textDocument/formatting",
+        vim.lsp.util.make_formatting_params({}),
+        function(err, res, ctx)
+            if err then
+                local err_msg = type(err) == "string" and err or err.message
+                -- you can modify the log message / level (or ignore it completely)
+                vim.notify("formatting: " .. err_msg, vim.log.levels.WARN)
+                return
+            end
+
+            -- don't apply results if buffer is unloaded or has been modified
+            if not vim.api.nvim_buf_is_loaded(bufnr) or vim.api.nvim_buf_get_option(bufnr, "modified") then
+                return
+            end
+
+            if res then
+                local client = vim.lsp.get_client_by_id(ctx.client_id)
+                vim.lsp.util.apply_text_edits(res, bufnr, client and client.offset_encoding or "utf-16")
+                vim.api.nvim_buf_call(bufnr, function()
+                    vim.cmd("silent noautocmd update")
+                end)
+            end
+        end
+    )
+end
+
+local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+
+local null_ls = require("null-ls")
+
+null_ls.setup({
+    sources = {
+        -- code actions
+        null_ls.builtins.code_actions.eslint_d,
+        null_ls.builtins.code_actions.gitsigns,
+        null_ls.builtins.code_actions.ltrs,
+        null_ls.builtins.code_actions.proselint,
+        null_ls.builtins.code_actions.shellcheck,
+        null_ls.builtins.code_actions.ts_node_action,
+        -- completions
+        null_ls.builtins.completion.luasnip,
+        null_ls.builtins.completion.spell,
+        null_ls.builtins.completion.tags,
+        -- diagnostics
+        null_ls.builtins.diagnostics.actionlint,
+        null_ls.builtins.diagnostics.alex,
+        null_ls.builtins.diagnostics.bandit,
+        null_ls.builtins.diagnostics.checkmake,
+        null_ls.builtins.diagnostics.chktex,
+        null_ls.builtins.diagnostics.clang_check,
+        -- null_ls.builtins.diagnostics.codespell, needs pip install codespell
+        null_ls.builtins.diagnostics.credo,
+        null_ls.builtins.diagnostics.djlint,
+        null_ls.builtins.diagnostics.dotenv_linter,
+        null_ls.builtins.diagnostics.erb_lint,
+        null_ls.builtins.diagnostics.eslint_d,
+        null_ls.builtins.diagnostics.flake8,
+        null_ls.builtins.diagnostics.gitlint,
+        null_ls.builtins.diagnostics.jsonlint,
+        null_ls.builtins.diagnostics.ltrs,
+        null_ls.builtins.diagnostics.markdownlint,
+        null_ls.builtins.diagnostics.proselint,
+        null_ls.builtins.diagnostics.rubocop,
+        null_ls.builtins.diagnostics.shellcheck,
+        null_ls.builtins.diagnostics.solhint,
+        null_ls.builtins.diagnostics.stylelint,
+        null_ls.builtins.diagnostics.tsc,
+        null_ls.builtins.diagnostics.zsh,
+
+        --
+        -- formatting
+        null_ls.builtins.formatting.erb_format,
+        null_ls.builtins.formatting.erlfmt,
+        null_ls.builtins.formatting.eslint_d,
+        null_ls.builtins.formatting.fixjson,
+        null_ls.builtins.formatting.forge_fmt,
+        null_ls.builtins.formatting.gofmt,
+        null_ls.builtins.formatting.goimports,
+        null_ls.builtins.formatting.htmlbeautifier,
+        null_ls.builtins.formatting.lua_format,
+        null_ls.builtins.formatting.mix,
+        null_ls.builtins.formatting.prettierd,
+        null_ls.builtins.formatting.remark,
+        null_ls.builtins.formatting.rubocop,
+        null_ls.builtins.formatting.rustfmt,
+        null_ls.builtins.formatting.shellharden,
+        null_ls.builtins.formatting.sqlformat,
+        null_ls.builtins.formatting.stylelint,
+
+        --
+        -- hover
+        null_ls.builtins.hover.dictionary,
+        null_ls.builtins.hover.printenv
+    },
+    debug = false,
+    on_attach = function(client, bufnr)
+      if client.supports_method("textDocument/formatting") then
+        vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+        vim.api.nvim_create_autocmd("BufWritePost", {
+          group = augroup,
+          buffer = bufnr,
+          callback = function()
+            async_formatting(bufnr)
+          end,
+        })
+      end
+    end,
+})
+
+-----------------------------------------------------------------
+-- Lexical
+-----------------------------------------------------------------
+
+require("lspconfig").lexical.setup {
+  cmd = { "/Users/frm/.bin/lexical/bin/start_lexical.sh" },
 }
 
 -----------------------------------------------------------------
@@ -45,16 +214,23 @@ require("mason-lspconfig").setup {
 -- map("n", "<localleader>qf", ':lua require("replacer").run()<cr>', {silent = true})
 
 -----------------------------------------------------------------
+-- Aerial
+-----------------------------------------------------------------
+
+require('aerial').setup()
+
+-----------------------------------------------------------------
 -- Telescope
 -----------------------------------------------------------------
 
 local telescope_actions = require('telescope.actions')
-local telescope = require('telescope.builtin')
+local telescope = require('telescope')
 
-require('telescope').load_extension('fzf')
-require('telescope').load_extension('gh')
+telescope.load_extension('fzf')
+telescope.load_extension('gh')
+telescope.load_extension('aerial')
 
-require('telescope').setup {
+telescope.setup {
     defaults = {
         file_ignore_patterns = {
             "node_modules", ".git", "_build", ".elixir_ls", "deps"
@@ -85,11 +261,25 @@ map('n', '<localleader>ghw', ':Telescope gh run<CR>')
 map('n', '<localleader>gb', ':Telescope git_branches<CR>')
 map('n', '<localleader>gc', ':Telescope git_commits<CR>')
 
-map('n', '<C-k>', ':Telescope commands<CR>')
+map('n', '<localleader>o', ':Telescope aerial<CR>')
+map('n', '<C-S-k>', ':Telescope commands<CR>')
 map('n', '<C-p>', ':Telescope find_files<CR>')
+map('n', '<C-S-p>', ':Telescope projects<CR>')
+map('n', '<localleader>gr', ':Telescope lsp_references<CR>')
 map('n', '<C-f>', ':Telescope live_grep<CR>')
 map('n', '<C-w><C-w>', ':Telescope oldfiles<CR>')
 
+-----------------------------------------------------------------
+-- Wilder
+-----------------------------------------------------------------
+
+local wilder = require('wilder')
+
+wilder.setup({ modes = { ':', '/', '?' } })
+
+wilder.set_option('renderer', wilder.popupmenu_renderer({
+  highlighter = wilder.basic_highlighter(),
+}))
 
 -----------------------------------------------------------------
 -- FZF
@@ -147,6 +337,12 @@ vim.opt.grepprg="rg --vimgrep --color=always --no-heading"
 
 -- require("lualine/evil")
 require("lualine/bubbles")
+require("lualine").setup({
+  sections = {
+    lualine_x = { "aerial" }
+  }
+})
+
 
 -----------------------------------------------------------------
 -- Barbar
@@ -310,9 +506,11 @@ map('t', '<C-d>', '<C-\\><C-n>:FloatermToggle term<CR>', { silent = true })
 -- PairGPT
 -----------------------------------------------------------------
 
-map('v', '<localleader>pw', ':PairGPTWrite<CR>')
-map('v', '<localleader>pe', ':PairGPTExplain<CR>')
-map('v', '<localleader>pr', ':PairGPTRefactor<CR>')
+require('pair-gpt').setup()
+
+map('v', '<leader>gw', ':PairGPTWrite<CR>')
+map('v', '<leader>ge', ':PairGPTExplain<CR>')
+map('v', '<leader>gr', ':PairGPTRefactor<CR>')
 
 -----------------------------------------------------------------
 -- ChatGPT
@@ -427,6 +625,42 @@ require('term_find').setup({
 -- vim.diagnostic.config({ virtual_lines = false })
 
 require('diagflow').setup({
-    scope = 'line',
-    toggle_event = { 'InsertEnter' }
+  scope = 'line',
+  event = 'LspDiagnosticsChanged',
+  placement = 'top',
+  toggle_event = { 'InsertEnter' },
+  show_borders = true,
 })
+
+
+-----------------------------------------------------------------
+-- nvim-treesitter-textsubjects
+-----------------------------------------------------------------
+
+require('nvim-treesitter.configs').setup {
+    textsubjects = {
+        enable = true,
+        prev_selection = ',',
+        keymaps = {
+            ['<CR>'] = 'textsubjects-smart',
+            ['<space-cr>'] = 'textsubjects-container-inner'
+        },
+    },
+}
+
+-----------------------------------------------------------------
+-- mini
+-----------------------------------------------------------------
+
+local animate = require('mini.animate')
+animate.setup({
+  cursor = {
+    timing = animate.gen_timing.linear({ duration = 100, unit = 'total' }),
+  }
+})
+
+-----------------------------------------------------------------
+-- Blamer
+-----------------------------------------------------------------
+
+map('n', '<localleader>gbl', ':BlamerToggle<CR>')

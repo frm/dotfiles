@@ -18,3 +18,16 @@ vim.cmd [[colorscheme dracula]]
 vim.opt.showtabline = 0
 vim.opt.laststatus = 2
 vim.opt.fillchars:append("vert:│")
+
+-- Set warning signs
+local signs = { Error = "× ", Warn = " ", Hint = "💡", Info = " " }
+for type, icon in pairs(signs) do
+  local hl = "DiagnosticSign" .. type
+  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+end
+
+-- Fix vim illuminate
+-- bg is set to the same as the dracula theme
+vim.cmd("highlight IlluminatedWordText gui=None guibg=#424450")
+vim.cmd("highlight IlluminatedWordRead gui=None guibg=#424450")
+vim.cmd("highlight IlluminatedWordWrite gui=None guibg=#424450")

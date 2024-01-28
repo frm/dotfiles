@@ -11,15 +11,16 @@ require("lazy").setup({
   -- use 'vimpostor/vim-tpipeline'
   {
     'nvim-lualine/lualine.nvim',
-    dependencies = { 'kyazdani42/nvim-web-devicons' }
+    dependencies = { 'nvim-tree/nvim-web-devicons' }
   },
 
-  {'romgrk/barbar.nvim',
+  {
+    'romgrk/barbar.nvim',
     dependencies = {
       'lewis6991/gitsigns.nvim',
       'nvim-tree/nvim-web-devicons',
     },
-    init = function() vim.g.barbar_auto_setup = false end
+    config = function() vim.g.barbar_auto_setup = false end
   },
 
 
@@ -27,6 +28,15 @@ require("lazy").setup({
     'nvim-tree/nvim-tree.lua',
     dependencies = {'nvim-tree/nvim-web-devicons'},
     tag = 'nightly'
+  },
+
+  { 'echasnovski/mini.nvim', version = false },
+
+  {
+    'gelguy/wilder.nvim',
+    config = function()
+      require('wilder').setup({ modes = { ':', '/', '?' } })
+    end
   },
 
   -- Behaviour
@@ -44,39 +54,64 @@ require("lazy").setup({
      end
   },
 
+  {
+    "nvim-treesitter/nvim-treesitter-textobjects",
+    dependencies = "nvim-treesitter/nvim-treesitter",
+  },
+  'RRethy/nvim-treesitter-textsubjects',
+
   -- Functionality
   'tpope/vim-fugitive',
   'tpope/vim-rhubarb',
+  'APZelos/blamer.nvim',
   'tpope/vim-projectionist',
   'kristijanhusak/any-jump.vim',
-  {'phaazon/hop.nvim', config = function() require('hop').setup() end},
   'embear/vim-localvimrc',
-  'gcmt/wildfire.vim',
   'tpope/vim-abolish',
-  'tpope/vim-commentary',
   'tpope/vim-surround',
   'vim-test/vim-test',
   'voldikss/vim-floaterm',
   'wincent/terminus',
   -- use 'gabrielpoca/replacer.nvim'
   'stefandtw/quickfix-reflector.vim',
-  {'mg979/vim-visual-multi', branch = 'master'},
-  {'RRethy/vim-hexokinase', make = 'make hexokinase'},
+  { 'mg979/vim-visual-multi', branch = 'master' },
+  { 'RRethy/vim-hexokinase', build = 'make hexokinase' },
+  { 'ahmedkhalf/project.nvim', config = function() require('project_nvim').setup() end },
+  { 'phaazon/hop.nvim', config = function() require('hop').setup() end },
 
-  {'junegunn/fzf', make = 'install --all'},
+  { 'junegunn/fzf', build = './install --all' },
   'junegunn/fzf.vim',
 
-  {'nvim-telescope/telescope-fzf-native.nvim', make = 'make' },
+  {
+    'stevearc/aerial.nvim',
+    dependencies = {
+       "nvim-treesitter/nvim-treesitter",
+       "nvim-tree/nvim-web-devicons"
+    },
+  },
+
+  { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
 
   {
-      'nvim-telescope/telescope.nvim',
-      dependencies = {
-        'nvim-lua/popup.nvim',
-        'nvim-lua/plenary.nvim',
-        'nvim-telescope/telescope-github.nvim',
-        'nvim-telescope/telescope-ui-select.nvim',
-        'nvim-telescope/telescope-fzf-native.nvim'
-      },
+     'nvim-telescope/telescope.nvim',
+     dependencies = {
+       'nvim-lua/popup.nvim',
+       'nvim-lua/plenary.nvim',
+       'nvim-telescope/telescope-github.nvim',
+       'nvim-telescope/telescope-ui-select.nvim',
+       'nvim-telescope/telescope-fzf-native.nvim'
+     },
+  },
+
+
+  'JoosepAlviste/nvim-ts-context-commentstring',
+
+  {
+    'numToStr/Comment.nvim',
+    lazy = false,
+    config = function()
+      require('Comment').setup()
+    end
   },
 
   -----------------------------------------------------------------
@@ -85,20 +120,19 @@ require("lazy").setup({
 
   -- Languages
 
-  'kana/vim-textobj-user',
   'sheerun/vim-polyglot',
   'elixir-editors/vim-elixir',
   'tjdevries/nlua.nvim',
-  {
-    'andyl/vim-textobj-elixir',
-    dependencies = {'kana/vim-textobj-user'},
-    ft = { 'elixir' },
-  },
 
   -- AI Pair programming
 
   'github/copilot.vim',
-  {'naps62/pair-gpt.nvim', make = 'cargo install --git https://github.com/naps62/pair-gpt.nvim' },
+
+  {
+    'naps62/pair-gpt.nvim',
+    build = 'cargo install --git https://github.com/naps62/pair-gpt.nvim',
+  },
+
   {
     "jackMort/ChatGPT.nvim",
       event = "VeryLazy",
@@ -117,9 +151,9 @@ require("lazy").setup({
 
   {
     'neovim/nvim-lspconfig',
-    dependencies = {'williamboman/nvim-lsp-installer'},
+    dependencies = { 'williamboman/nvim-lsp-installer' },
     config = function()
-        require("nvim-lsp-installer").setup {automatic_installation = true}
+      require("nvim-lsp-installer").setup { automatic_installation = true }
     end
   },
 
@@ -132,38 +166,41 @@ require("lazy").setup({
   --     end
   -- }
 
-  {
-    'dgagn/diagflow.nvim',
-    config = function()
-      require('diagflow').setup()
-    end
-  },
+  'dgagn/diagflow.nvim',
 
 
-  {'nvim-treesitter/nvim-treesitter', make = ':TSUpdate'},
+  { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' },
 
-  {
-    "williamboman/mason.nvim",
-    "williamboman/mason-lspconfig.nvim",
-  },
+  'williamboman/mason.nvim',
+  'williamboman/mason-lspconfig.nvim',
+  'mfussenegger/nvim-dap',
+  'jay-babu/mason-nvim-dap.nvim',
+  { "folke/neodev.nvim", opts = {} }, -- required for nvim-dap-ui
+  'rcarriga/nvim-dap-ui',
+  'theHamsta/nvim-dap-virtual-text',
+  'nvimtools/none-ls.nvim',
 
   'folke/which-key.nvim',
-
-  { 'JoosepAlviste/nvim-ts-context-commentstring' },
-
-  {'ms-jpq/coq_nvim', branch = 'coq'},
-  {'ms-jpq/coq.artifacts', branch = 'artifacts'},
+  { 'ms-jpq/coq_nvim', branch = 'coq' },
+  { 'ms-jpq/coq.artifacts', branch = 'artifacts' },
 
   {
       'ms-jpq/coq.thirdparty',
-      dependencies = {'ms-jpq/coq_nvim'},
+      dependencies = { 'ms-jpq/coq_nvim', 'ms-jpq/coq.artifacts' },
+      build = ':COQdeps',
       config = function()
           require("coq_3p") {
-              {src = "nvimlua", short_name = "nLUA"},
-              {src = "copilot", short_name = "COP", accept_key = "<c-f>"}
+              { src = "nvimlua", short_name = "nLUA" },
+              { src = "copilot", short_name = "COP", accept_key = "<c-f>" }
           }
       end
   },
+
+  -- TODO: enable when they add debugging support and code lens
+  -- {
+  --   'lexical-lsp/lexical',
+  --   build = 'mix deps.get && INDEXING_ENABLED=true mix package && mv _build/dev/package/lexical ~/.bin'
+  -- },
 
   -----------------------------------------------------------------
   -- Colours

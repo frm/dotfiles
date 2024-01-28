@@ -84,9 +84,6 @@ do_setup('efm', {
     settings = {version = 2, languages = languages}
 })
 
-do_setup('elixirls',
-         {root_dir = nvim_lsp.util.root_pattern {'.git/', 'mix.exs'}})
-
 vim.lsp.handlers['textDocument/publishDiagnostics'] =
     vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
         virtual_text = false,
