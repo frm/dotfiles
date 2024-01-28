@@ -1,4 +1,4 @@
-alias ls="exa --group-directories-first --icons --git --time-style=long-iso --level=1"
+alias ls="eza --group-directories-first --icons --git --time-style=long-iso --level=1"
 
 alias v="nvim"
 alias vim="nvim"

@@ -90,7 +90,7 @@ set -g @batt_icon_charge_tier3 '▼'
 set -g @batt_icon_charge_tier2 '▼'
 set -g @batt_icon_charge_tier1 '▼'
 
-source ~/.dotfiles/tmux/themes/everforest.tmux.conf
+source ~/.dotfiles/tmux/themes/dracula.tmux.conf
 
 # TPM plugins
 set -g @plugin 'tmux-plugins/tpm'

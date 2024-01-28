@@ -36,4 +36,8 @@ source $DOTFILES/system/direnv.init
 source $DOTFILES/system/fzf.init
 source $DOTFILES/system/z.init
 
-source $DOTFILES/remote/remote.init
+if [ "$MNDS_WORK_PROFILE"]; then
+  source $DOTFILES/remote/remote.init
+fi
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

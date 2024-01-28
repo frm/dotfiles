@@ -6,4 +6,4 @@ mendes has dotfiles.
 
 `zsh <(curl -s https://raw.githubusercontent.com/frm/dotfiles/main/install)`
 
-It just works.
+It (mostly) just works.

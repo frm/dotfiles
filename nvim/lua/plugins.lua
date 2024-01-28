@@ -14,7 +14,14 @@ require("lazy").setup({
     dependencies = { 'kyazdani42/nvim-web-devicons' }
   },
 
-  {'romgrk/barbar.nvim', dependencies = {'kyazdani42/nvim-web-devicons'}},
+  {'romgrk/barbar.nvim',
+    dependencies = {
+      'lewis6991/gitsigns.nvim',
+      'nvim-tree/nvim-web-devicons',
+    },
+    init = function() vim.g.barbar_auto_setup = false end
+  },
+
 
   {
     'nvim-tree/nvim-tree.lua',
@@ -150,5 +157,6 @@ require("lazy").setup({
   -----------------------------------------------------------------
 
   'sainnhe/gruvbox-material',
-  'sainnhe/everforest'
+  'sainnhe/everforest',
+  { 'dracula/vim', name = 'dracula' }
 })
