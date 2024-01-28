@@ -99,6 +99,19 @@ require("lazy").setup({
 
   'github/copilot.vim',
   {'naps62/pair-gpt.nvim', make = 'cargo install --git https://github.com/naps62/pair-gpt.nvim' },
+  {
+    "jackMort/ChatGPT.nvim",
+      event = "VeryLazy",
+      config = function()
+        require("chatgpt").setup()
+      end,
+      dependencies = {
+        "MunifTanjim/nui.nvim",
+        "nvim-lua/plenary.nvim",
+        "folke/trouble.nvim",
+        "nvim-telescope/telescope.nvim"
+      }
+  },
 
   -- LSP & Treesitter
 

@@ -82,14 +82,18 @@ map('n', '<localleader>ghi', ':Telescope gh issues<CR>')
 map('n', '<localleader>ghp', ':Telescope gh pull_request<CR>')
 map('n', '<localleader>ghw', ':Telescope gh run<CR>')
 
+map('n', '<localleader>gb', ':Telescope git_branches<CR>')
+map('n', '<localleader>gc', ':Telescope git_commits<CR>')
+
+map('n', '<C-k>', ':Telescope commands<CR>')
+map('n', '<C-p>', ':Telescope find_files<CR>')
+map('n', '<C-f>', ':Telescope live_grep<CR>')
+map('n', '<C-w><C-w>', ':Telescope oldfiles<CR>')
+
 
 -----------------------------------------------------------------
 -- FZF
 -----------------------------------------------------------------
-
-map('n', '<C-p>', ':Files<CR>')
-map('n', '<C-f>', ':Rg<CR>')
-map('n', '<leader>h', ':History<CR>')
 
 -- Make fzf match the vim colorscheme colors
 vim.g.fzf_colors = {
@@ -306,9 +310,18 @@ map('t', '<C-d>', '<C-\\><C-n>:FloatermToggle term<CR>', { silent = true })
 -- PairGPT
 -----------------------------------------------------------------
 
-map('v', '<localleader>gw', ':PairGPTWrite<CR>')
-map('v', '<localleader>ge', ':PairGPTExplain<CR>')
-map('v', '<localleader>gr', ':PairGPTRefactor<CR>')
+map('v', '<localleader>pw', ':PairGPTWrite<CR>')
+map('v', '<localleader>pe', ':PairGPTExplain<CR>')
+map('v', '<localleader>pr', ':PairGPTRefactor<CR>')
+
+-----------------------------------------------------------------
+-- ChatGPT
+-----------------------------------------------------------------
+
+map('n', '<C-t>', ':ChatGPT<CR>')
+map('n', '<C-S-T>', ':ChatGPTRun<CR>')
+map('n', '<C-S-A>', ':ChatGPTActAs<CR>')
+map('v', '<C-t>', ':ChatGPTEditWithInstructions<CR>')
 
 -----------------------------------------------------------------
 -- VimTest
