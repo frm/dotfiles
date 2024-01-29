@@ -594,14 +594,6 @@ map('n', '<localleader><localleader>', ':TestLast<CR>', { silent = true })
 map('n', '<localleader>q', ':call v:lua.floaterm_test_toggle()<CR>')
 
 -----------------------------------------------------------------
--- UltiSnips
------------------------------------------------------------------
-
-vim.g.UltiSnipsExpandTrigger = "<C-j>"
-vim.g.UltiSnipsJumpForwardTrigger = "<C-j>"
-vim.g.UltiSnipsJumpBackwardTrigger = "<C-k>"
-
------------------------------------------------------------------
 -- Projectionist
 -----------------------------------------------------------------
 
