@@ -196,6 +196,9 @@ wget https://raw.githubusercontent.com/mmorearty/elixir-ctags/master/.ctags -q -
 pp_info "ctags" "setting up ctags environment"
 dirlink ctags ~/.ctags.d
 
+pp_info "luarocks" "setting up lua env"
+cat lua/deps | xargs -I {} luarocks install --server=https://luarocks.org/dev {}
+
 pp_info "bat" "installing custom theme"
 mkdir -p "$(bat --config-dir)/themes/tranquility"
 mkdir -p "$(bat --config-dir)/themes/mountaineer"
