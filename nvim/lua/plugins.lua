@@ -1,3 +1,5 @@
+-- LuaFormatter off
+
 -- Make sure to set `mapleader` before lazy so your mappings are correct
 vim.g.mapleader = " "
 
@@ -210,3 +212,4 @@ require("lazy").setup({
   'sainnhe/everforest',
   { 'dracula/vim', name = 'dracula' }
 })
+-- LuaFormatter on

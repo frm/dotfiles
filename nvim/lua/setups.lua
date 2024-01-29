@@ -197,10 +197,10 @@ null_ls.setup({
 -----------------------------------------------------------------
 -- Lexical
 -----------------------------------------------------------------
-
-require("lspconfig").lexical.setup {
-  cmd = { "/Users/frm/.bin/lexical/bin/start_lexical.sh" },
-}
+-- TODO: reenable this when Lexical adds needed support for codelens and DAP
+-- require("lspconfig").lexical.setup {
+--   cmd = { "/Users/frm/.bin/lexical/bin/start_lexical.sh" },
+-- }
 
 -----------------------------------------------------------------
 -- Replacer
@@ -626,7 +626,7 @@ require('term_find').setup({
 
 require('diagflow').setup({
   scope = 'line',
-  event = 'LspDiagnosticsChanged',
+  event = 'LspAttach',
   placement = 'top',
   toggle_event = { 'InsertEnter' },
   show_borders = true,
