@@ -1,3 +1,5 @@
+-- LuaFormatter off
+
 local merge = function(t1, t2)
     for k, v in pairs(t2) do
         if (type(v) == "table") and (type(t1[k] or false) == "table") then
@@ -664,3 +666,5 @@ animate.setup({
 -----------------------------------------------------------------
 
 map('n', '<localleader>gbl', ':BlamerToggle<CR>')
+
+-- LuaFormatter on
