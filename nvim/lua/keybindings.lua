@@ -1,9 +1,8 @@
 ----------
 -- Setup
 ----------
-
 local function map(mode, combo, mapping)
-  vim.api.nvim_set_keymap(mode, combo, mapping, {noremap = true})
+    vim.api.nvim_set_keymap(mode, combo, mapping, {noremap = true})
 end
 
 local autocmd = vim.api.nvim_create_autocmd
@@ -15,7 +14,7 @@ local autocmd = vim.api.nvim_create_autocmd
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ','
 
-vim.opt.timeoutlen=300
+vim.opt.timeoutlen = 300
 map('i', 'jk', '<Esc>')
 
 -- Better pane movement
@@ -53,26 +52,23 @@ map('v', '<localleader>S', '"hy:S/<C-r>h/')
 map('v', '<localleader>SS', '"hy:%S/<C-r>h/')
 
 -- Remove whitespace on save
-autocmd('BufWritePre', {
-  pattern = '',
-  command = ":%s/\\s\\+$//e"
-})
+autocmd('BufWritePre', {pattern = '', command = ":%s/\\s\\+$//e"})
 
 -- Sleep from nvim
 function _G.sleep()
-  os.execute("osascript -e 'tell application \"System Events\" to sleep'")
+    os.execute("osascript -e 'tell application \"System Events\" to sleep'")
 end
 
 map('n', '<leader><leader>S', ':call v:lua.sleep()<CR>')
 
 function _G.rename()
-  local current = vim.fn.expand('%')
-  local new_file = vim.fn.input('New name: ', current)
-  if new_file ~= current and new_file ~= '' then
-    vim.cmd(':saveas ' .. new_file)
-    vim.cmd(':silent !rm ' .. current)
-    vim.cmd('redraw!')
-  end
+    local current = vim.fn.expand('%')
+    local new_file = vim.fn.input('New name: ', current)
+    if new_file ~= current and new_file ~= '' then
+        vim.cmd(':saveas ' .. new_file)
+        vim.cmd(':silent !rm ' .. current)
+        vim.cmd('redraw!')
+    end
 end
 
 map('n', '<leader>r', ':call v:lua.rename()<CR>')
@@ -82,12 +78,13 @@ map('n', '<localleader>r', ':silent !browser.refresh<CR>')
 
 -- Make the current file executable
 function _G.make_executable()
-  local confirmation = vim.fn.confirm("Make this file executable?", "&Yes\n&No")
+    local confirmation = vim.fn.confirm("Make this file executable?",
+                                        "&Yes\n&No")
 
-  if confirmation == 1 then
-    vim.cmd(':silent !chmod +x %')
-    vim.cmd('redraw!')
-  end
+    if confirmation == 1 then
+        vim.cmd(':silent !chmod +x %')
+        vim.cmd('redraw!')
+    end
 end
 
 map('n', '<C-x>', ':call v:lua.make_executable()<CR>')
