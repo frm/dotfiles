@@ -241,7 +241,9 @@ telescope.setup {
             i = {
                 ["<C-j>"] = telescope_actions.move_selection_next,
                 ["<C-k>"] = telescope_actions.move_selection_previous,
-                ["<C-c>"] = telescope_actions.close
+                ["<C-c>"] = telescope_actions.close,
+                ["<C-q>"] = telescope_actions.smart_send_to_qflist + telescope_actions.open_qflist,
+                ["<M-q>"] = telescope_actions.send_to_qflist + telescope_actions.open_qflist,
             },
             n = {["<C-c>"] = telescope_actions.close}
         }
