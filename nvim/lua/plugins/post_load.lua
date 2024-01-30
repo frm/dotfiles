@@ -342,13 +342,16 @@ require("lualine/bubbles")
 require("lualine").setup({
   sections = {
     lualine_x = { "aerial" }
-  }
+  },
+  extensions = {'nvim-tree'}
 })
 
 
 -----------------------------------------------------------------
 -- Barbar
 -----------------------------------------------------------------
+
+vim.g.barbar_auto_setup = false
 
 map('n', '<leader>1', ':BufferGoto 1<CR>', { silent = true })
 map('n', '<leader>2', ':BufferGoto 2<CR>', { silent = true })
@@ -361,6 +364,11 @@ map('n', '<leader>8', ':BufferGoto 8<CR>', { silent = true })
 map('n', '<leader>9', ':BufferGoto 9<CR>', { silent = true })
 map('n', '<leader>0', ':BufferLast<CR>',   { silent = true })
 map('n', '<leader>w', ':BufferClose<CR>',  { silent = true })
+
+require("barbar").setup({
+    animation = true,
+    exclude_ft = { 'NvimTree' },
+})
 
 -----------------------------------------------------------------
 -- NvimTree
