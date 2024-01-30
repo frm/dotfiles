@@ -263,3 +263,19 @@ cs() {
     return 1
   fi
 }
+
+battery_status() {
+  pmset -g batt | awk -F '; *' 'NR==2 { print $2 }'
+}
+
+battery_percentage() {
+  pmset -g batt | rg -o "[0-9]{1,3}%"
+}
+
+battery_charge_remaining() {
+  pmset -g batt | rg -o "[0-9]+:[0-9]+"
+}
+
+battery() {
+  echo "$(battery_status): $(battery_percentage) ($(battery_charge_remaining) remaining)"
+}
