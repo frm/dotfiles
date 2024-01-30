@@ -1,4 +1,3 @@
---theme="dracula"
 --style="numbers,changes,header"
 --italic-text=never
 --map-syntax=.ignore:.gitignore

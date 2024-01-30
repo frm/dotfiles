@@ -1,16 +1,17 @@
+source $DOTFILES/system/fzf/themes/Catppuccin-$CATPPUCCIN_VARIANT.zsh
+
 export FZF_DEFAULT_COMMAND="rg --files --hidden --follow --ignore-file $DOTFILES/ripgrep/ignore"
 
-export FZF_PREVIEW_COMMAND="bat --theme=dracula --style=numbers,changes,header --map-syntax=.ignore:.gitignore --color=always {}"
+export FZF_PREVIEW_COMMAND="bat --style=numbers,changes,header --map-syntax=.ignore:.gitignore --color=always {}"
 
 export FZF_CTRL_R_OPTS="
   --preview 'echo {}' --preview-window up:3:hidden:wrap
   --bind 'ctrl-/:toggle-preview'
   --bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort'
-  --color header:italic
   --header 'Press CTRL-Y to copy command into clipboard'"
 
 export FZF_CTRL_T_OPTS="
-  --preview 'bat --theme=dracula --style=numbers,changes,header --map-syntax=.ignore:.gitignore -n --color=always {}'
+  --preview 'bat --style=numbers,changes,header --map-syntax=.ignore:.gitignore -n --color=always {}'
   --bind 'ctrl-/:change-preview-window(down|hidden|)'"
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

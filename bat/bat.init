@@ -1,1 +1,2 @@
 export BAT_CONFIG_PATH="$DOTFILES/bat/config"
+export BAT_THEME="Catppuccin-$CATPPUCCIN_VARIANT"

@@ -23,5 +23,5 @@
 # GEOMETRY_ENV="production"
 # source $HOME/Developer/geometry/$GEOMETRY_ENV/geometry.zsh
 
-BREW_ZSH_HIGHLIGHTERS=/opt/homebrew/share/zsh-syntax-highlighting/
-source $BREW_ZSH_HIGHLIGHTERS/zsh-syntax-highlighting.zsh
+BREW_ZSH_HIGHLIGHTERS=/opt/homebrew/opt/zsh-fast-syntax-highlighting/share/zsh-fast-syntax-highlighting/
+source $BREW_ZSH_HIGHLIGHTERS/fast-syntax-highlighting.plugin.zsh
