@@ -150,7 +150,7 @@ chsh -s $(which zsh)
 
 pp_info "zsh" "setting up environment"
 dirlink . ~/.dotfiles
-cp ./system/env.init ./system/global_env.init
+cp ./system/secrets.init.sample ./system/secrets.init
 
 pp_info "zsh" "replacing current zshrc"
 if [ -f ~/.zshrc ]; then

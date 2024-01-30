@@ -5,8 +5,8 @@ set -g prefix C-a
 setw -g xterm-keys on
 
 # 256 colourspace
-set -g default-terminal "xterm-256color"
-set -g terminal-overrides ',xterm-256color:Tc'
+set -g default-terminal "screen-256color"
+set -g terminal-overrides ',screen-256color:Tc'
 
 # Fix cursor change in nvim
 set -g -a terminal-overrides ',*:Ss=\E[%p1%d q:Se=\E[2 q'
@@ -62,11 +62,12 @@ bind -n M-7 select-window -t 7
 bind -n M-8 select-window -t 8
 bind -n M-9 select-window -t 9
 
+set-option -g status-position top
+
 # Status bar config
 # currently disabled over a better catppuccin setup
 # set-option -g status 2
 # set-option -g status-format[1] ""
-# set-option -g status-position top
 # set-option -g status-style dim
 #
 # setw -g window-status-format "   #W"
@@ -125,7 +126,6 @@ set -g @catppuccin_status_left_separator  ""
 set -g @catppuccin_status_right_separator " "
 set -g @catppuccin_status_fill "all"
 set -g @catppuccin_status_connect_separator "no"
-
 
 # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
 run '~/.tmux/plugins/tpm/tpm'
