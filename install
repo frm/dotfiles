@@ -164,9 +164,9 @@ pp_info "zsh" "setting up themes"
 mkdir -p ~/.config/fsh
 
 for variant in frappe latte macchiato mocha; do
-  wget -O "zsh/themes/catppuccin-$variant.ini" "https://raw.githubusercontent.com/catppuccin/zsh-fsh/main/themes/catppuccin-$variant.ini"
+  wget -O "$DOTFILES/zsh/themes/catppuccin-$variant.ini" "https://raw.githubusercontent.com/catppuccin/zsh-fsh/main/themes/catppuccin-$variant.ini"
 
-  gln -srf "zsh/themes/catppuccin-$variant.ini" "$HOME/.config/fsh/catppuccin-$variant.ini"
+  gln -srf "$DOTFILES/zsh/themes/catppuccin-$variant.ini" "$HOME/.config/fsh/catppuccin-$variant.ini"
 done
 
 fast-theme XDG:catppuccin-$CATPPUCCIN_VARIANT
@@ -244,6 +244,11 @@ for variant in frappe latte macchiato mocha; do
     -o                                                                                  \
     "$DOTFILES/starship/themes/catppuccin/$variant"                                     \
     "https://raw.githubusercontent.com/catppuccin/starship/main/palettes/$variant.toml"
+done
+
+pp_info "kitty" "installing custom themes"
+for variant in Frappe Latte Macchiato Mocha; do
+  kitty +kitten themes --dump-theme "Catppuccin-$variant" > "$DOTFILES/kitty/Catppuccin-$variant.conf"
 done
 
 pp_info "fonts" "installing fira code"
