@@ -6,7 +6,8 @@ export PATH="$PATH:/opt/homebrew/bin"
 # Load custom bins
 export PATH="$PATH:$DOTFILES/bin:/usr/local/bin"
 
-source $DOTFILES/system/global_env.init
+source $DOTFILES/system/env.init
+source $DOTFILES/system/secrets.init
 
 source $DOTFILES/zsh/init.zsh
 source $DOTFILES/zsh/theme.zsh
