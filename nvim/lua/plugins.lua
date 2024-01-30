@@ -219,6 +219,7 @@ require("lazy").setup({
 
   'sainnhe/gruvbox-material',
   'sainnhe/everforest',
-  { 'dracula/vim', name = 'dracula' }
+  { 'dracula/vim', name = 'dracula' },
+  { "catppuccin/nvim", name = "catppuccin", priority = 1000 }
 })
 -- LuaFormatter on

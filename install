@@ -158,6 +158,18 @@ if [ -f ~/.zshrc ]; then
 fi
 
 gln -srf zsh/zshrc.symlink ~/.zshrc
+source $HOME/.dotfiles/system/env.init
+
+pp_info "zsh" "setting up themes"
+mkdir -p ~/.config/fsh
+
+for variant in frappe latte macchiato mocha; do
+  wget -O "zsh/themes/catppuccin-$variant.ini" "https://raw.githubusercontent.com/catppuccin/zsh-fsh/main/themes/catppuccin-$variant.ini"
+
+  gln -srf "zsh/themes/catppuccin-$variant.ini" "$HOME/.config/fsh/catppuccin-$variant.ini"
+done
+
+fast-theme XDG:catppuccin-$CATPPUCCIN_VARIANT
 
 pp_info "tmux" "installing plugins"
 mkdir -p ~/.tmux/plugins/
@@ -207,16 +219,34 @@ mkdir -p "$(bat --cache-dir)"
 gln -sfr bat/tranquility.tmTheme "$(bat --config-dir)/themes/tranquility"
 gln -sfr bat/tranquility_eighties.tmTheme "$(bat --config-dir)/themes/tranquility"
 gln -sfr bat/mountaineer.tmTheme "$(bat --config-dir)/themes/mountaineer"
-curl -o "$(bat --config-dir)/themes/dracula/dracula.tmTheme" https://raw.githubusercontent.com/dracula/sublime/master/Dracula.tmTheme
+
+curl                                                                          \
+    -o                                                                        \
+    "$(bat --config-dir)/themes/dracula/dracula.tmTheme"                      \
+    https://raw.githubusercontent.com/dracula/sublime/master/Dracula.tmTheme
+
+for variant in frappe latte macchiato mocha; do
+  mkdir -p "$(bat --config-dir)/themes/Catppuccin-$variant"
+
+  curl                                                                                  \
+    -o                                                                                  \
+    "$(bat --config-dir)/themes/Catppuccin-$variant/Catppuccin-$variant.tmTheme"        \
+    "https://raw.githubusercontent.com/catppuccin/bat/main/Catppuccin-$variant.tmTheme"
+done
 
 bat cache --build
 
-# pp_info "iterm2" "installing dracula"
-# DRACULA_PATH=$DOTFILES/iterm2/colors/Dracula.itermcolors
-# curl -o $DRACULA_PATH https://raw.githubusercontent.com/dracula/iterm/master/Dracula.itermcolors
-# chmod +x $DRACULA_PATH
+pp_info "starship" "installing custom themes"
+mkdir -p $DOTFILES/starship/themes/catppuccin/
 
-pp_info "iterm2" "installing fira code"
+for variant in frappe latte macchiato mocha; do
+  curl                                                                                  \
+    -o                                                                                  \
+    "$DOTFILES/starship/themes/catppuccin/$variant"                                     \
+    "https://raw.githubusercontent.com/catppuccin/starship/main/palettes/$variant.toml"
+done
+
+pp_info "fonts" "installing fira code"
 
 cd ~/Downloads
 mkdir fonts
@@ -231,8 +261,3 @@ mv ./*.ttf ~/Library/Fonts/
 cd $WD
 
 pp_success "install" "automatic config done!"
-pp_success "install" "you now need to config iterm2"
-pp_success "install" "to do that, open preferences and do the following steps:
-             1. in the general pane, select 'Load preferences from custom folder' and enter $DEV_DOTFILES/iterm2
-             2. in the same pane, select 'Save changes to folder when iterm2 quits'
-             3. restart iterm2"

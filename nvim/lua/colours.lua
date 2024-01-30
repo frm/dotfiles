@@ -13,17 +13,17 @@ vim.g.everforest_disable_italic_comment = 1
 vim.g.everforest_transparent_background = 1
 vim.g.everforest_current_word = "grey background"
 
-vim.cmd [[colorscheme dracula]]
+vim.cmd.colorscheme("catppuccin-" .. os.getenv("CATPPUCCIN_VARIANT"))
 
 vim.opt.showtabline = 0
 vim.opt.laststatus = 2
 vim.opt.fillchars:append("vert:│")
 
 -- Set warning signs
-local signs = { Error = "× ", Warn = " ", Hint = "💡", Info = " " }
+local signs = {Error = "× ", Warn = " ", Hint = "💡", Info = " "}
 for type, icon in pairs(signs) do
-  local hl = "DiagnosticSign" .. type
-  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+    local hl = "DiagnosticSign" .. type
+    vim.fn.sign_define(hl, {text = icon, texthl = hl, numhl = hl})
 end
 
 -- Fix vim illuminate

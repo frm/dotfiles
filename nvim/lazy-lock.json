@@ -5,6 +5,7 @@
   "any-jump.vim": { "branch": "master", "commit": "f42768a51e4a8788f809ffb035c3a2d1907ea698" },
   "barbar.nvim": { "branch": "master", "commit": "c3ab0dbfe143ffb89a245e5b530f5349d6bb64e1" },
   "blamer.nvim": { "branch": "master", "commit": "e0d43c11697300eb68f00d69df8b87deb0bf52dc" },
+  "catppuccin": { "branch": "main", "commit": "c2e6f8e7eb8d0ebf55700c89bdf842809aeecf09" },
   "copilot.vim": { "branch": "release", "commit": "22fd9542e3c47552abab5e685fefd760e4f405b2" },
   "coq.artifacts": { "branch": "artifacts", "commit": "e7202d1a1b5cfa91446d5b7a035f915934e4d713" },
   "coq.thirdparty": { "branch": "3p", "commit": "fcccc6bc80a89b652736f97142da839cb4169ef8" },
