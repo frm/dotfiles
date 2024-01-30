@@ -105,11 +105,13 @@ set -g @catppuccin_flavour "frappe"
 set -g @catppuccin_window_default_text "#W"
 set -g @catppuccin_window_current_text "#W"
 set -g @catppuccin_directory_color "green"
+set -g @catppuccin_battery_color "#($DOTFILES/tmux/bin/tmux_battery_color)"
 set -g @catppuccin_application_text "#{b:pane_current_command}"
 set -g @catppuccin_status_modules_right "cpu application directory battery"
+set -g @catppuccin_pane_active_border_style "fg=red"
+set -g @catppuccin_pane_border_style "fg=black"
 
 # nasty catppuccin configurations, remove these to have a sane default
-
 # this group sets angled separators on the left
 set -g @catppuccin_window_left_separator "█"
 set -g @catppuccin_window_right_separator "█ "
