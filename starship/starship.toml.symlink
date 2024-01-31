@@ -1,9 +1,13 @@
+# This is not actually using the Pure preset but an equivalent one.
+# See this comment as we were getting <200b> rendered:
+# https://github.com/starship/starship/issues/4927#issuecomment-1485246825
 format = """
 $username\
 $hostname\
 $directory\
 $git_branch\
 $git_state\
+${custom.git_status_dirty}\
 $git_status\
 $cmd_duration\
 $line_break\
@@ -25,16 +29,16 @@ format = "[$branch]($style)"
 style = "bright-black"
 
 [git_status]
-format = "[[($conflicted$untracked$modified$staged$renamed$deleted)](218) ($ahead_behind$stashed)]($style)"
+format = "[($ahead_behind$stashed)]($style)"
 style = "cyan"
-conflicted = "*"
-untracked = "*"
-modified = "*"
-staged = "*"
-renamed = "*"
-deleted = "*"
-diverged = "⇡⇣"
 stashed = "≡"
+diverged = "⇡⇣"
+
+[custom.git_status_dirty]
+when = 'test -n "$(git status --porcelain)"'
+symbol = "*"
+style = "purple"
+format="[$symbol]($style) "
 
 [git_state]
 format = '\([$state( $progress_current/$progress_total)]($style)\) '
@@ -53,9 +57,6 @@ style = "bright-black"
 disabled = true
 
 [elixir]
-disabled = true
-
-[line_break]
 disabled = true
 
 [palettes.catppuccin_frappe]
