@@ -2,5 +2,15 @@
 
 # Copies the description of the last git commit
 
-git log -1 --pretty=%B | copy \
-  && echo "[git]: saved last commit's comment to clipboard"
+zparseopts -- {b,-body-only}=body {s,-subject-only}=subject
+
+if [[ "$body" ]]; then
+  pretty_format="%b"
+elif [[ "$subject" ]]; then
+  pretty_format="%s"
+else
+  pretty_format="%B"
+fi
+
+git log -1 --pretty=$pretty_format | copy \
+  && echo "[git]: saved last commit's description to clipboard"
