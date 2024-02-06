@@ -99,7 +99,7 @@ require("lazy").setup({
     },
   },
 
-  { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+  { 'nvim-telescope/telescope-fzf-native.nvim', build = 'CFLAGS=-march=native make' },
 
   {
      'nvim-telescope/telescope.nvim',

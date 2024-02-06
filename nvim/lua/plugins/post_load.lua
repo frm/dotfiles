@@ -228,10 +228,6 @@ require('aerial').setup()
 local telescope_actions = require('telescope.actions')
 local telescope = require('telescope')
 
-telescope.load_extension('fzf')
-telescope.load_extension('gh')
-telescope.load_extension('aerial')
-
 telescope.setup {
     defaults = {
         file_ignore_patterns = {
@@ -258,6 +254,10 @@ telescope.setup {
     }
 }
 
+telescope.load_extension('fzf')
+telescope.load_extension('gh')
+telescope.load_extension('aerial')
+
 map('n', '<localleader>ghi', ':Telescope gh issues<CR>')
 map('n', '<localleader>ghp', ':Telescope gh pull_request<CR>')
 map('n', '<localleader>ghw', ':Telescope gh run<CR>')
@@ -270,7 +270,7 @@ map('n', '<C-S-k>', ':Telescope commands<CR>')
 map('n', '<C-p>', ':Telescope find_files<CR>')
 map('n', '<C-S-p>', ':Telescope projects<CR>')
 map('n', '<localleader>gr', ':Telescope lsp_references<CR>')
-map('n', '<C-f>', ':Telescope live_grep<CR>')
+map('n', '<C-f>', ':Telescope grep_string search= <CR>') -- ensures fuzzy search
 map('n', '<C-w><C-w>', ':Telescope oldfiles<CR>')
 
 -----------------------------------------------------------------
