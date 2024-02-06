@@ -40,6 +40,14 @@ require("lazy").setup({
     end
   },
 
+  {
+    "startup-nvim/startup.nvim",
+    requires = {"nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim"},
+    config = function()
+      require"startup".setup({ theme = "dashboard" })
+    end
+  },
+
   -- Behaviour
   'AndrewRadev/splitjoin.vim',
   'derekprior/vim-trimmer',
