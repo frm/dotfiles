@@ -40,13 +40,13 @@ require("lazy").setup({
     end
   },
 
-  {
-    "startup-nvim/startup.nvim",
-    requires = {"nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim"},
-    config = function()
-      require"startup".setup({ theme = "dashboard" })
-    end
-  },
+  -- {
+  --   "startup-nvim/startup.nvim",
+  --   requires = {"nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim"},
+  --   config = function()
+  --     require"startup".setup({ theme = "dashboard" })
+  --   end
+  -- },
 
   -- Behaviour
   'AndrewRadev/splitjoin.vim',
@@ -131,6 +131,13 @@ require("lazy").setup({
 
   'sheerun/vim-polyglot',
   'elixir-editors/vim-elixir',
+
+  -- TODO: See plugins/post_load#lsp-format
+  {
+    'elixir-lsp/elixir-ls',
+    build =  'asdf install && mix deps.get && mix compile && mix elixir_ls.release2 -o dist',
+  },
+
   'tjdevries/nlua.nvim',
 
   -- AI Pair programming
@@ -188,6 +195,8 @@ require("lazy").setup({
   'rcarriga/nvim-dap-ui',
   'theHamsta/nvim-dap-virtual-text',
   'nvimtools/none-ls.nvim',
+  'lukas-reineke/lsp-format.nvim',
+  { "folke/trouble.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
 
   {
     "folke/which-key.nvim",

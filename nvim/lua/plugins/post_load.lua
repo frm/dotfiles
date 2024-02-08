@@ -80,121 +80,144 @@ map('n', '<localleader>dr', ':lua require("dap").repl.open()<CR>')
 --  Linters & Formatters --
 ---------------------------
 
+-- Async formatting using none-ls
 -- See: https://github.com/nvimtools/none-ls.nvim/wiki/Formatting-on-save
+-- Note: this is currently commented out because for large codebases,
+-- compilation was taking a long while and this maade it so that
+-- none-ls would write the compilation output on the actual file buffer.
+--
+-- Alternatively testing lsp-format.nvim
 
-local async_formatting = function(bufnr)
-    bufnr = bufnr or vim.api.nvim_get_current_buf()
+-- local async_formatting = function(bufnr)
+--     bufnr = bufnr or vim.api.nvim_get_current_buf()
+--
+--     vim.lsp.buf_request(
+--         bufnr,
+--         "textDocument/formatting",
+--         vim.lsp.util.make_formatting_params({}),
+--         function(err, res, ctx)
+--             if err then
+--                 local err_msg = type(err) == "string" and err or err.message
+--                 -- you can modify the log message / level (or ignore it completely)
+--                 vim.notify("formatting: " .. err_msg, vim.log.levels.WARN)
+--                 return
+--             end
+--
+--             -- don't apply results if buffer is unloaded or has been modified
+--             if not vim.api.nvim_buf_is_loaded(bufnr) or vim.api.nvim_buf_get_option(bufnr, "modified") then
+--                 return
+--             end
+--
+--             if res then
+--                 local client = vim.lsp.get_client_by_id(ctx.client_id)
+--                 vim.lsp.util.apply_text_edits(res, bufnr, client and client.offset_encoding or "utf-16")
+--                 vim.api.nvim_buf_call(bufnr, function()
+--                     vim.cmd("silent noautocmd update")
+--                 end)
+--             end
+--         end
+--     )
+-- end
+--
+-- local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+--
+-- local null_ls = require("null-ls")
+--
+-- null_ls.setup({
+--     sources = {
+--         -- code actions
+--         null_ls.builtins.code_actions.eslint_d,
+--         null_ls.builtins.code_actions.gitsigns,
+--         null_ls.builtins.code_actions.ltrs,
+--         null_ls.builtins.code_actions.proselint,
+--         null_ls.builtins.code_actions.shellcheck,
+--         null_ls.builtins.code_actions.ts_node_action,
+--         -- completions
+--         null_ls.builtins.completion.luasnip,
+--         null_ls.builtins.completion.spell,
+--         null_ls.builtins.completion.tags,
+--         -- diagnostics
+--         null_ls.builtins.diagnostics.actionlint,
+--         null_ls.builtins.diagnostics.alex,
+--         null_ls.builtins.diagnostics.bandit,
+--         null_ls.builtins.diagnostics.checkmake,
+--         null_ls.builtins.diagnostics.chktex,
+--         null_ls.builtins.diagnostics.clang_check,
+--         -- null_ls.builtins.diagnostics.codespell, needs pip install codespell
+--         null_ls.builtins.diagnostics.credo,
+--         null_ls.builtins.diagnostics.djlint,
+--         null_ls.builtins.diagnostics.dotenv_linter,
+--         null_ls.builtins.diagnostics.erb_lint,
+--         null_ls.builtins.diagnostics.eslint_d,
+--         null_ls.builtins.diagnostics.flake8,
+--         null_ls.builtins.diagnostics.gitlint,
+--         null_ls.builtins.diagnostics.jsonlint,
+--         null_ls.builtins.diagnostics.ltrs,
+--         null_ls.builtins.diagnostics.markdownlint,
+--         null_ls.builtins.diagnostics.proselint,
+--         null_ls.builtins.diagnostics.rubocop,
+--         null_ls.builtins.diagnostics.shellcheck,
+--         null_ls.builtins.diagnostics.solhint,
+--         null_ls.builtins.diagnostics.stylelint,
+--         null_ls.builtins.diagnostics.tsc,
+--         null_ls.builtins.diagnostics.zsh,
+--
+--         --
+--         -- formatting
+--         null_ls.builtins.formatting.erb_format,
+--         null_ls.builtins.formatting.erlfmt,
+--         null_ls.builtins.formatting.eslint_d,
+--         null_ls.builtins.formatting.fixjson,
+--         null_ls.builtins.formatting.forge_fmt,
+--         null_ls.builtins.formatting.gofmt,
+--         null_ls.builtins.formatting.goimports,
+--         null_ls.builtins.formatting.htmlbeautifier,
+--         null_ls.builtins.formatting.lua_format,
+--         null_ls.builtins.formatting.mix,
+--         null_ls.builtins.formatting.prettierd,
+--         null_ls.builtins.formatting.remark,
+--         null_ls.builtins.formatting.rubocop,
+--         null_ls.builtins.formatting.rustfmt,
+--         null_ls.builtins.formatting.shellharden,
+--         null_ls.builtins.formatting.sqlformat,
+--         null_ls.builtins.formatting.stylelint,
+--
+--         --
+--         -- hover
+--         null_ls.builtins.hover.dictionary,
+--         null_ls.builtins.hover.printenv
+--     },
+--     debug = false,
+--     on_attach = function(client, bufnr)
+--       if client.supports_method("textDocument/formatting") then
+--         vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+--         vim.api.nvim_create_autocmd("BufWritePost", {
+--           group = augroup,
+--           buffer = bufnr,
+--           callback = function()
+--             async_formatting(bufnr)
+--           end,
+--         })
+--       end
+--     end,
+-- })
 
-    vim.lsp.buf_request(
-        bufnr,
-        "textDocument/formatting",
-        vim.lsp.util.make_formatting_params({}),
-        function(err, res, ctx)
-            if err then
-                local err_msg = type(err) == "string" and err or err.message
-                -- you can modify the log message / level (or ignore it completely)
-                vim.notify("formatting: " .. err_msg, vim.log.levels.WARN)
-                return
-            end
+require("lsp-format").setup {}
 
-            -- don't apply results if buffer is unloaded or has been modified
-            if not vim.api.nvim_buf_is_loaded(bufnr) or vim.api.nvim_buf_get_option(bufnr, "modified") then
-                return
-            end
-
-            if res then
-                local client = vim.lsp.get_client_by_id(ctx.client_id)
-                vim.lsp.util.apply_text_edits(res, bufnr, client and client.offset_encoding or "utf-16")
-                vim.api.nvim_buf_call(bufnr, function()
-                    vim.cmd("silent noautocmd update")
-                end)
-            end
-        end
-    )
-end
-
-local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
-
-local null_ls = require("null-ls")
-
-null_ls.setup({
-    sources = {
-        -- code actions
-        null_ls.builtins.code_actions.eslint_d,
-        null_ls.builtins.code_actions.gitsigns,
-        null_ls.builtins.code_actions.ltrs,
-        null_ls.builtins.code_actions.proselint,
-        null_ls.builtins.code_actions.shellcheck,
-        null_ls.builtins.code_actions.ts_node_action,
-        -- completions
-        null_ls.builtins.completion.luasnip,
-        null_ls.builtins.completion.spell,
-        null_ls.builtins.completion.tags,
-        -- diagnostics
-        null_ls.builtins.diagnostics.actionlint,
-        null_ls.builtins.diagnostics.alex,
-        null_ls.builtins.diagnostics.bandit,
-        null_ls.builtins.diagnostics.checkmake,
-        null_ls.builtins.diagnostics.chktex,
-        null_ls.builtins.diagnostics.clang_check,
-        -- null_ls.builtins.diagnostics.codespell, needs pip install codespell
-        null_ls.builtins.diagnostics.credo,
-        null_ls.builtins.diagnostics.djlint,
-        null_ls.builtins.diagnostics.dotenv_linter,
-        null_ls.builtins.diagnostics.erb_lint,
-        null_ls.builtins.diagnostics.eslint_d,
-        null_ls.builtins.diagnostics.flake8,
-        null_ls.builtins.diagnostics.gitlint,
-        null_ls.builtins.diagnostics.jsonlint,
-        null_ls.builtins.diagnostics.ltrs,
-        null_ls.builtins.diagnostics.markdownlint,
-        null_ls.builtins.diagnostics.proselint,
-        null_ls.builtins.diagnostics.rubocop,
-        null_ls.builtins.diagnostics.shellcheck,
-        null_ls.builtins.diagnostics.solhint,
-        null_ls.builtins.diagnostics.stylelint,
-        null_ls.builtins.diagnostics.tsc,
-        null_ls.builtins.diagnostics.zsh,
-
-        --
-        -- formatting
-        null_ls.builtins.formatting.erb_format,
-        null_ls.builtins.formatting.erlfmt,
-        null_ls.builtins.formatting.eslint_d,
-        null_ls.builtins.formatting.fixjson,
-        null_ls.builtins.formatting.forge_fmt,
-        null_ls.builtins.formatting.gofmt,
-        null_ls.builtins.formatting.goimports,
-        null_ls.builtins.formatting.htmlbeautifier,
-        null_ls.builtins.formatting.lua_format,
-        null_ls.builtins.formatting.mix,
-        null_ls.builtins.formatting.prettierd,
-        null_ls.builtins.formatting.remark,
-        null_ls.builtins.formatting.rubocop,
-        null_ls.builtins.formatting.rustfmt,
-        null_ls.builtins.formatting.shellharden,
-        null_ls.builtins.formatting.sqlformat,
-        null_ls.builtins.formatting.stylelint,
-
-        --
-        -- hover
-        null_ls.builtins.hover.dictionary,
-        null_ls.builtins.hover.printenv
-    },
-    debug = false,
-    on_attach = function(client, bufnr)
-      if client.supports_method("textDocument/formatting") then
-        vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
-        vim.api.nvim_create_autocmd("BufWritePost", {
-          group = augroup,
-          buffer = bufnr,
-          callback = function()
-            async_formatting(bufnr)
-          end,
-        })
-      end
-    end,
+-- TODO: lsp-format requires nvim-lsp-installer instead of mason
+--       elixirls errors when autoinstalling so we need to install it
+--       and configure it manually
+--       to do that, we need to disable automatic_installation
+require("nvim-lsp-installer").setup({
+    automatic_installation = false,
 })
+
+require("lspconfig").elixirls.setup {
+    cmd = { "/Users/fernando.mendes/.local/share/nvim/lazy/elixir-ls/dist/language_server.sh" },
+    on_attach = require("lsp-format").on_attach,
+}
+
+map('n', '<leader>t', ':TroubleToggle<CR>')
 
 -----------------------------------------------------------------
 -- Lexical

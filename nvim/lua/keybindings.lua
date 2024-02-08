@@ -29,6 +29,9 @@ map('n', '<M-j>', '<C-w>J')
 map('n', '<M-k>', '<C-w>K')
 map('n', '<M-l>', '<C-w>L')
 
+-- Autosort
+map('v', '<leader>s', ':sort<CR>')
+
 -- Swap lines
 map('n', 'mj', ':m +1<CR>')
 map('n', 'mk', ':m -2<CR>')
