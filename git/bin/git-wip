@@ -1,7 +1,25 @@
-#!/usr/bin/env sh
+#!/usr/bin/env zsh
 
-git add . && git commit -m "[skip ci] wip"
+set -e
 
-if [[ $1 == "-p" ]]; then
+DEFAULT_GIT_MESSAGE="[skip ci] wip"
+
+zparseopts --               \
+  -no-verify=flag_no_verify \
+  {p,-push}=flag_push       \
+  {m,-message}:=message
+
+git_message=${message[-1]:-$DEFAULT_GIT_MESSAGE}
+
+git_args=("-m \"$git_message\"")
+
+if [[ "$flag_no_verify" ]]; then
+  git_args+=("--no-verify")
+fi
+
+git add .
+git commit ${git_args[@]}
+
+if [[ "$flag_push" ]]; then
   git push
 fi
