@@ -189,12 +189,12 @@ require("lazy").setup({
 
   'williamboman/mason.nvim',
   'williamboman/mason-lspconfig.nvim',
+  'creativenull/efmls-configs-nvim',
   'mfussenegger/nvim-dap',
   'jay-babu/mason-nvim-dap.nvim',
   { "folke/neodev.nvim", opts = {} }, -- required for nvim-dap-ui
   'rcarriga/nvim-dap-ui',
   'theHamsta/nvim-dap-virtual-text',
-  'nvimtools/none-ls.nvim',
   'lukas-reineke/lsp-format.nvim',
   { "folke/trouble.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
 
