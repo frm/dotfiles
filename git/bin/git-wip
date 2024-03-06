@@ -11,7 +11,7 @@ zparseopts --               \
 
 git_message=${message[-1]:-$DEFAULT_GIT_MESSAGE}
 
-git_args=("-m \"$git_message\"")
+git_args=("-m $git_message")
 
 if [[ "$flag_no_verify" ]]; then
   git_args+=("--no-verify")
