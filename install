@@ -108,6 +108,8 @@ asdf plugin-add crystal
 asdf plugin-add golang
 asdf plugin-add postgres
 asdf plugin-add kubectl
+asdf plugin-add flutter
+asdf plugin-add cocoapods
 
 asdf_check=$(pp $RESET "asdf" "check if the asdf/tool-versions.symlink file contains the desired language versions and press ENTER when ready ")
 read -r "_unused?$asdf_check"
