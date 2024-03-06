@@ -267,4 +267,7 @@ done
 mv ./*.ttf ~/Library/Fonts/
 cd $WD
 
+pp_info "gh" "installing gh extensions..."
+cat gh/extensions | xargs -I {} gh extension install {}
+
 pp_success "install" "automatic config done!"
