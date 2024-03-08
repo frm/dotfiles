@@ -116,7 +116,7 @@ local efmls_config = {
 }
 
 lspconfig.elixirls.setup {
-    cmd = { "/Users/fernando.mendes/.local/share/nvim/lazy/elixir-ls/dist/language_server.sh" },
+    cmd = { vim.fn.expand("$HOME/.local/share/nvim/lazy/elixir-ls/dist/language_server.sh") },
     on_attach = lsp_format_on_attach,
 }
 
