@@ -70,12 +70,16 @@
   untrack = update-index --assume-unchanged
 
   apf = !git-amend-push
+  cc = !git-copy-comment
   ch = !git-whatchanged
   cob = !git-checkout-branch
   conf = !git-conflicts
   cpr = !git-close-pr
   cr = !git-code-review
   div = !git-divergence
+  mb = !git-my-branches
+  mbs = !git-my-branches --select
+  mbss = !git-my-branches --select --short
   mpr = !git-merge-pr
   nk = !git-nuke
   ppr = !git-push-pr
