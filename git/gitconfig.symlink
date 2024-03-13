@@ -1,7 +1,5 @@
 [user]
   name = Fernando Mendes
-  email = fernando@mendes.codes
-  signingkey = 45CE4B6B02238E3A
 [github]
   user = frm
 [branch]
@@ -71,7 +69,7 @@
 
   apf = !git-amend-push
   cc = !git-copy-comment
-  ch = !git-whatchanged
+  ch = !git-what-changed
   cob = !git-checkout-branch
   conf = !git-conflicts
   cpr = !git-close-pr
