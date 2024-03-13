@@ -190,13 +190,9 @@ pgw() {
     return 1
   fi
 
-  db="$PGW_DB"
+  db="${PGW_DB:-$(basename $(pwd))_dev}"
   user=${PGW_USER:-postgres}
   host=${PGW_HOST:-localhost}
-
-  if [ -z "$db" ]; then
-    db="$(basename $(pwd))_dev"
-  fi
 
   pgweb --host "$host" --user "$user" --db "$db"
 }
