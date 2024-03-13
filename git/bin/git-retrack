@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+
+# Reverses any file exclusion using git-untrack
+
+set -e
+
+if [ $# -eq 0 ]; then
+  echo "[git]: ERR: git-retrack requires a list of files to exclude"
+  exit 1
+fi
+
+for file in $@; do
+  echo "[git]: resuming the tracking of $file..."
+
+  git update-index --no-skip-worktree $file
+done
+
+echo ""
+echo "[git]: resumed the tracking of the given files"
