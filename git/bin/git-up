@@ -1,0 +1,18 @@
+#!/usr/bin/env zsh
+# Commits updates and optionally pushes them
+
+zparseopts -- {p,-push}=push
+
+COMMIT_MESSAGE="A little bit of updates
+
+A little bit of updates in my life.
+A little bit of fixes in my mind.
+A little bit of improvements' all I need.
+A little bit of shipping's all I see."
+
+git add . && \
+  git commit -m $COMMIT_MESSAGE
+
+if [[ "$push" ]]; then
+  git push
+fi
