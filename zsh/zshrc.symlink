@@ -32,6 +32,7 @@ source $DOTFILES/rust/cargo.init
 source $DOTFILES/python/python.init
 source $DOTFILES/node/node.init
 source $DOTFILES/go/go.init
+source $DOTFILES/conda/conda.init
 
 source $DOTFILES/system/direnv.init
 source $DOTFILES/system/fzf.init
