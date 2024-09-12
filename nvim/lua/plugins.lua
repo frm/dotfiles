@@ -135,7 +135,7 @@ require("lazy").setup({
   -- TODO: See plugins/post_load#lsp-format
   {
     'elixir-lsp/elixir-ls',
-    build =  'asdf install && mix deps.get && mix compile && mix elixir_ls.release2 -o dist',
+    build =  'MIX_ENV=prod mix deps.get && MIX_ENV=prod mix compile && MIX_ENV=prod mix elixir_ls.release2 -o dist',
   },
 
   'tjdevries/nlua.nvim',
@@ -163,13 +163,34 @@ require("lazy").setup({
       }
   },
 
-  -- LSP & Treesitter
+  -- LSP + COQ & Treesitter
 
   {
     'neovim/nvim-lspconfig',
-    dependencies = { 'williamboman/nvim-lsp-installer' },
+    lazy = false,
+    dependencies = {
+      'williamboman/nvim-lsp-installer',
+      { "ms-jpq/coq_nvim", branch = "coq" },
+      { "ms-jpq/coq.artifacts", branch = "artifacts" },
+      { 'ms-jpq/coq.thirdparty', branch = "3p" }
+    },
+    init = function()
+      vim.g.coq_settings = {
+        auto_start = 'shut-up',
+        keymap = {
+            jump_to_mark = '<C-g>',
+        }
+      }
+    end,
     config = function()
       require("nvim-lsp-installer").setup { automatic_installation = true }
+
+      require("coq_3p") {
+        { src = "nvimlua", short_name = "nLUA" },
+        { src = "repl", sh = "zsh" },
+        { src = "bc", short_name = "MATH" },
+        { src = "cow", trigger = "!cow" }
+      }
     end
   },
 
@@ -193,6 +214,7 @@ require("lazy").setup({
   'mfussenegger/nvim-dap',
   'jay-babu/mason-nvim-dap.nvim',
   { "folke/neodev.nvim", opts = {} }, -- required for nvim-dap-ui
+  { "nvim-neotest/nvim-nio" }, -- required for nvim-dap-ui
   'rcarriga/nvim-dap-ui',
   'theHamsta/nvim-dap-virtual-text',
   'lukas-reineke/lsp-format.nvim',
@@ -206,21 +228,6 @@ require("lazy").setup({
       vim.o.timeoutlen = 300
     end,
     opts = {}
-  },
-
-  { 'ms-jpq/coq_nvim', branch = 'coq' },
-  { 'ms-jpq/coq.artifacts', branch = 'artifacts' },
-
-  {
-      'ms-jpq/coq.thirdparty',
-      dependencies = { 'ms-jpq/coq_nvim', 'ms-jpq/coq.artifacts' },
-      build = ':COQdeps',
-      config = function()
-          require("coq_3p") {
-              { src = "nvimlua", short_name = "nLUA" },
-              { src = "copilot", short_name = "COP", accept_key = "<c-f>" }
-          }
-      end
   },
 
   -- TODO: enable when they add debugging support and code lens

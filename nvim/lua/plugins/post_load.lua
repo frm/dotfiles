@@ -35,7 +35,6 @@ require("mason-lspconfig").setup {
         "jsonls",
         "rubocop",
         "rust_analyzer",
-        "tsserver",
         "vimls",
     },
     automatic_installation = true,
@@ -341,17 +340,6 @@ vim.g.splitjoin_split_mapping = ''
 vim.g.splitjoin_join_mapping = ''
 
 map('n', 'sj', ':SplitjoinSplit<CR>')
-
------------------------------------------------------------------
--- COQ
------------------------------------------------------------------
-
-vim.g.coq_settings = {
-    auto_start = 'shut-up',
-    keymap = {
-        jump_to_mark = '<C-g>',
-    }
-}
 
 -----------------------------------------------------------------
 -- TreeSitter
