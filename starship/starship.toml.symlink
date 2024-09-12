@@ -11,7 +11,6 @@ ${custom.git_status_dirty}\
 $git_status\
 $cmd_duration\
 $line_break\
-$python\
 $character"""
 
 palette = "catppuccin_frappe"
@@ -50,6 +49,7 @@ format = "[$duration]($style) "
 style = "yellow"
 
 [python]
+disabled = true
 format = "[$virtualenv]($style) "
 style = "bright-black"
 
