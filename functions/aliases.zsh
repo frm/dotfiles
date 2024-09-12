@@ -23,10 +23,6 @@ alias y="yarn"
 alias c="cargo"
 alias i="iex"
 
-alias dev="development"
-alias prod="production"
-alias stag="staging"
-
 alias lock="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
 
 alias cht="cheat"
