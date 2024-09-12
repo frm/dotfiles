@@ -12,6 +12,10 @@ local merge = function(t1, t2)
     return t1
 end
 
+local function unmap(mode, combo)
+    vim.api.nvim_del_keymap(mode, combo)
+end
+
 local function map(mode, combo, mapping, opts)
     local options = merge({noremap = true}, opts or {})
     vim.api.nvim_set_keymap(mode, combo, mapping, options)
@@ -373,6 +377,7 @@ require('nvim-treesitter.configs').setup {
         'jq',
         'json',
         'lua',
+        'luadoc',
         'make',
         'markdown',
         'markdown_inline',
@@ -386,6 +391,7 @@ require('nvim-treesitter.configs').setup {
         'toml',
         'typescript',
         'vim',
+        'vimdoc',
         'yaml'
     }
 }
@@ -589,5 +595,26 @@ require('nvim-treesitter.configs').setup {
 -----------------------------------------------------------------
 
 map('n', '<localleader>gbl', ':BlamerToggle<CR>')
+
+-----------------------------------------------------------------
+-- Copilot
+-----------------------------------------------------------------
+
+vim.g.copilot_no_tab_map = true
+
+map('i', '<C-F>', '<Cmd>call copilot#Accept()<CR>', {
+  expr = true,
+  replace_keycodes = false
+})
+
+-- M-[: <Plug>(copilot-previous)
+-- M-]: <Plug>(copilot-next)
+-- M-\: <Plug>(copilot-suggest)')
+-- M-<Space>: <Plug>(copilot-dismiss)
+
+-- unmap existing keybindings
+unmap('i', '<C-]>') -- originally <Plug>(copilot-dismiss)
+
+map('i', '<M-Space>', '<Plug>(copilot-dismiss)')
 
 -- LuaFormatter on
