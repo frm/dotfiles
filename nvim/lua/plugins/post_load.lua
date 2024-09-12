@@ -602,7 +602,7 @@ map('n', '<localleader>gbl', ':BlamerToggle<CR>')
 
 vim.g.copilot_no_tab_map = true
 
-map('i', '<C-F>', '<Cmd>call copilot#Accept()<CR>', {
+map('i', '<C-F>', 'copilot#Accept("\\<CR>")', {
   expr = true,
   replace_keycodes = false
 })
