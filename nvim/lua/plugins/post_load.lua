@@ -440,16 +440,6 @@ map('t', '<C-e>', '<C-\\><C-n>', { silent = true })
 map('t', '<C-d>', '<C-\\><C-n>:FloatermToggle term<CR>', { silent = true })
 
 -----------------------------------------------------------------
--- PairGPT
------------------------------------------------------------------
-
-require('pair-gpt').setup()
-
-map('v', '<leader>gw', ':PairGPTWrite<CR>')
-map('v', '<leader>ge', ':PairGPTExplain<CR>')
-map('v', '<leader>gr', ':PairGPTRefactor<CR>')
-
------------------------------------------------------------------
 -- ChatGPT
 -----------------------------------------------------------------
 
@@ -532,9 +522,9 @@ map('n', '<localleader>q', ':call v:lua.floaterm_test_toggle()<CR>')
 -- Projectionist
 -----------------------------------------------------------------
 
-map('n', '<leader>aa', ':A<CR>')
-map('n', '<leader>as', ':AS<CR>')
-map('n', '<leader>av', ':AV<CR>')
+map('n', '<leader>ta', ':A<CR>')
+map('n', '<leader>ts', ':AS<CR>')
+map('n', '<leader>tv', ':AV<CR>')
 
 -----------------------------------------------------------------
 -- TermFind
@@ -616,5 +606,11 @@ map('i', '<C-F>', 'copilot#Accept("\\<CR>")', {
 unmap('i', '<C-]>') -- originally <Plug>(copilot-dismiss)
 
 map('i', '<M-Space>', '<Plug>(copilot-dismiss)')
+
+-----------------------------------------------------------------
+-- Avante
+-----------------------------------------------------------------
+
+require('avante_lib').load()
 
 -- LuaFormatter on

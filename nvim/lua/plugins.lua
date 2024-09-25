@@ -145,11 +145,6 @@ require("lazy").setup({
   'github/copilot.vim',
 
   {
-    'naps62/pair-gpt.nvim',
-    build = 'cargo install --git https://github.com/naps62/pair-gpt.nvim',
-  },
-
-  {
     "jackMort/ChatGPT.nvim",
       event = "VeryLazy",
       config = function()
@@ -161,6 +156,44 @@ require("lazy").setup({
         "folke/trouble.nvim",
         "nvim-telescope/telescope.nvim"
       }
+  },
+  {
+    "yetone/avante.nvim",
+    event = "VeryLazy",
+    lazy = false,
+    opts = {
+      provider="copilot",
+      auto_suggestions_provider = "copilot"
+    },
+    build = "make", -- to build from source: `make BUILD_FROM_SOURCE=true`
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      "stevearc/dressing.nvim",
+      "nvim-lua/plenary.nvim",
+      "MunifTanjim/nui.nvim",
+      "nvim-tree/nvim-web-devicons",
+      "zbirenbaum/copilot.lua",
+      {
+        "HakonHarnes/img-clip.nvim",
+        event = "VeryLazy",
+        opts = {
+          default = {
+            embed_image_as_base64 = false,
+            prompt_for_file_name = false,
+            drag_and_drop = {
+              insert_mode = true,
+            },
+          },
+        },
+      },
+      {
+        'MeanderingProgrammer/render-markdown.nvim',
+        opts = {
+          file_types = { "markdown", "Avante" },
+        },
+        ft = { "markdown", "Avante" },
+      },
+    },
   },
 
   -- LSP + COQ & Treesitter
@@ -219,7 +252,6 @@ require("lazy").setup({
   'theHamsta/nvim-dap-virtual-text',
   'lukas-reineke/lsp-format.nvim',
   { "folke/trouble.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
-
   {
     "folke/which-key.nvim",
     event = "VeryLazy",
