@@ -14,5 +14,7 @@
     "workbench.colorTheme": "Catppuccin Mocha",
     "workbench.activityBar.orientation": "vertical",
     "catppuccin.italicKeywords": false,
-    "editor.fontFamily": "FiraCode Nerd Font Mono, Menlo, Monaco, 'Courier New', monospace"
+    "editor.fontFamily": "FiraCode Nerd Font Mono, Menlo, Monaco, 'Courier New', monospace",
+    "elixirLS.fetchDeps": true,
+    "elixirLS.languageServerOverridePath": "$HOME/.local/share/nvim/lazy/elixir-ls/dist"
 }
