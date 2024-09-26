@@ -4,6 +4,7 @@ alias v="nvim"
 alias vim="nvim"
 alias vi="command vim"
 alias ireallywantvi="command vi"
+alias cs="cursor"
 
 alias ta="tmux attach"
 alias tls="tmux list-sessions"
@@ -36,7 +37,7 @@ alias ..3="cd ../../.."
 alias ..4="cd ../../../.."
 alias ..5="cd ../../../../.."
 
-alias wttr="curl wttr.in/~Braga+Portugal"
+alias wttr="curl wttr.in/~Porto+Portugal"
 alias yeahillhavetheuhhh="brew install"
 
 alias octave='/usr/local/octave/3.8.0/bin/octave-3.8.0'
