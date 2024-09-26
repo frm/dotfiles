@@ -83,7 +83,7 @@
     {
         "key": "ctrl+h",
         "command": "workbench.action.focusLastEditorGroup",
-        "when": "terminalChatFocus"
+        "when": "activeAIChatEditor"
     },
     // movement in menus
     {
@@ -110,6 +110,28 @@
         "key": "ctrl+k",
         "command": "selectPrevSuggestion",
         "when": "suggestWidgetMultipleSuggestions"
+    },
+    {
+        "key": "ctrl+j",
+        "command": "runCommands",
+        "when": "searchViewletFocus",
+        "args": {
+            "commands": [
+                "search.action.focusSearchList",
+                "list.focusDown",
+            ]
+        }
+    },
+    {
+        "key": "ctrl+k",
+        "command": "runCommands",
+        "when": "searchViewletFocus",
+        "args": {
+            "commands": [
+                "search.action.focusSearchList",
+                "list.focusUp",
+            ]
+        }
     },
     // moving splits
     {
