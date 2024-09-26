@@ -12,6 +12,7 @@
         }
     },
     "workbench.colorTheme": "Catppuccin Mocha",
+    "workbench.activityBar.orientation": "vertical",
     "catppuccin.italicKeywords": false,
     "editor.fontFamily": "FiraCode Nerd Font Mono, Menlo, Monaco, 'Courier New', monospace"
 }

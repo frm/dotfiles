@@ -61,44 +61,29 @@
     // movement
     {
         "key": "ctrl+h",
-        "command": "workbench.action.focusLeftGroup",
-        "when": "editorFocus && neovim.mode != insert"
+        "command": "workbench.action.navigateLeft",
+        // "when": "editorFocus && neovim.mode != insert"
     },
     {
         "key": "ctrl+l",
-        "command": "workbench.action.focusRightGroup",
-        "when": "editorFocus && neovim.mode != insert"
+        "command": "workbench.action.navigateRight",
+        // "when": "editorFocus && neovim.mode != insert"
     },
     {
         "key": "ctrl+j",
-        "command": "workbench.action.focusBelowGroup",
-        "when": "editorFocus && neovim.mode != insert"
+        "command": "workbench.action.navigateDown",
+        // "when": "editorFocus && neovim.mode != insert"
     },
     {
         "key": "ctrl+k",
-        "command": "workbench.action.focusAboveGroup",
-        "when": "editorFocus && neovim.mode != insert"
+        "command": "workbench.action.navigateUp",
+        // "when": "editorFocus && neovim.mode != insert"
     },
-    // if we're the bottom pane in a horizontal split, go to terminal
-    // note: not working if we're not the last pane in a vertical split
-    {
-        "key": "ctrl+j",
-        "command": "workbench.action.terminal.focus",
-        "when": "editorFocus && neovim.mode != insert && terminal.active && ((multipleEditorGroups && activeEditorIsLastInGroup) || !multipleEditorGroups)"
-    },
-    // go to the sidebar if we're the leftmost editor
-    // note: not working
+    // TODO: this is not working
     {
         "key": "ctrl+h",
-        "command": "workbench.view.explorer",
-        "when": "editorFocus && neovim.mode != insert && activeEditorGroupIndex == 0 && explorerViewletVisible"
-    },
-    // go to the chat if we're the rightmost editor
-    // note: not working
-    {
-        "key": "ctrl+l",
-        "command": "chat.action.focus",
-        "when": "editorFocus && neovim.mode != insert && activeEditorIsLastInGroup && chatIsEnabled"
+        "command": "workbench.action.focusLastEditorGroup",
+        "when": "terminalChatFocus"
     },
     // movement in menus
     {
