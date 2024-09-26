@@ -242,20 +242,20 @@ l() {
   fi
 }
 
-cs() {
+cn() {
   if [ -f bin/console ]; then
     bin/console
   elif [ -f mix.exs ]; then
-    _mnds_pp_info "cs" "starting iex console..."
+    _mnds_pp_info "cn" "starting iex console..."
     iex -S mix
   elif [ -f Gemfile ]; then
-    _mnds_pp_info "cs" "starting pry console..."
+    _mnds_pp_info "cn" "starting pry console..."
     pry
   elif [ -f package.json ]; then
-    _mnds_pp_info "cs" "running node console..."
+    _mnds_pp_info "cn" "running node console..."
     node
   else
-    _mnds_pp_error "cs" "no console found"
+    _mnds_pp_error "cn" "no console found"
     return 1
   fi
 }

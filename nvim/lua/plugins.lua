@@ -238,7 +238,6 @@ require("lazy").setup({
 
   'dgagn/diagflow.nvim',
 
-
   { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' },
 
   'williamboman/mason.nvim',

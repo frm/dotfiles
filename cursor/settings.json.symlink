@@ -1,0 +1,17 @@
+{
+    "window.commandCenter": 1,
+    "editor.accessibilitySupport": "off",
+    "editor.formatOnSave": true,
+    "diffEditor.codeLens": true,
+    "extensions.experimental.affinity": {
+        "asvetliakov.vscode-neovim": 1
+    },
+    "vscode-neovim.compositeKeys": {
+        "jk": {
+            "command": "vscode-neovim.escape"
+        }
+    },
+    "workbench.colorTheme": "Catppuccin Mocha",
+    "catppuccin.italicKeywords": false,
+    "editor.fontFamily": "FiraCode Nerd Font Mono, Menlo, Monaco, 'Courier New', monospace"
+}
