@@ -522,9 +522,9 @@ map('n', '<localleader>q', ':call v:lua.floaterm_test_toggle()<CR>')
 -- Projectionist
 -----------------------------------------------------------------
 
-map('n', '<leader>ta', ':A<CR>')
-map('n', '<leader>ts', ':AS<CR>')
-map('n', '<leader>tv', ':AV<CR>')
+map('n', '<leader>aa', ':A<CR>')
+map('n', '<leader>as', ':AS<CR>')
+map('n', '<leader>av', ':AV<CR>')
 
 -----------------------------------------------------------------
 -- TermFind
@@ -612,5 +612,7 @@ map('i', '<M-Space>', '<Plug>(copilot-dismiss)')
 -----------------------------------------------------------------
 
 require('avante_lib').load()
+
+map('n', '<leader>l', '<Plug>(AvanteAsk)')
 
 -- LuaFormatter on
