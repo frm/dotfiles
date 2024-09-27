@@ -48,7 +48,7 @@
     },
     {
         "key": "ctrl+v",
-        "command": "explorer.openToSide",
+        "command": "workbench.action.alternativeAcceptSelectedQuickOpenItem",
         "when": "inQuickOpen",
     },
     // not working, missing the currently selected file
