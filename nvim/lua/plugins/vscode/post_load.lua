@@ -1,3 +1,8 @@
+local function map(mode, combo, mapping, opts)
+    local options = merge({noremap = true}, opts or {})
+    vim.api.nvim_set_keymap(mode, combo, mapping, options)
+end
+
 -----------------------------------------------------------------
 -- Hop
 -----------------------------------------------------------------
