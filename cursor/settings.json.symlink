@@ -1,8 +1,15 @@
 {
-    "window.commandCenter": 1,
-    "editor.accessibilitySupport": "off",
-    "editor.formatOnSave": true,
     "diffEditor.codeLens": true,
+    "editor.accessibilitySupport": "off",
+    "editor.fontFamily": "FiraCode Nerd Font Mono, Menlo, Monaco, 'Courier New', monospace",
+    "editor.formatOnSave": true,
+    "files.insertFinalNewline": true,
+    "window.commandCenter": true,
+    "workbench.activityBar.orientation": "vertical",
+    "workbench.colorTheme": "Catppuccin Mocha",
+    // colours
+    "catppuccin.italicKeywords": false,
+    // neovim integration
     "extensions.experimental.affinity": {
         "asvetliakov.vscode-neovim": 1
     },
@@ -11,12 +18,10 @@
             "command": "vscode-neovim.escape"
         }
     },
-    "workbench.colorTheme": "Catppuccin Mocha",
-    "workbench.activityBar.orientation": "vertical",
-    "catppuccin.italicKeywords": false,
-    "editor.fontFamily": "FiraCode Nerd Font Mono, Menlo, Monaco, 'Courier New', monospace",
+    // elixirLS
     "elixirLS.fetchDeps": true,
     "elixirLS.languageServerOverridePath": "$HOME/.local/share/nvim/lazy/elixir-ls/dist",
+    // projectManager
     "projectManager.git.baseFolders": [
         "~/Developer"
     ],
