@@ -2,7 +2,7 @@ ruby 3.3.0
 erlang 26.2.5
 elixir 1.17.1-otp-26
 nodejs 20.9.0
-rust nightly
+rust stable
 python 3.9.9
 golang 1.18
 postgres 16.0
