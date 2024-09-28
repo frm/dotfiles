@@ -36,7 +36,7 @@
         "command": "vscode-neovim.send",
         "when": "editorTextFocus && neovim.mode != insert",
         "args": ":noh<CR>",
-    }
+    },
     // splits
     {
         "key": "ctrl+a s",
@@ -158,7 +158,8 @@
     {
         "key": "space n",
         "command": "workbench.view.explorer",
-        "when": "editorTextFocus && neovim.mode != insert"
+        // allow shortcut in blank slate after :qa
+        "when": "(editorTextFocus && neovim.mode != insert) || !editorIsOpen"
     },
     {
         "key": "space n",
@@ -167,7 +168,8 @@
     },
     {
         "key": "space shift+n",
-        "command": "workbench.files.action.showActiveFileInExplorer"
+        "command": "workbench.files.action.showActiveFileInExplorer",
+        "when": "editorTextFocus && neovim.mode != insert"
     },
     {
         "key": "ctrl+l",
