@@ -1,0 +1,16 @@
+{
+    "*.js": {
+        "alternate": [
+            "{dirname}/__test__/{basename}.test.js",
+            "{}.test.js"
+        ]
+    },
+    "*.jsx": {
+        "alternate": [
+            "{dirname}/__test__/{basename}.test.jsx",
+            "{dirname}/__test__/{basename}.test.js",
+            "{}.test.jsx",
+            "{}.test.js"
+        ]
+    }
+}

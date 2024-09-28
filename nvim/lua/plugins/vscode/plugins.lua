@@ -15,7 +15,6 @@ require("lazy").setup({
   { 'phaazon/hop.nvim', config = function() require('hop').setup() end },
 
   -- Functionality
-  'tpope/vim-projectionist',
   'kristijanhusak/any-jump.vim',
   'tpope/vim-abolish',
   'tpope/vim-surround',

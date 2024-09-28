@@ -1,7 +1,4 @@
-local function map(mode, combo, mapping, opts)
-    local options = merge({noremap = true}, opts or {})
-    vim.api.nvim_set_keymap(mode, combo, mapping, options)
-end
+-- LuaFormatter off
 
 -----------------------------------------------------------------
 -- Hop
@@ -31,10 +28,4 @@ vim.keymap.set('', 'T', function()
   hop.hint_char1({ direction = directions.BEFORE_CURSOR, current_line_only = true, hint_offset = 1 })
 end, { remap=true })
 
------------------------------------------------------------------
--- Projectionist
------------------------------------------------------------------
-
-map('n', '<leader>aa', ':A<CR>')
-map('n', '<leader>as', ':AS<CR>')
-map('n', '<leader>av', ':AV<CR>')
+-- LuaFormatter on

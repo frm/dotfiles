@@ -1,0 +1,107 @@
+#!/usr/bin/env zsh
+
+set -e
+
+local projections_dir="$DOTFILES/vscode/projections"
+local languages=()
+
+function ensure_git_repo() {
+    if [[ ! -d ".git" ]]; then
+        echo "Not a git repository"
+        exit 1
+    fi
+}
+
+function ensure_projections_file() {
+    if [[ -f ".projections.json" ]]; then
+        if [[ "$1" != "-f" ]]; then
+            echo "Projections file already exists, use -f to overwrite"
+            exit 1
+        else
+            rm ".projections.json"
+        fi
+    fi
+
+    touch ".projections.json"
+}
+
+function detect_project_types() {
+    # keep these separate if-clauses so we can use multi-language projects
+    if [[ -f package.json ]]; then
+        languages+="javascript"
+        languages+="typescript"
+    fi
+
+    if [[ -f Gemfile ]]; then
+        languages="ruby"
+    fi
+    
+    if [[ -f "mix.exs" ]]; then
+        languages+="elixir"
+        # disabled for now, trying out the default projections of
+        # vscode-alternate-file
+        #
+        # if [[ -d "apps" ]]; then
+        #     languages+="elixir-umbrella"
+        # fi
+    fi
+}
+
+function generate_elixir_umbrella_projections() {
+    local projections=()
+
+    for app in $(ls apps); do
+        projections+=("{
+            \"apps/$app/lib/*.ex\": {
+                \"skeleton\": \"mod\",
+                \"alternate\": \"apps/$app/test/{}_test.exs\"
+            }
+        }")
+
+        projections+=("{
+            \"apps/$app/test/*_test.exs\": {
+                \"skeleton\": \"case\",
+                \"alternate\": \"apps/$app/lib/{}.ex\"
+            }
+        }")
+    done
+    
+    echo $projections | jq -s add
+}
+
+function generate_projections_file() {
+    echo "Generating projections file..."
+    
+    local projections=()
+
+    for language in "${languages[@]}"; do
+        case "$language" in
+            "elixir-umbrella")
+                echo "Generating elixir umbrella projections..."
+    
+                projections+=($(generate_elixir_umbrella_projections))
+                ;;
+            *)
+                echo "Adding projections for $language..."
+
+                projections+=($(cat "$projections_dir/$language.json"))
+                ;;
+        esac
+    done
+
+    local projections_json=$(echo $projections | jq -s add)
+
+    echo $projections_json > .projections.json
+}
+
+function main() {
+    ensure_git_repo
+
+    detect_project_types
+    
+    ensure_projections_file "$1"
+     
+    generate_projections_file
+}
+
+main $@
