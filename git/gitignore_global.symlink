@@ -67,3 +67,6 @@ Temporary Items
 
 # terraform
 .terraform
+
+# projectionist
+.projections.json

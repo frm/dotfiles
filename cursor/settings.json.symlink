@@ -25,4 +25,5 @@
     "projectManager.git.baseFolders": [
         "~/Developer"
     ],
+    "git.openRepositoryInParentFolders": "never",
 }

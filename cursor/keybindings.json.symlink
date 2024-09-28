@@ -27,7 +27,7 @@
     },
     {
         "key": "escape",
-        "command": "workbench.action.focusLastEditorGroup",
+        "command": "workbench.action.focusActiveEditorGroup",
         "when": "searchViewletFocus"
     },
     // run :noh
@@ -62,27 +62,23 @@
     {
         "key": "ctrl+h",
         "command": "workbench.action.navigateLeft",
-        // "when": "editorFocus && neovim.mode != insert"
     },
     {
         "key": "ctrl+l",
         "command": "workbench.action.navigateRight",
-        // "when": "editorFocus && neovim.mode != insert"
     },
     {
         "key": "ctrl+j",
         "command": "workbench.action.navigateDown",
-        // "when": "editorFocus && neovim.mode != insert"
     },
     {
         "key": "ctrl+k",
         "command": "workbench.action.navigateUp",
-        // "when": "editorFocus && neovim.mode != insert"
     },
     // TODO: this is not working
     {
         "key": "ctrl+h",
-        "command": "workbench.action.focusLastEditorGroup",
+        "command": "workbench.action.focusActiveEditorGroup",
         "when": "activeAIChatEditor"
     },
     // movement in menus
@@ -160,27 +156,27 @@
         "command": "workbench.action.toggleSidebarVisibility"
     },
     {
-        "key": "ctrl+shift+n",
-        "command": "workbench.view.explorer"
-    },
-    {
         "key": "space n",
         "command": "workbench.view.explorer",
         "when": "editorTextFocus && neovim.mode != insert"
     },
     {
         "key": "space n",
-        "command": "workbench.action.focusLastEditorGroup",
+        "command": "workbench.action.focusActiveEditorGroup",
         "when": "explorerViewletFocus"
     },
     {
+        "key": "space shift+n",
+        "command": "workbench.files.action.showActiveFileInExplorer"
+    },
+    {
         "key": "ctrl+l",
-        "command": "workbench.action.focusLastEditorGroup",
+        "command": "workbench.action.focusActiveEditorGroup",
         "when": "sideBarFocus"
     },
     {
         "key": "ctrl+l",
-        "command": "workbench.action.focusLastEditorGroup",
+        "command": "workbench.action.focusActiveEditorGroup",
         "when": "filesExplorerFocus"
     },
     // terminal control: splits
@@ -243,9 +239,20 @@
     },
     // bind to vim plugins
     {
-        "key": "f s",
+        "key": ", f s",
         "command": "vscode-neovim.send",
         "when": "editorTextFocus && neovim.mode != insert",
         "args": ":HopChar1<CR>"
+    },
+    // projectionist/vscode-alternate-alternate-file
+    {
+        "key": "space a a",
+        "command": "alternateFile.alternateFile",
+        "when": "editorTextFocus && neovim.mode != insert",
+    },
+    {
+        "key": "space a v",
+        "command": "alternateFile.alternateFileInSplit",
+        "when": "editorTextFocus && neovim.mode != insert",
     }
 ]

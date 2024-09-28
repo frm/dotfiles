@@ -1,0 +1,21 @@
+{
+    "lib/*.ex": {
+        "skeleton": "mod",
+        "alternate": "test/{}_test.exs"
+    },
+    "test/*_test.exs": {
+        "alternate": "lib/{}.ex",
+        "skeleton": "case"
+    },
+    "assets/js/*.js": {
+        "alternate": "test/js/{}_test.js"
+    },
+    "apps/**/lib/**/*.ex": {
+        "alternate": "apps/{dirname}/test/{dirname}/{basename}_test.exs",
+        "skeleton": "mod"
+    },
+    "apps/**/test/**/*_test.exs": {
+        "alternate": "apps/{dirname}/lib/{dirname}/{basename}.ex",
+        "skeleton": "case"
+    }
+}
