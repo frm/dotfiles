@@ -20,6 +20,7 @@ source $DOTFILES/git/init.zsh
 
 source $DOTFILES/asdf/asdf.init
 source $DOTFILES/bat/bat.init
+source $DOTFILES/cheat/cheat.init
 # source $DOTFILES/broot/broot.init
 source $DOTFILES/starship/starship.init
 
