@@ -1,28 +1,69 @@
 #!/usr/bin/env zsh
 
-ci_result() {
+source $DOTFILES/functions/helpers.zsh
+
+CREEPY_VOICES=("Albert" "Bahh" "Boing" "Bubbles" "Wobble" "Jester")
+FRIENDLY_VOICES=("Bad News" "Bells" "Cellos" "Good News" "Organ" "Superstar" "Zarvox" "Trinoids")
+
+function ci_result() {
   _result=$(ci-wait)
 
   case $? in
     0)
-      msg="passed"
+      msg="has passed"
       ;;
     1)
-      msg="failed"
+      msg="has failed"
       ;;
     2)
-      msg="not running"
+      msg="is not running"
       ;;
   esac
 
   echo $msg
 }
 
-notify_of() {
+function notify_of() {
   osascript -e "display notification \"CI $1\" with title \"CI $1\""
 }
 
-msg=$(ci_result)
+function say_with_mood() {
+  local mood="$1"
+  local msg="$2"
+  local voice_idx=""
+  local voice=""
 
-notify_of $msg
-say "CI $msg"
+  if [[ "$mood" == "friendly" ]]; then
+    voice_idx=$((1 + ((RANDOM % ${#FRIENDLY_VOICES[@]}))))
+    voice=${FRIENDLY_VOICES[$voice_idx]}
+  elif [[ "$mood" == "creepy" ]]; then
+    voice_idx=$((1 + ((RANDOM % ${#CREEPY_VOICES[@]}))))
+    voice=${CREEPY_VOICES[$voice_idx]}
+  fi
+
+  _mnds_pp_info "ci-notify" "(in a $mood voice) $msg"
+  say -v $voice $msg
+}
+
+function main() {
+  local mood="$1"
+
+  if [[ "$mood" == "creepy" ]]; then
+    echo "using creepy mood..."
+  fi
+
+  local suffix=$(ci_result)
+  local msg="The build $suffix. I repeat, the build $suffix."
+
+  # notify_of "$msg"
+  say_with_mood "$mood" "$msg"
+}
+
+case $1 in
+  -c|--creepy)
+    main "creepy"
+    ;;
+  *)
+    main "friendly"
+    ;;
+esac
