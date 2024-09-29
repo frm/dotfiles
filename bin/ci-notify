@@ -5,9 +5,7 @@ source $DOTFILES/functions/helpers.zsh
 CREEPY_VOICES=("Albert" "Bahh" "Boing" "Bubbles" "Wobble" "Jester")
 FRIENDLY_VOICES=("Bad News" "Bells" "Cellos" "Good News" "Organ" "Superstar" "Zarvox" "Trinoids")
 
-function ci_result() {
-  _result=$(ci-wait)
-
+function determine_msg_suffix() {
   case $? in
     0)
       msg="has passed"
@@ -49,10 +47,12 @@ function main() {
   local mood="$1"
 
   if [[ "$mood" == "creepy" ]]; then
-    echo "using creepy mood..."
+    _mnds_pp_neutral "ci-notify" "running in creepy mood..."
   fi
 
-  local suffix=$(ci_result)
+  ci-wait
+
+  local suffix=$(determine_msg_suffix)
   local msg="The build $suffix. I repeat, the build $suffix."
 
   # notify_of "$msg"
