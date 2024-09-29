@@ -1,3 +1,7 @@
 [submodule "zsh/zsh-autopair"]
   path = zsh/zsh-autopair
   url = https://github.com/hlissner/zsh-autopair.git
+
+[submodule "cheat/cheatsheet"]
+  path = cheat/cheatsheets/community
+  url = https://github.com/cheat/cheatsheets.git

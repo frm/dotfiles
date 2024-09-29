@@ -6,11 +6,11 @@ colorize: true
 # Which 'chroma' colorscheme should be applied to the output?
 # Options are available here:
 #   https://github.com/alecthomas/chroma/tree/master/styles
-style: monokai
+style: catppuccin-mocha
 
 # Which 'chroma' "formatter" should be applied?
 # One of: "terminal", "terminal256", "terminal16m"
-formatter: terminal16m
+formatter: terminal256
 
 # Through which pager should output be piped? (Unset this key for no pager.)
 pager: less -FRX
@@ -45,14 +45,14 @@ cheatpaths:
   # Once downloaded, ensure that 'path' below points to the location at which
   # you downloaded the community cheatsheets.
   - name: community
-    path: /Users/frm/.config/cheat/cheatsheets/community
+    path: /Users/frm/.dotfiles/cheat/cheatsheets/community
     tags: [ community ]
     readonly: true
 
   # If you have personalized cheatsheets, list them last. They will take
   # precedence over the more global cheatsheets.
   - name: personal
-    path: /Users/frm/.config/cheat/cheatsheets/personal
+    path: /Users/frm/.dotfiles/cheat/cheatsheets/personal
     tags: [ personal ]
     readonly: false
 
