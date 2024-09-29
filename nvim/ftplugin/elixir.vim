@@ -9,12 +9,12 @@ function! AddUmbrellaProjections()
 
     for l:app in l:apps
       let l:projections[l:app . '/lib/*.ex'] = {
-            \ "skeleton": "mod",
+            \ "skeleton": "defm",
             \ "alternate": l:app . "/test/{}_test.exs"
             \ }
 
       let l:projections[l:app . '/test/*_test.exs'] = {
-            \ "skeleton": "mod",
+            \ "skeleton": "deft",
             \ "alternate": l:app . "/lib/{}.ex"
             \ }
     endfor
@@ -31,14 +31,14 @@ function! GenerateProjectionsJSON()
 
     for l:app in l:apps
       let l:entry = '"' . l:app . '/lib/*.ex": {
-            \  "skeleton": "mod",
+            \  "skeleton": "defm",
             \  "alternate": "' . l:app . '/test/{}_test.exs"
             \}'
 
       call add(l:projections, l:entry)
 
       let l:entry = '"' . l:app . '/test/*_.exs": {
-            \  "skeleton": "mod",
+            \  "skeleton": "deft",
             \  "alternate": "' . l:app . '/lib/{}.ex"
             \}'
     endfor
@@ -53,12 +53,12 @@ autocmd User ProjectionistDetect
 \ call projectionist#append(getcwd(),
 \ {
 \    'lib/*.ex':  {
-\       'skeleton': 'mod',
+\       'skeleton': 'defm',
 \       'alternate': 'test/{}_test.exs'
 \    },
 \    'test/*_test.exs':  {
 \      'alternate': 'lib/{}.ex',
-\      'skeleton': 'case'
+\      'skeleton': 'deft'
 \     },
 \ })
 

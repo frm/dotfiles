@@ -137,7 +137,7 @@ require("lazy").setup({
     'elixir-lsp/elixir-ls',
     build =  'MIX_ENV=prod mix deps.get && MIX_ENV=prod mix compile && MIX_ENV=prod mix elixir_ls.release2 -o dist',
   },
-
+  'lucidstack/hex.vim',
   'tjdevries/nlua.nvim',
 
   -- AI Pair programming
@@ -250,7 +250,44 @@ require("lazy").setup({
   'rcarriga/nvim-dap-ui',
   'theHamsta/nvim-dap-virtual-text',
   'lukas-reineke/lsp-format.nvim',
-  { "folke/trouble.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
+  {
+    "folke/trouble.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    cmd = "Trouble",
+    keys = {
+      {
+        "<leader>xx",
+        "<cmd>Trouble diagnostics toggle<cr>",
+        desc = "Diagnostics (Trouble)",
+      },
+      {
+        "<localleader>xx",
+        "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
+        desc = "Buffer Diagnostics (Trouble)",
+      },
+      {
+        "<localleader>xl",
+        "<cmd>Trouble diagnostics toggle filter.buf=0 focus=false win.position=right<cr>",
+        desc = "Buffer Diagnostics on the right (Trouble)",
+      },
+      {
+        "<leader>xl",
+        "<cmd>Trouble diagnostics toggle focus=false win.position=right<cr>",
+        desc = "Diagnostics on the right (Trouble)",
+      },
+      {
+        "<leader>xs",
+        "<cmd>Trouble symbols toggle focus=false<cr>",
+        desc = "Symbols (Trouble)",
+      },
+      {
+        "<localleader>xs",
+        "<cmd>Trouble symbols toggle filter.buf=0 focus=false<cr>",
+        desc = "Buffer Symbols (Trouble)",
+      },
+    },
+    opts={},
+  },
   {
     "folke/which-key.nvim",
     event = "VeryLazy",
