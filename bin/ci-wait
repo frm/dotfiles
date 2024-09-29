@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 # configurable definitions
-CI_WAIT_PERIOD=${CI_WAIT_PERIOD:-2}
+CI_WAIT_PERIOD=${CI_WAIT_PERIOD:-4}
 
 # global variables for a closure in TRAPUSR1
 CI_PASSED=0
@@ -14,6 +14,10 @@ function TRAPUSR1() {
   wait $ASYNC_PROC
   CI_STATUS=$?
   CI_PASSED=1
+}
+
+function ci_is_setup() {
+  [[ $(gh pr status --json state -q '.currentBranch') != "" ]]
 }
 
 function status_rollup() {
@@ -45,7 +49,19 @@ function ci_status() {
   fi
 }
 
+# return codes:
+# 0: CI passed
+# 1: CI run failed
+# 2: CI is not running
+# 3: CI is not setup
+# 4: Unknown status
+
 function check_ci() {
+  if ! ci_is_setup; then
+    kill -s USR1 $$
+    exit 3
+  fi
+
   local current_status=$(ci_status)
 
   while [[ $current_status == "pending" ]]; do
@@ -55,16 +71,22 @@ function check_ci() {
 
   kill -s USR1 $$
 
-  # 0: CI passed
-  # 2: no CI running
-  # 1: Failed for any other reason
-  if [[ $current_status == "success" ]]; then
-    exit 0
-  elif [[ $current_status == "no status" ]]; then
-    exit 2
-  else
-    exit 1
-  fi
+  case $current_status in
+    "success")
+      exit 0
+      ;;
+    "failure")
+      exit 1
+      ;;
+    "no status")
+      _mnds_pp_warn "ci-wait" "CI is not running"
+      exit 2
+      ;;
+    *)
+      _mnds_pp_error "ci-wait" "Unknown CI status"
+      exit 4
+      ;;
+  esac
 }
 
 function print_loader() {
@@ -92,13 +114,23 @@ function main() {
 
   clear_line
 
-  if [ $CI_STATUS -eq 0 ]; then
-    _mnds_pp_success "ci-wait" "✓"
-  elif [ $CI_STATUS -eq 2 ]; then
-    _mnds_pp_info "ci-wait" "ci not running"
-  else
-    _mnds_pp_error "ci-wait" "✗"
-  fi
+  case $CI_STATUS in
+    0)
+      _mnds_pp_success "ci-wait" "✓"
+      ;;
+    1)
+      _mnds_pp_error "ci-wait" "✗"
+      ;;
+    2)
+      _mnds_pp_info "ci-wait" "CI is not running"
+      ;;
+    3)
+      _mnds_pp_warn "ci-wait" "CI is not setup"
+      ;;
+    4)
+      _mnds_pp_error "ci-wait" "unknown status"
+      ;;
+  esac
 
   exit $CI_STATUS
 }
