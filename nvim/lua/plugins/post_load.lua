@@ -276,6 +276,9 @@ vim.opt.grepprg="rg --vimgrep --color=always --no-heading"
 -- require("lualine/evil")
 require("lualine/bubbles")
 require("lualine").setup({
+  options = {
+    theme = "catppuccin-" .. os.getenv("CATPPUCCIN_VARIANT"),
+  },
   sections = {
     lualine_x = { "aerial" }
   },
