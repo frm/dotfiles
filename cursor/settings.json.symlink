@@ -26,4 +26,5 @@
         "~/Developer"
     ],
     "git.openRepositoryInParentFolders": "never",
+    "cursor.chat.smoothStreaming": true,
 }

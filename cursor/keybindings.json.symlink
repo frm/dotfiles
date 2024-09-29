@@ -159,7 +159,7 @@
         "key": "space n",
         "command": "workbench.view.explorer",
         // allow shortcut in blank slate after :qa
-        "when": "(editorTextFocus && neovim.mode != insert) || !editorIsOpen"
+        "when": "(editorTextFocus && neovim.mode != insert) || (!editorIsOpen && terminal.active)"
     },
     {
         "key": "space n",
@@ -220,7 +220,7 @@
         "when": "editorTextFocus && neovim.mode != insert"
     },
     {
-        "key": ", f",
+        "key": ", f f",
         "command": "testing.runCurrentFile",
         "when": "editorTextFocus && neovim.mode != insert"
     },
@@ -249,12 +249,12 @@
     // projectionist/vscode-alternate-alternate-file
     {
         "key": "space a a",
-        "command": "alternateFile.alternateFile",
+        "command": "alternateFile.createAlternateFile",
         "when": "editorTextFocus && neovim.mode != insert",
     },
     {
         "key": "space a v",
-        "command": "alternateFile.alternateFileInSplit",
+        "command": "alternateFile.createAlternateFileInSplit",
         "when": "editorTextFocus && neovim.mode != insert",
     }
 ]
