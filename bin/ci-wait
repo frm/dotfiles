@@ -1,30 +1,32 @@
 #!/usr/bin/env zsh
 
-SUCCESS_MSG="✓"
-FAILURE_MSG="✗"
-NO_CI_MSG="none running."
+# configurable definitions
+CI_WAIT_PERIOD=${CI_WAIT_PERIOD:-2}
 
-PREFIX_MSG="[ci]:"
-WAITING_MSG="waiting..."
-CAR_RET=${#WAITING_MSG}
-
-CI_WAIT_SEC=2
-
+# global variables for a closure in TRAPUSR1
 CI_PASSED=0
 CI_STATUS=0
 ASYNC_PROC=0
 
+source $DOTFILES/functions/helpers.zsh
+
+function TRAPUSR1() {
+  wait $ASYNC_PROC
+  CI_STATUS=$?
+  CI_PASSED=1
+}
+
 function status_rollup() {
   gh pr status \
     --json statusCheckRollup \
-    -q '.currentBranch.statusCheckRollup.[].status' \
+    -q '.currentBranch.statusCheckRollup.[].status' 2>/dev/null \
     | uniq
 }
 
 function conclusion_rollup() {
   gh pr status \
     --json statusCheckRollup \
-    -q '.currentBranch.statusCheckRollup.[].conclusion' \
+    -q '.currentBranch.statusCheckRollup.[].conclusion' 2> /dev/null \
     | uniq
 }
 
@@ -47,7 +49,7 @@ function check_ci() {
   local current_status=$(ci_status)
 
   while [[ $current_status == "pending" ]]; do
-    sleep $CI_WAIT_SEC
+    sleep $CI_WAIT_PERIOD
     current_status=$(ci_status)
   done
 
@@ -65,58 +67,40 @@ function check_ci() {
   fi
 }
 
-function TRAPUSR1() {
-  wait $ASYNC_PROC
-  CI_STATUS=$?
-  CI_PASSED=1
-}
+function print_loader() {
+  local spinner=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
+  local bold=$(tput bold)
+  local normal=$(tput sgr0)
 
-function clear_input() {
-  for i in {1..$CAR_RET};
-  do
-    printf "  "
-  done
-}
-
-function spinner_round() {
-  spinner=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
-
-  for spin in "${spinner[@]}";
-  do
-    printf "\r$PREFIX_MSG $spin $WAITING_MSG"
+  for spin in "${spinner[@]}"; do
+    printf "\r${bold}[ci-wait]${normal}: $spin waiting..."
     sleep 0.1
   done
 }
 
-function pretty_print() {
-  printf "\r\e[38;05;$1m$2\e[m"
+function clear_line() {
+  printf "\033[1K\r"
 }
 
-check_ci &
-ASYNC_PROC=$!
+function main() {
+  check_ci &
+  ASYNC_PROC=$!
 
-while [ $CI_PASSED -eq 0 ];
-do
-  spinner_round
-done
+  while [ $CI_PASSED -eq 0 ]; do
+    print_loader
+  done
 
-RED="001"
-GREEN="002"
-YELLOW="003"
-BLUE="004"
+  clear_line
 
-if [ $CI_STATUS -eq 0 ];
-then
-  pretty_print $GREEN "$PREFIX_MSG $SUCCESS_MSG"
-elif [ $CI_STATUS -eq 2 ];
-then
-  pretty_print $BLUE "$PREFIX_MSG $NO_CI_MSG"
-  CI_STATUS=0
-else
-  pretty_print $RED "$PREFIX_MSG $FAILURE_MSG"
-fi
+  if [ $CI_STATUS -eq 0 ]; then
+    _mnds_pp_success "ci-wait" "✓"
+  elif [ $CI_STATUS -eq 2 ]; then
+    _mnds_pp_info "ci-wait" "ci not running"
+  else
+    _mnds_pp_error "ci-wait" "✗"
+  fi
 
-clear_input
-echo ""
+  exit $CI_STATUS
+}
 
-exit $CI_STATUS
+main
