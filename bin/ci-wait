@@ -14,13 +14,41 @@ CI_PASSED=0
 CI_STATUS=0
 ASYNC_PROC=0
 
-function check_ci() {
-  local ci_status=$(hub ci-status)
+function status_rollup() {
+  gh pr status \
+    --json statusCheckRollup \
+    -q '.currentBranch.statusCheckRollup.[].status' \
+    | uniq
+}
 
-  while [[ $ci_status == "pending" ]];
-  do
+function conclusion_rollup() {
+  gh pr status \
+    --json statusCheckRollup \
+    -q '.currentBranch.statusCheckRollup.[].conclusion' \
+    | uniq
+}
+
+function ci_status() {
+  local progress=$(status_rollup)
+  local results=$(conclusion_rollup)
+
+  if [[ $progress =~ "QUEUED" ]] || [[ $progress =~ "IN_PROGRESS" ]]; then
+    echo "pending"
+  elif [[ $progress == "COMPLETED" ]] && [[ $results =~ "FAILURE" ]]; then
+    echo "failure"
+  elif [[ $progress == "COMPLETED" ]] && [[ $results == "SUCCESS" ]]; then
+    echo "success"
+  else
+    echo "no status"
+  fi
+}
+
+function check_ci() {
+  local current_status=$(ci_status)
+
+  while [[ $current_status == "pending" ]]; do
     sleep $CI_WAIT_SEC
-    ci_status=$(hub ci-status)
+    current_status=$(ci_status)
   done
 
   kill -s USR1 $$
@@ -28,11 +56,9 @@ function check_ci() {
   # 0: CI passed
   # 2: no CI running
   # 1: Failed for any other reason
-  if [[ $ci_status == "success" ]];
-  then
+  if [[ $current_status == "success" ]]; then
     exit 0
-  elif [[ $ci_status == "no status" ]];
-  then
+  elif [[ $current_status == "no status" ]]; then
     exit 2
   else
     exit 1
