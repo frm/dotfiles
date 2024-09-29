@@ -1,29 +1,38 @@
 #!/usr/bin/env zsh
 
 # private functions only used by personal scripts
-_COLOR_BLUE='\033[1;34m'
-_COLOR_GREEN='\033[1;32m'
-_COLOR_RED='\033[1;91m'
-_COLOR_RESET='\033[0m'
+export MNDS_FMT_BOLD=`tput bold`
+export MNDS_FMT_RESET=`tput sgr0`
+export MNDS_FMT_RED=`tput setaf 1`
+export MNDS_FMT_GREEN=`tput setaf 2`
+export MNDS_FMT_YELLOW=`tput setaf 3`
+export MNDS_FMT_BLUE=`tput setaf 4`
+export MNDS_FMT_MAGENTA=`tput setaf 5`
+export MNDS_FMT_CYAN=`tput setaf 6`
+export MNDS_FMT_WHITE=`tput setaf 7`
 
 _mnds_pp() {
-  echo "$1[$2]: $3${_COLOR_RESET}"
+  echo "${MNDS_FMT_BOLD}$1[$2]${MNDS_FMT_RESET}$1: $3${MNDS_FMT_RESET}"
 }
 
 _mnds_pp_info() {
-  _mnds_pp $_COLOR_BLUE "$1" "$2"
+  _mnds_pp $MNDS_FMT_BLUE "$1" "$2"
 }
 
 _mnds_pp_success() {
-  _mnds_pp $_COLOR_GREEN "$1" "$2"
+  _mnds_pp $MNDS_FMT_GREEN "$1" "$2"
 }
 
 _mnds_pp_error() {
-  _mnds_pp $_COLOR_RED "$1" "$2"
+  _mnds_pp $MNDS_FMT_RED "$1" "$2"
+}
+
+_mnds_pp_warn() {
+  _mnds_pp $MNDS_FMT_YELLOW "$1" "$2"
 }
 
 _mnds_pp_neutral() {
-  _mnds_pp $_COLOR_RESET "$1" "$2"
+  _mnds_pp $MNDS_FMT_WHITE "$1" "$2"
 }
 
 _mnds_not_installed() {
