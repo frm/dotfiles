@@ -2,6 +2,6 @@
 
 figures=(blowfish bong daemon dragon dragon-and-cow eyes flaming-sheep ghostbusters koala luke-koala meow satanic stegosaurus vader vader-koala default moofasa moose skeleton)
 
-rand=$((1 + ((RANDOM % 8))))
+rand=$((1 + ((RANDOM % ${#figures[@]}))))
 
 cowsay -f ${figures[rand]} $1 | lolcat
