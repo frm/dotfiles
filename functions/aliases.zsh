@@ -27,6 +27,7 @@ alias i="iex"
 alias sleep="pmset displaysleepnow > /dev/null 2>& 1"
 
 alias cht="cheat"
+alias mo="moar --style=catppuccin-mocha --colors=16M --render-unprintable=whitespace --statusbar=plain"
 
 alias reload="source ~/.zshrc"
 alias :q="exit"
