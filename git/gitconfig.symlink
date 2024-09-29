@@ -81,4 +81,5 @@
   mpr = !git-merge-pr
   nk = !git-nuke
   ppr = !git-push-pr
+  rba = !git-auto-rebase
   rbm = !git-rebase-main

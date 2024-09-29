@@ -1,0 +1,33 @@
+#!/usr/bin/env zsh
+
+set -e
+
+source $DOTFILES/functions/helpers.zsh
+
+# Autorebases off of main or -b flag
+
+_git_auto_rebase() {
+  nr_changes=$(git log --left-right --graph --cherry-pick --oneline HEAD..."$1" \
+    | grep '^<' \
+    | wc -l)
+
+  nr_changes=${nr_changes:gs/ /}
+
+  if [ $nr_changes -eq 1 ]; then
+    _mnds_pp_info "git" "fast rebasing off of $1..."
+    GIT_EDITOR="vim -u NONE +wq" git rebase -i "$1"
+    echo ""
+  elif [ $nr_changes -gt 1 ]; then
+    _mnds_pp_info "git" "interactive rebasing off of $1..."
+    git rebase -i "$1"
+    echo ""
+  else
+    _mnds_pp_info "git" "no rebase needed, skipping..."
+  fi
+}
+
+zparseopts -D -E -- b:=destination
+destination=${(@)destination:#-b}
+destination=${destination:-main}
+
+_git_auto_rebase "$destination"
