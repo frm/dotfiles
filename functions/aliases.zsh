@@ -24,7 +24,7 @@ alias y="yarn"
 alias c="cargo"
 alias i="iex"
 
-alias lock="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
+alias sleep="pmset displaysleepnow > /dev/null 2>& 1"
 
 alias cht="cheat"
 
