@@ -20,11 +20,12 @@
     },
     // elixirLS
     "elixirLS.fetchDeps": true,
-    "elixirLS.languageServerOverridePath": "$HOME/.local/share/nvim/lazy/elixir-ls/dist",
+    // "elixirLS.languageServerOverridePath": "$HOME/.local/share/nvim/lazy/elixir-ls/dist",
     // projectManager
     "projectManager.git.baseFolders": [
         "~/Developer"
     ],
     "git.openRepositoryInParentFolders": "never",
     "cursor.chat.smoothStreaming": true,
+    "cursor.general.gitGraphIndexing": "enabled",
 }
