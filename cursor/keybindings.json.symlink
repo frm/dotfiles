@@ -220,7 +220,7 @@
         "when": "editorTextFocus && neovim.mode != insert"
     },
     {
-        "key": ", f f",
+        "key": ", f",
         "command": "testing.runCurrentFile",
         "when": "editorTextFocus && neovim.mode != insert"
     },
@@ -241,7 +241,7 @@
     },
     // bind to vim plugins
     {
-        "key": ", f s",
+        "key": "f s",
         "command": "vscode-neovim.send",
         "when": "editorTextFocus && neovim.mode != insert",
         "args": ":HopChar1<CR>"
