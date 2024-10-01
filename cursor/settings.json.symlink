@@ -1,4 +1,5 @@
 {
+    // editor settings
     "diffEditor.codeLens": true,
     "editor.accessibilitySupport": "off",
     "editor.fontFamily": "FiraCode Nerd Font Mono, Menlo, Monaco, 'Courier New', monospace",
@@ -6,9 +7,13 @@
     "files.insertFinalNewline": true,
     "window.commandCenter": true,
     "workbench.activityBar.orientation": "vertical",
-    "workbench.colorTheme": "Catppuccin Mocha",
+    "git.openRepositoryInParentFolders": "never",
+    // cursor settings
+    "cursor.chat.smoothStreaming": true,
+    "cursor.general.gitGraphIndexing": "enabled",
     // colours
     "catppuccin.italicKeywords": false,
+    "workbench.colorTheme": "Catppuccin Mocha",
     // neovim integration
     "extensions.experimental.affinity": {
         "asvetliakov.vscode-neovim": 1
@@ -16,6 +21,11 @@
     "vscode-neovim.compositeKeys": {
         "jk": {
             "command": "vscode-neovim.escape"
+        },
+        "fs": {
+            "command": "vscode-neovim.send",
+            "when": "editorTextFocus && neovim.mode != insert",
+            "args": ":HopChar1<CR>"
         }
     },
     // elixirLS
@@ -25,7 +35,4 @@
     "projectManager.git.baseFolders": [
         "~/Developer"
     ],
-    "git.openRepositoryInParentFolders": "never",
-    "cursor.chat.smoothStreaming": true,
-    "cursor.general.gitGraphIndexing": "enabled",
 }
