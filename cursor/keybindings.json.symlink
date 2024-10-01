@@ -239,13 +239,6 @@
         "command": "testing.reRunFailTests",
         "when": "editorTextFocus && neovim.mode != insert"
     },
-    // bind to vim plugins
-    {
-        "key": "f s",
-        "command": "vscode-neovim.send",
-        "when": "editorTextFocus && neovim.mode != insert",
-        "args": ":HopChar1<CR>"
-    },
     // projectionist/vscode-alternate-alternate-file
     {
         "key": "space a a",
