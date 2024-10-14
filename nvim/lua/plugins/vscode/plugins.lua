@@ -12,15 +12,18 @@ require("lazy").setup({
   'AndrewRadev/splitjoin.vim',
   'derekprior/vim-trimmer',
   'SirVer/ultisnips',
-  { 'phaazon/hop.nvim', config = function() require('hop').setup() end },
+  {
+     'smoka7/hop.nvim',
+     version = "*",
+     opts = {
+       keys = 'etovxqpdygfblzhckisuran'
+     }
+  },
 
   -- Functionality
   'kristijanhusak/any-jump.vim',
   'tpope/vim-abolish',
   'tpope/vim-surround',
-  'vim-test/vim-test',
-  { 'ahmedkhalf/project.nvim', config = function() require('project_nvim').setup() end },
-  { 'phaazon/hop.nvim', config = function() require('hop').setup() end },
 
   'JoosepAlviste/nvim-ts-context-commentstring',
 
