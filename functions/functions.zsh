@@ -275,3 +275,45 @@ battery_charge_remaining() {
 battery() {
   echo "$(battery_status): $(battery_percentage) ($(battery_charge_remaining) remaining)"
 }
+
+cs_extensions() {
+  case "$1" in
+    "export")
+      shift
+      cs_extensions_export $@
+      ;;
+    "install")
+      cs_extensions_install $@
+      ;;
+    *)
+      pp_error "cs" "invalid subcommand: $1. supported: [export, install]"
+    esac
+}
+
+cs_extensions_export() {
+  local flag=$1
+  local exts=$DOTFILES/cursor/extensions
+
+  if [ -z "$flag" ]; then
+      (cat $exts <(cursor --list-extensions) | sort | uniq) > $ext_file
+      return 0
+  fi
+
+  case "$flag" in
+    -f|--force)
+      cursor --list-extensions > $exts
+      ;;
+    *)
+      pp_error "cs" "invalid flag: $1. supported: [-f, --force]"
+}
+
+cs_extensions_install() {
+  local exts=$DOTFILES/cursor/extensions
+
+  if [ ! -f $exts ]; then
+    pp_error "cs" "no extensions file found"
+    return 1
+  fi
+
+  cat $exts | xargs -L 1 code --install-extension
+}
