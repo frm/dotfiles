@@ -283,10 +283,16 @@ cs_extensions() {
       cs_extensions_export $@
       ;;
     "install")
+      shift
       cs_extensions_install $@
+      ;;
+    "update")
+      shift
+      cs_extensions_update $@
       ;;
     *)
       pp_error "cs" "invalid subcommand: $1. supported: [export, install]"
+      ;;
     esac
 }
 
@@ -295,16 +301,18 @@ cs_extensions_export() {
   local exts=$DOTFILES/cursor/extensions
 
   if [ -z "$flag" ]; then
-      (cat $exts <(cursor --list-extensions) | sort | uniq) > $ext_file
+      (cat $exts <(cursor --list-extensions --show-versions) | sort | uniq) > $exts
       return 0
   fi
 
   case "$flag" in
     -f|--force)
-      cursor --list-extensions > $exts
+      cursor --list-extensions --show-versions > $exts
       ;;
     *)
       pp_error "cs" "invalid flag: $1. supported: [-f, --force]"
+      ;;
+  esac
 }
 
 cs_extensions_install() {
@@ -315,5 +323,9 @@ cs_extensions_install() {
     return 1
   fi
 
-  cat $exts | xargs -L 1 code --install-extension
+  cat $exts | xargs -L 1 cursor --install-extension
+}
+
+cs_extensions_update() {
+  cursor --update-extensions
 }
