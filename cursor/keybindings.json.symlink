@@ -37,6 +37,11 @@
         "when": "editorTextFocus && neovim.mode != insert",
         "args": ":noh<CR>",
     },
+    {
+        "key": "shift+cmd+backspace",
+        "command": "notifications.clearAll",
+        "when": "terminalFocus || editorFocus"
+    },
     // splits
     {
         "key": "ctrl+a s",
@@ -51,7 +56,7 @@
         "command": "workbench.action.alternativeAcceptSelectedQuickOpenItem",
         "when": "inQuickOpen",
     },
-    // not working, missing the currently selected file
+    // TODO: not working, missing the currently selected file
     {
         "key": "ctrl+s",
         "command": "vscode-neovim.send",
