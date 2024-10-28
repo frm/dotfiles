@@ -291,7 +291,7 @@ cs_extensions() {
       cs_extensions_update $@
       ;;
     *)
-      pp_error "cs" "invalid subcommand: $1. supported: [export, install]"
+      _mnds_pp_error "cs" "invalid subcommand: $1. supported: [export, install]"
       ;;
     esac
 }
@@ -310,7 +310,7 @@ cs_extensions_export() {
       cursor --list-extensions --show-versions > $exts
       ;;
     *)
-      pp_error "cs" "invalid flag: $1. supported: [-f, --force]"
+      _mnds_pp_error "cs" "invalid flag: $1. supported: [-f, --force]"
       ;;
   esac
 }
@@ -319,7 +319,7 @@ cs_extensions_install() {
   local exts=$DOTFILES/cursor/extensions
 
   if [ ! -f $exts ]; then
-    pp_error "cs" "no extensions file found"
+    _mnds_pp_error "cs" "no extensions file found"
     return 1
   fi
 
