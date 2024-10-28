@@ -2,6 +2,7 @@
   "diffEditor.codeLens": true,
   "editor.accessibilitySupport": "off",
   "editor.fontFamily": "FiraCode Nerd Font Mono, Menlo, Monaco, 'Courier New', monospace",
+  "editor.fontLigatures": true,
   "editor.formatOnSave": true,
   "files.insertFinalNewline": true,
   "window.commandCenter": true,
@@ -12,7 +13,7 @@
   "cursor.general.gitGraphIndexing": "enabled",
   // colours
   "catppuccin.italicKeywords": false,
-  "workbench.colorTheme": "Catppuccin Mocha",
+  "workbench.colorTheme": "Rouge No Italics",
   // neovim integration
   "extensions.experimental.affinity": {
       "asvetliakov.vscode-neovim": 1
@@ -24,14 +25,16 @@
       "fs": {
           "command": "vscode-neovim.send",
           "when": "editorTextFocus && neovim.mode != insert",
-          "args": ":HopChar1<CR>"
+          "args": ":HintChar1<CR>"
       }
   },
   // elixirLS
   "elixirLS.fetchDeps": true,
-  // "elixirLS.languageServerOverridePath": "$HOME/.local/share/nvim/lazy/elixir-ls/dist",
+  "elixirLS.languageServerOverridePath": "$HOME/.local/share/nvim/lazy/elixir-ls/dist",
   // projectManager
   "projectManager.git.baseFolders": ["~/Developer"],
   // spelling
-  "cSpell.userWords": ["HRIS"]
+"cSpell.userWords": [
+    "HRIS"
+]
 }
