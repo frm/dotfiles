@@ -1,5 +1,16 @@
 #! /usr/bin/env sh
 
+# The following error might happen during asdf install
+# because I'm running OpenSSL 3.0 while postgres defaults to 1.1:
+# configure: error: library 'crypto' is required for OpenSSL
+#
+# These flags solve it.
+export POSTGRES_EXTRA_CONFIGURE_OPTIONS="
+  --with-lz4
+  --with-uuid=e2fs
+  --with-libraries=/usr/local/lib:$(brew --prefix openssl@1.1)/lib
+  --with-includes=/usr/local/include:$(brew --prefix openssl@1.1)/include"
+
 pg_server() {
   pg_version=$(pg_ctl --version | cut -d ' ' -f3)
   pg_dir="$HOME/.asdf/installs/postgres/$pg_version/data"
