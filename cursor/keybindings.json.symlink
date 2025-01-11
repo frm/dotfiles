@@ -192,6 +192,17 @@
         "command": "workbench.action.terminal.split",
         "when": "terminalFocus && terminalProcessSupported || terminalFocus && terminalWebExtensionContributedProfile"
     },
+    // terminal control: maximise
+    {
+        "key": "cmd+ctrl+t",
+        "command": "workbench.action.closePanel",
+        "when": "terminalFocus"
+    },
+    {
+      "key": "cmd+ctrl+t",
+      "command": "workbench.action.toggleMaximizedPanel",
+      "when": "!terminalFocus"
+    },
     // terminal control: movement
     {
         "key": "ctrl+h",
@@ -218,31 +229,46 @@
         "command": "workbench.action.terminal.killEditor",
         "when": "terminalEditorFocus && terminalFocus && terminalHasBeenCreated && resourceScheme == 'vscode-terminal' || terminalEditorFocus && terminalFocus && terminalProcessSupported && resourceScheme == 'vscode-terminal'"
     },
-    // testing
     {
         "key": ", c",
-        "command": "testing.runAtCursor",
-        "when": "editorTextFocus && neovim.mode != insert"
+        "when": "editorTextFocus && neovim.mode != insert",
+        "command": "workbench.action.tasks.runTask",
+        "args": "test:line"
     },
     {
         "key": ", f",
-        "command": "testing.runCurrentFile",
-        "when": "editorTextFocus && neovim.mode != insert"
+        "when": "editorTextFocus && neovim.mode != insert",
+        "command": "workbench.action.tasks.runTask",
+        "args": "test:file"
     },
     {
         "key": ", a",
-        "command": "testing.runAll",
-        "when": "editorTextFocus && neovim.mode != insert"
-    },
-    {
-        "key": ", ,",
-        "command": "testing.reRunLastRun",
-        "when": "editorTextFocus && neovim.mode != insert"
+        "when": "editorTextFocus && neovim.mode != insert",
+        "command": "workbench.action.tasks.runTask",
+        "args": "test:all"
     },
     {
         "key": ", w",
-        "command": "testing.reRunFailTests",
-        "when": "editorTextFocus && neovim.mode != insert"
+        "when": "editorTextFocus && neovim.mode != insert",
+        "command": "workbench.action.tasks.runTask",
+        "args": "test:failed"
+    },
+    {
+        "key": ", s",
+        "when": "editorTextFocus && neovim.mode != insert",
+        "command": "workbench.action.tasks.runTask",
+        "args": "test:stale"
+    },
+    {
+        "key": ", ,",
+        "when": "editorTextFocus && neovim.mode != insert",
+        "command": "workbench.action.tasks.reRunTask",
+    },
+    {
+        "key": ", d",
+        "when": "editorTextFocus && neovim.mode != insert",
+        "command": "workbench.action.tasks.runTask",
+        "args": "test:debug:line"
     },
     // projectionist/vscode-alternate-alternate-file
     {
@@ -254,5 +280,18 @@
         "key": "space a v",
         "command": "alternateFile.createAlternateFileInSplit",
         "when": "editorTextFocus && neovim.mode != insert",
+    },
+    // neovim   
+    {
+        "key": "space j",
+        "command": "vscode-neovim.send",
+        "when": "editorTextFocus && neovim.mode != 'insert'",
+        "args": ":SplitjoinSplit<CR>"
+    },
+    {
+        "key": "space k",
+        "command": "vscode-neovim.send",
+        "when": "editorTextFocus && neovim.mode != 'insert'",
+        "args": ":SplitjoinJoin<CR>"
     }
 ]

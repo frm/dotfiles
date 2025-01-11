@@ -1,0 +1,133 @@
+{
+  "version": "2.0.0",
+  "options": {
+    "shell": {
+      "executable": "/bin/zsh",
+      "args": [
+        "-l",
+        "-c"
+      ]
+    },
+    "cwd": "${fileWorkspaceFolder}"
+  },
+  "tasks": [
+    {
+      "label": "test:all",
+      "type": "shell",
+      "command": "mix test",
+      "problemMatcher": [],
+      "group": "test",
+      "runOptions": {
+        "reevaluateOnRerun": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "test:file",
+      "type": "shell",
+      "command": "mix test ${relativeFile}",
+      "problemMatcher": [],
+      "group": "test",
+      "runOptions": {
+        "reevaluateOnRerun": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "test:line",
+      "type": "shell",
+      "command": "mix test ${relativeFile}:${lineNumber}",
+      "runOptions": {
+        "reevaluateOnRerun": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "test:stale",
+      "type": "shell",
+      "command": "mix test --stale",
+      "runOptions": {
+        "reevaluateOnRerun": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "test:failed",
+      "type": "shell",
+      "command": "mix test --failed",
+      "runOptions": {
+        "reevaluateOnRerun": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "test:previous",
+      "type": "shell",
+      "command": "!!",
+      "problemMatcher": [],
+      "group": "test",
+      "runOptions": {
+        "reevaluateOnRerun": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "test:debug:line",
+      "type": "shell",
+      "command": "iex --dbg pry -S mix test --timeout 999999999 ${relativeFile}:${lineNumber}",
+      "runOptions": {
+        "reevaluateOnRerun": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    }
+  ]
+}
