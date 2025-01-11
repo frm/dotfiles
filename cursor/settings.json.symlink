@@ -4,16 +4,22 @@
   "editor.fontFamily": "FiraCode Nerd Font Mono, Menlo, Monaco, 'Courier New', monospace",
   "editor.fontLigatures": true,
   "editor.formatOnSave": true,
+  "editor.lineNumbers": "relative",
   "files.insertFinalNewline": true,
   "window.commandCenter": true,
   "workbench.activityBar.orientation": "vertical",
+  "workbench.sideBar.location": "right",
+  "terminal.integrated.tabs.enabled": false,
   "git.openRepositoryInParentFolders": "never",
+
   // cursor settings
   "cursor.chat.smoothStreaming": true,
   "cursor.general.gitGraphIndexing": "enabled",
+
   // colours
   "catppuccin.italicKeywords": false,
   "workbench.colorTheme": "Rouge No Italics",
+
   // neovim integration
   "extensions.experimental.affinity": {
       "asvetliakov.vscode-neovim": 1
@@ -28,13 +34,16 @@
           "args": ":HintChar1<CR>"
       }
   },
-  // elixirLS
-  "elixirLS.fetchDeps": true,
-  "elixirLS.languageServerOverridePath": "$HOME/.local/share/nvim/lazy/elixir-ls/dist",
+
   // projectManager
   "projectManager.git.baseFolders": ["~/Developer"],
-  // spelling
-"cSpell.userWords": [
-    "HRIS"
-]
+
+  // elixirLS
+  "elixirLS.fetchDeps": true,
+  // "elixirLS.languageServerOverridePath": "$HOME/.local/share/nvim/lazy/elixir-ls/dist",
+
+  // language specific
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }
