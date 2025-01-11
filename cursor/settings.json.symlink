@@ -38,12 +38,24 @@
   // projectManager
   "projectManager.git.baseFolders": ["~/Developer"],
 
+  // spelling
+  "cSpell.userWords": [
+      "HRIS"
+  ],
+
+  // language specific settings
+  "[javascript]": {
+    "updateImportsOnFileMove.enabled": "always"
+  },
+  "[json]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "updateImportsOnFileMove.enabled": "always"
+  }
+
   // elixirLS
   "elixirLS.fetchDeps": true,
   // "elixirLS.languageServerOverridePath": "$HOME/.local/share/nvim/lazy/elixir-ls/dist",
-
-  // language specific
-  "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
 }
