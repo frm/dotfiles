@@ -5,6 +5,7 @@
   "editor.fontLigatures": true,
   "editor.formatOnSave": true,
   "editor.lineNumbers": "relative",
+  "explorer.confirmDragAndDrop": false,
   "files.insertFinalNewline": true,
   "window.commandCenter": true,
   "workbench.activityBar.orientation": "vertical",
@@ -44,18 +45,16 @@
   ],
 
   // language specific settings
-  "[javascript]": {
-    "updateImportsOnFileMove.enabled": "always"
-  },
   "[json]": {
       "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[typescript]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode",
-      "updateImportsOnFileMove.enabled": "always"
-  }
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "javascript.updateImportsOnFileMove.enabled": "always",
 
   // elixirLS
-  "elixirLS.fetchDeps": true,
   // "elixirLS.languageServerOverridePath": "$HOME/.local/share/nvim/lazy/elixir-ls/dist",
+  "elixirLS.fetchDeps": true
 }
