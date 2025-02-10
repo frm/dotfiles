@@ -235,7 +235,7 @@ l() {
     bin/lint
   elif [ -f mix.exs ]; then
     _mnds_pp_info "l" "running mix lint..."
-    iex -S mix lint
+    mix lint
   else
     _mnds_pp_error "l" "no valid linters found"
     return 1
