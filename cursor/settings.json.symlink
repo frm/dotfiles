@@ -21,7 +21,7 @@
 
   // colours
   "catppuccin.italicKeywords": false,
-  "workbench.colorTheme": "Rouge No Italics",
+  "workbench.colorTheme": "Ayu Dark",
 
   // neovim integration
   "extensions.experimental.affinity": {
@@ -58,5 +58,7 @@
 
   // elixirLS
   // "elixirLS.languageServerOverridePath": "$HOME/.local/share/nvim/lazy/elixir-ls/dist",
-  "elixirLS.fetchDeps": true
+  "elixirLS.fetchDeps": true,
+  "search.useGlobalIgnoreFiles": true,
+  "search.useParentIgnoreFiles": true
 }
