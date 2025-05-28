@@ -1,4 +1,9 @@
 [
+    // cursor
+    {
+        "key": "cmd+i",
+        "command": "composerMode.agent"
+    },
     // basic maps
     {
         "key": "ctrl+s",
@@ -29,6 +34,31 @@
         "key": "escape",
         "command": "workbench.action.focusActiveEditorGroup",
         "when": "searchViewletFocus"
+    },
+    {
+        "key": "ctrl+]",
+        "command": "editor.action.revealDefinition",
+        "when": "editorTextFocus && neovim.mode != insert && editorHasDefinitionProvider"
+    },
+    {
+        "key": "ctrl+[",
+        "command": "workbench.action.navigateBack",
+        "when": "editorTextFocus && neovim.mode != insert"
+    },
+    {
+        "key": "alt+]",
+        "command": "editor.action.peekDefinition",
+        "when": "editorTextFocus && neovim.mode != insert && editorHasDefinitionProvider"
+    },
+    {
+        "key": "ctrl+o",
+        "command": "workbench.action.navigateBack",
+        "when": "editorTextFocus && !neovim.recording && neovim.mode != 'insert'"
+    },
+    {
+        "key": "ctrl+i",
+        "command": "workbench.action.navigateForward",
+        "when": "editorTextFocus && !neovim.recording && neovim.mode != 'insert'"
     },
     // run :noh
     {
