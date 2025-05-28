@@ -21,7 +21,6 @@ require("lazy").setup({
   },
 
   -- Functionality
-  'kristijanhusak/any-jump.vim',
   'tpope/vim-abolish',
   'tpope/vim-surround',
 
