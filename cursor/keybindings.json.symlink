@@ -225,13 +225,19 @@
     // terminal control: maximise
     {
         "key": "cmd+ctrl+t",
-        "command": "workbench.action.closePanel",
+        "command": "workbench.action.toggleMaximizedPanel",
         "when": "terminalFocus"
     },
     {
       "key": "cmd+ctrl+t",
-      "command": "workbench.action.toggleMaximizedPanel",
-      "when": "!terminalFocus"
+      "command": "runCommands",
+      "when": "!terminalFocus",
+      "args": {
+          "commands": [
+              "workbench.action.terminal.focus",
+              "workbench.action.toggleMaximizedPanel",
+          ]
+      }
     },
     // terminal control: movement
     {
