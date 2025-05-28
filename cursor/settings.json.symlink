@@ -1,4 +1,6 @@
 {
+  "cursor.aipreview.enabled": true,
+  "cursor.cmdk.useThemedDiffBackground": true,
   "diffEditor.codeLens": true,
   "editor.accessibilitySupport": "off",
   "editor.fontFamily": "FiraCode Nerd Font Mono, Menlo, Monaco, 'Courier New', monospace",
@@ -23,36 +25,36 @@
 
   // neovim integration
   "extensions.experimental.affinity": {
-      "asvetliakov.vscode-neovim": 1
+    "asvetliakov.vscode-neovim": 1
   },
   "vscode-neovim.compositeKeys": {
-      "jk": {
-          "command": "vscode-neovim.escape"
-      },
-      "fs": {
-          "command": "vscode-neovim.send",
-          "when": "editorTextFocus && neovim.mode != insert",
-          "args": ":HintChar1<CR>"
-      }
+    "jk": {
+      "command": "vscode-neovim.escape"
+    },
+    "fs": {
+      "command": "vscode-neovim.send",
+      "when": "editorTextFocus && neovim.mode != insert",
+      "args": ":HintChar1<CR>"
+    }
   },
 
   // projectManager
   "projectManager.git.baseFolders": ["~/Developer"],
 
   // spelling
-  "cSpell.userWords": [
-      "HRIS"
-  ],
+  "cSpell.userWords": ["HRIS"],
 
   // language specific settings
   "[json]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[typescript]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "typescript.updateImportsOnFileMove.enabled": "always",
   "javascript.updateImportsOnFileMove.enabled": "always",
+
+  "python.createEnvironment.trigger": "off",
 
   // elixirLS
   // "elixirLS.languageServerOverridePath": "$HOME/.local/share/nvim/lazy/elixir-ls/dist",
