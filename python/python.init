@@ -1,3 +1,3 @@
-CURRENT_PYTHON=$(asdf current python | cut -d ' ' -f 1)
+CURRENT_PYTHON=$(asdf current python | tail -n 1 | awk '{ print $2 }')
 
 export PATH="$PATH:$HOME/.asdf/installs/python/$CURRENT_PYTHON/bin/:$HOME/.local/bin"
