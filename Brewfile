@@ -2,6 +2,7 @@ tap 'cantino/mcfly'
 tap 'eddieantonio/eddieantonio'
 tap 'heroku/brew'
 
+brew 'asdf'
 brew 'ansible'
 brew 'asciinema'
 brew 'autoconf'

@@ -1,3 +1,4 @@
-RUST_VERSION=nightly
+RUST_VERSION=$(asdf current rust | tail -n 1 | awk '{ print $2 }')
 
+. "$HOME/.asdf/installs/rust/$RUST_VERSION/env"
 export PATH="$PATH:$HOME/.asdf/installs/rust/$RUST_VERSION/bin"
