@@ -2,8 +2,10 @@ export ASDF_GEM_DEFAULT_PACKAGES_FILE="$DOTFILES/ruby/default-gems"
 export ASDF_NPM_DEFAULT_PACKAGES_FILE="$DOTFILES/node/default-npm-packages"
 export ASDF_PYTHON_DEFAULT_PACKAGES_FILE="$DOTFILES/python/requirements.txt"
 
-. $HOME/.asdf/asdf.sh
+# only necessary for pre v0.16.0
+# . $HOME/.asdf/asdf.sh
 
 export fpath=(${HOME}/.asdf/completions $fpath)
 
-export PATH="$PATH:$HOME/.asdf/shims"
+export ASDF_DATA_DIR="$HOME/.asdf"
+export PATH="$ASDF_DATA_DIR/shims:$PATH"
