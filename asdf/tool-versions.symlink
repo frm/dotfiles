@@ -1,12 +1,12 @@
 ruby 3.3.0
-erlang 26.2.5
-elixir 1.17.1-otp-26
+erlang 27.3.4
+elixir 1.18.4-otp-27
 nodejs 22.12.0
 rust stable
 python 3.12.9 2.7.18
 golang 1.18
-postgres 16.0
+postgres 17.5
 kubectl 1.25.13
 flutter 3.19.2
-cocoapods latest
+cocoapods 1.16.2
 haskell 9.10-latest
