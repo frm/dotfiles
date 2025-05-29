@@ -1,6 +1,11 @@
 {
+  // cursor settings
   "cursor.aipreview.enabled": true,
+  "cursor.chat.smoothStreaming": true,
   "cursor.cmdk.useThemedDiffBackground": true,
+  "cursor.general.gitGraphIndexing": "enabled",
+
+  // vscode settings
   "diffEditor.codeLens": true,
   "editor.accessibilitySupport": "off",
   "editor.fontFamily": "FiraCode Nerd Font Mono, Menlo, Monaco, 'Courier New', monospace",
@@ -9,15 +14,13 @@
   "editor.lineNumbers": "relative",
   "explorer.confirmDragAndDrop": false,
   "files.insertFinalNewline": true,
+  "git.openRepositoryInParentFolders": "never",
+  "search.useGlobalIgnoreFiles": true,
+  "search.useParentIgnoreFiles": true
+  "terminal.integrated.tabs.enabled": false,
   "window.commandCenter": true,
   "workbench.activityBar.orientation": "vertical",
   "workbench.sideBar.location": "right",
-  "terminal.integrated.tabs.enabled": false,
-  "git.openRepositoryInParentFolders": "never",
-
-  // cursor settings
-  "cursor.chat.smoothStreaming": true,
-  "cursor.general.gitGraphIndexing": "enabled",
 
   // colours
   "catppuccin.italicKeywords": false,
@@ -58,7 +61,5 @@
 
   // elixirLS
   // "elixirLS.languageServerOverridePath": "$HOME/.local/share/nvim/lazy/elixir-ls/dist",
-  "elixirLS.fetchDeps": true,
-  "search.useGlobalIgnoreFiles": true,
-  "search.useParentIgnoreFiles": true
+  "elixirLS.fetchDeps": true
 }
