@@ -191,6 +191,11 @@
         "command": "workbench.action.toggleSidebarVisibility"
     },
     {
+        "key": "ctrl+shift+n",
+        "command": "workbench.view.explorer",
+        "when": "sideBarVisible"
+    },
+    {
         "key": "space n",
         "command": "workbench.view.explorer",
         // allow shortcut in blank slate after :qa
@@ -205,6 +210,11 @@
         "key": "space shift+n",
         "command": "workbench.files.action.showActiveFileInExplorer",
         "when": "editorTextFocus && neovim.mode != insert"
+    },
+    {
+        "key": "ctrl+g",
+        "command": "workbench.view.scm",
+        "when": "workbench.scm.active"
     },
     {
         "key": "ctrl+l",
