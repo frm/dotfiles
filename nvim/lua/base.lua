@@ -60,5 +60,5 @@ vim.opt.foldmethod = "indent"
 
 -- Set python locations
 vim.g.python_host_prog = "/usr/local/bin/python2.7"
-vim.g.python3_host_prog = "/Users/frm/.asdf/shims/python3.12"
+vim.g.python3_host_prog = os.getenv("HOME") .. "/.asdf/shims/python3.12"
 vim.g.loaded_perl_provider = 0
