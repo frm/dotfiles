@@ -4,6 +4,7 @@
   "cursor.chat.smoothStreaming": true,
   "cursor.cmdk.useThemedDiffBackground": true,
   "cursor.general.gitGraphIndexing": "enabled",
+  "editor.cursorSmoothCaretAnimation": "on",
 
   // vscode settings
   "diffEditor.codeLens": true,
@@ -16,9 +17,10 @@
   "files.insertFinalNewline": true,
   "git.openRepositoryInParentFolders": "never",
   "search.useGlobalIgnoreFiles": true,
-  "search.useParentIgnoreFiles": true
+  "search.useParentIgnoreFiles": true,
   "terminal.integrated.tabs.enabled": false,
   "window.commandCenter": true,
+  "workbench.activityBar.location": "top",
   "workbench.activityBar.orientation": "vertical",
   "workbench.sideBar.location": "right",
 
@@ -51,12 +53,13 @@
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+
   "typescript.updateImportsOnFileMove.enabled": "always",
   "javascript.updateImportsOnFileMove.enabled": "always",
-
   "python.createEnvironment.trigger": "off",
 
   // elixirLS
