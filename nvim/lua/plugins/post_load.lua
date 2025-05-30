@@ -64,7 +64,7 @@ local dap = require('dap')
 
 dap.adapters.mix_task = {
   type = 'executable',
-  command = '/Users/frm/.bin/lexical/bin/debug_shell.sh',
+  command = os.getenv("HOME") .. '/.bin/lexical/bin/debug_shell.sh',
   args = {}
 }
 
