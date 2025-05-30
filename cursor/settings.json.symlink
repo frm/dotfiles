@@ -26,7 +26,7 @@
 
   // colours
   "catppuccin.italicKeywords": false,
-  "workbench.colorTheme": "Ayu Dark",
+  "workbench.colorTheme": "Gruvbox Material Dark",
 
   // neovim integration
   "extensions.experimental.affinity": {
