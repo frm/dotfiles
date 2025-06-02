@@ -196,6 +196,22 @@
         "when": "sideBarVisible"
     },
     {
+        "key": "ctrl+shift+l",
+        "command": "aichat.close-sidebar",
+        "when": "auxiliaryBarVisible"
+    },
+    {
+        "key": "ctrl+shift+l",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                "workbench.action.toggleAuxiliaryBar",
+                "workbench.action.focusActiveEditorGroup"
+            ]
+        },
+        "when": "!auxiliaryBarVisible"
+    },
+    {
         "key": "space n",
         "command": "workbench.view.explorer",
         // allow shortcut in blank slate after :qa
