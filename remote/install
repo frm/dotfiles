@@ -23,16 +23,15 @@ function pp_error {
   pp $RED $1 $2
 }
 
+function dirlink {
+  (cd $HOME && ln -s "$WD/$1" "$2")
+}
+
 pp_info "remote" "installing package deps"
 brew bundle --file=$DEV_DOTFILES/remote/Brewfile
 
-pp_info "remote" "installing asdf plugins"
-
-asdf plugin add elixir
-asdf plugin add erlang
-asdf plugin add nodejs
-asdf plugin add postgres
-asdf plugin add redis
+pp_info "remote" "configuring mise"
+dirlink $DEV_DOTFILES/remote/mise ~/.config/mise
 
 pp_info "remote" "running softwareupdate"
 softwareupdate --install-rosetta
