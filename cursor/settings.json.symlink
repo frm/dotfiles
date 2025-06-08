@@ -1,8 +1,5 @@
 {
   // cursor settings
-  "cursor.aipreview.enabled": true,
-  "cursor.chat.smoothStreaming": true,
-  "cursor.cmdk.useThemedDiffBackground": true,
   "cursor.general.gitGraphIndexing": "enabled",
   "editor.cursorSmoothCaretAnimation": "on",
 
@@ -50,12 +47,8 @@
   "cSpell.userWords": ["HRIS"],
 
   // language specific settings
-  "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
   },
 
   "typescript.updateImportsOnFileMove.enabled": "always",
