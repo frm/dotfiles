@@ -107,8 +107,18 @@
         "command": "workbench.action.navigateDown",
     },
     {
+        "key": "ctrl+j",
+        "command": "outline.focus",
+        "when": "explorerViewletFocus"
+    },
+    {
         "key": "ctrl+k",
         "command": "workbench.action.navigateUp",
+    },
+    {
+        "key": "ctrl+k",
+        "command": "workbench.explorer.fileView.focus",
+        "when": "outlineFocused"
     },
     // TODO: this is not working
     {
@@ -241,6 +251,16 @@
         "key": "ctrl+l",
         "command": "workbench.action.focusActiveEditorGroup",
         "when": "filesExplorerFocus"
+    },
+    {
+        "key": "space shift+o",
+        "command": "outline.focus",
+        "when": "(editorFocus && neovim.mode != 'insert') || terminalFocus || explorerViewletFocus"
+    },
+    {
+        "key": "space o",
+        "command": "outline.toggleVisibility",
+        "when": "(editorFocus && neovim.mode != 'insert') || terminalFocus || explorerViewletFocus"
     },
     // terminal control: splits
     {
