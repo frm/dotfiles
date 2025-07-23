@@ -1,0 +1,20 @@
+#!/usr/bin/env zsh
+
+# tgr-up: Updates and runs tiger
+# -r (optional): when present, resets the database
+
+source $DOTFILES/functions/helpers.zsh
+
+_mnds_pp_info "tgr up" "checking mix deps..."
+mix deps.get
+
+if [[ "$1" == "-r" ]]; then
+  _mnds_pp_info "tgr up" "resetting the database..."
+  mix ecto.reset
+else
+  _mnds_pp_info "tgr up" "attempting to run migrations..."
+  mix ecto.migrate
+fi
+
+_mnds_pp_info "tgr up" "starting the server..."
+iex -S mix phx.server

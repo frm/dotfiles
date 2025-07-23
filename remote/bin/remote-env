@@ -1,0 +1,185 @@
+#!/usr/bin/env zsh
+#
+# Helper module for using remotectl in different environments
+#
+# Usage:
+#
+# <ENV> iex - starts an iex function
+#
+# <ENV> ssh - ssh's into a new pod
+#
+# <ENV> cp <from> (optional <to>) - copies a file from local to remote pod. if
+#                                   2nd argument not given, uses the current
+#                                   filename
+#
+# <ENV> cp-from <from> (optional <to>) - copies a file from remote pod to local.
+#                                        if 2nd argument not given, uses the
+#                                        current filename
+#
+# <ENV> access <url> (optional <reason>) - copies into the clipboard the Elixir
+#                                          command to gain UI production
+#                                          access. If no reason given, uses
+#                                          "Debug support request"
+#
+# Supported environemnts:
+# - prod or production
+# - stag or staging
+# - sand or sandbox
+#
+# Examples:
+#
+# prod iex
+# stag ssh
+# sand cp file.csv
+
+
+#
+# Helpers
+#
+
+function my_username() {
+  remotectl aws whoami \
+    | grep "Username:" \
+    | cut -d ':' -f2
+}
+
+function my_running_pods() {
+  username=${(MS)$(my_username | tr -s '.' '-')##[[:graph:]]*[[:graph:]]}
+
+  kubectl get pod --field-selector status.phase==Running \
+    | grep "$username" \
+    | cut -d ' ' -f1
+}
+
+function copy_to_clipboard() {
+  if which pbcopy &> /dev/null; then
+    if [ -f $@ ]; then
+        cat $@ | pbcopy
+    else
+        echo $@ | pbcopy
+    fi
+  elif which xclip &> /dev/null; then
+      xclip -selection clipboard < $@
+  fi
+}
+
+#
+# Commands
+#
+
+function iex_in() {
+  proj=$(basename `pwd`)
+  region="eu"
+  role="production-basic"
+
+  if [[ "$1" == "sandbox" ]]; then
+    region="us"
+    role="staging-basic"
+  fi
+
+  remotectl k8s shell -lc -e $1 $proj-api --role $role -m 4Gi --region $region -- tiger/bin/tiger start_iex
+}
+
+function ssh_to() {
+  proj=$(basename `pwd`)
+  region="eu"
+  role="production-basic"
+
+  if [[ "$1" == "sandbox" ]]; then
+    region="us"
+    role="staging-basic"
+  fi
+
+  remotectl k8s shell -lc -e $1 $proj-api -m 4Gi --region $region --role $role
+}
+
+function cp_to() {
+  from="$2"
+  to="/opt/app/${${3:-$(basename $2)}#/}"
+
+  pod=$(my_running_pods | tail -n 1) # use the latest pod
+
+  remotectl k8s cp $from $pod:$to
+}
+
+function cp_from() {
+  from="/opt/app/${${3:-$(basename $2)}#/}"
+  to="$2"
+
+  pod=$(my_running_pods | tail -n 1) # use the latest pod
+
+  remotectl k8s cp $pod:$from $to
+}
+
+function access() {
+  local url=$1
+  local reason=${2:-"Debug support request"}
+
+  { tee >(cat 1>&2) | copy_to_clipboard } << EOF
+Tiger.Scripts.GrantTemporaryAdminAccess.run(
+  "$(whoami)@remote.com",
+  "Engineering Support",
+  "$reason",
+  "$url",
+  120
+)
+EOF
+}
+
+#
+# Runner functions
+#
+
+function run_in_env() {
+  case "$2" in
+    ssh)
+      ssh_to "$1"
+      ;;
+    iex)
+      iex_in "$1"
+      ;;
+    cp)
+      cp_to "$1" "$3" "$4"
+      ;;
+
+    "cp-from")
+      cp_from "$1" "$3" "$4"
+      ;;
+
+    "access")
+      access "$3" "$4"
+      ;;
+    *)
+      echo "unsupported action '$2', supported actions: ssh"
+      exit 1
+      ;;
+  esac
+}
+
+function main() {
+  if [ "$#" -lt 2 ]; then
+    echo "usage: remote-env (prod|production|stag|staging|sand|sandbox) ssh"
+    exit 1
+  fi
+
+  case "$1" in
+    prod|production)
+      shift
+      run_in_env "production" $@
+      ;;
+    stag|staging)
+      shift
+      run_in_env "staging" $@
+      ;;
+    sand|sandbox)
+      shift
+      run_in_env "sandbox" $@
+      ;;
+    *)
+      echo "unknown env, supported envs: prod(uction), stag(ing), sand(box)"
+      exit 1
+      ;;
+  esac
+}
+
+main $@
