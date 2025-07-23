@@ -8,3 +8,5 @@ export MISE_OVERRIDE_TOOL_VERSIONS_FILENAMES=none
 export MISE_STATUS_MESSAGE_MISSING_TOOLS=never
 export MISE_DISABLE_TOOLS="ruby,erlang,rust,python,go,postgres,flutter,cocoapods"
 export MISE_QUIET=true
+
+export PATH="$PATH:$DOTFILES/remote/bin"
