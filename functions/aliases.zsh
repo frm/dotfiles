@@ -24,6 +24,7 @@ alias b="bundle"
 alias y="yarn"
 alias c="cargo"
 alias i="iex"
+alias mk="make"
 
 alias sleep="pmset displaysleepnow > /dev/null 2>& 1"
 
