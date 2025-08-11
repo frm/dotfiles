@@ -9,7 +9,6 @@ WD=$(pwd)
 
 DEV_DOTFILES=~/Developer/frm/dotfiles
 MAC_OS_MOJAVE_HEADERS=/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg
-DEFAULT_ASDF_VERSION=0.13.1
 
 function pp {
   echo -e "\n$1[$2]: $3${RESET}"
@@ -38,9 +37,9 @@ git clone --recurse-submodules -j8 https://github.com/frm/dotfiles.git $DEV_DOTF
 cd $DEV_DOTFILES
 
 pp_info "install" "installing brew"
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-PATH="$PATH:/opt/homebrew/bin"
+PATH="/opt/homebrew/bin:$PATH"
 
 pp_info "brew" "bundling apps"
 brew bundle
@@ -64,9 +63,6 @@ else
   pp_info "macos" "not using mojave, skipping headers"
 fi
 
-pp_info "macos" "accepting developer license"
-sudo xcodebuild -license accept
-
 pp_info "macos" "setting up system configs"
 read_hostname=$(pp $RESET "macos" "enter your desired hostname (default: da3mon) ")
 read -r "hostname?$read_hostname"
@@ -88,9 +84,6 @@ fi
 pp_info "asdf" "setting up environment"
 gln -srf asdf/asdfrc.symlink ~/.asdfrc
 
-pp_info "asdf" "installing asdf"
-brew install asdf
-
 pp_info "asdf" "adding plugins"
 asdf plugin add elixir
 asdf plugin add erlang
@@ -110,29 +103,25 @@ read -r "_unused?$asdf_check"
 
 gln -srf asdf/tool-versions.symlink ~/.tool-versions
 
-# Ensure postgres is configured
-export POSTGRES_EXTRA_CONFIGURE_OPTIONS="
-  --with-lz4
-  --with-uuid=e2fs
-  --with-libraries=/usr/local/lib:$(brew --prefix openssl@1.1)/lib
-  --with-includes=/usr/local/include:$(brew --prefix openssl@1.1)/include"
-
-brew install icu4c
-brew link icu4c --force
-
 asdf install
 
-source $HOME/.asdf/shims
+source asdf/asdf.init
 
 pp_info "elixir" "setting up iex"
 gln -srf elixir/iex.exs.symlink ~/.iex.exs
 
-pp_info "ruby" "installing gems"
+pp_info "ruby" "installing bundler"
 gem install bundler
+gem update --system
+
+pp_info "ruby" "installing gems"
 cat ruby/default-gems | xargs gem install
 
+pp_info "node" "upgrading npm"
+npm i -g npm@latest
+
 pp_info "node" "installing packages"
-npm install -g node
+cat node/default-npm-packages | xargs npm i -g
 
 pp_info "python" "upgrading pip"
 pip install --upgrade pip
@@ -188,7 +177,6 @@ pp_info "fzf" "setting up fzf"
 $(brew --prefix)/opt/fzf/install
 
 pp_info "nvim" "setting up environment"
-mkdir ~/.config
 dirlink nvim ~/.config/
 
 pip install neovim
@@ -232,6 +220,9 @@ done
 
 bat cache --build
 
+pp_info "starship" "setting configs"
+gln -srf starship/starship.toml.symlink ~/.config/starship.toml
+
 pp_info "starship" "installing custom themes"
 mkdir -p $DOTFILES/starship/themes/catppuccin/
 
@@ -241,6 +232,9 @@ for variant in frappe latte macchiato mocha; do
     "$DOTFILES/starship/themes/catppuccin/$variant"                                     \
     "https://raw.githubusercontent.com/catppuccin/starship/main/palettes/$variant.toml"
 done
+
+pp_info "kitty" "setting configs"
+dirlink kitty ~/.config/kitty
 
 pp_info "kitty" "installing custom themes"
 for variant in Frappe Latte Macchiato Mocha; do
