@@ -35,10 +35,10 @@ require("mason").setup()
 
 require("mason-lspconfig").setup {
     ensure_installed = {
-        "elixirls", -- TODO: disable when lexical is working
+        "elixirls",
         "jsonls",
         "rubocop",
-        "rust_analyzer",
+        -- "rust_analyzer", TODO: enable once the package is fixed
         "vimls",
     },
     automatic_installation = true,
@@ -59,14 +59,6 @@ require("neodev").setup({
   library = { plugins = { "nvim-dap-ui" }, types = true },
 })
 
-
-local dap = require('dap')
-
-dap.adapters.mix_task = {
-  type = 'executable',
-  command = os.getenv("HOME") .. '/.bin/lexical/bin/debug_shell.sh',
-  args = {}
-}
 
 require("dapui").setup()
 
@@ -128,14 +120,6 @@ lspconfig.efm.setup(vim.tbl_extend('force', efmls_config, {
 }))
 
 map('n', '<leader>t', ':TroubleToggle<CR>')
-
------------------------------------------------------------------
--- Lexical
------------------------------------------------------------------
--- TODO: reenable this when Lexical adds needed support for codelens and DAP
--- require("lspconfig").lexical.setup {
---   cmd = { "/Users/frm/.bin/lexical/bin/start_lexical.sh" },
--- }
 
 -----------------------------------------------------------------
 -- Replacer
