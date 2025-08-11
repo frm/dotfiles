@@ -24,4 +24,7 @@
 # source $HOME/Developer/geometry/$GEOMETRY_ENV/geometry.zsh
 
 BREW_ZSH_HIGHLIGHTERS=/opt/homebrew/opt/zsh-fast-syntax-highlighting/share/zsh-fast-syntax-highlighting/
+
 source $BREW_ZSH_HIGHLIGHTERS/fast-syntax-highlighting.plugin.zsh
+
+FAST_HIGHLIGHT[use_brackets]=1
