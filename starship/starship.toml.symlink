@@ -16,7 +16,7 @@ $character"""
 palette = "catppuccin_mocha"
 
 [directory]
-style = "blue"
+style = "rosewater"
 
 [character]
 success_symbol = "[❯](purple)"
