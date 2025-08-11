@@ -103,6 +103,16 @@ read -r "_unused?$asdf_check"
 
 gln -srf asdf/tool-versions.symlink ~/.tool-versions
 
+# Ensure postgres is configured
+export POSTGRES_EXTRA_CONFIGURE_OPTIONS="
+  --with-lz4
+  --with-uuid=e2fs
+  --with-libraries=/usr/local/lib:$(brew --prefix openssl@3)/lib
+  --with-includes=/usr/local/include:$(brew --prefix openssl@3)/include"
+
+brew install icu4c
+brew link icu4c --force
+
 asdf install
 
 source asdf/asdf.init
