@@ -1,6 +1,7 @@
 export DOTFILES="$HOME/.dotfiles"
 
 # Load homebrew
+export PATH="/opt/homebrew/sbin:$PATH"
 export PATH="/opt/homebrew/bin:$PATH"
 
 # Load custom bins
