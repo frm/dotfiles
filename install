@@ -163,6 +163,10 @@ gln -srf ./tmux/tmux.conf.symlink "$HOME/.tmux.conf"
 gln -srf ./tmux/tmate.conf.symlink "$HOME/.tmate.conf"
 ~/.tmux/plugins/tpm/bin/install_plugins
 
+pp_info "tmux" "installing catppuccin"
+mkdir -p $HOME/.config/tmux/plugins/catppuccin
+git clone -b v2.1.3 https://github.com/catppuccin/tmux.git ~/.config/tmux/plugins/catppuccin/tmux
+
 pp_info "git" "setting up environment"
 gln -srf git/gitconfig.symlink ~/.gitconfig
 gln -srf git/gitignore_global.symlink ~/.gitignore_global

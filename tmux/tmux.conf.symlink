@@ -60,39 +60,10 @@ bind -n M-7 select-window -t 7
 bind -n M-8 select-window -t 8
 bind -n M-9 select-window -t 9
 
-set-option -g status-position top
-
-# Status bar config
-# currently disabled over a better catppuccin setup
-# set-option -g status 2
-# set-option -g status-format[1] ""
-# set-option -g status-style dim
-#
-# setw -g window-status-format "   #W"
-# setw -g window-status-current-format " ▹ #W"
-#
-# set -g status-justify left
-# set -g status-left ''
-# set -g status-right "#{battery_color_bg}#{battery_icon} #{battery_percentage} #[fg=#4C4C4C]#(spotify_info)"
-#
-# set -g @batt_icon_status_charged '▲'
-# set -g @batt_icon_status_charging '▲'
-# set -g @batt_icon_status_discharging '▼'
-# set -g @batt_icon_charged '▲'
-# set -g @batt_icon_charging '▲'
-# set -g @batt_icon_discharging '▼'
-# set -g @batt_icon_charge_tier8 '▼'
-# set -g @batt_icon_charge_tier7 '▼'
-# set -g @batt_icon_charge_tier6 '▼'
-# set -g @batt_icon_charge_tier5 '▼'
-# set -g @batt_icon_charge_tier4 '▼'
-# set -g @batt_icon_charge_tier3 '▼'
-# set -g @batt_icon_charge_tier2 '▼'
-# set -g @batt_icon_charge_tier1 '▼'
+set-option -g status-position bottom
 
 # TPM plugins
 set -g @plugin 'tmux-plugins/tpm'
-set -g @plugin 'catppuccin/tmux'
 set -g @plugin 'tmux-plugins/tmux-battery'
 set -g @plugin 'tmux-plugins/tmux-cpu'
 set -g @plugin 'tmux-plugins/tmux-copycat'
@@ -101,31 +72,40 @@ set -g @plugin 'tmux-plugins/tmux-yank'
 set -g @plugin 'christoomey/vim-tmux-navigator'
 
 # base catppuccin configurations
-set -g @catppuccin_flavour "mocha"
-set -g @catppuccin_window_default_text "#W"
-set -g @catppuccin_window_current_text "#W"
-set -g @catppuccin_directory_color "green"
-set -g @catppuccin_battery_color "#($DOTFILES/tmux/bin/tmux_battery_color)"
-set -g @catppuccin_application_text "#{b:pane_current_command}"
-set -g @catppuccin_status_modules_right "cpu application directory battery"
-set -g @catppuccin_pane_active_border_style "fg=red"
+set -g @catppuccin_flavor "mocha"
+set -g @catppuccin_status_fill "all"
+set -g @catppuccin_window_status_style "slanted"
+set -g @catppuccin_status_background "#{E:@thm_bg}"
+
+set -g @catppuccin_pane_active_border_style "fg=#{@thm_red}"
 set -g @catppuccin_pane_border_style "fg=black"
-
-# nasty catppuccin configurations, remove these to have a sane default
-# this group sets angled separators on the left
-set -g @catppuccin_window_left_separator "█"
-set -g @catppuccin_window_right_separator "█ "
-set -g @catppuccin_window_number_position "right"
-set -g @catppuccin_window_middle_separator "  █"
-set -g @catppuccin_status_right_separator_inverse "yes"
-set -g @catppuccin_window_default_fill "number"
-set -g @catppuccin_window_current_fill "number"
-
-# this group sets fully mapped curved separators on the right
-set -g @catppuccin_status_left_separator  ""
-set -g @catppuccin_status_right_separator " "
+set -g @catppuccin_window_current_number_color "#{@thm_red}"
+set -g @catppuccin_pane_default_fill "none"
 set -g @catppuccin_status_fill "all"
 set -g @catppuccin_status_connect_separator "no"
+set -g @catppuccin_pane_number_position "left"
+set -g @catppuccin_status_module_text_bg "#{E:@thm_bg}"
+
+set -g @catppuccin_window_current_number " #I "
+set -g @catppuccin_window_number " #I "
+set -g @catppuccin_window_text " #W"
+set -g @catppuccin_window_current_text " #W"
+
+set -g @catppuccin_application_text " #{b:pane_current_command}"
+set -g @catppuccin_battery_color "#($DOTFILES/tmux/bin/tmux_battery_color)"
+
+# Use catppuccin without tpm
+run ~/.config/tmux/plugins/catppuccin/tmux/catppuccin.tmux
+
+set -g status-right-length 100
+set -gF status-right "#{E:@catppuccin_status_cpu}"
+set -ag status-right "#{E:@catppuccin_status_application}"
+set -ag status-right "#{E:@catppuccin_status_directory}"
+set -agF status-right "#{E:@catppuccin_status_battery}"
+
+set -g status-left-length 100
+set -g status-left ""
 
 # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
 run '~/.tmux/plugins/tpm/tpm'
+
