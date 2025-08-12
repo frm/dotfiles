@@ -92,7 +92,7 @@ set -g @catppuccin_window_text " #W"
 set -g @catppuccin_window_current_text " #W"
 
 set -g @catppuccin_application_text " #{b:pane_current_command}"
-set -g @catppuccin_battery_color "#($DOTFILES/tmux/bin/tmux_battery_color)"
+set -gF @catppuccin_battery_color "#($DOTFILES/tmux/bin/tmux_battery_color_catppuccin)"
 
 # Use catppuccin without tpm
 run ~/.config/tmux/plugins/catppuccin/tmux/catppuccin.tmux
