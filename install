@@ -269,6 +269,9 @@ done
 mv ./*.ttf ~/Library/Fonts/
 cd $WD
 
+pp_info "ghostty" "setting configs"
+dirlink ghostty ~/.config/ghostty
+
 pp_info "gh" "installing gh extensions..."
 cat gh/extensions | xargs -I {} gh extension install {}
 
