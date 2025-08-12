@@ -1,0 +1,41 @@
+#!/usr/bin/env zsh
+
+battery_percentage() {
+  pmset -g batt | rg -o "([0-9]{1,3})%" -r '$1'
+}
+
+battery_status() {
+  pmset -g batt | awk -F '; *' 'NR==2 { print $2 }'
+}
+
+fmt_color() {
+  echo "#{E:$1}"
+}
+
+# if charging && 100%: blue
+# if charging: cyan
+# if > 70%: green
+# if > 50%: gray
+# if > 30%: yellow
+# else: red
+
+function main() {
+  local battery_percentage=$(battery_percentage)
+  local battery_status=$(battery_status)
+
+  if [[ "$battery_status" == "charged" ]]; then
+    fmt_color "@thm_blue"
+  elif [[ "$battery_status" == "charging" ]]; then
+    fmt_color "@thm_sapphire"
+  elif [[ $battery_percentage -ge 70 ]]; then
+    fmt_color "@thm_green"
+  elif [[ $battery_percentage -ge 50 ]]; then
+    fmt_color "@thm_mantle"
+  elif [[ $battery_percentage -ge 30 ]]; then
+    fmt_color "@thm_yellow"
+  else
+    fmt_color "@thm_red"
+  fi
+}
+
+main
