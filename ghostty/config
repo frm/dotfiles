@@ -4,6 +4,8 @@ font-family = "FiraCode Nerd Font Mono"
 font-size = 13.0
 
 quit-after-last-window-closed = true
+window-height = 35
+window-width = 120
 window-padding-x = 12
 window-padding-y = 12
 
