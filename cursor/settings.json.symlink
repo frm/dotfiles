@@ -23,7 +23,7 @@
 
   // colours
   "catppuccin.italicKeywords": false,
-  "workbench.colorTheme": "Gruvbox Material Dark",
+  "workbench.colorTheme": "Catppuccin Mocha",
 
   // neovim integration
   "extensions.experimental.affinity": {
@@ -42,9 +42,6 @@
 
   // projectManager
   "projectManager.git.baseFolders": ["~/Developer"],
-
-  // spelling
-  "cSpell.userWords": ["HRIS"],
 
   // language specific settings
   "editor.codeActionsOnSave": {
