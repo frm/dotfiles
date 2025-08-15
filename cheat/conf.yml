@@ -45,14 +45,14 @@ cheatpaths:
   # Once downloaded, ensure that 'path' below points to the location at which
   # you downloaded the community cheatsheets.
   - name: community
-    path: /Users/frm/.dotfiles/cheat/cheatsheets/community
+    path: ~/.dotfiles/cheat/cheatsheets/community
     tags: [ community ]
     readonly: true
 
   # If you have personalized cheatsheets, list them last. They will take
   # precedence over the more global cheatsheets.
   - name: personal
-    path: /Users/frm/.dotfiles/cheat/cheatsheets/personal
+    path: ~/.dotfiles/cheat/cheatsheets/personal
     tags: [ personal ]
     readonly: false
 
