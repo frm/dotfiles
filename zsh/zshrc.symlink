@@ -41,5 +41,6 @@ source $DOTFILES/system/fzf.init
 source $DOTFILES/system/z.init
 
 if [ "$MNDS_WORK_PROFILE" ]; then
-  source $DOTFILES/remote/remote.init
+  source $DOTFILES/river/river.init
 fi
+
