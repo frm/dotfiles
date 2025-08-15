@@ -85,7 +85,6 @@ require("nvim-lsp-installer").setup({
     automatic_installation = false,
 })
 
-local lspconfig = require("lspconfig")
 local lsp_format_on_attach = require("lsp-format").on_attach
 
 local eslint = require('efmls-configs.linters.eslint')
@@ -110,16 +109,25 @@ local efmls_config = {
   },
 }
 
-lspconfig.elixirls.setup {
+-- lspconfig.elixirls.setup {
+--     cmd = { vim.fn.expand("$HOME/.local/share/nvim/lazy/elixir-ls/dist/language_server.sh") },
+--     on_attach = lsp_format_on_attach,
+-- }
+--
+-- lspconfig.efm.setup(vim.tbl_extend('force', efmls_config, {
+--     on_attach = lsp_format_on_attach,
+-- }))
+
+vim.lsp.config('elixirls', {
     cmd = { vim.fn.expand("$HOME/.local/share/nvim/lazy/elixir-ls/dist/language_server.sh") },
     on_attach = lsp_format_on_attach,
-}
+})
 
-lspconfig.efm.setup(vim.tbl_extend('force', efmls_config, {
+vim.lsp.config('efm', vim.tbl_extend('force', efmls_config, {
     on_attach = lsp_format_on_attach,
 }))
 
-map('n', '<leader>t', ':TroubleToggle<CR>')
+map('n', '<leader>t', ':Trouble diagnostics toggle<CR>')
 
 -----------------------------------------------------------------
 -- Replacer
@@ -269,6 +277,14 @@ require("lualine").setup({
   extensions = {'nvim-tree'}
 })
 
+-----------------------------------------------------------------
+-- Catppuccin
+-----------------------------------------------------------------
+
+require("catppuccin").setup({
+  auto_integrations = true,
+})
+
 
 -----------------------------------------------------------------
 -- Barbar
@@ -359,6 +375,7 @@ require('nvim-treesitter.configs').setup {
         'go',
         'graphql',
         'haskell',
+        'heex',
         'html',
         'javascript',
         'jq',
