@@ -1,0 +1,2 @@
+source $DOTFILES/functions/aliases.zsh
+source $DOTFILES/functions/functions.zsh
