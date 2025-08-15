@@ -23,3 +23,8 @@ touch ~/.hushlogin
 # Allow automatic text replacement
 # &shrug; should equal ¯\_(ツ)_/¯ now
 defaults write -g WebAutomaticTextReplacementEnabled -bool true
+
+# Enable accent character overlay on text writing apps
+defaults write -app Slack ApplePressAndHoldEnabled -bool true
+defaults write -app Arc ApplePressAndHoldEnabled -bool true
+
