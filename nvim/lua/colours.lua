@@ -28,6 +28,6 @@ end
 
 -- Fix vim illuminate
 -- bg is set to the same as the dracula theme
-vim.cmd("highlight IlluminatedWordText gui=None guibg=#424450")
-vim.cmd("highlight IlluminatedWordRead gui=None guibg=#424450")
-vim.cmd("highlight IlluminatedWordWrite gui=None guibg=#424450")
+-- vim.cmd("highlight IlluminatedWordText gui=None guibg=#424450")
+-- vim.cmd("highlight IlluminatedWordRead gui=None guibg=#424450")
+-- vim.cmd("highlight IlluminatedWordWrite gui=None guibg=#424450")
