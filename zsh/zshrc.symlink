@@ -1,33 +1,25 @@
+# Setup base environment
 export DOTFILES="$HOME/.dotfiles"
 
-# Load homebrew
+# Setup homebrew
 export PATH="/opt/homebrew/sbin:$PATH"
 export PATH="/opt/homebrew/bin:$PATH"
 
-# Load custom bins
+# Setup custom bins
 export PATH="$PATH:$DOTFILES/bin:/usr/local/bin"
 
+# Load env and secrets before all else
 source $DOTFILES/system/env.init
 source $DOTFILES/system/secrets.init
 
-source $DOTFILES/zsh/init.zsh
-source $DOTFILES/zsh/theme.zsh
-source $DOTFILES/zsh/zsh-autopair/autopair.zsh
-source $DOTFILES/zsh/keys.zsh
-source $DOTFILES/zsh/keybindings.zsh
-source $DOTFILES/zsh/completions.zsh
-
-source $DOTFILES/git/init.zsh
-
+# Setup base tools
+source $DOTFILES/zsh/zsh.init
+source $DOTFILES/git/git.init
 source $DOTFILES/asdf/asdf.init
-source $DOTFILES/bat/bat.init
-source $DOTFILES/cheat/cheat.init
-# source $DOTFILES/broot/broot.init
-source $DOTFILES/starship/starship.init
+source $DOTFILES/functions/functions.init
+source $DOTFILES/system/system.init
 
-source $DOTFILES/functions/aliases.zsh
-source $DOTFILES/functions/functions.zsh
-
+# Setup languages
 source $DOTFILES/postgres/pg.init
 source $DOTFILES/elixir/erl.init
 source $DOTFILES/rust/cargo.init
@@ -36,10 +28,13 @@ source $DOTFILES/node/node.init
 source $DOTFILES/go/go.init
 source $DOTFILES/conda/conda.init
 
-source $DOTFILES/system/direnv.init
-source $DOTFILES/system/fzf.init
-source $DOTFILES/system/z.init
+# Setup extra tools
+source $DOTFILES/bat/bat.init
+source $DOTFILES/cheat/cheat.init
+source $DOTFILES/starship/starship.init
+# source $DOTFILES/broot/broot.init
 
+# Setup custom work profile
 if [ "$MNDS_WORK_PROFILE" ]; then
   source $DOTFILES/river/river.init
 fi
