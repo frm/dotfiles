@@ -75,7 +75,6 @@ require("lazy").setup({
   'APZelos/blamer.nvim',
   'tpope/vim-projectionist',
   'kristijanhusak/any-jump.vim',
-  'embear/vim-localvimrc',
   'tpope/vim-abolish',
   'tpope/vim-surround',
   'vim-test/vim-test',
@@ -86,6 +85,12 @@ require("lazy").setup({
   { 'mg979/vim-visual-multi', branch = 'master' },
   { 'RRethy/vim-hexokinase', build = 'make hexokinase' },
   { 'ahmedkhalf/project.nvim', config = function() require('project_nvim').setup() end },
+  {
+    "embear/vim-localvimrc",
+    init = function()
+      vim.g.localvimrc_whitelist = "^" .. vim.fn.expand("$HOME") .. "/Developer/.*"
+    end
+  },
   {
      'smoka7/hop.nvim',
      version = "*",
