@@ -41,10 +41,16 @@ _env_autoload_hook() {
     envfile="$root/$autosource_target"
     mtime="$(_env_mtime "$envfile")"
     if [[ -z "${_ENV_AUTOLOAD_MTIMES[$root]:-}" || "${_ENV_AUTOLOAD_MTIMES[$root]}" != "$mtime" ]]; then
+      # Since this is running in a zsh hook, when opening a tmux pane in a directory
+      # with $autosource_target, the hook runs before the environment is read,
+      # causing the side-effects of environment.sh.
+      #
+      # To avoid this, force loading the environment file in this hook.
+      source $HOME/.dotfiles/river/env.init
+
       source "$envfile"
       _ENV_AUTOLOAD_MTIMES[$root]="$mtime"
       _ENV_AUTOLOAD_LASTROOT="$root"
-      # print -P "↻ sourced %F{cyan}$envfile%f"
     fi
   else
     _ENV_AUTOLOAD_LASTROOT=""
