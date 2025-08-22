@@ -186,18 +186,16 @@ telescope.load_extension('aerial')
 map('n', '<localleader>ghi', ':Telescope gh issues<CR>')
 map('n', '<localleader>ghp', ':Telescope gh pull_request<CR>')
 map('n', '<localleader>ghw', ':Telescope gh run<CR>')
-
-map('n', '<localleader>gb', ':Telescope git_branches<CR>')
-map('n', '<localleader>gc', ':Telescope git_commits<CR>')
-
 map('n', '<localleader>o', ':Telescope aerial<CR>')
-map('n', '<C-S-k>', ':Telescope commands<CR>')
-map('n', '<C-p>', ':Telescope find_files<CR>')
-map('n', '<C-S-p>', ':Telescope projects<CR>')
-map('n', '<localleader>gr', ':Telescope lsp_references<CR>')
-map('n', '<C-f>', ':Telescope grep_string search= <CR>') -- ensures fuzzy search
-map('n', '<M-f>', ':Telescope live_grep<CR>')
-map('n', '<C-w><C-w>', ':Telescope oldfiles<CR>')
+
+map('n', '<localleader>gb', ':FzfLua git_branches<CR>')
+map('n', '<localleader>gc', ':FzfLua git_commits<CR>')
+
+map('n', '<C-p>', ':FzfLua files<CR>')
+map('n', '<localleader>gr', ':FzfLua lsp_references<CR>')
+map('n', '<C-f>', ':FzfLua grep_project<CR>')
+map('n', '<M-f>', ':FzfLua resume<CR>')
+map('n', '<C-w><C-w>', ':FzfLua oldfiles<CR>')
 
 -----------------------------------------------------------------
 -- Wilder

@@ -110,8 +110,6 @@ require("lazy").setup({
     },
   },
 
-  { 'nvim-telescope/telescope-fzf-native.nvim', build = 'CFLAGS=-march=native make' },
-
   {
      'nvim-telescope/telescope.nvim',
      dependencies = {
@@ -119,8 +117,20 @@ require("lazy").setup({
        'nvim-lua/plenary.nvim',
        'nvim-telescope/telescope-github.nvim',
        'nvim-telescope/telescope-ui-select.nvim',
-       'nvim-telescope/telescope-fzf-native.nvim'
+       {
+         'nvim-telescope/telescope-fzf-native.nvim',
+         build = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 && cmake --build build --config Release'
+       },
      },
+  },
+
+  -- in theory we don't need this because of nvim-telescope +
+  -- nvim-telescope-fzf-native but in practice, live_grep is really slow there
+  -- so for that let's use fzf lua directly
+  {
+    "ibhagwan/fzf-lua",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    opts = {}
   },
 
 

@@ -19,6 +19,7 @@
   "elixir-ls": { "branch": "master", "commit": "6111aed419149a53d77c9ac8282fb56334d539c1" },
   "everforest": { "branch": "master", "commit": "4132e797f6ce555de53825b6ef3df0b618456703" },
   "fzf": { "branch": "master", "commit": "1afd14381079a35eac0a4c2a5cacb86e2a3f476b" },
+  "fzf-lua": { "branch": "main", "commit": "5d2ba91230356dce4dac52df32ddc6cf5a940d56" },
   "fzf.vim": { "branch": "master", "commit": "3725f364ccd25b85a91970720ba9bc2931861910" },
   "gitsigns.nvim": { "branch": "main", "commit": "c7d37ca22b461f64e26f8f6701b2586128ed0bef" },
   "gruvbox-material": { "branch": "master", "commit": "d080710b58e605b45db0b0e4288205ca6f7587f0" },
