@@ -1,3 +1,2 @@
-export AUTOLOAD_ENVIRONMENT=false
-
+source $DOTFILES/river/env.init
 source $DOTFILES/river/zsh/autosource.zsh
