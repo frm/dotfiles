@@ -6,7 +6,7 @@
   // vscode settings
   "diffEditor.codeLens": true,
   "editor.accessibilitySupport": "off",
-  "editor.fontFamily": "FiraCode Nerd Font Mono, Menlo, Monaco, 'Courier New', monospace",
+  "editor.fontFamily": "FiraCode Nerd Font, Menlo, Monaco, 'Courier New', monospace",
   "editor.fontLigatures": true,
   "editor.formatOnSave": true,
   "editor.lineNumbers": "relative",
