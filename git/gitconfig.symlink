@@ -56,8 +56,8 @@
   mt = mergetool
   p = push
   pl = pull
-  prs = browse -- 'pulls?q=is:pr is:open -review:approved -author:justmendes'
-  myprs = browse -- 'pulls?q=review-requested:justmendes'
+  prs-me = browse -- 'pulls?q=is:pr is:open author:frm'
+  prs-rr = browse -- 'pulls?q=review-requested:frm is:open'
   pulls = browse -- pulls
   pt = push origin --tags
   rb = rebase
@@ -76,8 +76,8 @@
   cr = !git-code-review
   div = !git-divergence
   mb = !git-my-branches
-  mbs = !git-my-branches --select
-  mbss = !git-my-branches --select --short
+  mbr = !git-my-branches --select
+  mbrs = !git-my-branches --select --short
   mpr = !git-merge-pr
   nk = !git-nuke
   ppr = !git-push-pr
