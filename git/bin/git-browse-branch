@@ -1,0 +1,39 @@
+#!/usr/bin/env zsh
+# open the current branch on GitHub
+
+source "$DOTFILES/functions/helpers.zsh"
+
+zparseopts -- {c,-compare}=compare {b,-branch}:=branch
+
+if (( $#branch )); then
+  branch=$branch[2]
+else
+  branch=$(git rev-parse --abbrev-ref HEAD)
+fi
+
+open_compare_view() {
+  parent=$(git-parent-branch -b "$branch")
+
+  if [ $? -ne 0 ]; then
+    exit 1
+  fi
+
+  _mnds_pp_info "git" "Comparing $branch with $parent..."
+
+  repo_url=$(gh browse --no-browser)
+  open "$repo_url/compare/$parent...$branch"
+}
+
+open_branch_view() {
+  _mnds_pp_info "git" "Opening $branch on browser..."
+  gh browse --branch "$branch"
+}
+
+if [[ "$compare" ]]; then
+  open_compare_view
+  exit $?
+else
+  open_branch_view
+  exit $?
+fi
+
