@@ -1,0 +1,37 @@
+#!/usr/bin/env zsh
+# find the parent branch for HEAD or -b
+
+source "$DOTFILES/functions/helpers.zsh"
+
+zparseopts -- {b,-branch}:=branch
+
+if (( $#branch )); then
+  branch=$branch[2]
+else
+  branch=$(git rev-parse --abbrev-ref HEAD)
+fi
+
+get_parent_branch() {
+  # attempt via reflog's branch checkout history
+  parent=$(git reflog show --date=iso "$branch" \
+    | awk '/checkout: moving from/ {print $6; exit}')
+
+  if [ -z "$parent" ]; then
+    # attempt via reflog's full checkout history
+    parent=$(git reflog show --date=iso \
+      | grep "$branch" \
+      | grep checkout \
+      | tail -n 1 \
+      | awk '{print $8; exit}')
+  fi
+
+  if [ -n "$parent" ]; then
+    echo "$parent"
+    return 0
+  fi
+
+  _mnds_pp_error "git" "couldn't determine parent branch" 1>&2
+  return 1
+}
+
+echo "$(get_parent_branch)"
