@@ -225,7 +225,7 @@
         "key": "space n",
         "command": "workbench.view.explorer",
         // allow shortcut in blank slate after :qa
-        "when": "(editorTextFocus && neovim.mode != insert) || (!editorIsOpen && terminal.active)"
+        "when": "editorTextFocus && neovim.mode != insert"
     },
     {
         "key": "space n",
@@ -255,12 +255,12 @@
     {
         "key": "space shift+o",
         "command": "outline.focus",
-        "when": "(editorFocus && neovim.mode != 'insert') || terminalFocus || explorerViewletFocus"
+        "when": "(editorFocus && neovim.mode != 'insert') || explorerViewletFocus"
     },
     {
         "key": "space o",
         "command": "outline.toggleVisibility",
-        "when": "(editorFocus && neovim.mode != 'insert') || terminalFocus || explorerViewletFocus"
+        "when": "(editorFocus && neovim.mode != 'insert') || explorerViewletFocus"
     },
     // terminal control: splits
     {
