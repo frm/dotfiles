@@ -1,0 +1,4 @@
+GCLOUD_PATH="$HOME/.bin/google-cloud-sdk"
+
+if [ -f "$GCLOUD_PATH/path.zsh.inc" ]; then . "$GCLOUD_PATH/path.zsh.inc"; fi
+if [ -f "$GCLOUD_PATH/completion.zsh.inc" ]; then . "$GCLOUD_PATH/completion.zsh.inc"; fi
