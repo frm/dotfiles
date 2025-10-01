@@ -352,17 +352,6 @@
         "command": "workbench.action.tasks.runTask",
         "args": "test:debug:line"
     },
-    // projectionist/vscode-alternate-alternate-file
-    {
-        "key": "space a a",
-        "command": "alternateFile.createAlternateFile",
-        "when": "editorTextFocus && neovim.mode != insert",
-    },
-    {
-        "key": "space a v",
-        "command": "alternateFile.createAlternateFileInSplit",
-        "when": "editorTextFocus && neovim.mode != insert",
-    },
     // neovim   
     {
         "key": "space j",
@@ -375,5 +364,23 @@
         "command": "vscode-neovim.send",
         "when": "editorTextFocus && neovim.mode != 'insert'",
         "args": ":SplitjoinJoin<CR>"
-    }
+    },
+    {
+        "key": "space a a",
+        "command": "vscode-neovim.send",
+        "when": "editorTextFocus && neovim.mode != 'insert'",
+        "args": ":AC<CR>"
+    },
+    {
+        "key": "space a v",
+        "command": "vscode-neovim.send",
+        "when": "editorTextFocus && neovim.mode != 'insert'",
+        "args": ":AVC<CR>"
+    },
+    {
+        "key": "space a s",
+        "command": "vscode-neovim.send",
+        "when": "editorTextFocus && neovim.mode != 'insert'",
+        "args": ":ASC<CR>"
+    },
 ]
