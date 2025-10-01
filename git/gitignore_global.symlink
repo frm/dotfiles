@@ -70,3 +70,6 @@ Temporary Items
 
 # projectionist
 .projections.json
+
+# my own ai wikis
+.frm/
