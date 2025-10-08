@@ -23,7 +23,7 @@
 
   // colours
   "catppuccin.italicKeywords": false,
-  "workbench.colorTheme": "Catppuccin Mocha",
+  "workbench.colorTheme": "One Dark Pro Darker",
 
   // neovim integration
   "extensions.experimental.affinity": {
