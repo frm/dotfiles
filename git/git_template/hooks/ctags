@@ -2,9 +2,11 @@
 
 set -e
 
+PATH="/usr/local/bin:$PATH"
+GIT_DIR=(git rev-parse --git-dir)
+
 echo "[git]: ctags at .git/tags"
 
-PATH="/usr/local/bin:$PATH"
-trap "rm -f .git/tags.$$" EXIT
-ctags --tag-relative -Rf.git/tags.$$ --exclude=.git --languages=-javascript,sql > /dev/null 2>&1
-mv .git/tags.$$ .git/tags
+trap "rm -f $GIT_DIR/tags.$$" EXIT
+ctags --tag-relative -Rf$GIT_DIR/tags.$$ --exclude=$GIT_DIR --languages=-javascript,sql > /dev/null 2>&1
+mv $GIT_DIR/tags.$$ $GIT_DIR/tags
