@@ -1,0 +1,2 @@
+export MISE_DATA_DIR="$HOME/.mise"
+eval "$(mise activate zsh)"

@@ -81,27 +81,8 @@ else
   exit 1
 fi
 
-pp_info "asdf" "setting up environment"
-gln -srf asdf/asdfrc.symlink ~/.asdfrc
-
-pp_info "asdf" "adding plugins"
-asdf plugin add elixir
-asdf plugin add erlang
-asdf plugin add ruby
-asdf plugin add rust
-asdf plugin add python
-asdf plugin add nodejs
-asdf plugin add crystal
-asdf plugin add golang
-asdf plugin add postgres
-asdf plugin add kubectl
-asdf plugin add flutter
-asdf plugin add cocoapods
-
-asdf_check=$(pp $RESET "asdf" "check if the asdf/tool-versions.symlink file contains the desired language versions and press ENTER when ready ")
-read -r "_unused?$asdf_check"
-
-gln -srf asdf/tool-versions.symlink ~/.tool-versions
+pp_info "mise" "setting up environment"
+gln -srf mise/mise.toml.symlink ~/.mise.toml
 
 # Ensure postgres is configured
 export POSTGRES_EXTRA_CONFIGURE_OPTIONS="
@@ -110,12 +91,17 @@ export POSTGRES_EXTRA_CONFIGURE_OPTIONS="
   --with-libraries=/usr/local/lib:$(brew --prefix openssl@3)/lib
   --with-includes=/usr/local/include:$(brew --prefix openssl@3)/include"
 
+# directly install these dependencies for postgres
+# keep them out of the usual bundle
+brew install gcc readline zlib curl ossp-uuid icu4c pkg-config
+export PKG_CONFIG_PATH="/opt/homebrew/bin/pkg-config:$(brew --prefix icu4c)/lib/pkgconfig:$(brew --prefix curl)/lib/pkgconfig:$(brew --prefix zlib)/lib/pkgconfig"
+
 brew install icu4c
 brew link icu4c --force
 
-asdf install
+source mise/mise.init
 
-source asdf/asdf.init
+mise install
 
 pp_info "elixir" "setting up iex"
 gln -srf elixir/iex.exs.symlink ~/.iex.exs
