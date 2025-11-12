@@ -1,6 +1,6 @@
 #! /usr/bin/env sh
 
-# The following error might happen during asdf install
+# The following error might happen during mise install
 # because I'm running OpenSSL 3.0 while postgres defaults to 1.1:
 # configure: error: library 'crypto' is required for OpenSSL
 #
@@ -13,7 +13,7 @@ export POSTGRES_EXTRA_CONFIGURE_OPTIONS="
 
 pg_server() {
   pg_version=$(pg_ctl --version | cut -d ' ' -f3)
-  pg_dir="$HOME/.asdf/installs/postgres/$pg_version/data"
+  pg_dir="$HOME/.mise/installs/postgres/$pg_version/data"
 
   pg_ctl -D $pg_dir -l "$pg_dir/server.log" "$@"
 }

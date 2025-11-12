@@ -15,16 +15,13 @@ source $DOTFILES/system/secrets.init
 # Setup base tools
 source $DOTFILES/zsh/zsh.init
 source $DOTFILES/git/git.init
-source $DOTFILES/asdf/asdf.init
+source $DOTFILES/mise/mise.init
 source $DOTFILES/functions/functions.init
 source $DOTFILES/system/system.init
 
 # Setup languages
 source $DOTFILES/postgres/pg.init
 source $DOTFILES/elixir/erl.init
-source $DOTFILES/rust/cargo.init
-source $DOTFILES/python/python.init
-source $DOTFILES/node/node.init
 source $DOTFILES/go/go.init
 source $DOTFILES/conda/conda.init
 
