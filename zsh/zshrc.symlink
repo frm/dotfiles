@@ -1,3 +1,7 @@
+# basic variables to setup the rest of the scripts
+export DOTFILES="$HOME/.dotfiles"
+export DEVELOPER="$HOME/Developer"
+
 # load env and secrets before all else
 source $DOTFILES/system/env.init
 source $DOTFILES/system/secrets.init
