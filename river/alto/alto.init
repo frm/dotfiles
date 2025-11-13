@@ -1,0 +1,4 @@
+export ALTO="$RIVER/alto"
+export PATH="$ALTO/bin:$PATH"
+
+eval "$(alto completions zsh)"
