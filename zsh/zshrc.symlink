@@ -1,18 +1,9 @@
-# Setup base environment
-export DOTFILES="$HOME/.dotfiles"
-
-# Setup homebrew
-export PATH="/opt/homebrew/sbin:$PATH"
-export PATH="/opt/homebrew/bin:$PATH"
-
-# Setup custom bins
-export PATH="$PATH:$DOTFILES/bin:/usr/local/bin"
-
-# Load env and secrets before all else
+# load env and secrets before all else
 source $DOTFILES/system/env.init
 source $DOTFILES/system/secrets.init
 
 # Setup base tools
+source $DOTFILES/homebrew/homebrew.init
 source $DOTFILES/zsh/zsh.init
 source $DOTFILES/git/git.init
 source $DOTFILES/mise/mise.init

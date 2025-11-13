@@ -1,4 +1,6 @@
-source $DOTFILES/river/env.init
+export AUTOLOAD_ENVIRONMENT=false
+export RIVER="$DEVELOPER/river"
+
+source $DOTFILES/river/alto/alto.init
 source $DOTFILES/river/gcloud/gcloud.init
-source $DOTFILES/river/zsh/autosource.zsh
 
