@@ -1,5 +1,6 @@
 export AUTOLOAD_ENVIRONMENT=false
 export RIVER="$DEVELOPER/river"
+export MNDS_DEFAULT_MAIN_BRANCH_NAME=master
 
 source $DOTFILES/river/alto/alto.init
 source $DOTFILES/river/gcloud/gcloud.init
