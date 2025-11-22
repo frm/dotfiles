@@ -95,7 +95,8 @@ if [ -z "$reviewers" ]; then
 fi
 
 reviewers=$(_git_push_pr_get_reviewers "$reviewers" "$extra_reviewers")
-destination=${destination:-main}
+default_main_branch_name=${MNDS_DEFAULT_MAIN_BRANCH_NAME:-main}
+destination=${destination:-$default_main_branch_name}
 
 _git_push_pr_rebase_if_needed "$destination"
 
