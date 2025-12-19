@@ -66,6 +66,7 @@
   sts = stash save -u
   tree = log --graph --pretty=format:'%Cred%h%Creset %an: %s - %Creset %C(yellow)%d%Creset %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
   untrack = update-index --assume-unchanged
+  wt = worktree
 
   apf = !git-amend-push
   bb= !git-browse-branch
