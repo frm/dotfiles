@@ -11,3 +11,5 @@ kubectl = "1.25.13"
 flutter = "3.19.2"
 cocoapods = "1.16.2"
 
+[settings]
+trusted_config_paths = ['~/Developer']
