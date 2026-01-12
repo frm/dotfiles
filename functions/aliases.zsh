@@ -14,6 +14,7 @@ alias mux="tmuxinator"
 alias git="hub"
 alias g="hub"
 alias gb="gh browse"
+alias lg="lazygit"
 
 alias se="bin/setup"
 alias te="bin/test"
