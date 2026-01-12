@@ -28,7 +28,8 @@ require("lazy").setup({
   {
     'nvim-tree/nvim-tree.lua',
     dependencies = {'nvim-tree/nvim-web-devicons'},
-    tag = 'nightly'
+    version = "*",
+    lazy = false
   },
 
   { 'echasnovski/mini.nvim', version = false },
@@ -339,6 +340,7 @@ require("lazy").setup({
   'sainnhe/gruvbox-material',
   'sainnhe/everforest',
   { 'dracula/vim', name = 'dracula' },
-  { "catppuccin/nvim", name = "catppuccin", priority = 1000 }
+  { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
+  'lunarvim/horizon.nvim'
 })
 -- LuaFormatter on

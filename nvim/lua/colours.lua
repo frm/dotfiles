@@ -13,7 +13,10 @@ vim.g.everforest_disable_italic_comment = 1
 vim.g.everforest_transparent_background = 1
 vim.g.everforest_current_word = "grey background"
 
-vim.cmd.colorscheme("catppuccin-" .. os.getenv("CATPPUCCIN_VARIANT"))
+-- enable for auto catpuccin theme
+-- vim.cmd.colorscheme("catppuccin-" .. os.getenv("CATPPUCCIN_VARIANT"))
+
+vim.cmd.colorscheme("horizon")
 
 vim.opt.showtabline = 0
 vim.opt.laststatus = 2

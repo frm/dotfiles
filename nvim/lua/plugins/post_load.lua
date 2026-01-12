@@ -267,7 +267,9 @@ vim.opt.grepprg="rg --vimgrep --color=always --no-heading"
 require("lualine/bubbles")
 require("lualine").setup({
   options = {
-    theme = "catppuccin-" .. os.getenv("CATPPUCCIN_VARIANT"),
+    -- enable for auto catpuccin theme
+    -- theme = "catppuccin-" .. os.getenv("CATPPUCCIN_VARIANT"),
+    theme = "horizon"
   },
   sections = {
     lualine_x = { "aerial" }
@@ -320,7 +322,6 @@ require("nvim-tree").setup({
         side = "right",
     },
 })
-
 
 map('n', '<leader>n', ':NvimTreeToggle<CR>', { silent = true })
 map('n', '<leader>N', ':NvimTreeFindFile<CR>', { silent = true })
