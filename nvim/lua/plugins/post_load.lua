@@ -13,7 +13,7 @@ local merge = function(t1, t2)
 end
 
 local function unmap(mode, combo)
-    vim.api.nvim_del_keymap(mode, combo)
+    vim.keymap.del(mode, combo)
 end
 
 local function map(mode, combo, mapping, opts)
@@ -609,13 +609,5 @@ map('i', '<C-F>', 'copilot#Accept("\\<CR>")', {
 unmap('i', '<C-]>') -- originally <Plug>(copilot-dismiss)
 
 map('i', '<M-Space>', '<Plug>(copilot-dismiss)')
-
------------------------------------------------------------------
--- Avante
------------------------------------------------------------------
-
-require('avante_lib').load()
-
-map('n', '<leader>l', '<Plug>(AvanteAsk)')
 
 -- LuaFormatter on
