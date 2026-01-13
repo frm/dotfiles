@@ -149,6 +149,14 @@ require("lazy").setup({
   'lucidstack/hex.vim',
   'tjdevries/nlua.nvim',
 
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
+    ---@module 'render-markdown'
+    ---@type render.md.UserConfig
+    opts = {},
+  },
+
   -- AI Pair programming
 
   'github/copilot.vim',
