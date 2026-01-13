@@ -14,3 +14,7 @@ completer.hist
 
 *.pyc
 ctags
+
+# ai stuff
+.claude/
+.ai/
