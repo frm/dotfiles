@@ -59,6 +59,11 @@ require("lazy").setup({
     dependencies = "nvim-treesitter/nvim-treesitter",
   },
 
+  {
+    "HiPhish/rainbow-delimiters.nvim",
+    dependencies = "nvim-treesitter/nvim-treesitter",
+  },
+
   -- Functionality
   'tpope/vim-fugitive',
   'tpope/vim-rhubarb',

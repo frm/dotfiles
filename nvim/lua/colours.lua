@@ -1,6 +1,20 @@
 vim.opt.termguicolors = true
 vim.opt.background = "dark"
 
+-- Rainbow delimiters configuration
+vim.g.rainbow_delimiters = {
+  strategy = {
+    [''] = require('rainbow-delimiters').strategy['global'],
+  },
+  query = {
+    [''] = 'rainbow-delimiters',
+  },
+}
+
+local function set_hl(group, opts)
+  vim.api.nvim_set_hl(0, group, opts)
+end
+
 -- dracula
 -- vim.cmd("highlight IlluminatedWordText gui=None guibg=#424450")
 -- vim.cmd("highlight IlluminatedWordRead gui=None guibg=#424450")
@@ -26,9 +40,40 @@ vim.opt.background = "dark"
 -- horizon
 vim.api.nvim_create_autocmd("ColorScheme", {
 callback = function()
-  vim.api.nvim_set_hl(0, "IlluminatedWordText",  { bg = "#2a2d37", underline = false })
-  vim.api.nvim_set_hl(0, "IlluminatedWordRead",  { bg = "#2a2d37", underline = false })
-  vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { bg = "#2a2d37", underline = false })
+  set_hl("IlluminatedWordText",  { bg = "#2a2d37", underline = false })
+  set_hl("IlluminatedWordRead",  { bg = "#2a2d37", underline = false })
+  set_hl("IlluminatedWordWrite", { bg = "#2a2d37", underline = false })
+
+  --
+  -- improve highlighting in elixir
+  --
+
+  -- atoms -> orange like booleans
+  set_hl("@string.special.symbol.elixir", { link = "@boolean" })
+
+  -- regular variables -> default text color
+  -- vim.api.nvim_set_hl(0, "@variable.elixir", { link = "Normal" })
+  -- vim.api.nvim_set_hl(0, "@variable.parameter.elixir", { link = "Normal" })
+
+  -- module attributes -> should be red
+  set_hl("@constant.elixir", { link = "@variable" })
+
+  -- function keywords -> bold
+  local keyword_hl = vim.api.nvim_get_hl(0, { name = "Keyword" })
+  set_hl("@keyword.function.elixir", vim.tbl_extend("force", keyword_hl, { bold = true }))
+  set_hl("@keyword.elixir", vim.tbl_extend("force", keyword_hl, { bold = true }))
+
+  -- operators -> yellow
+  set_hl("@operator.elixir", { link = "Structure" })
+
+  -- rainbow delimiters: first level purple, second level blue, third level yellow
+  set_hl("RainbowDelimiterRed", { link = "Keyword" })      -- purple
+  set_hl("RainbowDelimiterYellow", { link = "Function" })  -- blue
+  set_hl("RainbowDelimiterBlue", { link = "Structure" })   -- yellow
+  set_hl("RainbowDelimiterOrange", { link = "Keyword" })   -- cycle back to purple
+  set_hl("RainbowDelimiterGreen", { link = "Function" })   -- cycle back to blue
+  set_hl("RainbowDelimiterViolet", { link = "Structure" }) -- cycle back to yellow
+  set_hl("RainbowDelimiterCyan", { link = "Keyword" })     -- cycle back to purple
 end,
 })
 
