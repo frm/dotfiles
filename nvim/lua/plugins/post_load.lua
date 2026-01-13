@@ -341,13 +341,19 @@ require("which-key").setup({
 })
 
 -----------------------------------------------------------------
--- Splitjoin
+-- TreeSJ
 -----------------------------------------------------------------
 
-vim.g.splitjoin_split_mapping = ''
-vim.g.splitjoin_join_mapping = ''
+local tsj = require('treesj')
 
-map('n', 'sj', ':SplitjoinSplit<CR>')
+tsj.setup({
+    use_default_keymaps = false,
+    max_join_length = 250,
+})
+
+vim.keymap.set('n', 'sj', function()
+    require('treesj').toggle({ split = { recursive = true } })
+end)
 
 -----------------------------------------------------------------
 -- TreeSitter

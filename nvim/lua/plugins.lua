@@ -41,7 +41,11 @@ require("lazy").setup({
   },
 
   -- Behaviour
-  'AndrewRadev/splitjoin.vim',
+  {
+    'Wansmer/treesj',
+    dependencies = { 'nvim-treesitter/nvim-treesitter' }
+  },
+
   'derekprior/vim-trimmer',
   'farmergreg/vim-lastplace',
   'gabrielpoca/term_find.nvim',
