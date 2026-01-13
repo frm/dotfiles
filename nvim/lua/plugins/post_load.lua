@@ -18,7 +18,7 @@ end
 
 local function map(mode, combo, mapping, opts)
     local options = merge({noremap = true}, opts or {})
-    vim.api.nvim_set_keymap(mode, combo, mapping, options)
+    vim.keymap.set(mode, combo, mapping, options)
 end
 
 local autocmd = vim.api.nvim_create_autocmd
@@ -130,15 +130,12 @@ vim.lsp.config('efm', vim.tbl_extend('force', efmls_config, {
 map('n', '<leader>t', ':Trouble diagnostics toggle<CR>')
 
 -----------------------------------------------------------------
--- Replacer
+-- VimTmuxNavigator
 -----------------------------------------------------------------
 
--- autocmd('FileType', {
---     pattern = 'qf',
---     command = 'lua require("replacer").run()'
--- })
-
--- map("n", "<localleader>qf", ':lua require("replacer").run()<cr>', {silent = true})
+-- vim-tmux-navigator doesn't actually set :TmuxNavigateLeft for terminals
+map('t', '<C-h>', '<C-\\><C-n>:TmuxNavigateLeft<CR>',  { silent = true })
+map('t', '<C-l>', '<C-\\><C-n>:TmuxNavigateRight<CR>', { silent = true })
 
 -----------------------------------------------------------------
 -- Aerial
@@ -265,6 +262,7 @@ vim.opt.grepprg="rg --vimgrep --color=always --no-heading"
 
 -- require("lualine/evil")
 require("lualine/bubbles")
+
 require("lualine").setup({
   options = {
     -- enable for auto catpuccin theme
@@ -274,6 +272,7 @@ require("lualine").setup({
   sections = {
     lualine_x = { "aerial" }
   },
+  tabline = {}, -- leave tabline for barbar
   extensions = {'nvim-tree'}
 })
 
@@ -285,28 +284,31 @@ require("catppuccin").setup({
   auto_integrations = true,
 })
 
-
 -----------------------------------------------------------------
 -- Barbar
 -----------------------------------------------------------------
 
 vim.g.barbar_auto_setup = false
 
-map('n', '<leader>1', ':BufferGoto 1<CR>', { silent = true })
-map('n', '<leader>2', ':BufferGoto 2<CR>', { silent = true })
-map('n', '<leader>3', ':BufferGoto 3<CR>', { silent = true })
-map('n', '<leader>4', ':BufferGoto 4<CR>', { silent = true })
-map('n', '<leader>5', ':BufferGoto 5<CR>', { silent = true })
-map('n', '<leader>6', ':BufferGoto 6<CR>', { silent = true })
-map('n', '<leader>7', ':BufferGoto 7<CR>', { silent = true })
-map('n', '<leader>8', ':BufferGoto 8<CR>', { silent = true })
-map('n', '<leader>9', ':BufferGoto 9<CR>', { silent = true })
-map('n', '<leader>0', ':BufferLast<CR>',   { silent = true })
-map('n', '<leader>w', ':BufferClose<CR>',  { silent = true })
+map('n', '<leader>1', ':BufferGoto 1<CR>',   { silent = true })
+map('n', '<leader>2', ':BufferGoto 2<CR>',   { silent = true })
+map('n', '<leader>3', ':BufferGoto 3<CR>',   { silent = true })
+map('n', '<leader>4', ':BufferGoto 4<CR>',   { silent = true })
+map('n', '<leader>5', ':BufferGoto 5<CR>',   { silent = true })
+map('n', '<leader>6', ':BufferGoto 6<CR>',   { silent = true })
+map('n', '<leader>7', ':BufferGoto 7<CR>',   { silent = true })
+map('n', '<leader>8', ':BufferGoto 8<CR>',   { silent = true })
+map('n', '<leader>9', ':BufferGoto 9<CR>',   { silent = true })
+map('n', '<leader>0', ':BufferLast<CR>',     { silent = true })
+map('n', '<leader>w', ':BufferClose<CR>',    { silent = true })
+map('n', '<Tab>',     ':BufferNext<CR>',     { silent = true })
+map('n', '<S-Tab>',   ':BufferPrevious<CR>', { silent = true })
 
 require("barbar").setup({
     animation = true,
     exclude_ft = { 'NvimTree' },
+    exclude_name = { '' },  -- exclude unnamed buffers
+    auto_hide = 1,  -- auto-hide when only one buffer is open
 })
 
 -----------------------------------------------------------------
@@ -553,22 +555,6 @@ require('diagflow').setup({
   toggle_event = { 'InsertEnter' },
   show_borders = true,
 })
-
-
------------------------------------------------------------------
--- nvim-treesitter-textsubjects
------------------------------------------------------------------
-
-require('nvim-treesitter.configs').setup {
-    textsubjects = {
-        enable = true,
-        prev_selection = ',',
-        keymaps = {
-            ['<CR>'] = 'textsubjects-smart',
-            ['<space-cr>'] = 'textsubjects-container-inner'
-        },
-    },
-}
 
 -----------------------------------------------------------------
 -- mini

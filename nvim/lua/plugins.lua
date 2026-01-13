@@ -10,7 +10,7 @@ require("lazy").setup({
 
   -- GUI
   'christoomey/vim-tmux-navigator',
-  -- use 'vimpostor/vim-tpipeline'
+
   {
     'nvim-lualine/lualine.nvim',
     dependencies = { 'nvim-tree/nvim-web-devicons' }
@@ -23,7 +23,6 @@ require("lazy").setup({
       'nvim-tree/nvim-web-devicons',
     },
   },
-
 
   {
     'nvim-tree/nvim-tree.lua',
@@ -41,14 +40,6 @@ require("lazy").setup({
     end
   },
 
-  -- {
-  --   "startup-nvim/startup.nvim",
-  --   requires = {"nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim"},
-  --   config = function()
-  --     require"startup".setup({ theme = "dashboard" })
-  --   end
-  -- },
-
   -- Behaviour
   'AndrewRadev/splitjoin.vim',
   'derekprior/vim-trimmer',
@@ -57,18 +48,16 @@ require("lazy").setup({
   'SirVer/ultisnips',
   'RRethy/vim-illuminate',
   'RRethy/nvim-treesitter-endwise',
+
   {
-    'anuvyklack/pretty-fold.nvim',
-     config = function()
-       require('pretty-fold').setup()
-     end
+    'kevinhwang91/nvim-ufo',
+    dependencies = 'kevinhwang91/promise-async'
   },
 
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
     dependencies = "nvim-treesitter/nvim-treesitter",
   },
-  'RRethy/nvim-treesitter-textsubjects',
 
   -- Functionality
   'tpope/vim-fugitive',
@@ -81,11 +70,9 @@ require("lazy").setup({
   'vim-test/vim-test',
   'voldikss/vim-floaterm',
   'wincent/terminus',
-  -- use 'gabrielpoca/replacer.nvim'
   'stefandtw/quickfix-reflector.vim',
   { 'mg979/vim-visual-multi', branch = 'master' },
   { 'RRethy/vim-hexokinase', build = 'make hexokinase' },
-  { 'ahmedkhalf/project.nvim', config = function() require('project_nvim').setup() end },
   {
     "embear/vim-localvimrc",
     init = function()
@@ -178,6 +165,32 @@ require("lazy").setup({
         "nvim-telescope/telescope.nvim"
       }
   },
+
+  {
+    "coder/claudecode.nvim",
+    dependencies = { "folke/snacks.nvim" },
+    config = true,
+    keys = {
+      { "<leader>a", nil, desc = "AI/Claude Code" },
+      { "<leader>ac", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude" },
+      { "<leader>af", "<cmd>ClaudeCodeFocus<cr>", desc = "Focus Claude" },
+      { "<leader>ar", "<cmd>ClaudeCode --resume<cr>", desc = "Resume Claude" },
+      { "<leader>aC", "<cmd>ClaudeCode --continue<cr>", desc = "Continue Claude" },
+      { "<leader>am", "<cmd>ClaudeCodeSelectModel<cr>", desc = "Select Claude model" },
+      { "<leader>ab", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add current buffer" },
+      { "<leader>as", "<cmd>ClaudeCodeSend<cr>", mode = "v", desc = "Send to Claude" },
+      {
+        "<leader>as",
+        "<cmd>ClaudeCodeTreeAdd<cr>",
+        desc = "Add file",
+        ft = { "NvimTree", "neo-tree", "oil", "minifiles", "netrw" },
+      },
+      -- Diff management
+      { "<leader>aA", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
+      { "<leader>aD", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny diff" },
+    },
+  },
+
 
   -- LSP + COQ & Treesitter
 

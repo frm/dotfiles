@@ -49,6 +49,9 @@ vim.opt.formatoptions:append("j")
 
 vim.opt.lazyredraw = true
 
+-- Enable tabline
+vim.opt.showtabline = 2
+
 -- Completion issues
 vim.opt.shortmess:append("c")
 vim.opt.signcolumn = "yes"
