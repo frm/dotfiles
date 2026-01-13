@@ -1,2 +1,4 @@
 export MISE_DATA_DIR="$HOME/.mise"
+export MISE_NODE_DEFAULT_PACKAGES_FILE="$DOTFILES/node/default-npm-packages"
+
 eval "$(mise activate zsh)"
