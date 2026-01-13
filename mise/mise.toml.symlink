@@ -2,7 +2,7 @@
 ruby = "3.4.7"
 erlang = "28.1.1"
 elixir = "1.19.2-otp-28"
-nodejs = "22.12.0"
+nodejs = "24.12.0"
 rust = "stable"
 python = ["3.12.9", "2.7.18"]
 golang = "1.18"
