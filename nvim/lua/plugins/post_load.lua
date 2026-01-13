@@ -46,10 +46,8 @@ require("mason-lspconfig").setup {
 
 require("mason-nvim-dap").setup({
     ensure_installed = {
-        "chrome",
         "elixir",
         "js",
-        "node2",
         "python",
     },
     automatic_installation = true,
