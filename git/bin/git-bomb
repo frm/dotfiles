@@ -3,23 +3,93 @@
 # CAUTION: BEWARE OF THIS SCRIPT! #
 # # # # # # # # # # # # # # # # # #
 #
-# Delete local branches that were already merged into main
-# To see the full version of this script check bin/git-nuke
+# Delete local branches (and their worktrees) that were already merged into main/master
+# For the full version of this script check bin/git-nuke
 
-# Prune origin
-echo "[git]: pruning..."
+set -e
+
+#
+# aux functions
+#
+
+__echo_git() {
+  echo "[git]: $1" >&2
+}
+
+__git_bomb_get_default_branch() {
+  if git rev-parse --verify main >/dev/null 2>&1; then
+    echo "main"
+  elif git rev-parse --verify master >/dev/null 2>&1; then
+    echo "master"
+  else
+    __echo_git "no main or master branch found"
+    exit 1
+  fi
+}
+
+__git_bomb_get_merged_branches() {
+  local default_branch="$1"
+
+  git branch --merged "$default_branch" \
+    | grep -v "$default_branch" \
+    | grep -v '^\*' \
+    | sed 's/^[[:space:]]*//'
+}
+
+__git_bomb_remove_worktree() {
+  local branch_name="$1"
+  local worktree_path=""
+
+  worktree_path=$(git worktree list --porcelain \
+    | grep -B2 "^branch refs/heads/$branch_name$" \
+    | grep "^worktree " \
+    | cut -d' ' -f2) || true
+
+  if [ -n "$worktree_path" ]; then
+    __echo_git "removing worktree at $worktree_path"
+    git worktree remove "$worktree_path" --force
+  fi
+}
+
+__git_bomb_delete_local_branch() {
+  local branch_name="$1"
+
+  __echo_git "deleting local branch '$branch_name'"
+  git branch -d "$branch_name"
+}
+
+__git_bomb_print_success() {
+  local line="THE EAGLE HAS LANDED.\n\nI REPEAT, THE EAGLE HAS LANDED"
+
+  if which cow-echo >/dev/null 2>&1; then
+    echo "$line" | cow-echo
+  elif which cowsay >/dev/null 2>&1; then
+    echo "$line" | cowsay
+  else
+    echo "\n\n$line"
+  fi
+}
+
+#
+# main script
+#
+
+__echo_git "pruning..."
 git fetch --prune
 
-# Delete merged branches
-echo "[git]: deleting merged branches..."
-git branch --merged | grep -v main | grep -v '^\*' | xargs git branch -d
+default_branch=$(__git_bomb_get_default_branch)
+__echo_git "using '$default_branch' as default branch"
 
-line="THE EAGLE HAS LANDED.\n\nI REPEAT, THE EAGLE HAS LANDED"
+__echo_git "deleting merged branches..."
+merged_branches=$(__git_bomb_get_merged_branches "$default_branch")
 
-if which cow-echo &> /dev/null; then
-  echo $line | cow-echo
-elif which cowsay &> /dev/null; then
-  echo $line | cowsay
+if [ -z "$merged_branches" ]; then
+  __echo_git "no merged branches to delete"
 else
-  echo "\n\n$line"
+  echo "$merged_branches" | while read -r branch; do
+    __git_bomb_remove_worktree "$branch"
+    __git_bomb_delete_local_branch "$branch"
+  done
 fi
+
+__git_bomb_print_success

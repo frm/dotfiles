@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 # deletes a branch (and its worktree if one exists)
-# usage: git del <branch>
+# usage: git del [-f] <branch>
+# -f: also delete the remote branch
 
 set -e
 
@@ -53,17 +54,29 @@ __git_del_delete_remote_branch() {
 # main script
 #
 
+delete_remote=false
+
+while getopts "f" opt; do
+  case $opt in
+    f) delete_remote=true ;;
+    *) ;;
+  esac
+done
+shift $((OPTIND - 1))
+
 if [ -z "$1" ]; then
   __echo_git "branch name required"
-  echo "usage: git del <branch>" >&2
+  echo "usage: git del [-f] <branch>" >&2
   exit 1
 fi
 
 branch_name="$1"
 
 __git_del_remove_worktree "$branch_name"
-
 __git_del_delete_local_branch "$branch_name"
-__git_del_delete_remote_branch "$branch_name"
+
+if [ "$delete_remote" = true ]; then
+  __git_del_delete_remote_branch "$branch_name"
+fi
 
 __echo_git "done"
