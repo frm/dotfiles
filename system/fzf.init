@@ -1,4 +1,4 @@
-source $DOTFILES/system/fzf/themes/Catppuccin-$CATPPUCCIN_VARIANT.zsh
+source $DOTFILES/system/fzf/themes/base16-horizon-dark.zsh
 
 export FZF_DEFAULT_COMMAND="rg --files --hidden --follow --ignore-file $DOTFILES/ripgrep/ignore"
 
