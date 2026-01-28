@@ -2,7 +2,7 @@
 
 set -e
 
-local projections_dir="$DOTFILES/vscode/projections"
+local projections_dir="$DOTFILES/cursor/projections"
 local languages=()
 
 function ensure_git_repo() {

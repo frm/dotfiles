@@ -1,5 +1,3 @@
 #!/bin/sh
 
-$(dirname "$0")/ctags &
-
-$HOME/.dotfiles/vscode/scripts/generate-projections -f > /dev/null 2>&1 &
+$HOME/.dotfiles/cursor/scripts/generate-projections -f > /dev/null 2>&1 &

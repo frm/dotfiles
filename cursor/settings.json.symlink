@@ -24,11 +24,6 @@
   // colours
   "catppuccin.italicKeywords": false,
   "workbench.colorTheme": "Horizon Bold",
-
-  // neovim integration
-  "extensions.experimental.affinity": {
-    "asvetliakov.vscode-neovim": 1
-  },
   "vscode-neovim.compositeKeys": {
     "jk": {
       "command": "vscode-neovim.escape"
