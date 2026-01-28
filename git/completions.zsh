@@ -4,12 +4,16 @@ __git_branches() {
 }
 
 _git_wrapper() {
+  local service=git
+  words[1]=git
+
   case ${words[2]} in
-    co|cpr|mpr|ppr|del) __git_branches ;;
+    co|cpr|mpr|ppr|dl|del|wt|wtd) __git_branches ;;
     *) _git ;;
   esac
 }
 
-# wrap around git completions and pass them down to hub
+# wrap around git completions and pass them down to hub/g
 compdef _git_wrapper hub
 compdef _git_wrapper git
+compdef _git_wrapper g

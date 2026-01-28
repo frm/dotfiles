@@ -1,23 +1,69 @@
 #!/usr/bin/env sh
-# Deletes local and remote branch
+# deletes a branch (and its worktree if one exists)
+# usage: git del <branch>
 
-if [ $# -eq 0 ]; then
-  echo "[git]: ERR: git-del requires a branch to delete"
+set -e
+
+#
+# aux functions
+#
+
+__echo_git() {
+  echo "[git]: $1" >&2
+}
+
+__git_del_remove_worktree() {
+  local branch_name="$1"
+  local worktree_path=""
+
+  worktree_path=$(git worktree list --porcelain \
+    | grep -B2 "^branch refs/heads/$branch_name$" \
+    | grep "^worktree " \
+    | cut -d' ' -f2) || true
+
+  if [ -n "$worktree_path" ]; then
+    __echo_git "removing worktree at $worktree_path"
+    git worktree remove "$worktree_path" --force
+  fi
+}
+
+__git_del_delete_local_branch() {
+  local branch_name="$1"
+
+  if git rev-parse --verify "$branch_name" >/dev/null 2>&1; then
+    __echo_git "deleting local branch '$branch_name'"
+    git branch -D "$branch_name"
+  else
+    __echo_git "local branch '$branch_name' does not exist, skipping"
+  fi
+}
+
+__git_del_delete_remote_branch() {
+  local branch_name="$1"
+
+  if git ls-remote --exit-code --heads origin "$branch_name" >/dev/null 2>&1; then
+    __echo_git "deleting remote branch '$branch_name'"
+    git push origin --delete "$branch_name"
+  else
+    __echo_git "remote branch '$branch_name' does not exist, skipping"
+  fi
+}
+
+#
+# main script
+#
+
+if [ -z "$1" ]; then
+  __echo_git "branch name required"
+  echo "usage: git del <branch>" >&2
   exit 1
 fi
 
-if ! (git rev-parse --verify "$1" > /dev/null 2>& 1); then
-  echo "[git]: branch $1 does not exist locally"
-else
-  git branch -d "$1"
-  echo "[git]: branch $1 deleted locally"
-fi
+branch_name="$1"
 
-remote=$(git remote get-url origin)
+__git_del_remove_worktree "$branch_name"
 
-if [ "$(git ls-remote --heads "$remote" "$1" | wc -l)" -eq "0" ]; then
-  echo "[git]: remote branch $1 does not exist"
-else
-  git push origin :"$1"
-  echo "[git]: remote branch $1 deleted"
-fi
+__git_del_delete_local_branch "$branch_name"
+__git_del_delete_remote_branch "$branch_name"
+
+__echo_git "done"

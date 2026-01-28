@@ -49,6 +49,7 @@
   co = checkout-worktree
   cp = cherry-pick
   d = diff
+  dl = del
   dt = difftool
   f = fetch
   l = log --color --graph --pretty=format:'%C(yellow)%d%Creset %Cgreen(%cr)%Creset %C(bold blue)[%an]%Creset %s %Cred(%h)%Creset' --abbrev-commit
@@ -66,7 +67,8 @@
   sts = stash save -u
   tree = log --graph --pretty=format:'%Cred%h%Creset %an: %s - %Creset %C(yellow)%d%Creset %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
   untrack = update-index --assume-unchanged
-  wt = worktree
+  wt = worktree-add
+  wtd = worktree-del
 
   apf = !git-amend-push
   bb= !git-browse-branch

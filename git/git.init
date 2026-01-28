@@ -1,6 +1,9 @@
 # Load custom git completions
 source $DOTFILES/git/completions.zsh
 
+# Load g wrapper function
+source $DOTFILES/git/g.zsh
+
 # Load custom git commands
 export PATH="$PATH:$DOTFILES/git/bin"
 
