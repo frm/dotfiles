@@ -12,10 +12,10 @@ if [ -z "$destination" ]; then
   fi
 fi
 echo "[git]: checking out $destination..."
-git checkout $destination
+git checkout-worktree $destination
 
 echo "[git]: updating..."
 git pull origin $destination
 
 echo "[git]: creating a new branch..."
-git checkout -b $1
+git checkout-worktree -b $1
