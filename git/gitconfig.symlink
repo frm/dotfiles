@@ -12,6 +12,7 @@
   ui = true
 [commit]
   gpgsign = true
+  template = ~/.gitmessage
 [core]
   editor = nvim -f
   pager = diff-so-fancy | less --tabs=4 -RFX
