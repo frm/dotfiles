@@ -1,0 +1,43 @@
+#!/usr/bin/env sh
+# tries to checkout a branch
+# if it fails due to worktree existing, cds into it
+
+set -e
+
+__git_checkout_wt_path() {
+  echo "$1" | sed -n "s/.*is already used by worktree at '\(.*\)'/\1/p"
+}
+
+if [ $# -eq 0 ]; then
+  echo "[git]: arguments required" >&2
+  exit 1
+fi
+
+checkout_output=$(git checkout "$@" 2>&1) && {
+  echo "$checkout_output"
+  exit 0
+}
+
+# we get here in case of error
+# try to extract any existing worktree path from the error
+worktree_path=$(__git_checkout_wt_path "$checkout_output")
+
+case "$worktree_path" in
+  # no worktree error, bypass it
+  "")
+    echo "$checkout_output" >&2
+    exit 1
+    ;;
+
+  # inside developer, print a formatted version of it
+  "$HOME/Developer/"*) display_path="${worktree_path#$HOME/Developer/}" ;;
+
+  # not in our usually path, make it clear
+  "$HOME/"*) display_path="${worktree_path#$HOME/}" ;;
+
+  # we're definitely somewhere we shouldn't be, print the full path
+  *) display_path="$worktree_path" ;;
+esac
+
+echo "[git]: branch is in worktree, cd'ing into $display_path"
+cd "$worktree_path"

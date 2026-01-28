@@ -46,7 +46,7 @@
   b = branch -avv
   c = commit
   cam = commit -a --amend --no-edit
-  co = checkout
+  co = checkout-worktree
   cp = cherry-pick
   d = diff
   dt = difftool
