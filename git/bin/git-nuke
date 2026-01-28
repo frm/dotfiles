@@ -3,9 +3,8 @@
 # CAUTION: BEWARE OF THIS SCRIPT! #
 # # # # # # # # # # # # # # # # # #
 #
-# This script prunes remote branches and
-# deletes local branches with no remote counterpart
-# INCLUDING UNMERGED BRANCHES WITH NO REMOTE
+# This script prunes remote branches and deletes local branches (and their worktrees)
+# with no remote counterpart, INCLUDING UNMERGED BRANCHES WITH NO REMOTE
 #
 # This means that if you have an unmerged branch and
 # someone deleted its remote counterpart for some reason
@@ -13,29 +12,114 @@
 #
 # For a lighter version see bin/git-bomb
 
-# Prune origin
-echo "[git]: pruning..."
+set -e
+
+#
+# aux functions
+#
+
+__echo_git() {
+  echo "[git]: $1" >&2
+}
+
+__git_nuke_get_default_branch() {
+  if git rev-parse --verify main >/dev/null 2>&1; then
+    echo "main"
+  elif git rev-parse --verify master >/dev/null 2>&1; then
+    echo "master"
+  else
+    __echo_git "no main or master branch found"
+    exit 1
+  fi
+}
+
+__git_nuke_get_merged_branches() {
+  local default_branch="$1"
+
+  git branch --merged "$default_branch" \
+    | grep -v "$default_branch" \
+    | grep -v '^\*' \
+    | sed 's/^[[:space:]]*//'
+}
+
+__git_nuke_get_gone_branches() {
+  git branch -vv \
+    | awk '/: gone\]/ { print $1 }'
+}
+
+__git_nuke_remove_worktree() {
+  local branch_name="$1"
+  local worktree_path=""
+
+  worktree_path=$(git worktree list --porcelain \
+    | grep -B2 "^branch refs/heads/$branch_name$" \
+    | grep "^worktree " \
+    | cut -d' ' -f2) || true
+
+  if [ -n "$worktree_path" ]; then
+    __echo_git "removing worktree at $worktree_path"
+    git worktree remove "$worktree_path" --force
+  fi
+}
+
+__git_nuke_delete_local_branch() {
+  local branch_name="$1"
+
+  __echo_git "deleting local branch '$branch_name'"
+  git branch -d "$branch_name"
+}
+
+__git_nuke_force_delete_local_branch() {
+  local branch_name="$1"
+
+  __echo_git "force deleting local branch '$branch_name'"
+  git branch -D "$branch_name"
+}
+
+__git_nuke_print_success() {
+  local line="I AM BECOME DEATH,\n\nDESTROYER OF WORLDS"
+
+  if which cow-echo >/dev/null 2>&1; then
+    echo "$line" | cow-echo
+  elif which cowsay >/dev/null 2>&1; then
+    echo "$line" | cowsay
+  else
+    echo "\n\n$line"
+  fi
+}
+
+#
+# main script
+#
+
+__echo_git "pruning..."
 git fetch --prune
 
-# Delete merged branches
-echo "[git]: deleting merged branches..."
-git branch --merged \
-  | grep -v main \
-  | grep -v '^\*' \
-  | xargs git branch -d
+default_branch=$(__git_nuke_get_default_branch)
+__echo_git "using '$default_branch' as default branch"
 
-# Delete unmerged branches with no remote counterpart
-echo "[git]: deleting unmerged branches..."
-git branch -avv \
-  | awk '/: gone\]/ { print $1 }' \
-  | xargs git branch -D
+__echo_git "deleting merged branches..."
+merged_branches=$(__git_nuke_get_merged_branches "$default_branch")
 
-line="I AM BECOME DEATH,\n\nDESTROYER OF WORLDS"
-
-if which cow-echo &> /dev/null; then
-  echo $line | cow-echo
-elif which cowsay &> /dev/null; then
-  echo $line | cowsay
+if [ -z "$merged_branches" ]; then
+  __echo_git "no merged branches to delete"
 else
-  echo "\n\n$line"
+  echo "$merged_branches" | while read -r branch; do
+    __git_nuke_remove_worktree "$branch"
+    __git_nuke_delete_local_branch "$branch"
+  done
 fi
+
+__echo_git "deleting unmerged branches with no remote..."
+gone_branches=$(__git_nuke_get_gone_branches)
+
+if [ -z "$gone_branches" ]; then
+  __echo_git "no gone branches to delete"
+else
+  echo "$gone_branches" | while read -r branch; do
+    __git_nuke_remove_worktree "$branch"
+    __git_nuke_force_delete_local_branch "$branch"
+  done
+fi
+
+__git_nuke_print_success
