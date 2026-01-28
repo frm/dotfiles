@@ -18,3 +18,5 @@ ctags
 # ai stuff
 .claude/
 .ai/
+
+ai/me.md
