@@ -168,6 +168,7 @@ pp_info "git" "setting up environment"
 gln -srf git/gitconfig.symlink ~/.gitconfig
 gln -srf git/gitignore_global.symlink ~/.gitignore_global
 gln -srf git/gitattributes.symlink ~/.gitattributes
+gln -srf git/gitmessage.symlink ~/.gitmessage
 dirlink git/git_template ~/.git_template
 
 pp_info "gnupg" "setting up gpg config"
