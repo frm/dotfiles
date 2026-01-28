@@ -39,5 +39,5 @@ case "$worktree_path" in
   *) display_path="$worktree_path" ;;
 esac
 
-echo "[git]: branch is in worktree, cd'ing into $display_path"
-cd "$worktree_path"
+echo "[git]: branch is in worktree, cd'ing into $display_path" >&2
+echo "$worktree_path"

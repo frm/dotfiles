@@ -12,7 +12,6 @@ alias tls="tmux list-sessions"
 alias mux="tmuxinator"
 
 alias git="hub"
-alias g="hub"
 alias gb="gh browse"
 alias lg="lazygit"
 

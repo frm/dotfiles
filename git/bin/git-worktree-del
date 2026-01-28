@@ -1,0 +1,71 @@
+#!/usr/bin/env sh
+# removes a worktree, deletes local dir, and deletes local+remote branch
+# usage: git worktree-del <branch>
+
+set -e
+
+#
+# aux functions
+#
+
+__echo_git() {
+  echo "[git]: $1" >&2
+}
+
+__git_wt_get_worktree_path() {
+  local branch_name="$1"
+
+  git worktree list --porcelain \
+    | grep -B2 "^branch refs/heads/$branch_name$" \
+    | grep "^worktree " \
+    | cut -d' ' -f2
+}
+
+__git_wt_remove_worktree() {
+  local worktree_path="$1"
+
+  __echo_git "removing worktree at $worktree_path"
+  git worktree remove "$worktree_path" --force
+}
+
+__git_wt_delete_local_branch() {
+  local branch_name="$1"
+
+  __echo_git "deleting local branch '$branch_name'"
+  git branch -D "$branch_name"
+}
+
+__git_wt_delete_remote_branch() {
+  local branch_name="$1"
+
+  if git ls-remote --exit-code --heads origin "$branch_name" >/dev/null 2>&1; then
+    __echo_git "deleting remote branch '$branch_name'"
+    git push origin --delete "$branch_name"
+  else
+    __echo_git "no remote branch found for '$branch_name', skipping"
+  fi
+}
+
+#
+# main script
+#
+
+if [ -z "$1" ]; then
+  __echo_git "branch name required"
+  echo "usage: git worktree-del <branch>" >&2
+  exit 1
+fi
+
+branch_name="$1"
+worktree_path=$(__git_wt_get_worktree_path "$branch_name")
+
+if [ -z "$worktree_path" ]; then
+  __echo_git "no worktree found for branch '$branch_name'"
+  exit 1
+fi
+
+__git_wt_remove_worktree "$worktree_path"
+__git_wt_delete_local_branch "$branch_name"
+__git_wt_delete_remote_branch "$branch_name"
+
+__echo_git "done"
