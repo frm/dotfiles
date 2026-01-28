@@ -11,6 +11,23 @@ _git_push_pr_ensure_git_root() {
   fi
 }
 
+_git_push_pr_find_template() {
+  local templates=(
+    ".github/pull_request_template.md"
+    ".github/PULL_REQUEST_TEMPLATE.md"
+    "pull_request_template.md"
+    "PULL_REQUEST_TEMPLATE.md"
+    "docs/pull_request_template.md"
+  )
+
+  for template in "${templates[@]}"; do
+    if [ -f "$template" ]; then
+      echo "$template"
+      return
+    fi
+  done
+}
+
 _git_push_pr_reviewers_file() {
   if [ ! -f .git/safe/reviewers ]; then
     _mnds_pp_info "git" "no reviewers file found, creating..."
@@ -67,15 +84,22 @@ _git_push_pr() {
 
   echo ""
 
-  if [ -z "$2" ]; then
-    _mnds_pp_info "git" "creating pull request to branch $1..."
+  local template=$(_git_push_pr_find_template)
+  local pr_args=(--base "$1")
 
-    gh pr create --fill --base "$1"
+  if [ -n "$template" ]; then
+    _mnds_pp_info "git" "using PR template: $template"
+    pr_args+=(--body-file "$template")
   else
-    _mnds_pp_info "git" "creating pull request to branch $1 with reviewers $2..."
-
-    gh pr create --fill --base "$1" --reviewer "$2"
+    pr_args+=(--fill)
   fi
+
+  if [ -n "$2" ]; then
+    pr_args+=(--reviewer "$2")
+  fi
+
+  _mnds_pp_info "git" "creating pull request to branch $1..."
+  gh pr create "${pr_args[@]}"
 }
 
 #
