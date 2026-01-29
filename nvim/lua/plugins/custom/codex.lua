@@ -1,21 +1,6 @@
 local M = {}
 
-function M.toggle()
-  local codex = require('codex')
-  local was_open = codex.is_open and codex.is_open()
-  codex.toggle()
-  if not was_open then
-    vim.schedule(function() vim.cmd('startinsert') end)
-  end
-end
-
-function M.focus()
-  local codex = require('codex')
-  -- Open if not open
-  if not (codex.is_open and codex.is_open()) then
-    codex.open()
-  end
-  -- Find and focus the codex terminal window
+local function startinsert_in_codex()
   vim.schedule(function()
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do
       local name = vim.api.nvim_buf_get_name(buf)
@@ -30,6 +15,23 @@ function M.focus()
       end
     end
   end)
+end
+
+function M.toggle()
+  local codex = require('codex')
+  local was_open = codex.is_open and codex.is_open()
+  codex.toggle()
+  if not was_open then
+    startinsert_in_codex()
+  end
+end
+
+function M.focus()
+  local codex = require('codex')
+  if not (codex.is_open and codex.is_open()) then
+    codex.open()
+  end
+  startinsert_in_codex()
 end
 
 function M.select_model()

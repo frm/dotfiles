@@ -259,7 +259,7 @@ require("lazy").setup({
     lazy = true,
     cmd = { 'Codex', 'CodexToggle' },
     keys = {
-      { '<leader>cc', '<cmd>CodexToggle<cr>', desc = 'Toggle Codex', mode = { 'n', 't' } },
+      { '<leader>cc', function() codex.toggle() end, desc = 'Toggle Codex', mode = { 'n', 't' } },
       { '<leader>cf', function() codex.focus() end, desc = 'Focus Codex' },
       { '<leader>cm', function() codex.select_model() end, desc = 'Select Codex model' },
       { '<leader>cs', function() codex.send() end, desc = 'Send to Codex', mode = 'v' },
