@@ -27,5 +27,5 @@ commits=$(git log --oneline "$upstream".."$branch")
 if [ -z "$commits" ]; then
   __echo_git "no unpushed commits on $branch"
 else
-  echo "$commits"
+  git log --color --pretty=format:'%Cred%h%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit "$upstream".."$branch"
 fi
