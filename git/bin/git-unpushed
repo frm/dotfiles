@@ -1,0 +1,31 @@
+#!/usr/bin/env sh
+# shows local commits that have not yet been pushed to the upstream branch
+# usage: git unpushed
+
+set -e
+
+#
+# aux functions
+#
+
+__echo_git() {
+  echo "[git]: $1" >&2
+}
+
+#
+# main script
+#
+
+branch=$(git rev-parse --abbrev-ref HEAD)
+upstream=$(git rev-parse --abbrev-ref "@{upstream}" 2>/dev/null) || {
+  __echo_git "no upstream configured for $branch"
+  exit 1
+}
+
+commits=$(git log --oneline "$upstream".."$branch")
+
+if [ -z "$commits" ]; then
+  __echo_git "no unpushed commits on $branch"
+else
+  echo "$commits"
+fi
