@@ -2,7 +2,10 @@
 unbind C-b
 set -g prefix C-a
 
-set -g extended-keys always
+set -g extended-keys on
+
+# Make S-Enter work inside tmux
+bind -n S-Enter send-keys "\e[13;2u"
 
 set -g default-terminal "tmux-256color"
 set -g terminal-overrides ',xterm-ghostty:extkeys'
