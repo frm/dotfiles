@@ -1,7 +1,5 @@
 completions/
 
-iterm2/vendor/
-
 tmux/plugins/
 
 # Ignore secrets
