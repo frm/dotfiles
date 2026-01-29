@@ -267,7 +267,8 @@ require("lazy").setup({
         '<C-w>z',
         function() assistant.zoom() end,
         desc = 'Toggle zoom',
-        mode = { 't', 'n', 'i' }
+        mode = { 't', 'n' },
+        ft = 'codex',
       },
     },
     opts = {
