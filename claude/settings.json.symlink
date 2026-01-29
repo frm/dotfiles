@@ -3,6 +3,9 @@
   "permissions": {
     "additionalDirectories": [
       "~/.dotfiles/ai/"
+    ],
+    "allowedTools": [
+      "Bash(gh:*)"
     ]
   }
 }
