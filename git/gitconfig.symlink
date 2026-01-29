@@ -47,6 +47,7 @@
   b = branch -avv
   c = commit
   cam = commit -a --amend --no-edit
+  cl = clone-cd
   co = checkout-worktree
   cp = cherry-pick
   d = diff

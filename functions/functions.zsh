@@ -57,23 +57,6 @@ t() {
   fi
 }
 
-# git clone a repo and cd to it
-# This needs to be a function to change the current environment
-alias gcl="git-clone-cd"
-
-git-clone-cd() {
-  if which gh &> /dev/null; then
-    gh repo clone $@
-  else
-    git clone
-  fi
-
-  if [[ $? -eq 0 ]]; then
-    dir=$(echo "$@" | awk -F / '{ print $NF }' | sed 's/.git//g' | cut -d ' ' -f 2)
-    cd $dir
-  fi
-}
-
 x() {
   if [ -f $1 ]; then
     case $1 in
