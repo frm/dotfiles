@@ -221,6 +221,12 @@ require("lazy").setup({
               mode = "t",
               desc = "Hide Claude terminal"
             },
+            claude_zoom = {
+              "<C-w>z",
+              function() require('plugins.ai').zoom() end,
+              mode = { "t", "n", "i" },
+              desc = "Toggle zoom"
+            },
           },
         },
       },
@@ -243,6 +249,12 @@ require("lazy").setup({
         function() require('plugins.codex').send() end,
         desc = 'Send to Codex',
         mode = 'v'
+      },
+      {
+        '<C-w>z',
+        function() require('plugins.ai').zoom() end,
+        desc = 'Toggle zoom',
+        mode = 't'
       },
     },
     opts = {
