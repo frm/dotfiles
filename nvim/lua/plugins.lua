@@ -227,26 +227,21 @@ require("lazy").setup({
   },
 
   {
-  'kkrampis/codex.nvim',
+  'johnseth97/codex.nvim',
     lazy = true,
     cmd = { 'Codex', 'CodexToggle' },
     keys = {
       {
         '<leader>cc',
-        function()
-          -- note: usually this is enough
-          -- function() require('codex').toggle() end,
-          -- however, there's no native support to go on insert mode
-          -- automatically on Codex start, so this works around that
-          local codex = require('codex')
-          local was_open = codex.is_open and codex.is_open()
-          codex.toggle()
-          if not was_open then
-            vim.schedule(function() vim.cmd('startinsert') end)
-          end
-        end,
-        desc = 'Toggle Codex popup or side-panel',
+        function() require('plugins.codex').toggle() end,
+        desc = 'Toggle Codex',
         mode = { 'n', 't' }
+      },
+      {
+        '<leader>cs',
+        function() require('plugins.codex').send() end,
+        desc = 'Send to Codex',
+        mode = 'v'
       },
     },
     opts = {
