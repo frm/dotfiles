@@ -128,6 +128,7 @@ require("lazy").setup({
             keys = {
               ["<C-v>"] = { "edit_vsplit", mode = { "i", "n" } },
               ["<C-x>"] = { "edit_split", mode = { "i", "n" } },
+              ["<C-u>"] = { function() vim.api.nvim_set_current_line("") end, mode = { "i", "n" } },
             },
           },
         },
