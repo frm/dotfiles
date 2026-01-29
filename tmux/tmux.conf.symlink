@@ -2,13 +2,11 @@
 unbind C-b
 set -g prefix C-a
 
-set -g extended-keys on
-
-# Make S-Enter work inside tmux
-bind -n S-Enter send-keys "\e[13;2u"
-
 set -g default-terminal "tmux-256color"
-set -g terminal-overrides ',xterm-ghostty:extkeys'
+
+# Pass Shift+Enter (CSI u from Ghostty keybind) through to apps
+set -s user-keys[0] "\e[13;2u"
+bind-key -n User0 send-keys "\e[13;2u"
 
 # Fix cursor change in nvim
 set -g -a terminal-overrides ',*:Ss=\E[%p1%d q:Se=\E[2 q'
