@@ -1,3 +1,5 @@
 #!/bin/sh
 
-$HOME/.dotfiles/cursor/scripts/generate-projections -f > /dev/null 2>&1 &
+# Generates Cursor projections after checkout.
+# Commenting out because back to nvim. Uncomment if using Cursor again.
+# $HOME/.dotfiles/cursor/scripts/generate-projections -f > /dev/null 2>&1 &
