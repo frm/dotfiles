@@ -8,7 +8,8 @@ _git_wrapper() {
   words[1]=git
 
   case ${words[2]} in
-    co|cpr|mpr|ppr|dl|del|wt|wtd) __git_branches ;;
+    co) __git_branches; _files ;;
+    cpr|mpr|ppr|dl|del|wt|wtd) __git_branches ;;
     *) _git ;;
   esac
 }
