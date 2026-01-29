@@ -8,7 +8,7 @@ vim.g.mapleader = " "
 -----------------------------------------------------------------
 
 local assistant = require('plugins.custom.assistant')
-local codex = codex
+local codex = require('plugins.custom.codex')
 require('plugins.custom.memorise').setup()
 
 -----------------------------------------------------------------
@@ -259,33 +259,15 @@ require("lazy").setup({
     lazy = true,
     cmd = { 'Codex', 'CodexToggle' },
     keys = {
-      {
-        '<leader>cc',
-        function() codex.toggle() end,
-        desc = 'Toggle Codex',
-        mode = { 'n', 't' }
-      },
-      {
-        '<leader>cf',
-        function() codex.focus() end,
-        desc = 'Focus Codex',
-      },
-      {
-        '<leader>cm',
-        function() codex.select_model() end,
-        desc = 'Select Codex model',
-      },
-      {
-        '<leader>cs',
-        function() codex.send() end,
-        desc = 'Send to Codex',
-        mode = 'v'
-      },
+      { '<leader>cc', '<cmd>CodexToggle<cr>', desc = 'Toggle Codex', mode = { 'n', 't' } },
+      { '<leader>cf', function() codex.focus() end, desc = 'Focus Codex' },
+      { '<leader>cm', function() codex.select_model() end, desc = 'Select Codex model' },
+      { '<leader>cs', function() codex.send() end, desc = 'Send to Codex', mode = 'v' },
       {
         '<C-w>z',
         function() assistant.zoom() end,
         desc = 'Toggle zoom',
-        mode = 't'
+        mode = { 't', 'n', 'i' }
       },
     },
     opts = {
