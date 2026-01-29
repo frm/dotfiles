@@ -310,7 +310,9 @@ require("lazy").setup({
 
   'williamboman/mason.nvim',
   'williamboman/mason-lspconfig.nvim',
-  'creativenull/efmls-configs-nvim',
+  'WhoIsSethDaniel/mason-tool-installer.nvim',
+  'stevearc/conform.nvim',
+  'mfussenegger/nvim-lint',
   'mfussenegger/nvim-dap',
   'jay-babu/mason-nvim-dap.nvim',
   { "folke/neodev.nvim", opts = {} }, -- required for nvim-dap-ui

@@ -29,6 +29,13 @@ local autocmd = vim.api.nvim_create_autocmd
 
 require("mason").setup()
 
+require("mason-tool-installer").setup({
+    ensure_installed = {
+        "prettierd",
+        "eslint_d",
+    },
+})
+
 -----------
 --  DAPs --
 -----------
@@ -110,62 +117,67 @@ cmp.setup({
 
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
--- Set up LSP keybindings and format-on-save via LspAttach autocmd
+-- Set up LSP keybindings via LspAttach autocmd
 autocmd('LspAttach', {
     callback = function(args)
         local bufnr = args.buf
-        local client = vim.lsp.get_client_by_id(args.data.client_id)
-
         vim.keymap.set('n', '<C-]>', vim.lsp.buf.definition, { buffer = bufnr })
-
-        -- Format on save
-        if client and client.server_capabilities.documentFormattingProvider then
-            autocmd('BufWritePre', {
-                buffer = bufnr,
-                callback = function()
-                    -- Disable smear cursor during format to prevent visible cursor jump
-                    local smear = require("smear_cursor")
-                    local was_enabled = smear.enabled
-                    smear.enabled = false
-
-                    -- Save cursor position (format moves cursor to 0,0)
-                    local pos = vim.api.nvim_win_get_cursor(0)
-                    vim.lsp.buf.format({
-                        async = false,
-                        timeout_ms = 3000,
-                        filter = function(c) return c.id == client.id end
-                    })
-                    -- Restore cursor (pcall handles invalid pos if lines were removed)
-                    pcall(vim.api.nvim_win_set_cursor, 0, pos)
-
-                    smear.enabled = was_enabled
-                end
-            })
-        end
     end,
 })
 
-local eslint = require('efmls-configs.linters.eslint')
-local prettier = require('efmls-configs.formatters.prettier')
+-----------------------------------------------------------------
+-- Conform (formatting)
+-----------------------------------------------------------------
 
-local languages = {
-  javascript = { eslint, prettier },
-  javascriptreact = { eslint, prettier },
-  typescript = { eslint, prettier },
-  typescriptreact = { eslint, prettier },
+local conform = require("conform")
+
+conform.setup({
+  formatters_by_ft = {
+    javascript = { "prettierd" },
+    javascriptreact = { "prettierd" },
+    typescript = { "prettierd" },
+    typescriptreact = { "prettierd" },
+    json = { "prettierd" },
+    css = { "prettierd" },
+    html = { "prettierd" },
+    markdown = { "prettierd" },
+  },
+})
+
+-- Format on save with smear cursor handling
+autocmd("BufWritePre", {
+  callback = function(args)
+    -- Disable smear cursor during format to prevent visible cursor jump
+    local smear = require("smear_cursor")
+    local was_enabled = smear.enabled
+    smear.enabled = false
+
+    -- lsp_fallback = true means: use conform if available, otherwise use LSP
+    conform.format({ bufnr = args.buf, timeout_ms = 3000, lsp_fallback = true })
+
+    smear.enabled = was_enabled
+  end,
+})
+
+-----------------------------------------------------------------
+-- nvim-lint (linting)
+-----------------------------------------------------------------
+
+local lint = require("lint")
+
+lint.linters_by_ft = {
+  javascript = { "eslint_d" },
+  javascriptreact = { "eslint_d" },
+  typescript = { "eslint_d" },
+  typescriptreact = { "eslint_d" },
 }
 
-local efmls_config = {
-  filetypes = vim.tbl_keys(languages),
-  settings = {
-    rootMarkers = { '.git/' },
-    languages = languages,
-  },
-  init_options = {
-    documentFormatting = true,
-    documentRangeFormatting = true,
-  },
-}
+-- Lint on save and when leaving insert mode
+autocmd({ "BufWritePost", "InsertLeave", "BufReadPost" }, {
+  callback = function()
+    lint.try_lint()
+  end,
+})
 
 local lspconfig = require('lspconfig')
 
@@ -184,12 +196,6 @@ require("mason-lspconfig").setup({
             lspconfig[server_name].setup({
                 capabilities = capabilities,
             })
-        end,
-        -- Custom handler for efm
-        ["efm"] = function()
-            lspconfig.efm.setup(vim.tbl_extend('force', efmls_config, {
-                capabilities = capabilities,
-            }))
         end,
     },
 })
