@@ -50,7 +50,8 @@ local function open_memorise_window()
 end
 
 function M.setup()
-    vim.keymap.set("n", "<localleader>gm", open_memorise_window, {
+    vim.api.nvim_create_user_command("Memorise", open_memorise_window, {})
+    vim.keymap.set("n", "<localleader>gm", "<cmd>Memorise<cr>", {
         noremap = true,
         silent = true,
         desc = "Open keybindings memorise window"
