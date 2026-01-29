@@ -1,17 +1,51 @@
 #!/usr/bin/env zsh
+# pushes a branch and creates a PR
+#
+# usage: git push-pr [-r reviewers] [-b destination]
+#   -r: comma-separated list of reviewers (friendly names or GitHub handles)
+#   -b: destination branch (default: main)
+#
+# reviewer resolution (aliases are namespaced by repo owner):
+#   - known alias       → resolved from ~/.config/git-ppr/aliases (owner:name=handle)
+#   - unknown + org     → fuzzy match against org members (cached 24h), confirm & save
+#   - unknown + multi   → fzf picker, save selection
+#   - unknown + none    → prompt for handle, save
+#   - no -r + defaults  → uses .git/safe/default-reviewers (one per line)
+#   - no -r + no defaults → no reviewers (CODEOWNERS handles it)
+#
+# pr creation:
+#   - no template           → uses commit title+body (--fill)
+#   - template + 1 commit   → prefills commit msg + template, opens editor
+#   - template + n commits  → interactive mode (gh prompts for title/body)
+#
+# after creation:
+#   - opens the PR in browser via `gh pr view --web`
+#
+# files:
+#   ~/.config/git-ppr/aliases      - owner-scoped aliases (owner:name=handle)
+#   ~/.cache/git-ppr/{org}.json    - cached org members (24h TTL)
+#   .git/safe/default-reviewers    - project default reviewers
 
 set -e
 
 source $DOTFILES/functions/helpers.zsh
 
-_git_push_pr_ensure_git_root() {
+GIT_PPR_ALIASES_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/git-ppr/aliases"
+GIT_PPR_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/git-ppr"
+GIT_PPR_CACHE_TTL=86400 # 24 hours in seconds
+
+#
+# aux functions
+#
+
+__git_ppr_ensure_git_root() {
   if [ ! -d .git ]; then
-    _mnds_pp_error "git" "this script must be run on the root of a git repo. Exiting..."
+    _mnds_pp_error "git" "must be run on the root of a git repo"
     exit 1
   fi
 }
 
-_git_push_pr_find_template() {
+__git_ppr_find_template() {
   local templates=(
     ".github/pull_request_template.md"
     ".github/PULL_REQUEST_TEMPLATE.md"
@@ -28,77 +62,225 @@ _git_push_pr_find_template() {
   done
 }
 
-_git_push_pr_reviewers_file() {
-  if [ ! -f .git/safe/reviewers ]; then
-    _mnds_pp_info "git" "no reviewers file found, creating..."
+__git_ppr_prompt() {
+  local var_name="$1"
+  local prompt_text="$2"
+  read -r "${var_name}?${MNDS_FMT_BOLD}${MNDS_FMT_BLUE}[git]${MNDS_FMT_RESET}${MNDS_FMT_BLUE}: ${prompt_text}${MNDS_FMT_RESET} "
+}
 
-    read -r "reviewers?enter a comma-separated list of reviewers: "
-    reviewers=${reviewers:gs/ /}
-
-    mkdir -p .git/safe
-
-    echo "$reviewers" >> .git/safe/reviewers
-
-    echo ""
+__git_ppr_get_alias() {
+  local owner="$1"
+  local name="$2"
+  if [ -f "$GIT_PPR_ALIASES_FILE" ]; then
+    grep -E "^${owner}:${name}=" "$GIT_PPR_ALIASES_FILE" 2>/dev/null | cut -d'=' -f2 | head -1
   fi
 }
 
-_git_push_pr_get_reviewers() {
-  if [ -z "$1" ]; then
-    reviewers=$(/bin/cat .git/safe/reviewers)
-  else
-    reviewers="$1"
-  fi
-
-  if [ ! -z "$2" ]; then
-    reviewers="$reviewers,$2"
-  fi
-
-  echo "${reviewers// /}"
+__git_ppr_save_alias() {
+  local owner="$1"
+  local name="$2"
+  local handle="$3"
+  mkdir -p "$(dirname "$GIT_PPR_ALIASES_FILE")"
+  echo "${owner}:${name}=${handle}" >> "$GIT_PPR_ALIASES_FILE"
+  _mnds_pp_success "git" "saved alias: ${owner}:${name} → ${handle}" >&2
 }
 
-_git_push_pr_rebase_if_needed() {
-  nr_changes=$(git log --left-right --graph --cherry-pick --oneline HEAD..."$1" \
+__git_ppr_get_org() {
+  gh repo view --json owner -q '.owner.login' 2>/dev/null
+}
+
+__git_ppr_is_org() {
+  local owner="$1"
+  local type=$(gh api "/users/${owner}" --jq '.type' 2>/dev/null)
+  [ "$type" = "Organization" ]
+}
+
+__git_ppr_cache_file() {
+  local org="$1"
+  echo "${GIT_PPR_CACHE_DIR}/${org}.json"
+}
+
+__git_ppr_cache_is_fresh() {
+  local cache_file="$1"
+  if [ ! -f "$cache_file" ]; then
+    return 1
+  fi
+  local cache_age=$(($(date +%s) - $(stat -f %m "$cache_file" 2>/dev/null || stat -c %Y "$cache_file" 2>/dev/null)))
+  [ "$cache_age" -lt "$GIT_PPR_CACHE_TTL" ]
+}
+
+__git_ppr_fetch_org_members() {
+  local org="$1"
+  local cache_file=$(__git_ppr_cache_file "$org")
+
+  if __git_ppr_cache_is_fresh "$cache_file"; then
+    /bin/cat "$cache_file"
+    return
+  fi
+
+  _mnds_pp_info "git" "fetching org members for ${org}..." >&2
+  mkdir -p "$GIT_PPR_CACHE_DIR"
+
+  local members=$(gh api "/orgs/${org}/members" --paginate -q '.[] | "\(.login):\(.login)"' 2>/dev/null)
+  if [ -n "$members" ]; then
+    echo "$members" > "$cache_file"
+    echo "$members"
+  fi
+}
+
+__git_ppr_match_member() {
+  local name="$1"
+  local members="$2"
+  echo "$members" | grep -i "$name" | cut -d':' -f1
+}
+
+__git_ppr_resolve_reviewer() {
+  local name="$1"
+  local owner="$2"
+  local is_org="$3"
+  name="${name// /}" # trim spaces
+
+  # check if already a known alias
+  local handle=$(__git_ppr_get_alias "$owner" "$name")
+  if [ -n "$handle" ]; then
+    _mnds_pp_info "git" "'${name}' → ${handle} (from ${owner} aliases)" >&2
+    echo "$handle"
+    return
+  fi
+
+  _mnds_pp_info "git" "'${name}' not found in ${owner} aliases" >&2
+
+  # check org members (only for orgs, not personal accounts)
+  if [ "$is_org" = "1" ]; then
+    local members=$(__git_ppr_fetch_org_members "$owner")
+    local matches=$(__git_ppr_match_member "$name" "$members")
+    local match_count=$(echo "$matches" | grep -c . 2>/dev/null || echo 0)
+
+    if [ "$match_count" -eq 1 ]; then
+      local matched_handle=$(echo "$matches" | head -1)
+      _mnds_pp_info "git" "found match for '${name}': ${matched_handle}" >&2
+      local confirm
+      __git_ppr_prompt "confirm" "is this correct? [Y/n]"
+      if [ -z "$confirm" ] || [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
+        __git_ppr_save_alias "$owner" "$name" "$matched_handle"
+        echo "$matched_handle"
+        return
+      fi
+    elif [ "$match_count" -gt 1 ]; then
+      _mnds_pp_info "git" "multiple matches for '${name}':" >&2
+      local selected=$(echo "$matches" | fzf --prompt="[git]: select reviewer: ")
+      if [ -n "$selected" ]; then
+        __git_ppr_save_alias "$owner" "$name" "$selected"
+        echo "$selected"
+        return
+      fi
+    else
+      _mnds_pp_warn "git" "no matches for '${name}' in ${owner} members" >&2
+    fi
+  fi
+
+  # no match or personal repo - prompt for handle
+  local manual_handle
+  __git_ppr_prompt "manual_handle" "enter GitHub handle for '${name}':"
+  if [ -n "$manual_handle" ]; then
+    __git_ppr_save_alias "$owner" "$name" "$manual_handle"
+    echo "$manual_handle"
+  fi
+}
+
+__git_ppr_resolve_reviewers() {
+  local input="$1"
+  local owner="$2"
+  local is_org="$3"
+  local resolved=()
+
+  # split by comma
+  local names=(${(s:,:)input})
+
+  for name in "${names[@]}"; do
+    local handle=$(__git_ppr_resolve_reviewer "$name" "$owner" "$is_org")
+    if [ -n "$handle" ]; then
+      resolved+=("$handle")
+    fi
+  done
+
+  # join with comma
+  echo "${(j:,:)resolved}"
+}
+
+__git_ppr_get_project_defaults() {
+  local defaults_file=".git/safe/default-reviewers"
+  if [ -f "$defaults_file" ]; then
+    # read file, join lines with comma
+    /bin/cat "$defaults_file" | tr '\n' ',' | sed 's/,$//'
+  fi
+}
+
+__git_ppr_commit_count() {
+  local base="$1"
+  git rev-list --count "$base"..HEAD | tr -d '[:space:]'
+}
+
+__git_ppr_rebase_if_needed() {
+  local base="$1"
+  local nr_changes=$(git log --left-right --graph --cherry-pick --oneline HEAD..."$base" \
     | grep '^<' \
     | wc -l)
 
   nr_changes=${nr_changes:gs/ /}
 
   if [ $nr_changes -eq 1 ]; then
-    _mnds_pp_info "git" "fast rebasing off of $1..."
-    GIT_EDITOR="vim -u NONE +wq" git rebase -i "$1"
+    _mnds_pp_info "git" "rebasing off of $base..."
+    git rebase "$base"
     echo ""
   elif [ $nr_changes -gt 1 ]; then
-    _mnds_pp_info "git" "rebasing off of $1..."
-    git rebase -i "$1"
+    _mnds_pp_info "git" "rebasing off of $base..."
+    git rebase -i "$base"
     echo ""
   else
-    _mnds_pp_info "git" "no rebase needed, skipping..."
+    _mnds_pp_info "git" "no rebase needed"
   fi
 }
 
-_git_push_pr() {
-  _mnds_pp_info "git" "force pushing changes..."
-
+__git_ppr_push() {
+  _mnds_pp_info "git" "force pushing..."
   git push -u -f
-
   echo ""
+}
 
-  local template=$(_git_push_pr_find_template)
-  local pr_args=(--base "$1")
+__git_ppr_create_pr() {
+  local base="$1"
+  local reviewers="$2"
+  local template="$3"
+  local commit_count="$4"
 
-  if [ -n "$template" ]; then
-    _mnds_pp_info "git" "using PR template: $template"
-    pr_args+=(--body-file "$template")
-  else
+  local pr_args=(--base "$base")
+
+  if [ -n "$reviewers" ]; then
+    pr_args+=(--reviewer "$reviewers")
+  fi
+
+  if [ -z "$template" ]; then
+    _mnds_pp_info "git" "no template, using commit info"
     pr_args+=(--fill)
+  elif (( commit_count == 1 )); then
+    _mnds_pp_info "git" "single commit + template, opening editor"
+    local title=$(git log -1 --pretty=format:"%s")
+    local body=$(git log -1 --pretty=format:"%b")
+    local template_content=$(/bin/cat "$template")
+
+    pr_args+=(--title "$title")
+    pr_args+=(--body "$body
+
+---
+
+$template_content")
+    pr_args+=(--editor)
+  else
+    _mnds_pp_info "git" "multiple commits + template, interactive mode"
   fi
 
-  if [ -n "$2" ]; then
-    pr_args+=(--reviewer "$2")
-  fi
-
-  _mnds_pp_info "git" "creating pull request to branch $1..."
+  _mnds_pp_info "git" "creating PR to $base..."
   gh pr create "${pr_args[@]}"
 }
 
@@ -106,22 +288,37 @@ _git_push_pr() {
 # main script
 #
 
-zparseopts -D -E -- r:=reviewers a:=extra_reviewers b:=destination
+zparseopts -D -E -- r:=reviewers b:=destination
 
 reviewers=${(@)reviewers:#-r}
-extra_reviewers=${(@)extra_reviewers:#-a}
 destination=${(@)destination:#-b}
 
-_git_push_pr_ensure_git_root
+__git_ppr_ensure_git_root
 
+# if no reviewers provided, check for project defaults
 if [ -z "$reviewers" ]; then
-  _git_push_pr_reviewers_file
+  reviewers=$(__git_ppr_get_project_defaults)
 fi
 
-reviewers=$(_git_push_pr_get_reviewers "$reviewers" "$extra_reviewers")
-default_main_branch_name=${MNDS_DEFAULT_MAIN_BRANCH_NAME:-main}
-destination=${destination:-$default_main_branch_name}
+# resolve friendly names to GitHub handles
+if [ -n "$reviewers" ]; then
+  owner=$(__git_ppr_get_org)
+  is_org=0
+  if [ -n "$owner" ] && __git_ppr_is_org "$owner"; then
+    is_org=1
+  fi
+  reviewers=$(__git_ppr_resolve_reviewers "$reviewers" "$owner" "$is_org")
+fi
 
-_git_push_pr_rebase_if_needed "$destination"
+destination=${destination:-${MNDS_DEFAULT_MAIN_BRANCH_NAME:-main}}
+template=$(__git_ppr_find_template)
+commit_count=$(__git_ppr_commit_count "$destination")
 
-_git_push_pr "$destination" "$reviewers"
+__git_ppr_rebase_if_needed "$destination"
+__git_ppr_push
+__git_ppr_create_pr "$destination" "$reviewers" "$template" "$commit_count"
+
+_mnds_pp_success "git" "done"
+
+_mnds_pp_info "git" "opening PR in browser..."
+gh pr view --web
