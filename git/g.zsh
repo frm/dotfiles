@@ -1,7 +1,7 @@
 # g - git wrapper that handles cd for worktree/checkout commands
 g() {
   case "$1" in
-    wt|worktree-add|co|checkout|checkout-worktree)
+    wt|worktree-add|co|checkout|checkout-worktree|cl|clone-cd)
       local output
       output=$(command hub "$@")
       local exit_code=$?

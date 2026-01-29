@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+# clone a repo and echo the directory path for cd
+
+set -e
+
+if [ $# -eq 0 ]; then
+  echo "[git]: repository required" >&2
+  exit 1
+fi
+
+if command -v gh >/dev/null 2>&1; then
+  gh repo clone "$@"
+else
+  git clone "$@"
+fi
+
+# extract directory name from repo argument
+dir=$(echo "$1" | awk -F / '{ print $NF }' | sed 's/.git//g')
+
+echo "$dir"
