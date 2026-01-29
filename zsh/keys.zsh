@@ -1,40 +1,43 @@
-# emacs keybindings
 bindkey -e
 
-# Fix backward-kill-word:
-# http://stackoverflow.com/questions/19202521/deleting-word-like-bash-in-zsh-autoload-is-not-working
-x-bash-backward-kill-word(){
-    WORDCHARS='' zle backward-kill-word
+# Ctrl+W / Ctrl+H: bash-style backward kill word (stop at every separator)
+x-bash-backward-kill-word() {
+  WORDCHARS='' zle backward-kill-word
 }
 zle -N x-bash-backward-kill-word
 bindkey '^W' x-bash-backward-kill-word
 bindkey '^H' x-bash-backward-kill-word
 
-x-backward-kill-word(){
-    WORDCHARS='*?_-[]~\!#$%^(){}<>|`@#$%^*()+:?' zle backward-kill-word
+# Alt+Backspace: backward kill word (treat special chars as part of word)
+x-backward-kill-word() {
+  WORDCHARS='*?_-[]~\!#$%^(){}<>|`@#$%^*()+:?' zle backward-kill-word
 }
-
 zle -N x-backward-kill-word
 bindkey '\e^?' x-backward-kill-word
 
-# Fix Fn + Backspace on macOS
-# See: http://superuser.com/questions/169920/binding-fn-delete-in-zsh-on-mac-os-x
-bindkey "^[[3~" delete-char
+# Navigation
+bindkey '^[[H'    beginning-of-line        # Home (xterm)
+bindkey '^[[1~'   beginning-of-line        # Home (tmux)
+bindkey '^[[F'    end-of-line              # End (xterm)
+bindkey '^[[4~'   end-of-line              # End (tmux)
+bindkey '^[[3~'   delete-char              # Delete
+bindkey '^[[5~'   up-line-or-history       # PageUp
+bindkey '^[[6~'   down-line-or-history     # PageDown
+bindkey '^[[1;5C' forward-word             # Ctrl+Right
+bindkey '^[[1;5D' backward-word            # Ctrl+Left
+bindkey '^[[Z'    reverse-menu-complete    # Shift+Tab
 
-# https://bbs.archlinux.org/viewtopic.php?pid=201976#p201976
-autoload zkbd
+# Prefix history search with Up/Down arrows
+autoload -U up-line-or-beginning-search down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey '^[[A' up-line-or-beginning-search
+bindkey '^[[B' down-line-or-beginning-search
 
-[[ ! -f ${ZDOTDIR:-$HOME}/.zkbd/$TERM-$VENDOR-$OSTYPE ]] && zkbd
-source ${ZDOTDIR:-$HOME}/.zkbd/$TERM-$VENDOR-$OSTYPE
+# History expansion on Space
+bindkey ' ' magic-space
 
-[[ -n ${key[Backspace]} ]] && bindkey "${key[Backspace]}" backward-delete-char
-[[ -n ${key[Insert]} ]] && bindkey "${key[Insert]}" overwrite-mode
-[[ -n ${key[Home]} ]] && bindkey "${key[Home]}" beginning-of-line
-[[ -n ${key[PageUp]} ]] && bindkey "${key[PageUp]}" up-line-or-history
-[[ -n ${key[Delete]} ]] && bindkey "${key[Delete]}" delete-char
-[[ -n ${key[End]} ]] && bindkey "${key[End]}" end-of-line
-[[ -n ${key[PageDown]} ]] && bindkey "${key[PageDown]}" down-line-or-history
-[[ -n ${key[Up]} ]] && bindkey "${key[Up]}" up-line-or-search
-[[ -n ${key[Left]} ]] && bindkey "${key[Left]}" backward-char
-[[ -n ${key[Down]} ]] && bindkey "${key[Down]}" down-line-or-search
-[[ -n ${key[Right]} ]] && bindkey "${key[Right]}" forward-char
+# Edit command line in $EDITOR with Ctrl+X Ctrl+E
+autoload -U edit-command-line
+zle -N edit-command-line
+bindkey '\C-x\C-e' edit-command-line
