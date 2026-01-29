@@ -6,3 +6,4 @@ yarn
 pnpm
 @anthropic-ai/claude-code
 @openai/codex
+@github/copilot-language-server

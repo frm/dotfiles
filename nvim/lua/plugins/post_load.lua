@@ -33,16 +33,8 @@ require("mason").setup()
 --  DAPs --
 -----------
 
-require("mason-lspconfig").setup {
-    ensure_installed = {
-        "elixirls",
-        "jsonls",
-        "rubocop",
-        -- "rust_analyzer", TODO: enable once the package is fixed
-        "vimls",
-    },
-    automatic_installation = true,
-}
+-- mason-lspconfig setup is done after nvim-cmp config below
+-- to ensure capabilities are defined first
 
 require("mason-nvim-dap").setup({
     ensure_installed = {
@@ -68,22 +60,90 @@ map('n', '<localleader>do', ':lua require("dap").step_over()<CR>')
 map('n', '<localleader>di', ':lua require("dap").step_into()<CR>')
 map('n', '<localleader>dx', ':lua require("dap").step_out()<CR>')
 map('n', '<localleader>dr', ':lua require("dap").repl.open()<CR>')
+map('n', '<localleader>du', ':lua require("dapui").toggle()<CR>')
 
 ---------------------------
---  Linters & Formatters --
+--  Completion (nvim-cmp)
 ---------------------------
 
-require("lsp-format").setup {}
+local cmp = require('cmp')
+local cmp_ultisnips_mappings = require('cmp_nvim_ultisnips.mappings')
 
--- TODO: lsp-format requires nvim-lsp-installer instead of mason
---       elixirls errors when autoinstalling so we need to install it
---       and configure it manually
---       to do that, we need to disable automatic_installation
-require("nvim-lsp-installer").setup({
-    automatic_installation = false,
+cmp.setup({
+  snippet = {
+    expand = function(args)
+      vim.fn["UltiSnips#Anon"](args.body)
+    end,
+  },
+  mapping = cmp.mapping.preset.insert({
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<CR>'] = cmp.mapping.confirm({ select = true }),
+    ['<Tab>'] = cmp.mapping(function(fallback)
+      -- Accept Copilot suggestion if visible
+      if vim.fn['copilot#GetDisplayedSuggestion']().text ~= '' then
+        vim.api.nvim_feedkeys(vim.fn['copilot#Accept'](), 'n', true)
+      elseif cmp.visible() then
+        cmp.select_next_item()
+      else
+        cmp_ultisnips_mappings.expand_or_jump_forwards(fallback)
+      end
+    end, { 'i', 's' }),
+    ['<S-Tab>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_prev_item()
+      else
+        cmp_ultisnips_mappings.jump_backwards(fallback)
+      end
+    end, { 'i', 's' }),
+  }),
+  sources = cmp.config.sources({
+    { name = 'nvim_lsp' },
+    { name = 'ultisnips' },
+    { name = 'buffer' },
+    { name = 'path' },
+  }),
 })
 
-local lsp_format_on_attach = require("lsp-format").on_attach
+---------------------------
+--  LSP Configuration
+---------------------------
+
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
+
+-- Set up LSP keybindings and format-on-save via LspAttach autocmd
+autocmd('LspAttach', {
+    callback = function(args)
+        local bufnr = args.buf
+        local client = vim.lsp.get_client_by_id(args.data.client_id)
+
+        vim.keymap.set('n', '<C-]>', vim.lsp.buf.definition, { buffer = bufnr })
+
+        -- Format on save
+        if client and client.server_capabilities.documentFormattingProvider then
+            autocmd('BufWritePre', {
+                buffer = bufnr,
+                callback = function()
+                    -- Disable smear cursor during format to prevent visible cursor jump
+                    local smear = require("smear_cursor")
+                    local was_enabled = smear.enabled
+                    smear.enabled = false
+
+                    -- Save cursor position (format moves cursor to 0,0)
+                    local pos = vim.api.nvim_win_get_cursor(0)
+                    vim.lsp.buf.format({
+                        async = false,
+                        timeout_ms = 3000,
+                        filter = function(c) return c.id == client.id end
+                    })
+                    -- Restore cursor (pcall handles invalid pos if lines were removed)
+                    pcall(vim.api.nvim_win_set_cursor, 0, pos)
+
+                    smear.enabled = was_enabled
+                end
+            })
+        end
+    end,
+})
 
 local eslint = require('efmls-configs.linters.eslint')
 local prettier = require('efmls-configs.formatters.prettier')
@@ -107,90 +167,43 @@ local efmls_config = {
   },
 }
 
--- lspconfig.elixirls.setup {
---     cmd = { vim.fn.expand("$HOME/.local/share/nvim/lazy/elixir-ls/dist/language_server.sh") },
---     on_attach = lsp_format_on_attach,
--- }
---
--- lspconfig.efm.setup(vim.tbl_extend('force', efmls_config, {
---     on_attach = lsp_format_on_attach,
--- }))
+local lspconfig = require('lspconfig')
 
-vim.lsp.config('elixirls', {
-    cmd = { vim.fn.expand("$HOME/.local/share/nvim/lazy/elixir-ls/dist/language_server.sh") },
-    on_attach = lsp_format_on_attach,
+-- Setup mason-lspconfig with handlers
+require("mason-lspconfig").setup({
+    ensure_installed = {
+        "elixirls",
+        "jsonls",
+        "rubocop",
+        "vimls",
+    },
+    automatic_installation = true,
+    handlers = {
+        -- Default handler for all servers
+        function(server_name)
+            lspconfig[server_name].setup({
+                capabilities = capabilities,
+            })
+        end,
+        -- Custom handler for efm
+        ["efm"] = function()
+            lspconfig.efm.setup(vim.tbl_extend('force', efmls_config, {
+                capabilities = capabilities,
+            }))
+        end,
+    },
 })
 
-vim.lsp.config('efm', vim.tbl_extend('force', efmls_config, {
-    on_attach = lsp_format_on_attach,
-}))
-
-map('n', '<leader>t', ':Trouble diagnostics toggle<CR>')
 
 -----------------------------------------------------------------
 -- VimTmuxNavigator
 -----------------------------------------------------------------
 
--- vim-tmux-navigator doesn't actually set :TmuxNavigateLeft for terminals
+-- vim-tmux-navigator doesn't actually set :TmuxNavigate* for terminals
 map('t', '<C-h>', '<C-\\><C-n>:TmuxNavigateLeft<CR>',  { silent = true })
+map('t', '<C-j>', '<C-\\><C-n>:TmuxNavigateDown<CR>',  { silent = true })
+map('t', '<C-k>', '<C-\\><C-n>:TmuxNavigateUp<CR>',    { silent = true })
 map('t', '<C-l>', '<C-\\><C-n>:TmuxNavigateRight<CR>', { silent = true })
-
------------------------------------------------------------------
--- Aerial
------------------------------------------------------------------
-
-require('aerial').setup()
-
------------------------------------------------------------------
--- Telescope
------------------------------------------------------------------
-
-local telescope_actions = require('telescope.actions')
-local telescope = require('telescope')
-
-telescope.setup {
-    defaults = {
-        file_ignore_patterns = {
-            "node_modules", ".git", "_build", ".elixir_ls", "deps"
-        },
-        mappings = {
-            i = {
-                ["<C-j>"] = telescope_actions.move_selection_next,
-                ["<C-k>"] = telescope_actions.move_selection_previous,
-                ["<C-c>"] = telescope_actions.close,
-                ["<C-q>"] = telescope_actions.smart_send_to_qflist + telescope_actions.open_qflist,
-                ["<M-q>"] = telescope_actions.send_to_qflist + telescope_actions.open_qflist,
-            },
-            n = {["<C-c>"] = telescope_actions.close}
-        }
-    },
-    extensions = {
-        fzf = {
-            fuzzy = true,
-            override_generic_sorter = true,
-            override_file_sorter = true,
-            case_mode = "smart_case",
-        }
-    }
-}
-
-telescope.load_extension('fzf')
-telescope.load_extension('gh')
-telescope.load_extension('aerial')
-
-map('n', '<localleader>ghi', ':Telescope gh issues<CR>')
-map('n', '<localleader>ghp', ':Telescope gh pull_request<CR>')
-map('n', '<localleader>ghw', ':Telescope gh run<CR>')
-map('n', '<localleader>o', ':Telescope aerial<CR>')
-
-map('n', '<localleader>gb', ':FzfLua git_branches<CR>')
-map('n', '<localleader>gc', ':FzfLua git_commits<CR>')
-
-map('n', '<C-p>', ':FzfLua files<CR>')
-map('n', '<localleader>gr', ':FzfLua lsp_references<CR>')
-map('n', '<C-f>', ':FzfLua grep_project<CR>')
-map('n', '<M-f>', ':FzfLua resume<CR>')
-map('n', '<C-w><C-w>', ':FzfLua oldfiles<CR>')
 
 -----------------------------------------------------------------
 -- Wilder
@@ -204,62 +217,12 @@ wilder.set_option('renderer', wilder.popupmenu_renderer({
   highlighter = wilder.basic_highlighter(),
 }))
 
------------------------------------------------------------------
--- FZF
------------------------------------------------------------------
-
--- Make fzf match the vim colorscheme colors
-vim.g.fzf_colors = {
-    fg = { 'fg', 'Normal' },
-    bg = { 'bg', 'Normal' },
-    hl = { 'fg', 'Comment' },
-    ['fg+'] = { 'fg', 'CursorLine', 'CursorColumn', 'Normal' },
-    ['bg+'] = { 'bg', 'CursorLine', 'CursorColumn' },
-    ['hl+'] = { 'fg', 'Statement' },
-    info = { 'fg', 'PreProc' },
-    border = { 'fg', 'Ignore' },
-    prompt = { 'fg', 'Conditional' },
-    pointer = { 'fg', 'Exception' },
-    marker = { 'fg', 'Keyword' },
-    spinner = { 'fg', 'Label' },
-    header = { 'fg', 'Comment' }
-}
-
--- Enable this if you want fzf statusline
--- make fzf status line use the vim theme colors
--- function! s:fzf_statusline()
---   highlight fzf1 ctermfg=161 ctermbg=251
---   highlight fzf2 ctermfg=23 ctermbg=251
---   highlight fzf3 ctermfg=237 ctermbg=251
---   setlocal statusline=%#fzf1#\ >\ %#fzf2#fz%#fzf3#f
--- endfunction
-
--- autocmd! User FzfStatusLine call <SID>fzf_statusline()
-
--- hide status line inside fzf
-vim.cmd("autocmd! FileType fzf")
-vim.cmd("autocmd  FileType fzf set laststatus=0 noshowmode noruler | autocmd BufLeave <buffer> set laststatus=2 showmode ruler")
-
 -- Use ripgrep over grep
 vim.opt.grepprg="rg --vimgrep --color=always --no-heading"
-
--- Enable this if you want a preview window when searching for files/regexes
--- command! -bang -nargs=* Rg
---   \ call fzf#vim#grep(
---   \   'rg --vimgrep --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1,
---   \   <bang>1 ? fzf#vim#with_preview('up:60%:wrap')
---   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
---   \   <bang>1)
-
--- command! -bang -nargs=? -complete=dir Files
---   \ call fzf#vim#files(<q-args>, fzf#vim#with_preview('up:60%:wrap'), <bang>1)
 
 -----------------------------------------------------------------
 -- Lualine
 -----------------------------------------------------------------
-
--- require("lualine/evil")
-require("lualine/bubbles")
 
 require("lualine").setup({
   options = {
@@ -272,6 +235,15 @@ require("lualine").setup({
   },
   tabline = {}, -- leave tabline for barbar
   extensions = {'nvim-tree'}
+})
+
+-----------------------------------------------------------------
+-- smear
+-----------------------------------------------------------------
+require("smear_cursor").setup({
+    stiffness = 0.5,
+    trailing_stiffness = 0.49,
+    never_draw_over_target = false
 })
 
 -----------------------------------------------------------------
@@ -449,15 +421,6 @@ map('t', '<C-e>', '<C-\\><C-n>', { silent = true })
 map('t', '<C-d>', '<C-\\><C-n>:FloatermToggle term<CR>', { silent = true })
 
 -----------------------------------------------------------------
--- ChatGPT
------------------------------------------------------------------
-
-map('n', '<C-t>', ':ChatGPT<CR>')
-map('n', '<C-S-T>', ':ChatGPTRun<CR>')
-map('n', '<C-S-A>', ':ChatGPTActAs<CR>')
-map('v', '<C-t>', ':ChatGPTEditWithInstructions<CR>')
-
------------------------------------------------------------------
 -- VimTest
 -----------------------------------------------------------------
 
@@ -536,44 +499,6 @@ map('n', '<leader>as', ':AS<CR>')
 map('n', '<leader>av', ':AV<CR>')
 
 -----------------------------------------------------------------
--- TermFind
------------------------------------------------------------------
-
-require('term_find').setup({
-    autocmd_pattern = 'floaterm',
-    keymap_mode = 'n',
-    keymap_mapping = 'gf',
-    callback = function() vim.cmd("FloatermHide") end
-})
-
------------------------------------------------------------------
--- Diagflow
------------------------------------------------------------------
-
--- vim.diagnostic.config({ virtual_lines = false })
-
-require('diagflow').setup({
-  scope = 'line',
-  event = 'LspAttach',
-  placement = 'top',
-  toggle_event = { 'InsertEnter' },
-  show_borders = true,
-})
-
------------------------------------------------------------------
--- mini
------------------------------------------------------------------
-
--- TODO: animate is pretty but causing issues in large buffers,
--- disable for now
--- local animate = require('mini.animate')
--- animate.setup({
---   cursor = {
---     timing = animate.gen_timing.linear({ duration = 100, unit = 'total' }),
---   }
--- })
-
------------------------------------------------------------------
 -- Blamer
 -----------------------------------------------------------------
 
@@ -585,15 +510,10 @@ map('n', '<localleader>gbl', ':BlamerToggle<CR>')
 
 vim.g.copilot_no_tab_map = true
 
-map('i', '<C-F>', 'copilot#Accept("\\<CR>")', {
-  expr = true,
-  replace_keycodes = false
-})
-
+-- Tab accepts Copilot (handled in nvim-cmp mapping above)
 -- M-[: <Plug>(copilot-previous)
 -- M-]: <Plug>(copilot-next)
 -- M-\: <Plug>(copilot-suggest)')
--- M-<Space>: <Plug>(copilot-dismiss)
 
 -- unmap existing keybindings
 unmap('i', '<C-]>') -- originally <Plug>(copilot-dismiss)

@@ -44,18 +44,18 @@ map('n', '<C-s>', ':write<CR>')
 map('i', '<C-s>', '<Esc>:write<CR>')
 
 -- Better find/replace bindings
-map('n', '<localleader>s', ':s/\v')
-map('n', '<localleader>ss', ':%s/\v')
+map('n', '<localleader>s', ':s/\\v')
+map('n', '<localleader>ss', ':%s/\\v')
 map('n', '<localleader>S', ':S/')
 map('n', '<localleader>SS', ':%S/')
 
-map('v', '<localleader>s', '"hy:s/\v<C-r>h/')
-map('v', '<localleader>ss', '"hy:%s/\v<C-r>h/')
+map('v', '<localleader>s', '"hy:s/\\v<C-r>h/')
+map('v', '<localleader>ss', '"hy:%s/\\v<C-r>h/')
 map('v', '<localleader>S', '"hy:S/<C-r>h/')
 map('v', '<localleader>SS', '"hy:%S/<C-r>h/')
 
--- Remove whitespace on save
-autocmd('BufWritePre', {pattern = '', command = ":%s/\\s\\+$//e"})
+-- replace non-leading whitespaces in the current line with \n
+map('n', '<localleader>s ', ':s/\\S\\zs\\s\\+/\\r/g<CR>')
 
 -- Sleep from nvim
 function _G.sleep()
