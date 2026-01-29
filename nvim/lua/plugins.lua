@@ -3,6 +3,18 @@
 -- Make sure to set `mapleader` before lazy so your mappings are correct
 vim.g.mapleader = " "
 
+-----------------------------------------------------------------
+-- Local plugins (plugins/custom)
+-----------------------------------------------------------------
+
+local assistant = require('plugins.custom.assistant')
+local codex = codex
+require('plugins.custom.memorise').setup()
+
+-----------------------------------------------------------------
+-- Lazy plugins
+-----------------------------------------------------------------
+
 require("lazy").setup({
   -- meta utils
   { 'echasnovski/mini.nvim', version = false },
@@ -89,7 +101,16 @@ require("lazy").setup({
   'tpope/vim-fugitive',
   'tpope/vim-rhubarb',
   'APZelos/blamer.nvim',
-  'SirVer/ultisnips',
+  {
+    'SirVer/ultisnips',
+    init = function()
+      vim.g.UltiSnipsExpandOrJumpTrigger = "<C-j>"
+      vim.g.UltiSnipsExpandTrigger = "<C-j>"
+      vim.g.UltiSnipsJumpForwardTrigger = "<C-j>"
+      vim.g.UltiSnipsJumpBackwardTrigger = "<C-k>"
+      vim.g.UltiSnipsSnippetDirectories = {vim.fn.expand("$HOME/.dotfiles/nvim/UltiSnips")}
+    end
+  },
   'tpope/vim-projectionist',
   'tpope/vim-abolish',
   'tpope/vim-surround',
@@ -223,7 +244,7 @@ require("lazy").setup({
             },
             claude_zoom = {
               "<C-w>z",
-              function() require('plugins.ai').zoom() end,
+              function() assistant.zoom() end,
               mode = { "t", "n", "i" },
               desc = "Toggle zoom"
             },
@@ -240,19 +261,29 @@ require("lazy").setup({
     keys = {
       {
         '<leader>cc',
-        function() require('plugins.codex').toggle() end,
+        function() codex.toggle() end,
         desc = 'Toggle Codex',
         mode = { 'n', 't' }
       },
       {
+        '<leader>cf',
+        function() codex.focus() end,
+        desc = 'Focus Codex',
+      },
+      {
+        '<leader>cm',
+        function() codex.select_model() end,
+        desc = 'Select Codex model',
+      },
+      {
         '<leader>cs',
-        function() require('plugins.codex').send() end,
+        function() codex.send() end,
         desc = 'Send to Codex',
         mode = 'v'
       },
       {
         '<C-w>z',
-        function() require('plugins.ai').zoom() end,
+        function() assistant.zoom() end,
         desc = 'Toggle zoom',
         mode = 't'
       },
