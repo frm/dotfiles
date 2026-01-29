@@ -44,9 +44,14 @@ callback = function()
   set_hl("IlluminatedWordRead",  { bg = "#2a2d37", underline = false })
   set_hl("IlluminatedWordWrite", { bg = "#2a2d37", underline = false })
 
-  --
-  -- improve highlighting in elixir
-  --
+  -- Fix snacks to work with horiozn
+  set_hl("NormalFloat", { fg = "#d5d8da", bg = "#1d1f27" })
+  set_hl("SnacksPickerMatch", { fg = "#e95678", bold = true })  -- horizon red/pink for matches
+  set_hl("SnacksPickerDir", { fg = "#6c6f93" })                 -- horizon comment gray for directory
+  set_hl("SnacksPickerFile", { fg = "#d5d8da" })                -- normal text for filename
+  set_hl("SnacksPickerPathHidden", { fg = "#4B4C53" })          -- dimmer gray for hidden path
+
+  -- improve horizon highlighting in elixir
 
   -- atoms -> orange like booleans
   set_hl("@string.special.symbol.elixir", { link = "@boolean" })

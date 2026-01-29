@@ -4,17 +4,28 @@
 vim.g.mapleader = " "
 
 require("lazy").setup({
-  -----------------------------------------------------------------
-  -- IDE-style features
-  -----------------------------------------------------------------
+  -- meta utils
+  { 'echasnovski/mini.nvim', version = false },
 
-  -- GUI
+  -- gui
   'christoomey/vim-tmux-navigator',
 
   {
     'nvim-lualine/lualine.nvim',
     dependencies = { 'nvim-tree/nvim-web-devicons' }
   },
+
+  {
+    'stevearc/aerial.nvim',
+    dependencies = {
+       "nvim-treesitter/nvim-treesitter",
+       "nvim-tree/nvim-web-devicons"
+    },
+    config = function()
+      require('aerial').setup()
+    end
+  },
+
 
   {
     'romgrk/barbar.nvim',
@@ -31,105 +42,23 @@ require("lazy").setup({
     lazy = false
   },
 
-  { 'echasnovski/mini.nvim', version = false },
+  'sphamba/smear-cursor.nvim',
+  'gelguy/wilder.nvim',
+  'RRethy/vim-illuminate',
+  'wincent/terminus',
+  'voldikss/vim-floaterm',
+  { 'RRethy/vim-hexokinase', build = 'make hexokinase' },
 
-  {
-    'gelguy/wilder.nvim',
-    config = function()
-      require('wilder').setup({ modes = { ':', '/', '?' } })
-    end
-  },
-
-  -- Behaviour
+  -- behaviour
   {
     'Wansmer/treesj',
     dependencies = { 'nvim-treesitter/nvim-treesitter' }
   },
 
-  'derekprior/vim-trimmer',
-  'farmergreg/vim-lastplace',
-  'gabrielpoca/term_find.nvim',
-  'SirVer/ultisnips',
-  'RRethy/vim-illuminate',
-  'RRethy/nvim-treesitter-endwise',
-
   {
     'kevinhwang91/nvim-ufo',
     dependencies = 'kevinhwang91/promise-async'
   },
-
-  {
-    "nvim-treesitter/nvim-treesitter-textobjects",
-    dependencies = "nvim-treesitter/nvim-treesitter",
-  },
-
-  {
-    "HiPhish/rainbow-delimiters.nvim",
-    dependencies = "nvim-treesitter/nvim-treesitter",
-  },
-
-  -- Functionality
-  'tpope/vim-fugitive',
-  'tpope/vim-rhubarb',
-  'APZelos/blamer.nvim',
-  'tpope/vim-projectionist',
-  'kristijanhusak/any-jump.vim',
-  'tpope/vim-abolish',
-  'tpope/vim-surround',
-  'vim-test/vim-test',
-  'voldikss/vim-floaterm',
-  'wincent/terminus',
-  'stefandtw/quickfix-reflector.vim',
-  { 'mg979/vim-visual-multi', branch = 'master' },
-  { 'RRethy/vim-hexokinase', build = 'make hexokinase' },
-  {
-    "embear/vim-localvimrc",
-    init = function()
-      vim.g.localvimrc_whitelist = "^" .. vim.fn.expand("$HOME") .. "/Developer/.*"
-    end
-  },
-  {
-     'smoka7/hop.nvim',
-     version = "*",
-     opts = {
-       keys = 'etovxqpdygfblzhckisuran'
-     }
-  },
-
-  { 'junegunn/fzf', build = './install --all' },
-  'junegunn/fzf.vim',
-
-  {
-    'stevearc/aerial.nvim',
-    dependencies = {
-       "nvim-treesitter/nvim-treesitter",
-       "nvim-tree/nvim-web-devicons"
-    },
-  },
-
-  {
-     'nvim-telescope/telescope.nvim',
-     dependencies = {
-       'nvim-lua/popup.nvim',
-       'nvim-lua/plenary.nvim',
-       'nvim-telescope/telescope-github.nvim',
-       'nvim-telescope/telescope-ui-select.nvim',
-       {
-         'nvim-telescope/telescope-fzf-native.nvim',
-         build = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 && cmake --build build --config Release'
-       },
-     },
-  },
-
-  -- in theory we don't need this because of nvim-telescope +
-  -- nvim-telescope-fzf-native but in practice, live_grep is really slow there
-  -- so for that let's use fzf lua directly
-  {
-    "ibhagwan/fzf-lua",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    opts = {}
-  },
-
 
   'JoosepAlviste/nvim-ts-context-commentstring',
 
@@ -141,20 +70,105 @@ require("lazy").setup({
     end
   },
 
-  -----------------------------------------------------------------
-  -- Language support
-  -----------------------------------------------------------------
+  -- shadow behaviour
+  'derekprior/vim-trimmer',
+  'farmergreg/vim-lastplace',
+  'RRethy/nvim-treesitter-endwise',
+
+  {
+    "HiPhish/rainbow-delimiters.nvim",
+    dependencies = "nvim-treesitter/nvim-treesitter",
+  },
+
+  {
+    "nvim-treesitter/nvim-treesitter-textobjects",
+    dependencies = "nvim-treesitter/nvim-treesitter",
+  },
+
+  -- ide-nss/functionality
+  'tpope/vim-fugitive',
+  'tpope/vim-rhubarb',
+  'APZelos/blamer.nvim',
+  'SirVer/ultisnips',
+  'tpope/vim-projectionist',
+  'tpope/vim-abolish',
+  'tpope/vim-surround',
+  'vim-test/vim-test',
+  'stefandtw/quickfix-reflector.vim',
+  { 'mg979/vim-visual-multi', branch = 'master' },
+
+  {
+    "embear/vim-localvimrc",
+    init = function()
+      vim.g.localvimrc_whitelist = "^" .. vim.fn.expand("$HOME") .. "/Developer/.*"
+    end
+  },
+
+  {
+     'smoka7/hop.nvim',
+     version = "*",
+     opts = {
+       keys = 'etovxqpdygfblzhckisuran'
+     }
+  },
+
+  -- Snacks.nvim
+  {
+    "folke/snacks.nvim",
+    opts = {
+      picker = {
+        enabled = true,
+        layout = {
+          layout = {
+            backdrop = false,
+          },
+        },
+        win = {
+          input = {
+            keys = {
+              ["<C-v>"] = { "edit_vsplit", mode = { "i", "n" } },
+              ["<C-x>"] = { "edit_split", mode = { "i", "n" } },
+            },
+          },
+        },
+      },
+    },
+    keys = {
+      -- Files
+      { "<C-p>", function() Snacks.picker.files() end, desc = "Find files" },
+      { "<C-f>", function() Snacks.picker.resume({ source = "grep" }) end, desc = "Grep" },
+
+      -- Git
+      { "<localleader>gb", function() Snacks.picker.git_branches() end, desc = "Git branches" },
+      { "<localleader>gc", function() Snacks.picker.git_log() end, desc = "Git commits" },
+
+      -- LSP
+      { "<localleader>gr", function() Snacks.picker.lsp_references() end, desc = "LSP references" },
+      { "<localleader>o", function() Snacks.picker.lsp_symbols() end, desc = "LSP symbols" },
+
+      -- GitHub
+      { "<localleader>ghi", function() Snacks.picker.git_issues() end, desc = "GitHub issues" },
+      { "<localleader>ghp", function() Snacks.picker.git_prs() end, desc = "GitHub PRs" },
+    },
+  },
+
+  {
+    "rachartier/tiny-code-action.nvim",
+    dependencies = {
+      { "nvim-lua/plenary.nvim" },
+      { "folke/snacks.nvim" },
+    },
+    event = "LspAttach",
+    opts = {
+      picker = "snacks",
+    },
+    keys = {
+      { "<localleader>ga", function() require("tiny-code-action").code_action() end, mode = { "n", "v" }, desc = "Code Action" },
+    },
+  },
 
   -- Languages
 
-  'sheerun/vim-polyglot',
-  'elixir-editors/vim-elixir',
-
-  -- TODO: See plugins/post_load#lsp-format
-  {
-    'elixir-lsp/elixir-ls',
-    build =  'MIX_ENV=prod mix deps.get && MIX_ENV=prod mix compile && MIX_ENV=prod mix elixir_ls.release2 -o dist',
-  },
   'lucidstack/hex.vim',
   'tjdevries/nlua.nvim',
 
@@ -166,26 +180,12 @@ require("lazy").setup({
     opts = {},
   },
 
-  -- AI Pair programming
+  -- AI
 
   'github/copilot.vim',
-  {
-    "jackMort/ChatGPT.nvim",
-      event = "VeryLazy",
-      config = function()
-        require("chatgpt").setup()
-      end,
-      dependencies = {
-        "MunifTanjim/nui.nvim",
-        "nvim-lua/plenary.nvim",
-        "folke/trouble.nvim",
-        "nvim-telescope/telescope.nvim"
-      }
-  },
 
   {
     "coder/claudecode.nvim",
-    dependencies = { "folke/snacks.nvim" },
     config = true,
     keys = {
       { "<leader>a", nil, desc = "AI/Claude Code" },
@@ -206,50 +206,97 @@ require("lazy").setup({
       { "<leader>aA", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
       { "<leader>aD", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny diff" },
     },
+    opts = {
+      diff_opts = {
+        auto_close_on_accept = true,
+        vertical_split = false,
+      },
+      terminal = {
+        snacks_win_opts = {
+          keys = {
+            claude_quit = {
+              "<C-q>",
+              function(self) self:hide() end,
+              mode = "t",
+              desc = "Hide Claude terminal"
+            },
+          },
+        },
+      },
+    },
   },
-
-
-  -- LSP + COQ & Treesitter
 
   {
-    'neovim/nvim-lspconfig',
-    lazy = false,
-    dependencies = {
-      'williamboman/nvim-lsp-installer',
-      { "ms-jpq/coq_nvim", branch = "coq" },
-      { "ms-jpq/coq.artifacts", branch = "artifacts" },
-      { 'ms-jpq/coq.thirdparty', branch = "3p" }
+  'kkrampis/codex.nvim',
+    lazy = true,
+    cmd = { 'Codex', 'CodexToggle' },
+    keys = {
+      {
+        '<leader>cc',
+        function()
+          -- note: usually this is enough
+          -- function() require('codex').toggle() end,
+          -- however, there's no native support to go on insert mode
+          -- automatically on Codex start, so this works around that
+          local codex = require('codex')
+          local was_open = codex.is_open and codex.is_open()
+          codex.toggle()
+          if not was_open then
+            vim.schedule(function() vim.cmd('startinsert') end)
+          end
+        end,
+        desc = 'Toggle Codex popup or side-panel',
+        mode = { 'n', 't' }
+      },
     },
-    init = function()
-      vim.g.coq_settings = {
-        auto_start = 'shut-up',
-        keymap = {
-            jump_to_mark = '<C-g>',
-        }
-      }
-    end,
-    config = function()
-      require("nvim-lsp-installer").setup { automatic_installation = true }
-
-      require("coq_3p") {
-        { src = "nvimlua", short_name = "nLUA" },
-        { src = "repl", sh = "zsh" },
-        { src = "bc", short_name = "MATH" },
-        { src = "cow", trigger = "!cow" }
-      }
-    end
+    opts = {
+      keymaps = {
+        toggle = nil,
+        quit = '<C-q>',
+      },
+      model       = 'gpt-5.2-codex',
+      border      = 'rounded',
+      width       = 0.3,
+      height      = 0.3,
+      autoinstall = false,
+      panel       = true,
+      use_buffer  = false,
+    },
   },
 
-  -- Currently trying out diagflow.nvim, might re-enable this in the future
-  -- use {
-  --     "https://git.sr.ht/~whynothugo/lsp_lines.nvim",
-  --     config = function()
-  --         vim.diagnostic.config({virtual_text = true})
-  --         require("lsp_lines").setup()
-  --     end
-  -- }
+  'neovim/nvim-lspconfig',
 
-  'dgagn/diagflow.nvim',
+  'hrsh7th/nvim-cmp',
+  'hrsh7th/cmp-nvim-lsp',
+  'hrsh7th/cmp-buffer',
+  'hrsh7th/cmp-path',
+  'quangnguyen30192/cmp-nvim-ultisnips',
+
+  {
+    "rachartier/tiny-inline-diagnostic.nvim",
+    event = "LspAttach",
+    priority = 1000,
+    config = function()
+        require("tiny-inline-diagnostic").setup({
+            options = {
+                add_messages = {
+                    display_count = true,
+                },
+                multilines = {
+                    enabled = true,
+                },
+                show_source = {
+                    enabled = false,
+                },
+                enable_on_insert = false,
+            },
+          })
+
+       -- Disable Neovim's default virtual text diagnostics
+        vim.diagnostic.config({ virtual_text = false, signs = false })
+    end,
+  },
+
 
   { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' },
 
@@ -262,45 +309,6 @@ require("lazy").setup({
   { "nvim-neotest/nvim-nio" }, -- required for nvim-dap-ui
   'rcarriga/nvim-dap-ui',
   'theHamsta/nvim-dap-virtual-text',
-  'lukas-reineke/lsp-format.nvim',
-  {
-    "folke/trouble.nvim",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    cmd = "Trouble",
-    keys = {
-      {
-        "<leader>xx",
-        "<cmd>Trouble diagnostics toggle<cr>",
-        desc = "Diagnostics (Trouble)",
-      },
-      {
-        "<localleader>xx",
-        "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
-        desc = "Buffer Diagnostics (Trouble)",
-      },
-      {
-        "<localleader>xl",
-        "<cmd>Trouble diagnostics toggle filter.buf=0 focus=false win.position=right<cr>",
-        desc = "Buffer Diagnostics on the right (Trouble)",
-      },
-      {
-        "<leader>xl",
-        "<cmd>Trouble diagnostics toggle focus=false win.position=right<cr>",
-        desc = "Diagnostics on the right (Trouble)",
-      },
-      {
-        "<leader>xs",
-        "<cmd>Trouble symbols toggle focus=false<cr>",
-        desc = "Symbols (Trouble)",
-      },
-      {
-        "<localleader>xs",
-        "<cmd>Trouble symbols toggle filter.buf=0 focus=false<cr>",
-        desc = "Buffer Symbols (Trouble)",
-      },
-    },
-    opts={},
-  },
   {
     "folke/which-key.nvim",
     event = "VeryLazy",
@@ -310,12 +318,6 @@ require("lazy").setup({
     end,
     opts = {}
   },
-
-  -- TODO: enable when they add debugging support and code lens
-  -- {
-  --   'lexical-lsp/lexical',
-  --   build = 'mix deps.get && INDEXING_ENABLED=true mix package && mv _build/dev/package/lexical ~/.bin'
-  -- },
 
   -----------------------------------------------------------------
   -- Colours

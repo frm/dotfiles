@@ -9,7 +9,6 @@ require("lazy").setup({
   -----------------------------------------------------------------
 
   -- Behaviour
-  'AndrewRadev/splitjoin.vim',
   'derekprior/vim-trimmer',
   'SirVer/ultisnips',
   {
