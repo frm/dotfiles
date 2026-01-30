@@ -127,6 +127,8 @@ set -g @powerkit_plugins "git,github,cpu,battery,nowplaying"
 set -g @powerkit_theme "horizon"
 set -g @powerkit_theme_variant "default"
 
+set -g @powerkit_show_options_key "None"
+
 set -g @powerkit_plugin_git_show_files "true"
 set -g @powerkit_plugin_git_branch_max_length "0"
 
