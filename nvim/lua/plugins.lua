@@ -167,6 +167,7 @@ require("lazy").setup({
 
       -- LSP
       { "<localleader>gr", function() Snacks.picker.lsp_references() end, desc = "LSP references" },
+      { "<localleader>gt", function() Snacks.picker.diagnostics() end, desc = "Diagnostics" },
       { "<localleader>o", function() Snacks.picker.lsp_symbols() end, desc = "LSP symbols" },
 
       -- GitHub

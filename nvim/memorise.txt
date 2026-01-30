@@ -4,6 +4,8 @@
 ├──────────────────┼──────────────────────┤
 │ <localleader>gr  │ LSP references       │
 ├──────────────────┼──────────────────────┤
+│ <localleader>gt  │ Diagnostics          │
+├──────────────────┼──────────────────────┤
 │ <localleader>o   │ LSP document symbols │
 ├──────────────────┼──────────────────────┤
 │ <localleader>ga  │ Code actions         │
