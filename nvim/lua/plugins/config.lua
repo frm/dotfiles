@@ -345,8 +345,6 @@ map('n', '<leader>8', ':BufferGoto 8<CR>',   { silent = true })
 map('n', '<leader>9', ':BufferGoto 9<CR>',   { silent = true })
 map('n', '<leader>0', ':BufferLast<CR>',     { silent = true })
 map('n', '<leader>w', ':BufferClose<CR>',    { silent = true })
-map('n', '<Tab>',     ':BufferNext<CR>',     { silent = true })
-map('n', '<S-Tab>',   ':BufferPrevious<CR>', { silent = true })
 
 require("barbar").setup({
     animation = true,
