@@ -122,11 +122,11 @@ __git_wt_attach() {
 }
 
 # copy over project artifacts so we don't have to recompile, reset secrets, etc
-# this includes project-specific artifacts defined via _MNDS_GIT_WT_ARTIFACTS
+# this includes project-specific artifacts defined via _MNDS_LOCAL_PROJECT_ARTIFACTS
 __git_wt_cp_artifacts() {
   local git_root="$1"
   local worktree_path="$2"
-  local all_artifacts="$_PROJECT_ARTIFACTS $_MNDS_GIT_WT_ARTIFACTS"
+  local all_artifacts="$_PROJECT_ARTIFACTS $_MNDS_LOCAL_PROJECT_ARTIFACTS"
 
   for pattern in $all_artifacts; do
     for item in $git_root/$pattern; do
