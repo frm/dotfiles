@@ -1,3 +1,2 @@
-source $DOTFILES/system/direnv.init
 source $DOTFILES/system/fzf.init
 source $DOTFILES/system/z.init

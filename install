@@ -216,6 +216,10 @@ done
 
 bat cache --build
 
+pp_info "direnv" "setting configs"
+mkdir -p ~/.config/direnv
+gln -srf direnv/direnv.toml ~/.config/direnv/direnv.toml
+
 pp_info "starship" "setting configs"
 gln -srf starship/starship.toml.symlink ~/.config/starship.toml
 

@@ -11,6 +11,7 @@ source $DOTFILES/homebrew/homebrew.init
 source $DOTFILES/zsh/zsh.init
 source $DOTFILES/git/git.init
 source $DOTFILES/mise/mise.init
+source $DOTFILES/direnv/direnv.init
 source $DOTFILES/functions/functions.init
 source $DOTFILES/system/system.init
 
@@ -24,7 +25,6 @@ source $DOTFILES/conda/conda.init
 source $DOTFILES/bat/bat.init
 source $DOTFILES/cheat/cheat.init
 source $DOTFILES/starship/starship.init
-# source $DOTFILES/broot/broot.init
 
 # Setup custom work profile
 if [ "$MNDS_WORK_PROFILE" ]; then
