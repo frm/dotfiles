@@ -24,6 +24,74 @@ end
 local autocmd = vim.api.nvim_create_autocmd
 
 -----------------------------------------------------------------
+-- Mini Starter
+-----------------------------------------------------------------
+
+local starter = require('mini.starter')
+
+starter.setup({
+    query_updaters = 'abdefhijklmorsuvwxyz0123456789_-.',
+    evaluate_single = true,
+    items = {
+        function()
+            local oldfiles = vim.v.oldfiles
+            local cwd = vim.fn.getcwd() .. '/'
+            local filtered = {}
+
+            for _, path in ipairs(oldfiles) do
+                if #filtered >= 5 then break end
+                if path:find(cwd, 1, true) and not path:find('%.git/') and vim.fn.filereadable(path) == 1 then
+                    local name = path:sub(#cwd + 1)
+                    table.insert(filtered, {
+                        name = name,
+                        action = 'edit ' .. path,
+                        section = 'Recent files',
+                    })
+                end
+            end
+
+            return filtered
+        end,
+
+        { name = 't. File tree',    action = 'NvimTreeToggle',                 section = 'Actions' },
+        { name = 'p. Find file',   action = 'lua Snacks.picker.files()',      section = 'Actions' },
+        { name = 'n. New file',     action = 'enew',                           section = 'Actions' },
+        { name = 'g. Grep',         action = 'lua Snacks.picker.grep()',       section = 'Actions' },
+
+        { name = 'cc. Claude Code', action = function() require('lazy').load({ plugins = { 'claudecode.nvim' } }); vim.cmd('ClaudeCode') end, section = 'AI' },
+        { name = 'co. Codex',       action = function() require('plugins.custom.codex').toggle() end, section = 'AI' },
+
+        { name = 'q. Quit',         action = 'qa',                            section = 'Quit' },
+    },
+
+    content_hooks = {
+        starter.gen_hook.adding_bullet('  '),
+        starter.gen_hook.indexing('all', { 'Actions', 'AI', 'Quit' }),
+        starter.gen_hook.aligning('center', 'center'),
+    },
+
+    footer = '',
+})
+
+-- mini.starter maps <C-p>/<C-n> for item navigation, which shadows
+-- Snacks keybindings. Override them on the starter buffer.
+autocmd('User', {
+    pattern = 'MiniStarterOpened',
+    callback = function(args)
+        local buf = args.buf
+        vim.keymap.set('n', '<C-p>', function() Snacks.picker.files() end, { buffer = buf })
+        vim.keymap.set('n', '<C-f>', function() Snacks.picker.resume({ source = "grep" }) end, { buffer = buf })
+        vim.keymap.set('n', 't', function() vim.cmd('NvimTreeToggle') end, { buffer = buf })
+        vim.keymap.set('n', 'p', function() Snacks.picker.files() end, { buffer = buf })
+        vim.keymap.set('n', 'g', function() Snacks.picker.grep() end, { buffer = buf })
+        vim.keymap.set('n', 'n', function() vim.cmd('enew') end, { buffer = buf })
+        vim.keymap.set('n', 'cc', function() require('lazy').load({ plugins = { 'claudecode.nvim' } }); vim.cmd('ClaudeCode') end, { buffer = buf })
+        vim.keymap.set('n', 'co', function() require('plugins.custom.codex').toggle() end, { buffer = buf })
+        vim.keymap.set('n', 'q', function() vim.cmd('qa') end, { buffer = buf })
+    end,
+})
+
+-----------------------------------------------------------------
 -- Mason
 -----------------------------------------------------------------
 
