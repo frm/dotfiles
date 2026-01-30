@@ -39,7 +39,7 @@ GIT_PPR_CACHE_TTL=86400 # 24 hours in seconds
 #
 
 __git_ppr_ensure_git_root() {
-  if [ ! -d .git ]; then
+  if [ ! -e .git ]; then
     _mnds_pp_error "git" "must be run on the root of a git repo"
     exit 1
   fi
