@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 # tries to checkout a branch
 # if it fails due to worktree existing, cds into it
+# supports `-` to go back to the previous worktree
 
 set -e
 
@@ -8,10 +9,41 @@ __git_checkout_wt_path() {
   echo "$1" | sed -n "s/.*is already used by worktree at '\(.*\)'/\1/p"
 }
 
+__git_checkout_display_path() {
+  case "$1" in
+    "$HOME/Developer/"*) echo "${1#$HOME/Developer/}" ;;
+    "$HOME/"*) echo "${1#$HOME/}" ;;
+    *) echo "$1" ;;
+  esac
+}
+
+__git_checkout_state_file() {
+  echo "$(git rev-parse --git-common-dir)/CHECKOUT_PREVIOUS"
+}
+
 if [ $# -eq 0 ]; then
   echo "[git]: arguments required" >&2
   exit 1
 fi
+
+# Handle "-" to go back to previous worktree/branch
+if [ "$1" = "-" ] && [ $# -eq 1 ]; then
+  _prev=$(cat "$(__git_checkout_state_file)" 2>/dev/null || echo "")
+  _curr=$(git rev-parse --show-toplevel 2>/dev/null || echo "")
+
+  if [ -n "$_prev" ] && [ -d "$_prev" ] && [ "$_prev" != "$_curr" ]; then
+    # save current worktree so the next `-` swaps back
+    echo "$_curr" > "$(__git_checkout_state_file)"
+    echo "[git]: cd'ing back to $(__git_checkout_display_path "$_prev")" >&2
+    echo "$_prev"
+    exit 0
+  fi
+
+  # same worktree or no previous — fall through to regular git checkout -
+fi
+
+# save current worktree before checkout so `-` can return here
+git rev-parse --show-toplevel > "$(__git_checkout_state_file)" 2>/dev/null || true
 
 checkout_output=$(git checkout "$@" 2>&1) && {
   echo "$checkout_output"
