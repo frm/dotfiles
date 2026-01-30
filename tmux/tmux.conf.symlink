@@ -4,10 +4,6 @@ set -g prefix C-a
 
 set -g default-terminal "tmux-256color"
 
-# Enable CSI u / extended keys so apps can detect Shift+Enter etc.
-set -s extended-keys on
-set -as terminal-features 'xterm-ghostty:extkeys'
-
 # Forward Shift+Enter as CSI u sequence into the pane
 bind -n S-Enter send-keys Escape "[13;2u"
 
