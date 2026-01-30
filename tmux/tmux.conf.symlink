@@ -28,6 +28,9 @@ set -g base-index 1
 # Automatic window renumber
 set-option -g renumber-windows on
 
+# if no window name is given, use the current path as the name
+set -g automatic-rename-format "#{b:pane_current_path}"
+
 # v to start copy mode as Vim's Visual Mode
 unbind [
 bind v copy-mode
@@ -116,8 +119,8 @@ set -g @powerkit_transparent "true"
 set -g @powerkit_edge_separator_style "pixel"
 set -g @powerkit_window_index_style "box_outline"
 set -g @powerkit_status_position "top"
-set -g @powerkit_active_window_title "#{b:pane_current_path}"
-set -g @powerkit_inactive_window_title "#{b:pane_current_path}"
+set -g @powerkit_active_window_title "#W"
+set -g @powerkit_inactive_window_title "#W"
 set -g @powerkit_pane_border_lines "heavy"
 set -g @powerkit_icon_padding "2"
 
