@@ -4,9 +4,12 @@ set -g prefix C-a
 
 set -g default-terminal "tmux-256color"
 
-# Pass Shift+Enter (CSI u from Ghostty keybind) through to apps
-set -s user-keys[0] "\e[13;2u"
-bind-key -n User0 send-keys "\e[13;2u"
+# Enable CSI u / extended keys so apps can detect Shift+Enter etc.
+set -s extended-keys on
+set -as terminal-features 'xterm-ghostty:extkeys'
+
+# Forward Shift+Enter as CSI u sequence into the pane
+bind -n S-Enter send-keys Escape "[13;2u"
 
 # Fix cursor change in nvim
 set -g -a terminal-overrides ',*:Ss=\E[%p1%d q:Se=\E[2 q'
