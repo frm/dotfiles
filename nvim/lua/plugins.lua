@@ -231,6 +231,7 @@ require("lazy").setup({
       { "<leader>aD", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny diff" },
     },
     opts = {
+      focus_after_send = true,
       diff_opts = {
         auto_close_on_accept = true,
         vertical_split = false,
