@@ -6,7 +6,8 @@
     ],
     "allowedTools": [
       "Bash(gh:*)",
-      "Read(~/.dotfiles/ai/*)"
+      "Read(~/.dotfiles/ai/*)",
+      "Skill"
     ]
   }
 }
