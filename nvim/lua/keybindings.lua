@@ -36,6 +36,10 @@ map('v', '<leader>s', ':sort<CR>')
 map('n', 'mj', ':m +1<CR>')
 map('n', 'mk', ':m -2<CR>')
 
+-- Swap # and * (# is easier to reach, so use it for forward search)
+map('n', '#', '*')
+map('n', '*', '#')
+
 -- Clear search results
 map('n', '<localleader><leader>', ':noh<CR>')
 
