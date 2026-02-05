@@ -10,6 +10,14 @@ _echo() {
   echo -e "$git_prefix $@"
 }
 
+_git_checkout() {
+  local output=$(git checkout-worktree "$1")
+
+  if [ -d "$output" ]; then
+    cd "$output"
+  fi
+}
+
 if [ -z "$destination" ]; then
   if $(git branch-check main); then
     destination="main"
@@ -31,10 +39,14 @@ if [[ $commits_behind -lt 1 ]]; then
   exit 0
 fi
 
+original_dir=$(pwd)
+
 _echo "rebasing $destination..."
-git checkout $destination || exit "couldn't checkout $destination"
-git rebase
+_git_checkout $destination || exit "couldn't checkout $destination"
+git rebase origin/$destination
 
 _echo "rebasing $branch"
-git checkout $branch
+# cd back into where we were in case of worktrees
+cd "$original_dir"
+_git_checkout $branch
 git rebase -i origin/$destination
