@@ -206,7 +206,17 @@ require("lazy").setup({
 
   -- AI
 
-  'github/copilot.vim',
+  {
+    'milanglacier/minuet-ai.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    config = function()
+      require('minuet').setup({
+        provider = 'openai',
+        throttle = 1000,
+        debounce = 500,
+      })
+    end,
+  },
 
   {
     "coder/claudecode.nvim",
