@@ -21,10 +21,13 @@ source $DOTFILES/elixir/erl.init
 source $DOTFILES/go/go.init
 source $DOTFILES/conda/conda.init
 
-# Setup extra tools
+# Setup system tools
 source $DOTFILES/bat/bat.init
 source $DOTFILES/cheat/cheat.init
 source $DOTFILES/starship/starship.init
+
+# Setup extra CLIs & external tools
+source $DOTFILES/sentry/sentry.init
 
 # Setup custom work profile
 if [ "$MNDS_WORK_PROFILE" ]; then
