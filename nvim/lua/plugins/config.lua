@@ -53,15 +53,15 @@ starter.setup({
             return filtered
         end,
 
-        { name = 't. File tree',    action = 'NvimTreeToggle',                 section = 'Actions' },
-        { name = 'p. Find file',   action = 'lua Snacks.picker.files()',      section = 'Actions' },
-        { name = 'n. New file',     action = 'enew',                           section = 'Actions' },
-        { name = 'g. Grep',         action = 'lua Snacks.picker.grep()',       section = 'Actions' },
+        { name = 'n. File tree',    action = 'NvimTreeToggle',                 section = 'Actions' },
+        { name = 'p. Find file',    action = 'lua Snacks.picker.files()',      section = 'Actions' },
+        { name = 'f. Grep',         action = 'lua Snacks.picker.grep()',       section = 'Actions' },
+        { name = 'i. New file',     action = 'enew',                           section = 'Actions' },
 
         { name = 'cc. Claude Code', action = function() require('lazy').load({ plugins = { 'claudecode.nvim' } }); vim.cmd('ClaudeCode') end, section = 'AI' },
         { name = 'co. Codex',       action = function() require('plugins.custom.codex').toggle() end, section = 'AI' },
 
-        { name = 'q. Quit',         action = 'qa',                            section = 'Quit' },
+        { name = 'q. Quit',         action = 'qa',                             section = 'Quit' },
     },
 
     content_hooks = {
@@ -81,10 +81,10 @@ autocmd('User', {
         local buf = args.buf
         vim.keymap.set('n', '<C-p>', function() Snacks.picker.files() end, { buffer = buf })
         vim.keymap.set('n', '<C-f>', function() Snacks.picker.resume({ source = "grep" }) end, { buffer = buf })
-        vim.keymap.set('n', 't', function() vim.cmd('NvimTreeToggle') end, { buffer = buf })
+        vim.keymap.set('n', 'n', function() vim.cmd('NvimTreeToggle') end, { buffer = buf })
         vim.keymap.set('n', 'p', function() Snacks.picker.files() end, { buffer = buf })
-        vim.keymap.set('n', 'g', function() Snacks.picker.grep() end, { buffer = buf })
-        vim.keymap.set('n', 'n', function() vim.cmd('enew') end, { buffer = buf })
+        vim.keymap.set('n', 'f', function() Snacks.picker.grep() end, { buffer = buf })
+        vim.keymap.set('n', 'i', function() vim.cmd('enew') end, { buffer = buf })
         vim.keymap.set('n', 'cc', function() require('lazy').load({ plugins = { 'claudecode.nvim' } }); vim.cmd('ClaudeCode') end, { buffer = buf })
         vim.keymap.set('n', 'co', function() require('plugins.custom.codex').toggle() end, { buffer = buf })
         vim.keymap.set('n', 'q', function() vim.cmd('qa') end, { buffer = buf })
