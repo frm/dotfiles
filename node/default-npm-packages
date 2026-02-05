@@ -4,6 +4,6 @@ tldr
 vercel
 yarn
 pnpm
+sentry
 @anthropic-ai/claude-code
 @openai/codex
-@github/copilot-language-server
