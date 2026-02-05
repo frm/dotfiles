@@ -271,4 +271,7 @@ cp -r ai/skills/* ~/.codex/skills/
 
 cp ai/me.md.sample ai/me.md
 
+pp_info "sentry" "installing sentry cli..."
+curl https://cli.sentry.dev/install -fsS | bash
+
 pp_success "install" "automatic config done!"

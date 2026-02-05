@@ -1,0 +1,2 @@
+export SENTRY="$HOME/.sentry"
+export PATH="$PATH:$SENTRY/bin"
