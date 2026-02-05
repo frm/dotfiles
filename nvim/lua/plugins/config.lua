@@ -154,10 +154,7 @@ cmp.setup({
     ['<C-Space>'] = cmp.mapping.complete(),
     ['<CR>'] = cmp.mapping.confirm({ select = true }),
     ['<Tab>'] = cmp.mapping(function(fallback)
-      -- Accept Copilot suggestion if visible
-      if vim.fn['copilot#GetDisplayedSuggestion']().text ~= '' then
-        vim.api.nvim_feedkeys(vim.fn['copilot#Accept'](), 'n', true)
-      elseif cmp.visible() then
+      if cmp.visible() then
         cmp.select_next_item()
       else
         cmp_ultisnips_mappings.expand_or_jump_forwards(fallback)
@@ -172,11 +169,15 @@ cmp.setup({
     end, { 'i', 's' }),
   }),
   sources = cmp.config.sources({
+    { name = 'minuet' },
     { name = 'nvim_lsp' },
     { name = 'ultisnips' },
     { name = 'buffer' },
     { name = 'path' },
   }),
+  performance = {
+    fetching_timeout = 2000,
+  },
 })
 
 ---------------------------
@@ -575,21 +576,5 @@ map('n', '<leader>av', ':AV<CR>')
 -----------------------------------------------------------------
 
 map('n', '<localleader>gbl', ':BlamerToggle<CR>')
-
------------------------------------------------------------------
--- Copilot
------------------------------------------------------------------
-
-vim.g.copilot_no_tab_map = true
-
--- Tab accepts Copilot (handled in nvim-cmp mapping above)
--- M-[: <Plug>(copilot-previous)
--- M-]: <Plug>(copilot-next)
--- M-\: <Plug>(copilot-suggest)')
-
--- unmap existing keybindings
-unmap('i', '<C-]>') -- originally <Plug>(copilot-dismiss)
-
-map('i', '<M-Space>', '<Plug>(copilot-dismiss)')
 
 -- LuaFormatter on
