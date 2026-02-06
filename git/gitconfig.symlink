@@ -90,3 +90,4 @@
   ppr = !git-push-pr
   rba = !git-auto-rebase
   rbm = !git-rebase-main
+  pr = !git-pr

@@ -1,0 +1,143 @@
+#!/usr/bin/env sh
+# lists PRs where I've been tagged for review with fuzzy selection
+# usage: git pr-reviews [-R|--include-reviewed] [--all] [-r|--review] [-i|--interactive]
+
+set -e
+
+#
+# aux functions
+#
+
+__echo_git() {
+  echo "[git]: $1" >&2
+}
+
+__git_pr_revs_usage() {
+  echo "usage: git pr-reviews [-R|--include-reviewed] [--all] [-r|--review] [-i|--interactive]" >&2
+}
+
+__git_pr_revs_select() {
+  local include_reviewed="$1"
+  local include_closed="$2"
+
+  __git_pr_revs_list "$include_reviewed" "$include_closed" \
+    | fzf --prompt="Review PR> " --header="Select PR to open" --reverse
+}
+
+__git_pr_revs_parse_number() {
+  echo "$1" | sed 's/.*#\([0-9]*\).*/\1/'
+}
+
+__git_pr_revs_browse() {
+  local pr_number="$1"
+
+  gh pr view "$pr_number" --web
+}
+
+__git_pr_revs_review() {
+  local pr_number="$1"
+  local interactive="$2"
+  local review_args="--open"
+
+  [ "$interactive" = "1" ] && review_args="$review_args --interactive"
+  git-pr-review $review_args "$pr_number"
+}
+
+__git_pr_revs_get_username() {
+  gh api user -q '.login'
+}
+
+# check if user has submitted a review on the PR
+__git_pr_revs_has_reviewed() {
+  local pr_number="$1"
+  local username="$2"
+
+  gh pr view "$pr_number" --json reviews -q ".reviews[].author.login" 2>/dev/null \
+    | grep -q "^${username}$"
+}
+
+__git_pr_revs_list() {
+  local include_reviewed="$1"
+  local include_closed="$2"
+  local username state_flag prs
+
+  username=$(__git_pr_revs_get_username)
+
+  if [ "$include_closed" = "1" ]; then
+    state_flag="all"
+  else
+    state_flag="open"
+  fi
+
+  # get PRs where review is requested (individual or team)
+  prs=$(gh pr list --search "review-requested:@me" --state "$state_flag" \
+    --json number,title,headRefName,state \
+    --template '{{range .}}[{{.state}}] #{{.number}} ({{.headRefName}}) | {{.title}}{{"\n"}}{{end}}' 2>/dev/null) || true
+
+  if [ -z "$prs" ]; then
+    __echo_git "no PRs found"
+    exit 0
+  fi
+
+  # filter out already reviewed PRs unless --include-reviewed
+  if [ "$include_reviewed" = "0" ]; then
+    echo "$prs" | while IFS='	' read -r line; do
+      number=$(echo "$line" | sed 's/.*#\([0-9]*\).*/\1/')
+      if ! __git_pr_revs_has_reviewed "$number" "$username"; then
+        echo "$line"
+      fi
+    done
+  else
+    echo "$prs"
+  fi
+}
+
+#
+# main script
+#
+
+include_reviewed=0
+include_closed=0
+do_review=0
+interactive=0
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --include-reviewed|-R)
+      include_reviewed=1
+      shift
+      ;;
+    --all)
+      include_reviewed=1
+      include_closed=1
+      shift
+      ;;
+    --review|-r)
+      do_review=1
+      shift
+      ;;
+    --interactive|-i)
+      interactive=1
+      shift
+      ;;
+    *)
+      __echo_git "unknown option: $1"
+      __git_pr_revs_usage
+      exit 1
+      ;;
+  esac
+done
+
+pr=$(__git_pr_revs_select "$include_reviewed" "$include_closed")
+
+if [ -z "$pr" ]; then
+  exit 0
+fi
+
+pr_number=$(__git_pr_revs_parse_number "$pr")
+
+if [ "$do_review" = "1" ]; then
+  __git_pr_revs_review "$pr_number" "$interactive"
+else
+  __git_pr_revs_browse "$pr_number"
+fi

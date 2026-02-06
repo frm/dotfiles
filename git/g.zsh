@@ -2,6 +2,11 @@
 g() {
   case "$1" in
     wt|worktree-add|co|checkout|checkout-worktree|cl|clone-cd)
+    pr)
+      shift
+      git-pr "$@"
+      return $?
+      ;;
       local output
       output=$(command hub "$@")
       local exit_code=$?
