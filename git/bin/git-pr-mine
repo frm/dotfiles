@@ -1,0 +1,28 @@
+#!/usr/bin/env sh
+# lists my open PRs in the current repo with fuzzy selection
+# usage: git pr-mine
+
+set -e
+
+#
+# aux functions
+#
+
+__echo_git() {
+  echo "[git]: $1" >&2
+}
+
+#
+# main script
+#
+
+pr=$(gh pr list --author "@me" --state open --json number,title,headRefName \
+  --template '{{range .}}#{{.number}}	{{.title}}	({{.headRefName}}){{"\n"}}{{end}}' \
+  | fzf --prompt="PR> " --header="Select PR to open" --reverse)
+
+if [ -z "$pr" ]; then
+  exit 0
+fi
+
+pr_number=$(echo "$pr" | sed 's/^#\([0-9]*\).*/\1/')
+gh pr view "$pr_number" --web

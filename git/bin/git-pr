@@ -1,0 +1,77 @@
+#!/usr/bin/env sh
+# pr command wrapper for review and browser actions
+# usage: git pr rev|review <branch|number|url>  - review with claude
+#        git pr revs|reviews [-r] [--all]       - fuzzy list PRs needing my review
+#        git pr me|mine                         - fuzzy list my open PRs
+#        git pr <branch|number|url>             - open in browser
+
+set -e
+
+#
+# aux functions
+#
+
+__echo_git() {
+  echo "[git]: $1" >&2
+}
+
+__git_pr_usage() {
+  echo "usage: git pr rev|review <branch|number|url>" >&2
+  echo "       git pr revs|reviews [-r|--include-reviewed] [--all]" >&2
+  echo "       git pr me|mine" >&2
+  echo "       git pr <branch|number|url>" >&2
+}
+
+__git_pr_review() {
+  git-pr-review "$@"
+}
+
+__git_pr_mine() {
+  git-pr-mine
+}
+
+__git_pr_reviews() {
+  git-pr-reviews "$@"
+}
+
+__git_pr_browse() {
+  local input="$1"
+
+  case "$input" in
+    http*://*)
+      # it's a URL, open directly
+      open "$input"
+      ;;
+    *)
+      # number or branch, use gh
+      gh pr view "$input" --web
+      ;;
+  esac
+}
+
+#
+# main script
+#
+
+if [ -z "$1" ]; then
+  __echo_git "input required"
+  __git_pr_usage
+  exit 1
+fi
+
+case "$1" in
+  rev|review)
+    shift
+    __git_pr_review "$@"
+    ;;
+  revs|reviews)
+    shift
+    __git_pr_reviews "$@"
+    ;;
+  me|mine)
+    __git_pr_mine
+    ;;
+  *)
+    __git_pr_browse "$1"
+    ;;
+esac

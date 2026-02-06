@@ -1,7 +1,7 @@
 ---
 name: review-pr
 description: Review a GitHub PR with context-aware depth. Use when user wants to review a PR, asks about PR changes, or needs help with code review.
-argument-hint: <pr-number-or-branch>
+argument-hint: <pr-number-or-branch-or-url>
 ---
 
 # PR Review Skill
@@ -15,6 +15,9 @@ Read `~/.dotfiles/ai/me.md` to get:
 - Teams you're a member of
 
 ## Step 1: Gather PR Information
+
+**If given a PR URL (e.g., `https://github.com/owner/repo/pull/123`):**
+Extract the PR number from the URL path and use it directly with `gh pr view`.
 
 **If given a PR number:**
 ```bash

@@ -1,0 +1,157 @@
+#!/usr/bin/env bash
+# reviews a PR using claude's /review-pr skill
+# usage: git pr-review [--checkout|--co] [--open] <branch>
+#        git pr-review [--checkout|--co] [--open] <pr-number>
+#        git pr-review [--checkout|--co] [--open] <pr-url>
+
+set -e
+
+#
+# aux functions
+#
+
+__echo_git() {
+  echo "[git]: $1" >&2
+}
+
+__git_pr_rev_print_help() {
+  cat <<EOF
+reviews a PR using claude's /review-pr skill
+
+usage: git pr-review [options] <branch|pr-number|pr-url>
+
+options:
+  --checkout, --co   checkout the PR branch locally
+  --interactive, -i  keep claude open for follow-up questions
+  --open, -o         open the PR in the browser
+  --help, -h         show this help message
+EOF
+}
+
+__git_pr_rev_print_usage() {
+  __echo_git "input required (branch, PR number, or PR URL)"
+  echo "usage: git pr-review [--checkout|--co] [--open] <branch>" >&2
+  echo "       git pr-review [--checkout|--co] [--open] <pr-number>" >&2
+  echo "       git pr-review [--checkout|--co] [--open] <pr-url>" >&2
+  exit 1
+}
+
+__git_pr_rev_build_pr_info() {
+  local pr_ref="$1"
+  gh pr view "$pr_ref" --json number,title --jq '"#\(.number) - \(.title)"'
+}
+
+__git_pr_rev_print_greeting() {
+  phrases="paging claude to review
+summoning claude for
+waking up claude to check
+claude is on the case for
+beep boop reviewing
+deploying claude to inspect
+claude has been dispatched to review
+rolling up sleeves for
+putting on reading glasses for"
+  phrase=$(echo "$phrases" | shuf -n 1)
+  echo "[git]: $phrase: $1" >&2
+}
+
+__git_pr_rev_spinner() {
+  local spin='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
+  local i=0
+  tput civis >/dev/tty 2>/dev/null
+  while true; do
+    printf "\r[git]: %s" "${spin:$i:1}" >&2
+    i=$(((i + 1) % ${#spin}))
+    sleep 0.1
+  done
+}
+
+__git_pr_rev_stop_spinner() {
+  kill "$1" 2>/dev/null
+  tput cnorm >/dev/tty 2>/dev/null
+  printf "\r        \r" >&2
+}
+
+__git_pr_rev_build_prompt() {
+  local pr_ref="$1"
+  local checkout="$2"
+  local prompt="/review-pr $pr_ref"
+  if [ -n "$checkout" ]; then
+    prompt="$prompt and check it out locally"
+  fi
+  echo "$prompt"
+}
+
+__git_pr_rev_review() {
+  local pr_ref="$1"
+  local checkout="$2"
+  local interactive="$3"
+  local prompt spinner_pid first_line
+
+  prompt=$(__git_pr_rev_build_prompt "$pr_ref" "$checkout")
+
+  __git_pr_rev_spinner &
+  spinner_pid=$!
+
+  if [ -n "$interactive" ]; then
+    __git_pr_rev_stop_spinner "$spinner_pid"
+    claude "$prompt"
+  else
+    {
+      IFS= read -r first_line
+      __git_pr_rev_stop_spinner "$spinner_pid"
+      printf '%s\n' "$first_line"
+      cat
+    } < <(claude --print "$prompt" 2>/dev/null) | glow
+  fi
+}
+
+__git_pr_rev_open() {
+  local pr_ref="$1"
+  local open="$2"
+  if [ -n "$open" ]; then
+    gh pr view "$pr_ref" --web >/dev/null 2>&1
+  fi
+}
+
+#
+# main script
+#
+
+checkout=""
+interactive=""
+open=""
+pr_ref=""
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --help|-h)
+      __git_pr_rev_print_help
+      exit 0
+      ;;
+    --checkout|--co)
+      checkout="1"
+      shift
+      ;;
+    --interactive|-i)
+      interactive="1"
+      shift
+      ;;
+    --open|-o)
+      open="1"
+      shift
+      ;;
+    *)
+      pr_ref="$1"
+      shift
+      ;;
+  esac
+done
+
+[ -z "$pr_ref" ] && __git_pr_rev_print_usage
+
+pr_info=$(__git_pr_rev_build_pr_info "$pr_ref")
+
+__git_pr_rev_print_greeting "$pr_info"
+__git_pr_rev_review "$pr_ref" "$checkout" "$interactive"
+__git_pr_rev_open "$pr_ref" "$open"
