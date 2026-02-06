@@ -154,7 +154,10 @@ __git_ppr_resolve_reviewer() {
   if [ "$is_org" = "1" ]; then
     local members=$(__git_ppr_fetch_org_members "$owner")
     local matches=$(__git_ppr_match_member "$name" "$members")
-    local match_count=$(echo "$matches" | grep -c . 2>/dev/null || echo 0)
+    local match_count=0
+    if [ -n "$matches" ]; then
+      match_count=$(echo "$matches" | wc -l | tr -d ' ')
+    fi
 
     if [ "$match_count" -eq 1 ]; then
       local matched_handle=$(echo "$matches" | head -1)
