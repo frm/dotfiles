@@ -1,7 +1,8 @@
 #!/usr/bin/env zsh
 # shows CI checks status for the open PR on the current branch
-# usage: git ci [--watch]
-#   --watch: continuously poll for status updates (every 10s)
+# usage: git ci [--watch] [--verbose]
+#   --watch, -w: continuously poll for status updates (every 10s)
+#   --verbose, -v: show which step failed for each failing check
 #
 # if multiple PRs are open for this branch, a selector is shown
 
@@ -43,13 +44,36 @@ __git_ci_extract_pr_number() {
   echo "$pr" | sed 's/^#\([0-9]*\).*/\1/'
 }
 
+__git_ci_show_failed_steps() {
+  local run_id="$1"
+  local check_name="$2"
+
+  # get failed steps from the run
+  local failed_steps
+  failed_steps=$(gh run view "$run_id" --json jobs --jq '
+    .jobs[]
+    | select(.conclusion == "failure" or .conclusion == "cancelled")
+    | .steps[]
+    | select(.conclusion == "failure" or .conclusion == "cancelled")
+    | "    → " + .name
+  ' 2>/dev/null)
+
+  if [ -n "$failed_steps" ]; then
+    echo "$failed_steps"
+  fi
+}
+
 __git_ci_show_status_summary() {
   local pr_number="$1"
+  local verbose="$2"
 
   # get check statuses as JSON (bucket field: pass, fail, pending, skipping, cancel)
-  # note: gh pr checks exits with code 8 when pending, so we ignore exit codes
+  # note: gh pr checks exits with non-zero codes for pending/failed, so we must ignore exit code
+  # but still capture stdout (not replace it with fallback on failure)
   local checks_json
-  checks_json=$(gh pr checks "$pr_number" --json name,bucket 2>&1 || true)
+  checks_json=$(gh pr checks "$pr_number" --json name,bucket,link 2>/dev/null) || true
+  # if no output, use empty array
+  [ -z "$checks_json" ] && checks_json="[]"
 
   # validate JSON - if invalid (e.g. error message), fallback to empty array
   if ! echo "$checks_json" | jq empty 2>/dev/null; then
@@ -66,6 +90,23 @@ __git_ci_show_status_summary() {
     _mnds_pp_warn "git" "no CI checks configured"
   elif [ "$failed" -gt 0 ]; then
     _mnds_pp_error "git" "build failed - $failed/$total checks failed"
+
+    # show failed step details in verbose mode
+    if [ "$verbose" = "1" ]; then
+      echo ""
+      local failed_checks
+      failed_checks=$(echo "$checks_json" | jq -r '.[] | select(.bucket == "fail" or .bucket == "cancel") | "\(.name)\t\(.link)"')
+      echo "$failed_checks" | while IFS=$'\t' read -r name url; do
+        [ -z "$name" ] && continue
+        # extract run ID from URL (format: .../actions/runs/12345678/...)
+        local run_id="${url##*/runs/}"
+        run_id="${run_id%%/*}"
+        if [ -n "$run_id" ] && [ "$run_id" != "$url" ]; then
+          echo "  ${MNDS_FMT_RED}✗ $name${MNDS_FMT_RESET}"
+          __git_ci_show_failed_steps "$run_id" "$name"
+        fi
+      done
+    fi
   elif [ "$pending" -gt 0 ]; then
     _mnds_pp_warn "git" "build pending - $pending/$total checks still running ($passed passed)"
   else
@@ -166,9 +207,13 @@ __git_ci_show_checks() {
 #
 
 watch=0
-if [ "$1" = "--watch" ] || [ "$1" = "-w" ]; then
-  watch=1
-fi
+verbose=0
+for arg in "$@"; do
+  case "$arg" in
+    --watch|-w) watch=1 ;;
+    --verbose|-v) verbose=1 ;;
+  esac
+done
 
 branch=$(__git_ci_get_current_branch)
 _mnds_pp_info "git" "checking PRs for branch: $branch"
@@ -191,6 +236,6 @@ _mnds_pp_info "git" "showing CI checks for PR #$pr_number"
 echo ""
 
 __git_ci_show_checks "$pr_number" "$watch"
-__git_ci_show_status_summary "$pr_number"
+__git_ci_show_status_summary "$pr_number" "$verbose"
 echo ""
 __git_ci_show_merge_status "$pr_number"
