@@ -1,0 +1,196 @@
+#!/usr/bin/env zsh
+# shows CI checks status for the open PR on the current branch
+# usage: git ci [--watch]
+#   --watch: continuously poll for status updates (every 10s)
+#
+# if multiple PRs are open for this branch, a selector is shown
+
+set -e
+
+source $DOTFILES/functions/helpers.zsh
+
+#
+# aux functions
+#
+
+__git_ci_get_current_branch() {
+  git rev-parse --abbrev-ref HEAD
+}
+
+__git_ci_get_prs_for_branch() {
+  local branch="$1"
+  gh pr list --head "$branch" --state open --json number,title,headRefName \
+    --template '{{range .}}#{{.number}}	{{.title}}	({{.headRefName}}){{"\n"}}{{end}}'
+}
+
+__git_ci_select_pr() {
+  local prs="$1"
+  local count=$(echo "$prs" | wc -l | tr -d ' ')
+
+  if [ "$count" -eq 0 ] || [ -z "$prs" ]; then
+    _mnds_pp_error "git" "no open PRs found for this branch"
+    exit 1
+  elif [ "$count" -eq 1 ]; then
+    echo "$prs"
+  else
+    _mnds_pp_info "git" "multiple PRs found for this branch"
+    echo "$prs" | fzf --prompt="PR> " --header="Select PR to check CI status" --reverse
+  fi
+}
+
+__git_ci_extract_pr_number() {
+  local pr="$1"
+  echo "$pr" | sed 's/^#\([0-9]*\).*/\1/'
+}
+
+__git_ci_show_status_summary() {
+  local pr_number="$1"
+
+  # get check statuses as JSON (bucket field: pass, fail, pending, skipping, cancel)
+  # note: gh pr checks exits with code 8 when pending, so we ignore exit codes
+  local checks_json
+  checks_json=$(gh pr checks "$pr_number" --json name,bucket 2>&1 || true)
+
+  # validate JSON - if invalid (e.g. error message), fallback to empty array
+  if ! echo "$checks_json" | jq empty 2>/dev/null; then
+    checks_json="[]"
+  fi
+
+  local total=$(echo "$checks_json" | jq 'length')
+  local passed=$(echo "$checks_json" | jq '[.[] | select(.bucket == "pass" or .bucket == "skipping")] | length')
+  local failed=$(echo "$checks_json" | jq '[.[] | select(.bucket == "fail" or .bucket == "cancel")] | length')
+  local pending=$(echo "$checks_json" | jq '[.[] | select(.bucket == "pending")] | length')
+
+  echo ""
+  if [ "$total" -eq 0 ]; then
+    _mnds_pp_warn "git" "no CI checks configured"
+  elif [ "$failed" -gt 0 ]; then
+    _mnds_pp_error "git" "build failed - $failed/$total checks failed"
+  elif [ "$pending" -gt 0 ]; then
+    _mnds_pp_warn "git" "build pending - $pending/$total checks still running ($passed passed)"
+  else
+    _mnds_pp_success "git" "build green - all $total checks passed"
+  fi
+}
+
+__git_ci_show_merge_status() {
+  local pr_number="$1"
+
+  # get PR review and merge status
+  local pr_json=$(gh pr view "$pr_number" --json mergeable,reviewDecision,reviewRequests,reviews,isDraft 2>/dev/null)
+
+  local mergeable=$(echo "$pr_json" | jq -r '.mergeable')
+  local review_decision=$(echo "$pr_json" | jq -r '.reviewDecision')
+  local is_draft=$(echo "$pr_json" | jq -r '.isDraft')
+
+  # get pending reviewers (requested but not yet reviewed)
+  # reviewRequests can have users (.login) or teams (.name with .slug)
+  local pending_reviewers=$(echo "$pr_json" | jq -r '
+    .reviewRequests[] |
+    if .login then .login
+    elif .name then "team:" + .name
+    else empty
+    end' 2>/dev/null)
+
+  # get latest review state per reviewer (reviews can have multiple entries per person)
+  local approved_reviewers=$(echo "$pr_json" | jq -r '
+    [.reviews | group_by(.author.login) | .[] | {login: .[0].author.login, state: .[-1].state}]
+    | .[] | select(.state == "APPROVED") | .login' 2>/dev/null)
+  local changes_requested=$(echo "$pr_json" | jq -r '
+    [.reviews | group_by(.author.login) | .[] | {login: .[0].author.login, state: .[-1].state}]
+    | .[] | select(.state == "CHANGES_REQUESTED") | .login' 2>/dev/null)
+
+  if [ "$is_draft" = "true" ]; then
+    _mnds_pp_warn "git" "DRAFT PR - not ready for review"
+  elif [ "$review_decision" = "APPROVED" ]; then
+    if [ "$mergeable" = "MERGEABLE" ]; then
+      _mnds_pp_success "git" "READY TO MERGE - approved and mergeable"
+    elif [ "$mergeable" = "CONFLICTING" ]; then
+      _mnds_pp_error "git" "CONFLICTS - approved but has merge conflicts"
+    else
+      _mnds_pp_warn "git" "APPROVED - but merge status: $mergeable"
+    fi
+  elif [ "$review_decision" = "CHANGES_REQUESTED" ]; then
+    _mnds_pp_error "git" "CHANGES REQUESTED - needs updates"
+  elif [ "$review_decision" = "REVIEW_REQUIRED" ] || [ -n "$pending_reviewers" ]; then
+    _mnds_pp_warn "git" "PENDING REVIEW"
+  else
+    if [ "$mergeable" = "MERGEABLE" ]; then
+      _mnds_pp_info "git" "MERGEABLE - no review required"
+    elif [ "$mergeable" = "CONFLICTING" ]; then
+      _mnds_pp_error "git" "CONFLICTS - has merge conflicts"
+    else
+      _mnds_pp_info "git" "merge status: $mergeable"
+    fi
+  fi
+
+  # show reviewer breakdown
+  if [ -n "$approved_reviewers" ]; then
+    echo "$approved_reviewers" | while read -r reviewer; do
+      [ -n "$reviewer" ] && echo "  ${MNDS_FMT_GREEN}✓ $reviewer${MNDS_FMT_RESET}"
+    done
+  fi
+  if [ -n "$changes_requested" ]; then
+    echo "$changes_requested" | while read -r reviewer; do
+      [ -n "$reviewer" ] && echo "  ${MNDS_FMT_RED}✗ $reviewer${MNDS_FMT_RESET}"
+    done
+  fi
+  if [ -n "$pending_reviewers" ]; then
+    echo "$pending_reviewers" | while read -r reviewer; do
+      if [ -n "$reviewer" ]; then
+        if [[ "$reviewer" == team:* ]]; then
+          echo "  ${MNDS_FMT_YELLOW}○ @${reviewer#team:}${MNDS_FMT_RESET}"
+        else
+          echo "  ${MNDS_FMT_YELLOW}○ $reviewer${MNDS_FMT_RESET}"
+        fi
+      fi
+    done
+  fi
+  echo ""
+}
+
+__git_ci_show_checks() {
+  local pr_number="$1"
+  local watch="$2"
+
+  # gh pr checks exits with code 8 when checks are pending, so we capture and ignore it
+  if [ "$watch" = "1" ]; then
+    gh pr checks "$pr_number" --watch --interval 10 || true
+  else
+    gh pr checks "$pr_number" || true
+  fi
+}
+
+#
+# main script
+#
+
+watch=0
+if [ "$1" = "--watch" ] || [ "$1" = "-w" ]; then
+  watch=1
+fi
+
+branch=$(__git_ci_get_current_branch)
+_mnds_pp_info "git" "checking PRs for branch: $branch"
+
+prs=$(__git_ci_get_prs_for_branch "$branch")
+
+if [ -z "$prs" ]; then
+  _mnds_pp_error "git" "no open PRs found for branch '$branch'"
+  exit 1
+fi
+
+selected=$(__git_ci_select_pr "$prs")
+
+if [ -z "$selected" ]; then
+  exit 0
+fi
+
+pr_number=$(__git_ci_extract_pr_number "$selected")
+_mnds_pp_info "git" "showing CI checks for PR #$pr_number"
+echo ""
+
+__git_ci_show_checks "$pr_number" "$watch"
+__git_ci_show_status_summary "$pr_number"
+echo ""
+__git_ci_show_merge_status "$pr_number"
