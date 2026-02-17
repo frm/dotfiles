@@ -18,6 +18,14 @@ _git_checkout() {
   fi
 }
 
+_git_rebase_or_skip() {
+  # skip if worktree has unstaged changes
+  if ! git diff --quiet; then
+    return 0
+  fi
+  git rebase "$@"
+}
+
 if [ -z "$destination" ]; then
   if $(git branch-check main); then
     destination="main"
@@ -41,9 +49,10 @@ fi
 
 original_dir=$(pwd)
 
+# Try to update local destination branch (master/main)
+# This may fail in worktrees if the main worktree has changes - that's ok
 _echo "rebasing $destination..."
-_git_checkout $destination || exit "couldn't checkout $destination"
-git rebase origin/$destination
+_git_checkout $destination 2>/dev/null && _git_rebase_or_skip origin/$destination || true
 
 _echo "rebasing $branch"
 # cd back into where we were in case of worktrees
