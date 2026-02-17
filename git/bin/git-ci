@@ -101,24 +101,24 @@ __git_ci_show_merge_status() {
     | .[] | select(.state == "CHANGES_REQUESTED") | .login' 2>/dev/null)
 
   if [ "$is_draft" = "true" ]; then
-    _mnds_pp_warn "git" "DRAFT PR - not ready for review"
+    _mnds_pp_warn "git" "draft - not ready for review"
   elif [ "$review_decision" = "APPROVED" ]; then
     if [ "$mergeable" = "MERGEABLE" ]; then
-      _mnds_pp_success "git" "READY TO MERGE - approved and mergeable"
+      _mnds_pp_success "git" "ready to merge - approved and mergeable"
     elif [ "$mergeable" = "CONFLICTING" ]; then
-      _mnds_pp_error "git" "CONFLICTS - approved but has merge conflicts"
+      _mnds_pp_error "git" "conflicts - approved but has merge conflicts"
     else
-      _mnds_pp_warn "git" "APPROVED - but merge status: $mergeable"
+      _mnds_pp_warn "git" "approved - but merge status: $mergeable"
     fi
   elif [ "$review_decision" = "CHANGES_REQUESTED" ]; then
-    _mnds_pp_error "git" "CHANGES REQUESTED - needs updates"
+    _mnds_pp_error "git" "changes requested - needs updates"
   elif [ "$review_decision" = "REVIEW_REQUIRED" ] || [ -n "$pending_reviewers" ]; then
-    _mnds_pp_warn "git" "PENDING REVIEW"
+    _mnds_pp_warn "git" "pending review"
   else
     if [ "$mergeable" = "MERGEABLE" ]; then
-      _mnds_pp_info "git" "MERGEABLE - no review required"
+      _mnds_pp_info "git" "mergeable - no review required"
     elif [ "$mergeable" = "CONFLICTING" ]; then
-      _mnds_pp_error "git" "CONFLICTS - has merge conflicts"
+      _mnds_pp_error "git" "conflicts - has merge conflicts"
     else
       _mnds_pp_info "git" "merge status: $mergeable"
     fi
