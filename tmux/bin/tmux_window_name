@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# Determines the tmux window name based on context:
+# - If session name matches the window's directory, show the git branch (or directory if not a repo)
+# - Otherwise, show the window's directory name
+# Note: Manually set window names are preserved by tmux's automatic-rename behavior
+
+pane_path="$1"
+window_dir="${pane_path##*/}"
+session_name=$(tmux display-message -p '#S')
+
+if [[ "$session_name" == "$window_dir" ]]; then
+  branch=$(git -C "$pane_path" rev-parse --abbrev-ref HEAD 2>/dev/null)
+  echo "${branch:-$window_dir}"
+else
+  echo "$window_dir"
+fi
