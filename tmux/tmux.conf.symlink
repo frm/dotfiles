@@ -27,8 +27,8 @@ set -g base-index 1
 # Automatic window renumber
 set-option -g renumber-windows on
 
-# if no window name is given, use the current path as the name
-set -g automatic-rename-format "#{b:pane_current_path}"
+# Window naming: git branch if session matches directory, else directory name
+set -g automatic-rename-format "#($DOTFILES/tmux/bin/tmux_window_name '#{pane_current_path}')"
 
 # v to start copy mode as Vim's Visual Mode
 unbind [
