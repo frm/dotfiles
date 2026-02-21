@@ -1,13 +1,29 @@
 {
-  "model": "opus",
   "permissions": {
     "additionalDirectories": [
       "~/.dotfiles/ai/"
     ],
-    "allowedTools": [
+    "allow": [
       "Bash(gh:*)",
+      "Bash(ls:*)",
+      "Bash(pbcopy:*)",
       "Read(~/.dotfiles/ai/*)",
-      "Skill"
+      "Skill",
+      "WebSearch",
+      "WebFetch",
+      "WebFetch(domain:*)",
+      "mcp__linear__get_issue",
+      "mcp__linear__list_comments"
     ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": ["postgres", "sentry", "linear", "figma"],
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
+    "allowUnsandboxedCommands": false,
+    "network": {
+      "allowLocalBinding": true
+    }
   }
 }
