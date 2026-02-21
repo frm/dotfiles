@@ -264,6 +264,8 @@ cat gh/extensions | xargs -I {} gh extension install {}
 pp_info "ai" "setting up AI coding assistant skills"
 mkdir -p ~/.claude ~/.codex/skills
 gln -srf ai/skills ~/.claude/skills
+gln -srf ai/agents.md ~/.claude/CLAUDE.md
+gln -srf ai/agents.md ~/.codex/AGENTS.md
 gln -srf claude/settings.json.symlink ~/.claude/settings.json
 gln -srf codex/config.toml.symlink ~/.codex/config.toml
 # codex adds custom scripts to ~/.codex/skills, so we copy instead of symlinking
