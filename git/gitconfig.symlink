@@ -74,7 +74,8 @@
   wtd = worktree-del
 
   apf = !git-amend-push
-  bb= !git-browse-branch
+  bb = !git-browse-branch
+  br = !git-browse-repo
   cc = !git-copy-comment
   ch = !git-what-changed
   cob = !git-checkout-branch
