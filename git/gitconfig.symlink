@@ -45,8 +45,9 @@
 [alias]
   a = add
   b = branch -avv
-  c = commit
+  c = commit --no-template
   cam = commit -a --amend --no-edit
+  ct = commit
   cl = clone-cd
   co = checkout-worktree
   cp = cherry-pick
