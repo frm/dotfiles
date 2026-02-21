@@ -84,7 +84,10 @@ __git_wt_infer_worktree_path() {
   case "$git_root" in
     */.worktrees/*)
       # if already inside a .worktrees directory, create sibling
-      worktrees_base="${git_root%/.worktrees/*}/.worktrees/$repo_name"
+      # extract repo name from path: .worktrees/<repo>/<branch>
+      local after_worktrees="${git_root#*/.worktrees/}"
+      local wt_repo_name="${after_worktrees%%/*}"
+      worktrees_base="${git_root%/.worktrees/*}/.worktrees/$wt_repo_name"
       ;;
     *)
       worktrees_base="$(dirname "$git_root")/.worktrees/$repo_name"
