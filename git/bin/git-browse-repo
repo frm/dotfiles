@@ -1,0 +1,52 @@
+#!/usr/bin/env sh
+# opens a repo on GitHub
+# usage: git browse-repo
+#        git browse-repo <repo>
+#        git browse-repo <owner>/<repo>
+
+set -e
+
+#
+# aux functions
+#
+
+__echo_git() {
+  echo "[git]: $1" >&2
+}
+
+__git_br_current_owner() {
+  gh repo view --json owner -q '.owner.login'
+}
+
+__git_br_parse_repo() {
+  local input="$1"
+
+  case "$input" in
+    */*)
+      echo "$input"
+      ;;
+    *)
+      local owner
+      owner=$(__git_br_current_owner) || {
+        __echo_git "failed to get current repo owner"
+        return 1
+      }
+      echo "$owner/$input"
+      ;;
+  esac
+}
+
+#
+# main script
+#
+
+if [ $# -eq 0 ]; then
+  __echo_git "opening current repo..."
+  gh browse
+  exit 0
+fi
+
+repo=$(__git_br_parse_repo "$1") || exit 1
+
+__echo_git "opening $repo..."
+gh browse --repo "$repo"
