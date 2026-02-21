@@ -74,5 +74,5 @@ Temporary Items
 # my own ai wikis
 .frm/
 
-# cursor plans
-.cursor/plans
+# ai plans
+.ai/plans
