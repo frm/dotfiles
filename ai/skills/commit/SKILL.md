@@ -42,7 +42,7 @@ Extract the ticket from the branch name. Branch format is typically:
 
 ## Process
 
-1. **Analyze changes**: Run `git diff --staged` and `git status` to understand what changed
+1. **Analyze changes**: Run `git diff --staged` and `git status` to understand what changed. Only consider staged changes unless explicitly told to include all changed files. If told to include all changes, run `git add -A` to stage everything first.
 2. **Extract ticket**: Get branch name with `git branch --show-current` and extract ticket
 3. **Generate message**: Create a commit message following the format above
 4. **Present to user**: Display the suggested commit message in a code block
@@ -51,7 +51,9 @@ Extract the ticket from the branch name. Branch format is typically:
 
 ## Important Rules
 
-- **NEVER commit** - Only suggest the message, let the user commit manually
+- **Don't commit by default** - Suggest the message and let the user decide
+- **Commit if asked** - If the user says "commit", "yes commit", "commit it", etc., run git commit with the approved message
+- **Use exact message** - Never add co-authored-by lines, AI attribution, or any other text to the commit message
 - **Be concise** in the "Why" section - anyone should understand the problem quickly
 - **Be high-level** in the "How" section - avoid implementation minutiae
 - **Wait for feedback** - The user may want to iterate on the message
