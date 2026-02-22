@@ -1,7 +1,10 @@
 export AUTOLOAD_ENVIRONMENT=false
-export NVIM_MINUET_PROVIDER="claude"
 export RIVER="$DEVELOPER/river"
+
 export MNDS_DEFAULT_MAIN_BRANCH_NAME=master
+
+export NVIM_MINUET_PROVIDER="claude"
+export NVIM_MINUET_ENABLED="0"
 
 source $DOTFILES/river/alto/alto.init
 source $DOTFILES/river/gcloud/gcloud.init
