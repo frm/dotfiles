@@ -211,7 +211,7 @@ require("lazy").setup({
     dependencies = { 'nvim-lua/plenary.nvim' },
     config = function()
       require('minuet').setup({
-        provider = 'claude',
+        provider = os.getenv('NVIM_MINUET_PROVIDER') or 'claude',
         throttle = 1000,
         debounce = 500,
       })
