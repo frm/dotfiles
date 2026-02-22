@@ -208,6 +208,7 @@ require("lazy").setup({
 
   {
     'milanglacier/minuet-ai.nvim',
+    cond = os.getenv('NVIM_MINUET_ENABLED') ~= '0',
     dependencies = { 'nvim-lua/plenary.nvim' },
     config = function()
       require('minuet').setup({
