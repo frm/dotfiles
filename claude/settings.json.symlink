@@ -1,9 +1,23 @@
 {
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.dotfiles/ai/skills/speech/hooks/speak_response.sh"
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "additionalDirectories": [
       "~/.dotfiles/ai/"
     ],
     "allow": [
+      "Bash(~/.dotfiles/ai/bin/speech-off)",
       "Bash(gh:*)",
       "Bash(ls:*)",
       "Bash(pbcopy:*)",

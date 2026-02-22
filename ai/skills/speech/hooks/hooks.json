@@ -1,0 +1,13 @@
+{
+  "Stop": [
+    {
+      "matcher": "",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "${SKILL_DIR}/hooks/speak_response.sh"
+        }
+      ]
+    }
+  ]
+}

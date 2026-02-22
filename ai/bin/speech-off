@@ -1,0 +1,5 @@
+#!/bin/bash
+echo "$(date): speech-off running, say PIDs: $(pgrep say)" >> /tmp/claude/.speech-off.log
+pkill -9 say 2>/dev/null || killall -9 say 2>/dev/null || true
+rm -f /tmp/claude/.claude-speak
+echo "$(date): done" >> /tmp/claude/.speech-off.log
