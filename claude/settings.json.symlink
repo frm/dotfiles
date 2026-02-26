@@ -1,4 +1,29 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(~/.dotfiles/ai/bin/speech-off)",
+      "Bash(gh:*)",
+      "Bash(ls:*)",
+      "Bash(pbcopy:*)",
+      "Read(~/.dotfiles/ai/*)",
+      "Skill",
+      "WebSearch",
+      "WebFetch",
+      "WebFetch(domain:*)",
+      "mcp__linear__get_issue",
+      "mcp__linear__list_comments"
+    ],
+    "additionalDirectories": [
+      "~/.dotfiles/ai/"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "postgres",
+    "sentry",
+    "linear",
+    "figma"
+  ],
   "hooks": {
     "Stop": [
       {
@@ -12,26 +37,6 @@
       }
     ]
   },
-  "permissions": {
-    "additionalDirectories": [
-      "~/.dotfiles/ai/"
-    ],
-    "allow": [
-      "Bash(~/.dotfiles/ai/bin/speech-off)",
-      "Bash(gh:*)",
-      "Bash(ls:*)",
-      "Bash(pbcopy:*)",
-      "Read(~/.dotfiles/ai/*)",
-      "Skill",
-      "WebSearch",
-      "WebFetch",
-      "WebFetch(domain:*)",
-      "mcp__linear__get_issue",
-      "mcp__linear__list_comments"
-    ]
-  },
-  "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["postgres", "sentry", "linear", "figma"],
   "sandbox": {
     "enabled": true,
     "autoAllowBashIfSandboxed": true,
