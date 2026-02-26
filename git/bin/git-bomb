@@ -33,7 +33,7 @@ __git_bomb_get_merged_branches() {
   git branch --merged "$default_branch" \
     | grep -v "$default_branch" \
     | grep -v '^\*' \
-    | sed 's/^[[:space:]]*//'
+    | sed 's/^[+[:space:]]*//'
 }
 
 __git_bomb_remove_worktree() {
