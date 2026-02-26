@@ -10,6 +10,12 @@ bind -n S-Enter send-keys Escape "[13;2u"
 # Fix cursor change in nvim
 set -g -a terminal-overrides ',*:Ss=\E[%p1%d q:Se=\E[2 q'
 
+# Enable passthrough for OSC sequences (hyperlinks, images, etc)
+set -g allow-passthrough on
+
+# Enable hyperlink support (OSC 8)
+set -ga terminal-features ",*:hyperlinks"
+
 # Bind splits to C-A s/S
 bind-key s split-window -h -c '#{pane_current_path}'
 bind-key S split-window -v -c '#{pane_current_path}'
@@ -62,6 +68,7 @@ set -g @plugin 'tmux-plugins/tmux-battery'
 set -g @plugin 'tmux-plugins/tmux-cpu'
 set -g @plugin 'tmux-plugins/tmux-sensible'
 set -g @plugin 'tmux-plugins/tmux-yank'
+set -g @plugin 'wfxr/tmux-fzf-url'
 set -g @plugin 'christoomey/vim-tmux-navigator'
 set -g @plugin 'fabioluciano/tmux-powerkit'
 
