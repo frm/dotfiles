@@ -39,12 +39,12 @@ __git_nuke_get_merged_branches() {
   git branch --merged "$default_branch" \
     | grep -v "$default_branch" \
     | grep -v '^\*' \
-    | sed 's/^[[:space:]]*//'
+    | sed 's/^[+[:space:]]*//'
 }
 
 __git_nuke_get_gone_branches() {
   git branch -vv \
-    | awk '/: gone\]/ { print $1 }'
+    | awk '/: gone\]/ { sub(/^[*+ ]+/, ""); print $1 }'
 }
 
 __git_nuke_remove_worktree() {
