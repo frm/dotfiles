@@ -140,6 +140,11 @@ require("lazy").setup({
     opts = {
       picker = {
         enabled = true,
+        sources = {
+          files = {
+            hidden = true,
+          },
+        },
         layout = {
           layout = {
             backdrop = false,
