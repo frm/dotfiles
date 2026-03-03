@@ -3,15 +3,36 @@
 # Determines the tmux window name based on context:
 # - If session name matches the window's directory, show the git branch (or directory if not a repo)
 # - Otherwise, show the window's directory name
+# - Prepends "(#PR)" if the current branch has an open PR
 # Note: Manually set window names are preserved by tmux's automatic-rename behavior
 
 pane_path="$1"
 window_dir="${pane_path##*/}"
 session_name=$(tmux display-message -p '#S')
 
+# Look up PR number for the current branch, with file-based caching (5 min TTL)
+pr_prefix=""
+branch=$(git -C "$pane_path" rev-parse --abbrev-ref HEAD 2>/dev/null)
+
+if [[ -n "$branch" ]]; then
+  cache_dir="${TMPDIR:-/tmp}/tmux_pr_cache"
+  mkdir -p "$cache_dir"
+
+  repo_id=$(git -C "$pane_path" rev-parse --show-toplevel 2>/dev/null | tr '/' '_')
+  cache_file="$cache_dir/${repo_id}_${branch}"
+
+  if [[ -f "$cache_file" ]] && [[ $(( $(date +%s) - $(stat -f %m "$cache_file") )) -lt 300 ]]; then
+    pr_number=$(cat "$cache_file")
+  else
+    pr_number=$(gh pr view "$branch" --repo "$(git -C "$pane_path" remote get-url origin 2>/dev/null)" --json number -q .number 2>/dev/null)
+    echo "${pr_number:-}" > "$cache_file"
+  fi
+
+  [[ -n "$pr_number" ]] && pr_prefix="(#$pr_number) "
+fi
+
 if [[ "$session_name" == "$window_dir" ]]; then
-  branch=$(git -C "$pane_path" rev-parse --abbrev-ref HEAD 2>/dev/null)
-  echo "${branch:-$window_dir}"
+  echo "${pr_prefix}${branch:-$window_dir}"
 else
-  echo "$window_dir"
+  echo "${pr_prefix}${window_dir}"
 fi
