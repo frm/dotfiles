@@ -5,7 +5,12 @@ source "$DOTFILES/functions/helpers.zsh"
 conflicts=`git diff --name-only --diff-filter=U`
 total_files="${(w)#conflicts}"
 
-raw_conflicts="$(rg -c '^=======$' "${(f)conflicts}")"
+existing_conflicts=()
+for f in ${(f)conflicts}; do
+  [[ -f "$f" ]] && existing_conflicts+=("$f")
+done
+
+raw_conflicts="$(rg -c '^=======$' "${existing_conflicts[@]}" 2>/dev/null)"
 raw_total=$(echo $raw_conflicts | cut -d ':' -f2 | paste -sd+ - | bc)
 total_conflicts=${raw_total##*(  )}
 
@@ -18,6 +23,11 @@ _mnds_pp_error "git" "found a total of $total_conflicts conflict(s) in $total_fi
 
 # List conflicts
 for file in $(echo "$conflicts"); do
+  if [[ ! -f "$file" ]]; then
+    _mnds_pp_info "git" "$file was deleted"
+    continue
+  fi
+
   nr_conflicts=$(rg -c '^=======$' $file || echo "0")
 
   if [ "$nr_conflicts" = "0" ]; then
