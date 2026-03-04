@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 # creates a worktree for a branch, copying common build artifacts
-# usage: git worktree-add <branch>
-#        git worktree-add --pr <number>
+# usage: git worktree-add [--reset] <branch>
+#        git worktree-add [--reset] --pr <number>
 
 set -e
 
@@ -54,11 +54,17 @@ __git_wt_parse_opts_from_pr() {
 }
 
 # parse the cli opts and args
+_RESET=false
+
 __git_wt_parse_opts() {
   local branch_name=""
 
   while [ $# -gt 0 ]; do
     case $1 in
+      --reset|-r)
+        _RESET=true
+        shift
+        ;;
       --pr)
         branch_name=$(__git_wt_parse_opts_from_pr "$2") || return 1
         shift 2
@@ -124,12 +130,179 @@ __git_wt_attach() {
   fi
 }
 
+# SHA256 hash of input, first 8 hex chars
+__git_wt_hash_id() {
+  local input="$1"
+  local digest
+
+  if command -v shasum >/dev/null 2>&1; then
+    digest=$(printf '%s' "$input" | shasum -a 256 | awk '{print $1}')
+  elif command -v sha256sum >/dev/null 2>&1; then
+    digest=$(printf '%s' "$input" | sha256sum | awk '{print $1}')
+  else
+    __echo_git "missing shasum/sha256sum"
+    return 1
+  fi
+
+  printf '%s' "$digest" | cut -c1-8
+}
+
+# upsert export KEY=VALUE in an env file
+__git_wt_upsert_env() {
+  local env_file="$1"
+  local key="$2"
+  local value="$3"
+  local tmp_file="${env_file}.tmp.$$"
+
+  if [ ! -f "$env_file" ]; then
+    echo "export ${key}=${value}" > "$env_file"
+    return
+  fi
+
+  awk -v key="$key" -v value="$value" '
+  BEGIN { updated = 0 }
+  $0 ~ "^export " key "=" {
+    print "export " key "=" value
+    updated = 1
+    next
+  }
+  { print }
+  END {
+    if (!updated) {
+      if (NR > 0) print ""
+      print "export " key "=" value
+    }
+  }' "$env_file" > "$tmp_file"
+
+  mv "$tmp_file" "$env_file"
+}
+
+# generate unique ports and optionally isolate DB vars for a worktree
+__git_wt_setup_env() {
+  local worktree_path="$1"
+  local env_file="${_MNDS_WORKTREE_ENV_FILE:-.envrc}"
+  local full_env_path="$worktree_path/$env_file"
+
+  [ -z "$_MNDS_WORKTREE_PORTS" ] && [ -z "$_MNDS_WORKTREE_DB_VARS" ] && return 0
+
+  local hash
+  hash=$(__git_wt_hash_id "$worktree_path") || return 1
+
+  if [ -n "$_MNDS_WORKTREE_PORTS" ]; then
+    local num_ports=0
+    for _entry in $_MNDS_WORKTREE_PORTS; do
+      num_ports=$((num_ports + 1))
+    done
+
+    local seed
+    seed=$(printf '%d' "0x$hash")
+    local bucket=$((seed % 500))
+    local i=0
+
+    __echo_git "assigning worktree ports (bucket $bucket):"
+    for entry in $_MNDS_WORKTREE_PORTS; do
+      local var_name="${entry%%:*}"
+      local port=$((20000 + bucket * num_ports + i))
+      __git_wt_upsert_env "$full_env_path" "$var_name" "$port"
+      __echo_git "  $var_name=$port"
+      i=$((i + 1))
+    done
+  fi
+
+  if [ "$_RESET" = true ] && [ -n "$_MNDS_WORKTREE_DB_VARS" ]; then
+    __echo_git "isolating database vars:"
+    for var_name in $_MNDS_WORKTREE_DB_VARS; do
+      local current_value=""
+      if [ -f "$full_env_path" ]; then
+        current_value=$(awk -v key="$var_name" '$0 ~ "^export " key "=" { sub("^export " key "=", ""); print }' "$full_env_path")
+      fi
+      if [ -n "$current_value" ]; then
+        local new_value="${current_value}_wt_${hash}"
+        __git_wt_upsert_env "$full_env_path" "$var_name" "$new_value"
+        __echo_git "  $var_name=$new_value"
+      fi
+    done
+  fi
+}
+
+__git_wt_cleanup_elixir_ls() {
+  local worktree_path="$1"
+
+  if [ -d "$worktree_path/.elixir_ls/build" ]; then
+    __echo_git "[elixir] removing stale .elixir_ls/build cache..."
+    rm -rf "$worktree_path/.elixir_ls/build"
+  fi
+}
+
+__git_wt_cleanup_artifacts() {
+  local worktree_path="$1"
+
+  __git_wt_cleanup_elixir_ls "$worktree_path"
+}
+
+__git_wt_mix() {
+  local worktree_path="$1"
+  local env="$2"
+
+  __echo_git "[mix:$env] fetching deps..."
+  (cd "$worktree_path" && MIX_ENV="$env" mix deps.get)
+  __echo_git "[mix:$env] compiling..."
+  (cd "$worktree_path" && MIX_ENV="$env" mix compile)
+  __echo_git "[mix:$env] migrating..."
+  (cd "$worktree_path" && MIX_ENV="$env" mix ecto.migrate)
+}
+
+__git_wt_yarn() {
+  local worktree_path="$1"
+
+  __echo_git "[yarn] installing deps..."
+  (cd "$worktree_path" && yarn install)
+}
+
+# install deps and compile the project
+__git_wt_compile() {
+  local worktree_path="$1"
+
+  if [ -f "$worktree_path/mix.exs" ]; then
+    __git_wt_mix "$worktree_path" dev
+    __git_wt_mix "$worktree_path" test
+  fi
+
+  if [ -f "$worktree_path/package.json" ]; then
+    __git_wt_yarn "$worktree_path"
+  fi
+}
+
+# copy a single artifact with a spinner
+__git_wt_cp_with_spinner() {
+  local src="$1"
+  local dest="$2"
+  local name="$3"
+
+  cp -r "$src" "$dest" 2>/dev/null &
+  local cp_pid=$!
+
+  local i=0
+  while kill -0 "$cp_pid" 2>/dev/null; do
+    case $((i % 10)) in
+      0) c='⠋' ;; 1) c='⠙' ;; 2) c='⠹' ;; 3) c='⠸' ;; 4) c='⠼' ;;
+      5) c='⠴' ;; 6) c='⠦' ;; 7) c='⠧' ;; 8) c='⠇' ;; 9) c='⠏' ;;
+    esac
+    printf '\r       %s copying %s...' "$c" "$name" >&2
+    i=$((i + 1))
+    sleep 0.1
+  done
+
+  wait "$cp_pid" 2>/dev/null || true
+  printf '\r       \033[K' >&2
+}
+
 # copy over project artifacts so we don't have to recompile, reset secrets, etc
-# this includes project-specific artifacts defined via _MNDS_LOCAL_PROJECT_ARTIFACTS
+# this includes project-specific artifacts defined via _MNDS_WORKTREE_PROJECT_ARTIFACTS
 __git_wt_cp_artifacts() {
   local git_root="$1"
   local worktree_path="$2"
-  local all_artifacts="$_PROJECT_ARTIFACTS $_MNDS_LOCAL_PROJECT_ARTIFACTS"
+  local all_artifacts="$_PROJECT_ARTIFACTS $_MNDS_WORKTREE_PROJECT_ARTIFACTS"
 
   for pattern in $all_artifacts; do
     for item in $git_root/$pattern; do
@@ -137,9 +310,11 @@ __git_wt_cp_artifacts() {
       local rel_path="${item#$git_root/}"
       local dest_dir="$worktree_path/$(dirname "$rel_path")"
       mkdir -p "$dest_dir"
-      cp -r "$item" "$dest_dir/" 2>/dev/null || true
+      __git_wt_cp_with_spinner "$item" "$dest_dir/" "$(basename "$item")"
     done
   done
+
+  printf '       ✓ all artifacts copied\n' >&2
 }
 
 #
@@ -150,8 +325,8 @@ branch_name=$(__git_wt_parse_opts "$@") || exit 1
 
 if [ -z "$branch_name" ]; then
   __echo_git "branch name required"
-  echo "usage: git worktree-add <branch>" >&2
-  echo "       git worktree-add --pr <number>" >&2
+  echo "usage: git worktree-add [--reset] <branch>" >&2
+  echo "       git worktree-add [--reset] --pr <number>" >&2
   exit 1
 fi
 
@@ -164,9 +339,23 @@ if [ -d "$worktree_path" ]; then
   exit 0
 fi
 
+__echo_git "creating worktree at $worktree_path"
 __git_wt_mkdir "$worktree_path"
 __git_wt_attach "$worktree_path" "$branch_name"
+__echo_git "copying artifacts..."
 __git_wt_cp_artifacts "$git_root" "$worktree_path"
+__git_wt_cleanup_artifacts "$worktree_path"
+__git_wt_setup_env "$worktree_path"
+__git_wt_compile "$worktree_path"
+
+if [ -n "$_MNDS_WORKTREE_POST_SETUP" ]; then
+  __echo_git "running post-setup hook..."
+  if [ "$_RESET" = true ]; then
+    (cd "$worktree_path" && $_MNDS_WORKTREE_POST_SETUP "$worktree_path" "$git_root" --reset)
+  else
+    (cd "$worktree_path" && $_MNDS_WORKTREE_POST_SETUP "$worktree_path" "$git_root")
+  fi
+fi
 
 __echo_git "worktree created at $worktree_path"
 echo "$worktree_path"
