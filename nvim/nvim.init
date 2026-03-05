@@ -1,0 +1,2 @@
+# Load custom nvim scripts
+export PATH="$PATH:$DOTFILES/nvim/bin"
