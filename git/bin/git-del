@@ -31,6 +31,50 @@ __git_del_output_main_worktree() {
   fi
 }
 
+__git_del_teardown_elixir() {
+  local worktree_path="$1"
+  local env_file="${_MNDS_WORKTREE_ENV_FILE:-.envrc}"
+  local full_env_path="$worktree_path/$env_file"
+
+  [ ! -f "$worktree_path/mix.exs" ] && return 0
+  [ -z "$_MNDS_WORKTREE_ISOLATED_VARS" ] && return 0
+  [ ! -f "$full_env_path" ] && return 0
+
+  # check if any DB var has a _wt_ isolated value
+  local has_isolated_db=false
+  for var_name in $_MNDS_WORKTREE_ISOLATED_VARS; do
+    local value
+    value=$(awk -v key="$var_name" '$0 ~ "^export " key "=" { sub("^export " key "=", ""); print }' "$full_env_path")
+    case "$value" in *_wt_*) has_isolated_db=true; break ;; esac
+  done
+
+  [ "$has_isolated_db" = false ] && return 0
+
+  __echo_git "[elixir] dropping isolated databases..."
+  for env in dev test; do
+    (cd "$worktree_path" && . "$full_env_path" && MIX_ENV="$env" mix ecto.drop) 2>/dev/null || true
+  done
+}
+
+__git_del_teardown_hook() {
+  local worktree_path="$1"
+
+  [ -z "$_MNDS_WORKTREE_PRE_TEARDOWN" ] && return 0
+
+  local git_root
+  git_root=$(cd "$worktree_path" && git rev-parse --show-toplevel 2>/dev/null) || true
+
+  __echo_git "running teardown hook..."
+  (cd "$worktree_path" && $_MNDS_WORKTREE_PRE_TEARDOWN "$worktree_path" "$git_root") || true
+}
+
+__git_del_teardown() {
+  local worktree_path="$1"
+
+  __git_del_teardown_elixir "$worktree_path"
+  __git_del_teardown_hook "$worktree_path"
+}
+
 __git_del_remove_worktree() {
   local branch_name="$1"
   local worktree_path=""
@@ -45,6 +89,7 @@ __git_del_remove_worktree() {
       __git_del_needs_cd=true
     fi
 
+    __git_del_teardown "$worktree_path"
     __echo_git "removing worktree at $worktree_path"
     git worktree remove "$worktree_path" --force
   fi
