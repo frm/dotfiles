@@ -183,7 +183,7 @@ __git_wt_setup_env() {
   local env_file="${_MNDS_WORKTREE_ENV_FILE:-.envrc}"
   local full_env_path="$worktree_path/$env_file"
 
-  [ -z "$_MNDS_WORKTREE_PORTS" ] && [ -z "$_MNDS_WORKTREE_DB_VARS" ] && return 0
+  [ -z "$_MNDS_WORKTREE_PORTS" ] && [ -z "$_MNDS_WORKTREE_ISOLATED_VARS" ] && return 0
 
   local hash
   hash=$(__git_wt_hash_id "$worktree_path") || return 1
@@ -209,9 +209,9 @@ __git_wt_setup_env() {
     done
   fi
 
-  if [ "$_RESET" = true ] && [ -n "$_MNDS_WORKTREE_DB_VARS" ]; then
+  if [ "$_RESET" = true ] && [ -n "$_MNDS_WORKTREE_ISOLATED_VARS" ]; then
     __echo_git "isolating database vars:"
-    for var_name in $_MNDS_WORKTREE_DB_VARS; do
+    for var_name in $_MNDS_WORKTREE_ISOLATED_VARS; do
       local current_value=""
       if [ -f "$full_env_path" ]; then
         current_value=$(awk -v key="$var_name" '$0 ~ "^export " key "=" { sub("^export " key "=", ""); print }' "$full_env_path")
@@ -222,6 +222,17 @@ __git_wt_setup_env() {
         __echo_git "  $var_name=$new_value"
       fi
     done
+  fi
+}
+
+# pull latest changes if on main/master to ensure worktree starts fresh
+__git_wt_pull_if_default_branch() {
+  local current_branch
+  current_branch=$(git rev-parse --abbrev-ref HEAD)
+
+  if [ "$current_branch" = "main" ] || [ "$current_branch" = "master" ]; then
+    __echo_git "on $current_branch, pulling latest changes..."
+    git pull
   fi
 }
 
@@ -248,6 +259,8 @@ __git_wt_mix() {
   (cd "$worktree_path" && MIX_ENV="$env" mix deps.get)
   __echo_git "[mix:$env] compiling..."
   (cd "$worktree_path" && MIX_ENV="$env" mix compile)
+  __echo_git "[mix:$env] creating database..."
+  (cd "$worktree_path" && MIX_ENV="$env" mix ecto.create || true)
   __echo_git "[mix:$env] migrating..."
   (cd "$worktree_path" && MIX_ENV="$env" mix ecto.migrate)
 }
@@ -338,6 +351,8 @@ if [ -d "$worktree_path" ]; then
   echo "$worktree_path"
   exit 0
 fi
+
+__git_wt_pull_if_default_branch
 
 __echo_git "creating worktree at $worktree_path"
 __git_wt_mkdir "$worktree_path"
