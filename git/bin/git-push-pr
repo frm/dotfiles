@@ -1,9 +1,10 @@
 #!/usr/bin/env zsh
 # pushes a branch and creates a PR
 #
-# usage: git push-pr [-r reviewers] [-b destination]
+# usage: git push-pr [-r reviewers] [-b destination] [--draft]
 #   -r: comma-separated list of reviewers (friendly names or GitHub handles)
 #   -b: destination branch (default: main)
+#   --draft: create PR as draft
 #
 # reviewer resolution (aliases are namespaced by repo owner):
 #   - known alias       → resolved from ~/.config/git-ppr/aliases (owner:name=handle)
@@ -256,8 +257,13 @@ __git_ppr_create_pr() {
   local reviewers="$2"
   local template="$3"
   local commit_count="$4"
+  local draft="$5"
 
   local pr_args=(--base "$base")
+
+  if [ -n "$draft" ]; then
+    pr_args+=(--draft)
+  fi
 
   if [ -n "$reviewers" ]; then
     pr_args+=(--reviewer "$reviewers")
@@ -291,7 +297,7 @@ $template_content")
 # main script
 #
 
-zparseopts -D -E -- r:=reviewers b:=destination
+zparseopts -D -E -- r:=reviewers b:=destination -draft=draft
 
 reviewers=${(@)reviewers:#-r}
 destination=${(@)destination:#-b}
@@ -319,7 +325,7 @@ commit_count=$(__git_ppr_commit_count "$destination")
 
 __git_ppr_rebase_if_needed "$destination"
 __git_ppr_push
-__git_ppr_create_pr "$destination" "$reviewers" "$template" "$commit_count"
+__git_ppr_create_pr "$destination" "$reviewers" "$template" "$commit_count" "$draft"
 
 _mnds_pp_success "git" "done"
 
