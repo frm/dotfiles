@@ -15,7 +15,7 @@
   template = ~/.gitmessage
 [core]
   editor = nvim -f
-  pager = diff-so-fancy | less --tabs=4 -RFX
+  pager = delta
   excludesfile = ~/.gitignore_global
 [credential]
   helper = osxkeychain
@@ -30,6 +30,7 @@
   cmd = "nvim -d \"$LOCAL\" \"$REMOTE\""
 [merge]
   tool = nvimdiff
+  conflictStyle = zdiff3
 [mergetool]
   prompt = true
 [mergetool "nvimdiff"]
@@ -93,3 +94,7 @@
   rba = !git-auto-rebase
   rbm = !git-rebase-main
   pr = !git-pr
+[interactive]
+  diffFilter = delta --color-only
+[delta]
+  navigate = true
