@@ -1,15 +1,15 @@
 #! /usr/bin/env sh
 
 # The following error might happen during mise install
-# because I'm running OpenSSL 3.0 while postgres defaults to 1.1:
+# because postgres needs OpenSSL headers/libs explicitly:
 # configure: error: library 'crypto' is required for OpenSSL
 #
 # These flags solve it.
 export POSTGRES_EXTRA_CONFIGURE_OPTIONS="
   --with-lz4
   --with-uuid=e2fs
-  --with-libraries=/usr/local/lib:$(brew --prefix openssl@1.1)/lib
-  --with-includes=/usr/local/include:$(brew --prefix openssl@1.1)/include"
+  --with-libraries=/usr/local/lib:$(brew --prefix openssl@3)/lib
+  --with-includes=/usr/local/include:$(brew --prefix openssl@3)/include"
 
 pg_server() {
   pg_version=$(pg_ctl --version | cut -d ' ' -f3)
