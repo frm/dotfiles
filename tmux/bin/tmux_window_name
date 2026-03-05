@@ -3,7 +3,8 @@
 # Determines the tmux window name based on context:
 # - If session name matches the window's directory, show the git branch (or directory if not a repo)
 # - Otherwise, show the window's directory name
-# - Prepends "(#PR)" if the current branch has an open PR
+# - Prepends PR status if the current branch has a PR:
+#   "(#123) " for open, "(✓ #123) " for merged, "(✗ #123) " for closed, "(⧖ #123) " for queued
 # Note: Manually set window names are preserved by tmux's automatic-rename behavior
 
 pane_path="$1"
@@ -22,13 +23,23 @@ if [[ -n "$branch" ]]; then
   cache_file="$cache_dir/${repo_id}_${branch}"
 
   if [[ -f "$cache_file" ]] && [[ $(( $(date +%s) - $(stat -f %m "$cache_file") )) -lt 300 ]]; then
-    pr_number=$(cat "$cache_file")
+    pr_info=$(cat "$cache_file")
   else
-    pr_number=$(gh pr view "$branch" --repo "$(git -C "$pane_path" remote get-url origin 2>/dev/null)" --json number -q .number 2>/dev/null)
-    echo "${pr_number:-}" > "$cache_file"
+    pr_info=$(gh pr view "$branch" --repo "$(git -C "$pane_path" remote get-url origin 2>/dev/null)" --json number,state -q '"\(.number) \(.state)"' 2>/dev/null)
+    echo "${pr_info:-}" > "$cache_file"
   fi
 
-  [[ -n "$pr_number" ]] && pr_prefix="(#$pr_number) "
+  pr_number="${pr_info%% *}"
+  pr_state="${pr_info#* }"
+
+  if [[ -n "$pr_number" ]]; then
+    case "$pr_state" in
+      MERGED) pr_prefix="(✓ #$pr_number) " ;;
+      CLOSED) pr_prefix="(✗ #$pr_number) " ;;
+      QUEUED) pr_prefix="(⧖ #$pr_number) " ;;
+      *)      pr_prefix="(#$pr_number) " ;;
+    esac
+  fi
 fi
 
 if [[ "$session_name" == "$window_dir" ]]; then
