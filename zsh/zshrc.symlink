@@ -22,6 +22,7 @@ source $DOTFILES/go/go.init
 source $DOTFILES/conda/conda.init
 
 # Setup system tools
+source $DOTFILES/nvim/nvim.init
 source $DOTFILES/bat/bat.init
 source $DOTFILES/cheat/cheat.init
 source $DOTFILES/starship/starship.init

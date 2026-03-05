@@ -1,0 +1,25 @@
+#!/usr/bin/env sh
+# editor wrapper that waits for buffer close when inside a Neovim terminal
+# used as $EDITOR/$GIT_EDITOR/$VISUAL when $NVIM is set
+
+if [ -z "$NVIM" ]; then
+  exec nvim "$@"
+fi
+
+# resolve to absolute path so bufnr() matches in the parent instance
+file="$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
+nvim --server "$NVIM" --remote "$file"
+
+# wait for the buffer to appear in the parent instance (up to 5s)
+retries=0
+while [ "$retries" -lt 50 ]; do
+  bufnr=$(nvim --server "$NVIM" --remote-expr "bufnr('$file')" 2>/dev/null)
+  [ -n "$bufnr" ] && [ "$bufnr" != "-1" ] && break
+  retries=$((retries + 1))
+  sleep 0.1
+done
+
+# poll until the buffer is unloaded (:bd, :bw, or :q without 'hidden')
+while nvim --server "$NVIM" --remote-expr "buflisted(bufnr('$file'))" 2>/dev/null | grep -q '^1$'; do
+  sleep 0.5
+done
