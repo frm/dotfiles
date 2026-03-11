@@ -1,15 +1,21 @@
 #!/usr/bin/env node
-import { execFileSync } from "node:child_process";
+import { execFileSync, fork } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const STATE_DIR = join(process.env.TMPDIR ?? "/tmp", "pi_panel_state");
+// State is read from tmux window options (@pi_state) instead of temp files
 const HOME = process.env.HOME ?? "";
 
-function readPiState(worktreePath) {
+function readPiState(sessionWindow) {
+	if (!sessionWindow) return null;
 	try {
-		const file = join(STATE_DIR, worktreePath.replace(/\//g, "_"));
-		return readFileSync(file, "utf-8").trim();
+		const raw = execFileSync("tmux", ["show-option", "-wv", "-t", sessionWindow, "@pi_state"], {
+			encoding: "utf-8",
+			timeout: 3000,
+			stdio: ["pipe", "pipe", "pipe"],
+		}).trim();
+		return raw || null;
 	} catch {
 		return null;
 	}
@@ -230,7 +236,7 @@ function prSubline(pr) {
 function fetchWorktrees() {
 	let raw;
 	try {
-		raw = execFileSync("tmux", ["list-windows", "-a", "-F", "#{session_name}\t#{window_name}\t#{pane_current_path}"], {
+		raw = execFileSync("tmux", ["list-windows", "-a", "-F", "#{session_name}\t#{window_name}\t#{pane_current_path}\t#{window_index}"], {
 			timeout: 5000,
 			encoding: "utf-8",
 			stdio: ["pipe", "pipe", "pipe"],
@@ -244,7 +250,7 @@ function fetchWorktrees() {
 	const seen = new Set();
 
 	for (const line of raw.split("\n")) {
-		const [session, window_, path] = line.split("\t");
+		const [session, window_, path, windowIndex] = line.split("\t");
 		if (!session || !window_ || !path) continue;
 		if (!path.includes(".worktrees/")) continue;
 		if (seen.has(path)) continue;
@@ -267,13 +273,27 @@ function fetchWorktrees() {
 		if (pr?.state === "MERGED") status = "done";
 		else if (pr?.state === "OPEN") status = "in-review";
 
-		const piState = readPiState(path);
+		const sessionWindow = `${session}:${windowIndex}`;
+		const piState = readPiState(sessionWindow);
 		const issueId = extractIssueId(branch);
 		const linearIssue = issueId ? lookupLinearIssue(issueId) : null;
-		entries.push({ session, window: window_, path, branch, status, pr, piState, linearIssue });
+		entries.push({ session, window: window_, path, branch, status, pr, piState, linearIssue, sessionWindow });
 	}
 
 	return entries;
+}
+
+// ─── Worker Mode ─────────────────────────────────────────────────────────────
+// When invoked with --fetch-data, just fetch and send data back via IPC
+
+if (process.argv.includes("--fetch-data")) {
+	try {
+		const entries = fetchWorktrees();
+		process.send(entries);
+	} catch {
+		process.send([]);
+	}
+	process.exit(0);
 }
 
 // ─── UI State ────────────────────────────────────────────────────────────────
@@ -328,6 +348,9 @@ function clampSelection() {
 	if (selectedIdx < 0) selectedIdx = 0;
 }
 
+let refreshing = false;
+const selfPath = fileURLToPath(import.meta.url);
+
 function doRefresh() {
 	if (loading) {
 		render();
@@ -337,11 +360,23 @@ function doRefresh() {
 			loading = false;
 			render();
 		}, 0);
-	} else {
-		const entries = fetchWorktrees();
-		applyEntries(entries);
-		render();
+		return;
 	}
+	if (refreshing) return;
+	refreshing = true;
+
+	// Fork a child process so the UI stays responsive during data fetch
+	const child = fork(selfPath, ["--fetch-data"], {
+		stdio: ["pipe", "pipe", "pipe", "ipc"],
+		timeout: 30_000,
+	});
+	child.on("message", (entries) => {
+		applyEntries(entries);
+		refreshing = false;
+		render();
+	});
+	child.on("error", () => { refreshing = false; });
+	child.on("exit", () => { if (refreshing) refreshing = false; });
 }
 
 function applyEntries(entries) {
@@ -739,9 +774,58 @@ function setup() {
 	});
 }
 
+// ─── State Polling ───────────────────────────────────────────────────────────
+// Fast poll: re-read pi state from tmux window options every 2s.
+// Also detect active window changes and clear alerts (like David's dashboard).
+
+let lastActiveWindow = null;
+
+function getActiveWindow() {
+	try {
+		return execFileSync("tmux", ["display-message", "-p", "#{session_name}:#{window_index}"], {
+			encoding: "utf-8",
+			timeout: 3000,
+			stdio: ["pipe", "pipe", "pipe"],
+		}).trim();
+	} catch {
+		return null;
+	}
+}
+
+function pollStates() {
+	// Detect window switch → clear alert on the now-active window
+	const activeWindow = getActiveWindow();
+	if (activeWindow && activeWindow !== lastActiveWindow && lastActiveWindow !== null) {
+		// User switched to a new window — clear "idle" but keep "question"
+		const currentState = readPiState(activeWindow);
+		if (currentState === "idle") {
+			try {
+				execFileSync("tmux", ["set-option", "-wu", "-t", activeWindow, "@pi_state"], {
+					stdio: ["pipe", "pipe", "pipe"],
+				});
+			} catch {}
+		}
+	}
+	lastActiveWindow = activeWindow;
+
+	// Re-read states for all entries
+	let changed = false;
+	for (const sec of sections) {
+		for (const entry of sec.entries) {
+			const newState = readPiState(entry.sessionWindow);
+			if (newState !== entry.piState) {
+				entry.piState = newState;
+				changed = true;
+			}
+		}
+	}
+	if (changed) render();
+}
+
 // ─── Main ────────────────────────────────────────────────────────────────────
 
 setup();
 doRefresh();
 setInterval(doRefresh, 60_000);
+setInterval(pollStates, 2_000);
 setInterval(checkPiPane, 5_000);

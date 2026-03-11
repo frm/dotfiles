@@ -1,18 +1,35 @@
-import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { execFileSync } from "child_process";
 import { join } from "path";
 import { fileURLToPath } from "url";
-import { mkdirSync, writeFileSync, unlinkSync, existsSync } from "fs";
+import { existsSync } from "fs";
 
-const STATE_DIR = join(process.env.TMPDIR ?? "/tmp", "pi_panel_state");
+// ─── tmux helpers ────────────────────────────────────────────────────────────
 
-function sanitizePath(p: string): string {
-	return p.replace(/\//g, "_");
+const PIPE = { stdio: ["pipe", "pipe", "pipe"] as const };
+const PIPE_UTF8 = { encoding: "utf-8" as const, ...PIPE };
+
+function tmuxRun(...args: string[]): void {
+	execFileSync("tmux", args, PIPE);
 }
+
+function tmuxQuery(...args: string[]): string {
+	return execFileSync("tmux", args, PIPE_UTF8).trim();
+}
+
+function tmuxFormat(format: string, target?: string): string {
+	const args = ["display-message"];
+	if (target) args.push("-t", target);
+	args.push("-p", format);
+	return tmuxQuery(...args);
+}
+
+// ─── Extension ───────────────────────────────────────────────────────────────
 
 export default function worktreePanel(pi: ExtensionAPI) {
 	let paneId: string | null = null;
-	let stateFile: string | null = null;
+	let tmuxWindowTarget: string | null = null;
+
 	let extensionDir: string;
 	try {
 		extensionDir = join(fileURLToPath(import.meta.url), "..");
@@ -22,37 +39,40 @@ export default function worktreePanel(pi: ExtensionAPI) {
 	const panelScript = join(extensionDir, "panel.mjs");
 	const nodeExec = process.execPath;
 
-	function writeState(state: "idle" | "question") {
-		if (!stateFile) return;
+	// ─── Pi State ────────────────────────────────────────────────────────
+
+	function detectTmuxWindow() {
 		try {
-			mkdirSync(STATE_DIR, { recursive: true });
-			writeFileSync(stateFile, state, "utf-8");
+			tmuxWindowTarget = tmuxFormat("#{session_name}:#{window_index}") || null;
+		} catch {
+			tmuxWindowTarget = null;
+		}
+	}
+
+	function setPiState(state: "idle" | "question") {
+		if (!tmuxWindowTarget) return;
+		try {
+			tmuxRun("set-option", "-w", "-t", tmuxWindowTarget, "@pi_state", state);
 		} catch {}
 		signalRefresh();
 	}
 
-	function clearState() {
-		if (!stateFile) return;
+	function clearPiState() {
+		if (!tmuxWindowTarget) return;
 		try {
-			unlinkSync(stateFile);
+			tmuxRun("set-option", "-wu", "-t", tmuxWindowTarget, "@pi_state");
 		} catch {}
 		signalRefresh();
 	}
+
+	// ─── Pane Lifecycle ──────────────────────────────────────────────────
 
 	function isPaneAlive(): boolean {
 		if (!paneId) return false;
 		try {
-			// Check pane exists and its process is alive
-			const info = execFileSync("tmux", ["display-message", "-t", paneId, "-p", "#{pane_dead} #{pane_current_command}"], {
-				encoding: "utf-8",
-				stdio: ["pipe", "pipe", "pipe"],
-			}).trim();
-			const dead = info.startsWith("1");
-			const isNode = info.includes("node");
-			if (dead || !isNode) {
-				try {
-					execFileSync("tmux", ["kill-pane", "-t", paneId], { stdio: ["pipe", "pipe", "pipe"] });
-				} catch {}
+			const info = tmuxFormat("#{pane_dead} #{pane_current_command}", paneId);
+			if (info.startsWith("1") || !info.includes("node")) {
+				try { tmuxRun("kill-pane", "-t", paneId); } catch {}
 				paneId = null;
 				return false;
 			}
@@ -63,21 +83,9 @@ export default function worktreePanel(pi: ExtensionAPI) {
 		}
 	}
 
-	function getCurrentPaneId(): string {
-		return execFileSync("tmux", ["display-message", "-p", "#{pane_id}"], {
-			encoding: "utf-8",
-			stdio: ["pipe", "pipe", "pipe"],
-		}).trim();
-	}
-
 	function createPane(): string | null {
-		// Kill existing panel pane if tracked
 		if (paneId) {
-			try {
-				execFileSync("tmux", ["kill-pane", "-t", paneId], {
-					stdio: ["pipe", "pipe", "pipe"],
-				});
-			} catch {}
+			try { tmuxRun("kill-pane", "-t", paneId); } catch {}
 			paneId = null;
 		}
 
@@ -86,17 +94,13 @@ export default function worktreePanel(pi: ExtensionAPI) {
 		}
 
 		try {
-			const piPaneId = getCurrentPaneId();
+			const piPaneId = tmuxFormat("#{pane_id}");
 			const cmd = `${nodeExec} ${panelScript} --pi-pane ${piPaneId}`;
-			paneId = execFileSync(
-				"tmux",
-				[
-					"split-window", "-hbd", "-l", "22%",
-					"-P", "-F", "#{pane_id}",
-					cmd,
-				],
-				{ encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] },
-			).trim();
+			paneId = tmuxQuery(
+				"split-window", "-hbd", "-l", "22%",
+				"-P", "-F", "#{pane_id}",
+				cmd,
+			);
 			return null;
 		} catch (e: any) {
 			paneId = null;
@@ -105,43 +109,24 @@ export default function worktreePanel(pi: ExtensionAPI) {
 	}
 
 	function killPane() {
-		if (paneId) {
-			try {
-				execFileSync("tmux", ["kill-pane", "-t", paneId], {
-					stdio: ["pipe", "pipe", "pipe"],
-				});
-			} catch {}
-			paneId = null;
-		}
+		if (!paneId) return;
+		try { tmuxRun("kill-pane", "-t", paneId); } catch {}
+		paneId = null;
 	}
 
 	function focusPane() {
 		if (!isPaneAlive()) return;
-		try {
-			execFileSync("tmux", ["select-pane", "-t", paneId!], {
-				stdio: ["pipe", "pipe", "pipe"],
-			});
-		} catch {}
+		try { tmuxRun("select-pane", "-t", paneId!); } catch {}
 	}
 
 	function focusPi() {
-		try {
-			const piPaneId = getCurrentPaneId();
-			execFileSync("tmux", ["select-pane", "-t", piPaneId], {
-				stdio: ["pipe", "pipe", "pipe"],
-			});
-		} catch {}
+		try { tmuxRun("select-pane", "-t", tmuxFormat("#{pane_id}")); } catch {}
 	}
 
 	function isPaneFocused(): boolean {
 		if (!isPaneAlive()) return false;
 		try {
-			const activePaneId = execFileSync(
-				"tmux",
-				["display-message", "-p", "#{pane_id}"],
-				{ encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] },
-			).trim();
-			return activePaneId === paneId;
+			return tmuxFormat("#{pane_id}") === paneId;
 		} catch {
 			return false;
 		}
@@ -150,11 +135,7 @@ export default function worktreePanel(pi: ExtensionAPI) {
 	function signalRefresh() {
 		if (!isPaneAlive()) return;
 		try {
-			const pid = execFileSync(
-				"tmux",
-				["display-message", "-t", paneId!, "-p", "#{pane_pid}"],
-				{ encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] },
-			).trim();
+			const pid = tmuxFormat("#{pane_pid}", paneId!);
 			if (pid) process.kill(parseInt(pid), "SIGUSR1");
 		} catch {}
 	}
@@ -171,7 +152,7 @@ export default function worktreePanel(pi: ExtensionAPI) {
 		}
 		if (subagentDepth > 0) return;
 		if (INPUT_TOOLS.has(event.toolName)) {
-			writeState("question");
+			setPiState("question");
 		}
 	});
 
@@ -183,30 +164,21 @@ export default function worktreePanel(pi: ExtensionAPI) {
 
 	pi.on("agent_end", async (_event, _ctx) => {
 		if (subagentDepth > 0) return;
-		writeState("idle");
-	});
-
-	pi.on("input", async (_event, _ctx) => {
-		clearState();
-	});
-
-	pi.on("before_agent_start", async (_event, _ctx) => {
-		clearState();
+		setPiState("idle");
 	});
 
 	// ─── Lifecycle ───────────────────────────────────────────────────────
 
 	pi.on("session_start", async (_event, ctx) => {
+		detectTmuxWindow();
+		clearPiState();
 		if (!ctx.hasUI) return;
-		stateFile = join(STATE_DIR, sanitizePath(ctx.cwd));
-		clearState();
 		const err = createPane();
 		if (err) ctx.ui.notify(`Worktree panel: ${err}`, "error");
 	});
 
 	pi.on("session_switch", async (_event, ctx) => {
 		if (!ctx.hasUI) return;
-		stateFile = join(STATE_DIR, sanitizePath(ctx.cwd));
 		if (isPaneAlive()) {
 			signalRefresh();
 		} else {
@@ -215,29 +187,25 @@ export default function worktreePanel(pi: ExtensionAPI) {
 	});
 
 	pi.on("session_shutdown", async () => {
-		clearState();
+		clearPiState();
 		killPane();
 	});
+
+	// ─── Commands & Shortcuts ────────────────────────────────────────────
 
 	pi.registerCommand("worktrees", {
 		description: "Manage worktree panel (show/hide/refresh)",
 		handler: async (args, ctx) => {
 			const sub = args?.trim().toLowerCase();
-			if (sub === "hide") {
-				killPane();
-				return;
-			}
+
+			if (sub === "hide") return killPane();
+			if (sub === "refresh") return signalRefresh();
 
 			if (sub === "show") {
 				if (!isPaneAlive()) {
 					const err = createPane();
 					if (err) ctx.ui.notify(`Worktree panel: ${err}`, "error");
 				}
-				return;
-			}
-
-			if (sub === "refresh") {
-				signalRefresh();
 				return;
 			}
 

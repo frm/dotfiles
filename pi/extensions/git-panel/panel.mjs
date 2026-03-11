@@ -76,17 +76,55 @@ function smartTruncatePath(filePath, maxW) {
 	return truncate(filePath, maxW);
 }
 
+// ─── Shell Helpers ───────────────────────────────────────────────────────────
+
+const PIPE = ["pipe", "pipe", "pipe"];
+
+function git(...args) {
+	return execFileSync("git", args, {
+		timeout: 5000, encoding: "utf-8", cwd: gitRoot, stdio: PIPE,
+	}).replace(/\n$/, "");
+}
+
+function gitRaw(...args) {
+	return execFileSync("git", args, {
+		timeout: 5000, cwd: gitRoot, stdio: PIPE,
+	});
+}
+
+function tmux(...args) {
+	return execFileSync("tmux", args, {
+		timeout: 3000, encoding: "utf-8", stdio: PIPE,
+	}).trim();
+}
+
+function tmuxPopup(args) {
+	process.stdin.setRawMode(false);
+	process.stdin.pause();
+	exitAltScreen();
+	showCursor();
+	try {
+		execFileSync("tmux", ["popup", "-E", "-w", "90%", "-h", "90%", "-d", gitRoot, ...args], { stdio: "inherit" });
+	} catch {}
+	enterAltScreen();
+	hideCursor();
+	process.stdin.setRawMode(true);
+	process.stdin.resume();
+	render();
+}
+
+function openUrl(url) {
+	try { execFileSync("open", [url], { timeout: 3000, stdio: PIPE }); } catch {}
+}
+
 // ─── Git Root ────────────────────────────────────────────────────────────────
 
 let gitRoot = "";
 try {
 	gitRoot = execFileSync("git", ["rev-parse", "--show-toplevel"], {
-		timeout: 3000,
-		encoding: "utf-8",
-		stdio: ["pipe", "pipe", "pipe"],
+		timeout: 3000, encoding: "utf-8", stdio: PIPE,
 	}).trim();
 } catch {
-	// Fallback to cwd
 	gitRoot = process.cwd();
 }
 
@@ -124,21 +162,14 @@ function absPath(relPath) {
 
 function fetchChangedFiles() {
 	try {
-		const raw = execFileSync("git", ["status", "--porcelain"], {
-			timeout: 5000,
-			encoding: "utf-8",
-			stdio: ["pipe", "pipe", "pipe"],
-			cwd: gitRoot,
-		}).replace(/\n$/, "");
+		const raw = git("status", "--porcelain");
 
 		if (!raw) return [];
 
 		// Get the definitive list of staged files from git
 		const stagedPaths = new Set();
 		try {
-			const stagedRaw = execFileSync("git", ["diff", "--cached", "--name-only"], {
-				timeout: 5000, encoding: "utf-8", cwd: gitRoot, stdio: ["pipe", "pipe", "pipe"],
-			}).trim();
+			const stagedRaw = git("diff", "--cached", "--name-only");
 			if (stagedRaw) {
 				for (const p of stagedRaw.split("\n")) {
 					if (p) stagedPaths.add(p);
@@ -235,10 +266,9 @@ function listDirChildren(dirPath) {
 /** @returns {PrInfo | null} */
 function fetchPrInfo() {
 	try {
-		const raw = execFileSync(
-			"gh",
+		const raw = execFileSync("gh",
 			["pr", "view", "--json", "number,title,state,statusCheckRollup"],
-			{ timeout: 15000, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] },
+			{ timeout: 15000, encoding: "utf-8", cwd: gitRoot, stdio: PIPE },
 		).trim();
 		if (!raw) return null;
 
@@ -286,17 +316,16 @@ function fetchPrInfo() {
 function fetchFileDiff(file) {
 	try {
 		let raw;
-		const opts = { timeout: 5000, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"], cwd: gitRoot };
 		if (file.status === "??") {
 			try {
-				raw = execFileSync("git", ["diff", "--no-index", "/dev/null", file.path], opts);
+				raw = git("diff", "--no-index", "/dev/null", file.path);
 			} catch (err) {
 				raw = err.stdout ?? "";
 			}
 		} else {
-			raw = execFileSync("git", ["diff", "HEAD", "--", file.path], opts);
+			raw = git("diff", "HEAD", "--", file.path);
 			if (!raw.trim()) {
-				raw = execFileSync("git", ["diff", "--cached", "--", file.path], opts);
+				raw = git("diff", "--cached", "--", file.path);
 			}
 		}
 		const lines = raw.split("\n");
@@ -761,6 +790,7 @@ function handleListInput(buf, ch) {
 	// Shift+Tab
 	if (buf.length === 3 && buf[0] === 0x1b && buf[1] === 0x5b && buf[2] === 0x5a) return switchTab();
 	if (ch === "a") return toggleStage();
+	if (ch === "A") return stageAll();
 	if (ch === "c") return triggerCommit();
 	if (ch === "r") return doRefresh();
 	// Ctrl+D (0x04) — half page down
@@ -886,34 +916,11 @@ function openDiff() {
 	const nav = navItems[selectedIdx];
 	if (nav.isDir) return;
 
-	const filePath = nav.path;
-	try {
-		process.stdin.setRawMode(false);
-		process.stdin.pause();
-		exitAltScreen();
-		showCursor();
-
-		if (nav.isTopLevel && nav.node.status === "??") {
-			// Untracked file — diff against /dev/null
-			execFileSync("tmux", [
-				"popup", "-E", "-w", "90%", "-h", "90%",
-				"-d", gitRoot,
-				"git", "diff", "--no-index", "/dev/null", filePath,
-			], { stdio: "inherit" });
-		} else {
-			execFileSync("tmux", [
-				"popup", "-E", "-w", "90%", "-h", "90%",
-				"-d", gitRoot,
-				"git", "diff", "HEAD", "--", filePath,
-			], { stdio: "inherit" });
-		}
-	} catch {}
-
-	enterAltScreen();
-	hideCursor();
-	process.stdin.setRawMode(true);
-	process.stdin.resume();
-	render();
+	if (nav.isTopLevel && nav.node.status === "??") {
+		tmuxPopup(["git", "diff", "--no-index", "/dev/null", nav.path]);
+	} else {
+		tmuxPopup(["git", "diff", "HEAD", "--", nav.path]);
+	}
 }
 
 function openInNvim() {
@@ -922,47 +929,24 @@ function openInNvim() {
 		if (selectedIdx >= navItems.length) return;
 		const nav = navItems[selectedIdx];
 
-		// Directories toggle expand
 		if (nav.isDir) {
 			toggleExpand();
 			return;
 		}
 
-		const filePath = absPath(nav.path);
-		try {
-			// Temporarily restore terminal state so tmux popup gets a clean TTY
-			process.stdin.setRawMode(false);
-			process.stdin.pause();
-			exitAltScreen();
-			showCursor();
-
-			execFileSync("tmux", [
-				"popup", "-E", "-w", "90%", "-h", "90%",
-				"-d", gitRoot,
-				"nvim", filePath,
-			], { stdio: "inherit" });
-		} catch {}
-
-		// Restore our terminal state
-		enterAltScreen();
-		hideCursor();
-		process.stdin.setRawMode(true);
-		process.stdin.resume();
-		render();
+		tmuxPopup(["nvim", absPath(nav.path)]);
 	} else {
-		// Checks tab — open in browser
 		const checks = prInfo?.checks ?? [];
 		if (selectedIdx >= checks.length) return;
 		const check = checks[selectedIdx];
-		if (check?.detailsUrl) {
-			try {
-				execFileSync("open", [check.detailsUrl], {
-					timeout: 3000,
-					stdio: ["pipe", "pipe", "pipe"],
-				});
-			} catch {}
-		}
+		if (check?.detailsUrl) openUrl(check.detailsUrl);
 	}
+}
+
+function stageAll() {
+	if (activeTab !== "files") return;
+	try { gitRaw("add", "."); } catch {}
+	doRefresh();
 }
 
 function toggleStage() {
@@ -983,15 +967,9 @@ function toggleStage() {
 		shouldUnstage = nav.node.staged && !nav.node.hasWorkingTreeChanges;
 	} else {
 		try {
-			const raw = execFileSync("git", ["diff", "--cached", "--name-only", "--", filePath], {
-				timeout: 5000, cwd: gitRoot, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"],
-			}).trim();
-			const isStagedChild = raw.length > 0;
-			// Check if there are also working tree changes
-			const wtRaw = execFileSync("git", ["diff", "--name-only", "--", filePath], {
-				timeout: 5000, cwd: gitRoot, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"],
-			}).trim();
-			shouldUnstage = isStagedChild && wtRaw.length === 0;
+			const isStagedChild = git("diff", "--cached", "--name-only", "--", filePath).length > 0;
+			const hasWtChanges = git("diff", "--name-only", "--", filePath).length > 0;
+			shouldUnstage = isStagedChild && !hasWtChanges;
 		} catch {
 			shouldUnstage = false;
 		}
@@ -999,13 +977,9 @@ function toggleStage() {
 
 	try {
 		if (shouldUnstage) {
-			execFileSync("git", ["restore", "--staged", "--", filePath], {
-				timeout: 5000, cwd: gitRoot, stdio: ["pipe", "pipe", "pipe"],
-			});
+			gitRaw("restore", "--staged", "--", filePath);
 		} else {
-			execFileSync("git", ["add", "--", filePath], {
-				timeout: 5000, cwd: gitRoot, stdio: ["pipe", "pipe", "pipe"],
-			});
+			gitRaw("add", "--", filePath);
 		}
 	} catch {}
 
@@ -1015,23 +989,14 @@ function toggleStage() {
 function triggerCommit() {
 	if (!piPaneId) return;
 	try {
-		execFileSync("tmux", ["send-keys", "-t", piPaneId, "/commit", "Enter"], {
-			timeout: 3000,
-			stdio: ["pipe", "pipe", "pipe"],
-		});
-		// Focus back to pi pane so user can interact with the commit flow
+		tmux("send-keys", "-t", piPaneId, "/commit", "Enter");
 		focusPiPane();
 	} catch {}
 }
 
 function focusPiPane() {
 	if (!piPaneId) return;
-	try {
-		execFileSync("tmux", ["select-pane", "-t", piPaneId], {
-			timeout: 3000,
-			stdio: ["pipe", "pipe", "pipe"],
-		});
-	} catch {}
+	try { tmux("select-pane", "-t", piPaneId); } catch {}
 }
 
 // ─── Pi Pane Watchdog ────────────────────────────────────────────────────────
@@ -1041,13 +1006,7 @@ const piPaneId = piPaneArg !== -1 ? process.argv[piPaneArg + 1] : null;
 
 function checkPiPane() {
 	if (!piPaneId) return;
-	try {
-		execFileSync("tmux", ["display-message", "-t", piPaneId, "-p", ""], {
-			stdio: ["pipe", "pipe", "pipe"],
-		});
-	} catch {
-		quit();
-	}
+	try { tmux("display-message", "-t", piPaneId, "-p", ""); } catch { quit(); }
 }
 
 // ─── Setup & Cleanup ─────────────────────────────────────────────────────────
@@ -1065,7 +1024,7 @@ function quit() {
 	const myPane = process.env.TMUX_PANE;
 	if (myPane) {
 		try {
-			execFileSync("tmux", ["kill-pane", "-t", myPane], { stdio: ["pipe", "pipe", "pipe"] });
+			tmux("kill-pane", "-t", myPane);
 		} catch {}
 	}
 	process.exit(0);
