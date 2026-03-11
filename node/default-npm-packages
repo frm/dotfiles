@@ -7,3 +7,4 @@ pnpm
 sentry
 @anthropic-ai/claude-code
 @openai/codex
+@mariozechner/pi-coding-agent
