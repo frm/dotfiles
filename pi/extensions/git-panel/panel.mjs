@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import { execFileSync } from "node:child_process";
+import { execFileSync, fork } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import { statSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 
@@ -308,6 +309,21 @@ function fetchFileDiff(file) {
 	}
 }
 
+// ─── Worker mode: fetch data in forked child and send back via IPC ──────────
+
+const selfPath = fileURLToPath(import.meta.url);
+
+if (process.argv.includes("--fetch-data")) {
+	try {
+		const files = fetchChangedFiles();
+		const pr = fetchPrInfo();
+		process.send({ files, pr });
+	} catch {
+		process.send({ files: [], pr: null });
+	}
+	process.exit(0);
+}
+
 // ─── UI State ────────────────────────────────────────────────────────────────
 
 /** @type {"files"|"checks"} */
@@ -369,13 +385,14 @@ function clampSelection() {
 
 // ─── Data Refresh ────────────────────────────────────────────────────────────
 
+let refreshing = false;
+
 function doRefresh() {
 	if (loading) {
 		render();
 		setTimeout(() => {
 			changedFiles = fetchChangedFiles();
 			prInfo = fetchPrInfo();
-			// Default to checks tab if working tree is clean and a PR is open
 			if (changedFiles.length === 0 && prInfo) {
 				activeTab = "checks";
 			}
@@ -384,40 +401,55 @@ function doRefresh() {
 			loading = false;
 			render();
 		}, 0);
-	} else {
-		// Collect all expanded paths (recursively) before refresh
-		const expandedPaths = new Set();
-		function collectExpanded(nodes) {
-			if (!nodes) return;
-			for (const n of nodes) {
-				if (n.expanded) {
-					expandedPaths.add(n.path || n.fullPath);
-					collectExpanded(n.children);
-				}
+		return;
+	}
+
+	if (refreshing) return;
+	refreshing = true;
+
+	// Collect expanded paths before refresh
+	const expandedPaths = new Set();
+	function collectExpanded(nodes) {
+		if (!nodes) return;
+		for (const n of nodes) {
+			if (n.expanded) {
+				expandedPaths.add(n.path || n.fullPath);
+				collectExpanded(n.children);
 			}
 		}
-		collectExpanded(changedFiles);
+	}
+	collectExpanded(changedFiles);
 
-		changedFiles = fetchChangedFiles();
+	// Fork a child process so the UI stays responsive
+	const child = fork(selfPath, ["--fetch-data"], {
+		stdio: ["pipe", "pipe", "pipe", "ipc"],
+		timeout: 30_000,
+	});
+	child.on("message", (data) => {
+		changedFiles = data.files;
+		prInfo = data.pr;
 
 		// Restore expansion state recursively
-		function restoreExpansion(nodes, parentPath) {
+		function restoreExpansion(nodes) {
 			if (!nodes) return;
 			for (const n of nodes) {
 				const p = n.path || n.fullPath;
 				if (expandedPaths.has(p) && n.isDir) {
 					n.expanded = true;
 					n.children = listDirChildren(p);
-					restoreExpansion(n.children, p);
+					restoreExpansion(n.children);
 				}
 			}
 		}
-		restoreExpansion(changedFiles, "");
-		prInfo = fetchPrInfo();
+		restoreExpansion(changedFiles);
+
 		if (activeTab === "checks" && !prInfo) activeTab = "files";
 		clampSelection();
+		refreshing = false;
 		render();
-	}
+	});
+	child.on("error", () => { refreshing = false; });
+	child.on("exit", () => { if (refreshing) refreshing = false; });
 }
 
 // ─── Rendering: List View ────────────────────────────────────────────────────
@@ -723,6 +755,7 @@ function handleListInput(buf, ch) {
 	if (ch === "j") return moveDown();
 	if (ch === "G") return jumpToBottom();
 	if (ch === "\r" || ch === "o") return openInNvim();
+	if (ch === "d") return openDiff();
 	if (ch === " ") return toggleExpand();
 	if (ch === "\t" || ch === "t") return switchTab();
 	// Shift+Tab
@@ -842,6 +875,44 @@ function toggleExpand() {
 	if (node.expanded && !node.children) {
 		node.children = listDirChildren(nav.path);
 	}
+	render();
+}
+
+function openDiff() {
+	if (activeTab !== "files") return;
+
+	const navItems = buildFileNavItems();
+	if (selectedIdx >= navItems.length) return;
+	const nav = navItems[selectedIdx];
+	if (nav.isDir) return;
+
+	const filePath = nav.path;
+	try {
+		process.stdin.setRawMode(false);
+		process.stdin.pause();
+		exitAltScreen();
+		showCursor();
+
+		if (nav.isTopLevel && nav.node.status === "??") {
+			// Untracked file — diff against /dev/null
+			execFileSync("tmux", [
+				"popup", "-E", "-w", "90%", "-h", "90%",
+				"-d", gitRoot,
+				"git", "diff", "--no-index", "/dev/null", filePath,
+			], { stdio: "inherit" });
+		} else {
+			execFileSync("tmux", [
+				"popup", "-E", "-w", "90%", "-h", "90%",
+				"-d", gitRoot,
+				"git", "diff", "HEAD", "--", filePath,
+			], { stdio: "inherit" });
+		}
+	} catch {}
+
+	enterAltScreen();
+	hideCursor();
+	process.stdin.setRawMode(true);
+	process.stdin.resume();
 	render();
 }
 
