@@ -3,11 +3,22 @@ name: solve-conflicts
 description: >
   Resolve git conflicts with structured analysis. Use when the user has merge/rebase/cherry-pick/revert
   conflicts and needs help resolving them. Enters plan mode to explain both sides, then applies surgical fixes.
+  Supports auto-accept mode for programmatic callers.
 ---
 
 # Solve Git Conflicts
 
 Resolve git conflicts through structured analysis and surgical edits.
+
+## Auto-Accept Mode
+
+When the user says "auto-accept" (or similar phrasing like "automatically accept the plan", "don't ask for approval", "skip plan approval"):
+
+- **Phase 2:** Skip step 5 (asking the user if the strategy looks right). Proceed directly to Phase 3.
+- **Phase 3:** Skip the review summary and test suggestions — just resolve and format.
+- **Phase 4:** Execute `git add` and commit without waiting for approval. Run the continue command automatically.
+
+This mode is intended for programmatic callers (e.g., the shepherd-pr extension) where human review is not available.
 
 ## Phase 1: Detection
 
@@ -44,7 +55,7 @@ Build a single holistic picture across ALL conflicting files. Do not analyze fil
 
 4. **Propose a resolution strategy**: a single cohesive plan covering ALL conflicting files, explaining how to reconcile both intents. Lead with your recommendation. Note alternatives only if there's genuine ambiguity.
 
-5. **Ask the user if the strategy looks right** before proceeding. Do not exit plan mode until they approve.
+5. **Ask the user if the strategy looks right** before proceeding. Do not exit plan mode until they approve. **If auto-accept is active, skip this step and proceed immediately.**
 
 ### How to get commit context
 
@@ -92,6 +103,7 @@ Check if the sandbox is active by looking at the tool permissions context.
   - With Linear issue: `<type>(<LINEAR-ISSUE>): <description>` (e.g., `fix(RVR-12345): resolve rebase conflicts in fee calculation`)
   - Without issue (fallback): `<type>(<scope>): <description>` (e.g., `fix(pricing): resolve rebase conflicts in fee calculation`)
 - Wait for user approval before executing either command
+- **If auto-accept is active:** execute `git add` and commit without waiting for approval
 
 **If sandbox is ON:**
 - Tell the user they cannot commit in sandbox mode
@@ -105,7 +117,7 @@ Based on the operation detected in Phase 1, suggest the appropriate command:
 - Cherry-pick: `git cherry-pick --continue`
 - Revert: `git revert --continue`
 
-Remind the user to run this after committing (or staging, depending on the operation).
+Remind the user to run this after committing (or staging, depending on the operation). **If auto-accept is active, run the continue command automatically.**
 
 ## Important Rules
 
@@ -113,5 +125,5 @@ Remind the user to run this after committing (or staging, depending on the opera
 - NEVER guess at conflict resolution without understanding both sides
 - NEVER rewrite entire files — surgical edits on conflict regions only
 - ALWAYS run the appropriate formatter after resolving
-- ALWAYS ask the user to verify before committing
+- ALWAYS ask the user to verify before committing (unless auto-accept is active)
 - Handle the case where some conflicts are straightforward and others need discussion
