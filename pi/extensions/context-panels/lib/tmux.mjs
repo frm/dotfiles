@@ -28,3 +28,62 @@ export function tmuxFormat(format, target) {
 export function tmuxInteractive(...args) {
 	execFileSync("tmux", args, { stdio: "inherit" });
 }
+
+export function tmuxHasSession(name) {
+	try { execFileSync("tmux", ["has-session", "-t", `=${name}`], { timeout: 3000, stdio: PIPE }); return true; }
+	catch { return false; }
+}
+
+export function tmuxNewSession(name, cmd, cwd, opts = {}) {
+	execFileSync("tmux", ["new-session", "-d", "-s", name, "-c", cwd, cmd], { timeout: 5000, stdio: PIPE });
+	if (opts.noStatus) {
+		try { execFileSync("tmux", ["set-option", "-t", `=${name}`, "status", "off"], { timeout: 3000, stdio: PIPE }); } catch {}
+	}
+}
+
+export function tmuxKillSession(name) {
+	try {
+		// Get the PID of the shell running in the session's first pane so we can
+		// kill the entire process tree.  Phoenix watchers (storybook, vite, etc.)
+		// spawn in their own process groups and won't receive the SIGHUP that
+		// tmux sends when it destroys a session, leaving orphaned processes.
+		const pid = execFileSync("tmux", [
+			"list-panes", "-t", `=${name}`, "-F", "#{pane_pid}",
+		], { timeout: 3000, encoding: "utf-8", stdio: PIPE }).trim().split("\n")[0];
+
+		if (pid) {
+			killProcessTree(parseInt(pid));
+		}
+	} catch {
+		// Session may already be gone
+	}
+
+	try { execFileSync("tmux", ["kill-session", "-t", `=${name}`], { timeout: 3000, stdio: PIPE }); } catch {}
+}
+
+function killProcessTree(rootPid) {
+	// Collect all descendants first, then kill leaf-to-root so children don't
+	// get re-parented before we can find them.
+	const pids = [];
+
+	function collectChildren(parentPid) {
+		let children;
+		try {
+			children = execFileSync("pgrep", ["-P", String(parentPid)], {
+				timeout: 3000, encoding: "utf-8", stdio: PIPE,
+			}).trim().split("\n").filter(Boolean).map(Number);
+		} catch { return; }
+
+		for (const child of children) {
+			collectChildren(child);
+			pids.push(child);
+		}
+	}
+
+	collectChildren(rootPid);
+	pids.push(rootPid);
+
+	for (const pid of pids) {
+		try { process.kill(pid, "SIGTERM"); } catch {}
+	}
+}

@@ -9,7 +9,7 @@ set -e
 # configs
 #
 
-_PROJECT_SECRETS=".env .envrc"
+_PROJECT_SECRETS=".env .envrc .pi"
 _ELIXIR_ARTIFACTS="deps _build priv/plts .elixir_ls"
 _JS_ARTIFACTS="node_modules assets"
 _PROJECT_ARTIFACTS="$_PROJECT_SECRETS $_ELIXIR_ARTIFACTS $_JS_ARTIFACTS"

@@ -348,7 +348,9 @@ function handleInput(data) {
 	}
 	if (str === "\r" || str === "o") return activate();
 	if (str === "p") return openPr();
-	if (str === "c") return openPrChanges();
+	if (str === "f") return openPrChanges();
+	if (str === "c") return reviewPr();
+	if (str === "C") return reviewPrLocal();
 	if (str === "l") return openLinear();
 	if (str === "r") { wt.clearPrCache(); return doRefresh(); }
 	if (str === "q" || (buf.length === 1 && buf[0] === 0x03)) return quit();
@@ -458,6 +460,35 @@ function openPrChanges() {
 	const entry = tab().getSelectedEntry();
 	const url = entry?.pr?.url ?? entry?.url;
 	if (url) openUrl(`${url}/files`);
+}
+
+function reviewPr() {
+	const entry = tab().getSelectedEntry();
+	const number = entry?.number ?? entry?.pr?.number;
+	if (!number || !piPaneId) return;
+	tmuxRun("send-keys", "-t", piPaneId, `/review-pr ${number}`, "Enter");
+	focusPiPane(piPaneId);
+}
+
+function reviewPrLocal() {
+	const entry = tab().getSelectedEntry();
+	const number = entry?.number ?? entry?.pr?.number;
+	const branch = entry?.branch ?? entry?.pr?.headRefName;
+	if (!number || !branch) return;
+
+	const wtEntry = wt.state.sections.flatMap((s) => s.entries).find((e) => e.path);
+	let repoRoot;
+	try { repoRoot = gitRepoRoot(wtEntry?.path); } catch { return; }
+	if (!repoRoot) return;
+
+	let session;
+	try { session = tmuxFormat("#{session_name}"); } catch { return; }
+	if (!session) return;
+
+	try {
+		tmuxRun("new-window", "-t", session, "-c", repoRoot);
+		tmuxRun("send-keys", "-t", session, `git fetch && g wt ${branch} && pi "/review-pr ${number}"`, "Enter");
+	} catch {}
 }
 
 function openLinear() {

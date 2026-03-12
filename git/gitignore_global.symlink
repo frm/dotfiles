@@ -76,3 +76,6 @@ Temporary Items
 
 # ai plans
 .ai/plans
+
+# pi project config
+.pi/config.json

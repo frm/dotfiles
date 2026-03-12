@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 import { fileURLToPath } from "node:url";
 
+import { createHash } from "node:crypto";
+import { readFileSync, existsSync } from "node:fs";
+import { join } from "node:path";
+
 import { git, gitRaw, gitRoot, absPath, openUrl } from "../lib/git.mjs";
 import { parsePiPaneId, setup, quit, checkPiPane, handleFocusEvent, focusPiPane, forkWorker } from "../lib/panel.mjs";
 import { createVimNav } from "../lib/vim-nav.mjs";
-import { tmuxRun, tmuxInteractive } from "../lib/tmux.mjs";
+import { tmuxRun, tmuxInteractive, tmuxHasSession, tmuxNewSession, tmuxKillSession } from "../lib/tmux.mjs";
 import {
-	dim, bgCyan, bgMuted, write,
+	dim, green, bgCyan, bgMuted, write,
 	enterAltScreen, exitAltScreen, hideCursor, showCursor,
 	clearScreen, moveTo, visWidth,
 } from "../lib/ui.mjs";
@@ -24,6 +28,36 @@ if (process.argv.includes("--fetch-data")) {
 	const prInfo = checks.fetchPrInfo();
 	process.send({ files: changedFiles, pr: prInfo });
 	process.exit(0);
+}
+
+// ─── Server ──────────────────────────────────────────────────────────────────
+
+const serverSessionName = "pi-srv-" + createHash("sha256").update(gitRoot).digest("hex").slice(0, 8);
+
+function readServerCommand() {
+	const configPath = join(gitRoot, ".pi", "config.json");
+	if (!existsSync(configPath)) return null;
+	try {
+		const config = JSON.parse(readFileSync(configPath, "utf-8"));
+		return config.server || null;
+	} catch { return null; }
+}
+
+function serverRunning() { return tmuxHasSession(serverSessionName); }
+
+function toggleServer() {
+	if (!serverRunning()) {
+		const cmd = readServerCommand();
+		if (!cmd) return;
+		tmuxNewSession(serverSessionName, cmd, gitRoot, { noStatus: true });
+	}
+
+	tmuxPopup(["tmux", "attach-session", "-t", `=${serverSessionName}`]);
+}
+
+function killServer() {
+	tmuxKillSession(serverSessionName);
+	render();
 }
 
 // ─── UI State ────────────────────────────────────────────────────────────────
@@ -151,7 +185,8 @@ function render() {
 	const checksLabel = prInfo
 		? (activeTab === "checks" ? activeBg(" Checks ") : dim(" Checks "))
 		: "";
-	const tabBar = filesLabel + (checksLabel ? dim("│") + checksLabel : "");
+	const srvIndicator = serverRunning() ? " " + green("●") + dim(" srv") : "";
+	const tabBar = filesLabel + (checksLabel ? dim("│") + checksLabel : "") + srvIndicator;
 	const hFill = "─".repeat(Math.max(0, innerW - visWidth(tabBar)));
 	moveTo(row++, 1);
 	write(dim("╭") + tabBar + dim(hFill + "╮"));
@@ -249,6 +284,8 @@ function handleInput(data) {
 	if (buf.length === 3 && buf[0] === 0x1b && buf[1] === 0x5b && buf[2] === 0x5a) return switchTab();
 	if (ch === "a") return doToggleStage();
 	if (ch === "A") return doStageAll();
+	if (ch === "s") return toggleServer();
+	if (ch === "S") return killServer();
 	if (ch === "l") return openLazygit();
 	if (ch === "v") return tmuxPopup(["nvim"]);
 	if (ch === "c") return triggerCommit();
