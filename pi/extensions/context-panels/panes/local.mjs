@@ -6,11 +6,12 @@ import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 
 import { git, gitRaw, gitRoot, absPath, openUrl } from "../lib/git.mjs";
-import { parsePiPaneId, setup, quit, checkPiPane, handleFocusEvent, focusPiPane, forkWorker } from "../lib/panel.mjs";
+import { createFocusManager } from "../lib/focus.mjs";
+import { parsePiPaneId, setup, quit, checkPiPane, focusPiPane, forkWorker } from "../lib/panel.mjs";
 import { createVimNav } from "../lib/vim-nav.mjs";
 import { tmuxRun, tmuxInteractive, tmuxHasSession, tmuxNewSession, tmuxKillSession } from "../lib/tmux.mjs";
 import {
-	dim, green, bgCyan, bgMuted, write, setPaneActive,
+	dim, green, bgCyan, bgMuted, write,
 	enterAltScreen, exitAltScreen, hideCursor, showCursor,
 	clearScreen, moveTo, visWidth,
 } from "../lib/ui.mjs";
@@ -81,7 +82,7 @@ let prInfo = null;
 let selectedIdx = 0;
 let scrollOffset = 0;
 let loading = true;
-let paneActive = false;
+const focus = createFocusManager({ render });
 
 function currentListLength() {
 	if (activeTab === "files") return files.buildNavItems(changedFiles).length;
@@ -215,7 +216,7 @@ function render() {
 	let row = 1;
 
 	// Header
-	const activeBg = paneActive ? bgCyan : bgMuted;
+	const activeBg = focus.active ? bgCyan : bgMuted;
 	const filesLabel = activeTab === "files" ? activeBg(" Changes ") : dim(" Changes ");
 	const checksLabel = prInfo
 		? (activeTab === "checks" ? activeBg(" Checks ") : dim(" Checks "))
@@ -297,27 +298,31 @@ function render() {
 // ─── Input ───────────────────────────────────────────────────────────────────
 
 function handleInput(data) {
-	const buf = Buffer.isBuffer(data) ? data : Buffer.from(data);
-	const ch = data.toString();
+	const str = data.toString();
 
-	const focus = handleFocusEvent(ch);
-	if (focus !== null) { paneActive = focus; setPaneActive(focus); render(); return; }
+	const remainder = focus.processInput(str);
+	if (remainder === null) return;
+
+	const buf = Buffer.isBuffer(data) ? data : Buffer.from(data);
+	const clean = remainder !== str;
+	const ch = clean ? remainder : str;
+	const inputBuf = clean ? Buffer.from(remainder) : buf;
 
 	if (detail.active) {
-		if (detail.handleInput(buf, ch)) {
+		if (detail.handleInput(inputBuf, ch)) {
 			if (!detail.active) render();
 		}
 		return;
 	}
 
-	if (nav.handleKey(buf, ch)) return;
+	if (nav.handleKey(inputBuf, ch)) return;
 
 	if (ch === "\r" || ch === "o") return openInNvim();
 	if (ch === "d") return openDiff();
 	if (ch === " ") return toggleExpand();
 	if (ch === "\t") return switchTab();
 	if (ch === "t") return toggleTerm();
-	if (buf.length === 3 && buf[0] === 0x1b && buf[1] === 0x5b && buf[2] === 0x5a) return switchTab();
+	if (inputBuf.length === 3 && inputBuf[0] === 0x1b && inputBuf[1] === 0x5b && inputBuf[2] === 0x5a) return switchTab();
 	if (ch === "a") return doStageFile();
 	if (ch === "u") return doUnstageFile();
 	if (ch === "A") return doStageAll();
@@ -327,8 +332,8 @@ function handleInput(data) {
 	if (ch === "v") return tmuxPopup(["nvim"]);
 	if (ch === "c") return triggerCommit();
 	if (ch === "r") { doRefresh(); doChecksRefresh(); return; }
-	if (buf.length === 1 && buf[0] === 0x07) return focusPiPane(piPaneId);
-	if (ch === "q" || (buf.length === 1 && buf[0] === 0x03)) return quit();
+	if (inputBuf.length === 1 && inputBuf[0] === 0x07) return focusPiPane(piPaneId);
+	if (ch === "q" || (inputBuf.length === 1 && inputBuf[0] === 0x03)) return quit();
 }
 
 function switchTab() {

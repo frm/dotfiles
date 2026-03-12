@@ -7,13 +7,14 @@ import { fileURLToPath } from "node:url";
 import { readPiState } from "../lib/data.mjs";
 import { prMerge } from "../lib/gh.mjs";
 import { gitCommonDir, gitRepoRoot, currentBranch, branchExists, worktreeDel, openUrl } from "../lib/git.mjs";
-import { parsePiPaneId, setup, quit, checkPiPane, handleFocusEvent, focusPiPane, forkWorker } from "../lib/panel.mjs";
+import { createFocusManager } from "../lib/focus.mjs";
+import { parsePiPaneId, setup, quit, checkPiPane, focusPiPane, forkWorker } from "../lib/panel.mjs";
 import { getSessionOption } from "../lib/session.mjs";
 import { createVimNav } from "../lib/vim-nav.mjs";
 import { tmuxRun, tmuxQuery, tmuxFormat, tmuxHasSession, tmuxNewSession } from "../lib/tmux.mjs";
 import {
 	R, dim, cyan, yellow, red, boldRed, magenta, bgCyan, bgMuted, write,
-	hideCursor, setPaneActive, createSpinner,
+	hideCursor, createSpinner,
 	clearScreen, moveTo, visWidth, truncate, wrapText, emptyLine, contentLine,
 } from "../lib/ui.mjs";
 
@@ -77,8 +78,7 @@ if (shared) {
 }
 
 const piPaneId = shared ? null : parsePiPaneId();
-let paneActive = false;
-let hadFocusOut = !shared; // In shared mode, ignore focus-in until first focus-out
+const focus = createFocusManager({ shared, render });
 
 function getActivePiPane() {
 	if (!shared) return piPaneId;
@@ -251,6 +251,31 @@ function refreshPrsAsync() {
 	});
 }
 
+function refreshAfterAction(cleanup) {
+	refreshing = true;
+	forkWorker(selfPath, ["--fetch-worktrees"], {
+		onMessage: (entries) => {
+			spinner.stop();
+			cleanup();
+			wt.applyEntries(entries);
+			loading = false;
+			refreshing = false;
+			render();
+			prsLoading = true;
+			refreshPrsAsync();
+		},
+		onDone: () => {
+			spinner.stop();
+			cleanup();
+			refreshing = false;
+			render();
+		},
+	});
+}
+
+function refreshAfterDelete() { refreshAfterAction(() => { deleting = false; }); }
+function refreshAfterMerge() { refreshAfterAction(() => { merging = false; }); }
+
 function doRefresh() {
 	if (refreshing) return;
 	refreshing = true;
@@ -270,7 +295,7 @@ function render() {
 	let row = 1;
 
 	// Tab header
-	const activeBg = paneActive ? bgCyan : bgMuted;
+	const activeBg = focus.active ? bgCyan : bgMuted;
 	const wtLabel = activeTab === "worktrees" ? activeBg(" Worktrees ") : dim(" Worktrees ");
 	const prLabel = activeTab === "prs" ? activeBg(" Pull Requests ") : dim(" Pull Requests ");
 	const tabBar = wtLabel + dim("│") + prLabel;
@@ -381,69 +406,67 @@ function isCtrlShiftW(buf, str) {
 }
 
 function handleInput(data) {
-	const buf = Buffer.isBuffer(data) ? data : Buffer.from(data);
 	const str = data.toString();
 
-	const focus = handleFocusEvent(str);
-	if (focus !== null) {
-		if (focus === false) hadFocusOut = true;
-		if (focus === true && !hadFocusOut) return; // ignore spurious focus-in before first focus-out
-		paneActive = focus;
-		setPaneActive(focus);
-		render();
-		return;
-	}
+	const remainder = focus.processInput(str);
+	if (remainder === null) return;
 
-	if (creating) return handleCreateInput(buf, str);
+	const buf = Buffer.isBuffer(data) ? data : Buffer.from(data);
+	// If focus events were stripped, work with the cleaned string
+	const clean = remainder !== str;
+	const inputStr = clean ? remainder : str;
+	const inputBuf = clean ? Buffer.from(remainder) : buf;
+
+	if (creating) return handleCreateInput(inputBuf, inputStr);
 
 	if (confirmingDelete) {
-		if (str === "y" || str === "Y") executeDelete();
+		if (inputStr === "y" || inputStr === "Y") executeDelete();
 		confirmingDelete = false;
 		render();
 		return;
 	}
 
 	if (confirmingMerge) {
-		if (str === "y" || str === "Y") executeMerge(false);
+		if (inputStr === "y" || inputStr === "Y") executeMerge(false);
 		confirmingMerge = false;
 		render();
 		return;
 	}
 
 	if (confirmingAutoMerge) {
-		if (str === "y" || str === "Y") executeMerge(true);
+		if (inputStr === "y" || inputStr === "Y") executeMerge(true);
 		confirmingAutoMerge = false;
 		render();
 		return;
 	}
 
-	if (isCtrlShiftW(buf, str)) return focusPiPane(getActivePiPane());
+	if (isCtrlShiftW(inputBuf, inputStr)) return focusPiPane(getActivePiPane());
 
 	// Tab switching
-	if (str === "t" || (buf.length === 1 && buf[0] === 0x09)) return switchTab();
-	if (buf.length === 3 && buf[0] === 0x1b && buf[1] === 0x5b && buf[2] === 0x5a) return switchTab();
+	if (inputStr === "t" || (inputBuf.length === 1 && inputBuf[0] === 0x09)) return switchTab();
+	if (inputBuf.length === 3 && inputBuf[0] === 0x1b && inputBuf[1] === 0x5b && inputBuf[2] === 0x5a) return switchTab();
 
-	if (nav.handleKey(buf, str)) return;
+	if (nav.handleKey(inputBuf, inputStr)) return;
 
 	// Arrow left/right for section collapse/expand
-	if (buf.length === 3 && buf[0] === 0x1b && buf[1] === 0x5b) {
-		if (buf[2] === 0x43) return expandSection();
-		if (buf[2] === 0x44) return collapseSection();
+	if (inputBuf.length === 3 && inputBuf[0] === 0x1b && inputBuf[1] === 0x5b) {
+		if (inputBuf[2] === 0x43) return expandSection();
+		if (inputBuf[2] === 0x44) return collapseSection();
 	}
-	if (str === "\r" || str === "o") return activate();
-	if (str === "p") return openPr();
-	if (str === "f") return openPrChanges();
-	if (str === "c") return reviewPr();
-	if (str === "C") return reviewPrLocal();
-	if (str === "l") return openLinear();
-	if (str === "m") return promptMerge();
-	if (str === "M") return promptAutoMerge();
-	if (str === "r") { wt.clearPrCache(); return doRefresh(); }
-	if (str === "q" || (buf.length === 1 && buf[0] === 0x03)) return shared ? quitShared() : quit();
+	if (inputStr === "\r" || inputStr === "o") return activate();
+	if (inputStr === "p") return openPr();
+	if (inputStr === "f") return openPrChanges();
+	if (inputStr === "c") return reviewPr();
+	if (inputStr === "C") return reviewPrLocal();
+	if (inputStr === "l") return openLinear();
+	if (inputStr === "m") return promptMerge();
+	if (inputStr === "M") return promptAutoMerge();
+	if (inputStr === "r") { wt.clearPrCache(); return doRefresh(); }
+	if (inputStr === "q" || (inputBuf.length === 1 && inputBuf[0] === 0x03)) return shared ? quitShared() : quit();
 
 	// Worktrees-only
-	if (activeTab === "worktrees" && str === "d") return promptDelete();
-	if (activeTab === "worktrees" && str === "a") return startCreate();
+	if (activeTab === "worktrees" && inputStr === "d") return promptDelete();
+	if (activeTab === "worktrees" && inputStr === "a") return startCreate();
 }
 
 function handleCreateInput(buf, str) {
@@ -634,19 +657,16 @@ function executeMerge(auto) {
 	forkWorker(selfPath, ["--merge-pr", String(number), auto ? "--auto" : "", wtEntry.path].filter(Boolean), {
 		timeout: 60_000,
 		onMessage: (result) => {
-			spinner.stop();
 			if (result?.ok) {
-				merging = false;
+				spinner.update("Refreshing worktrees");
 			} else {
 				spinner.start(result?.error ?? "merge failed", red);
-				setTimeout(() => { spinner.stop(); merging = false; render(); }, 3000);
+				setTimeout(() => { spinner.update("Refreshing worktrees"); }, 3000);
 			}
 		},
 		onDone: () => {
-			spinner.stop();
-			merging = false;
 			wt.clearPrCache();
-			doRefresh();
+			refreshAfterMerge();
 		},
 	});
 }
@@ -674,10 +694,9 @@ function executeDelete() {
 	forkWorker(selfPath, ["--delete-worktree", repoRoot, branch, sessionWindow], {
 		timeout: 60_000,
 		onDone: () => {
-			spinner.stop();
-			deleting = false;
+			spinner.update("Refreshing worktrees");
 			wt.clearPrCache();
-			doRefresh();
+			refreshAfterDelete();
 		},
 	});
 }

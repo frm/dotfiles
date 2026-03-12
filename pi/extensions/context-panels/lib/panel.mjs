@@ -59,11 +59,4 @@ export function checkPiPane(piPaneId) {
 	catch { quit(); }
 }
 
-/**
- * Returns true for focus-in, false for focus-out, null if not a focus event.
- */
-export function handleFocusEvent(str) {
-	if (str === "\x1b[I") return true;
-	if (str === "\x1b[O") return false;
-	return null;
-}
+

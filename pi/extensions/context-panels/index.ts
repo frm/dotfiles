@@ -236,7 +236,7 @@ function createGlobalPaneManager(config: PaneConfig) {
 
 // ─── Extension ───────────────────────────────────────────────────────────────
 
-export default function contextPanels(pi: ExtensionAPI) {
+export default function panels(pi: ExtensionAPI) {
 	let extensionDir: string;
 	try {
 		extensionDir = join(fileURLToPath(import.meta.url), "..");
@@ -252,13 +252,13 @@ export default function contextPanels(pi: ExtensionAPI) {
 	}
 
 	const global = createGlobalPaneManager({
-		script: join(extensionDir, "panels", "global.mjs"),
+		script: join(extensionDir, "panes", "global.mjs"),
 		side: "left",
 		size: "22%",
 	});
 
 	const local = createPaneManager({
-		script: join(extensionDir, "panels", "local.mjs"),
+		script: join(extensionDir, "panes", "local.mjs"),
 		side: "right",
 		size: "22%",
 		guard: isGitRepo,
@@ -338,19 +338,9 @@ export default function contextPanels(pi: ExtensionAPI) {
 
 	// ─── Commands ────────────────────────────────────────────────────────
 
-	pi.registerCommand("worktrees", {
-		description: "Manage worktree panel (show/hide/refresh)",
-		handler: async (args, ctx) => {
-			const sub = args?.trim().toLowerCase();
-			if (sub === "hide") return global.kill();
-			if (sub === "refresh") return global.signal();
-			if (sub === "show") {
-				if (!global.isPaneAlive()) {
-					const err = global.create();
-					if (err) ctx.ui.notify(`Global panel: ${err}`, "error");
-				}
-				return;
-			}
+	pi.registerCommand("global", {
+		description: "Toggle global panel",
+		handler: async (_args, ctx) => {
 			if (global.isPaneAlive()) global.kill();
 			else {
 				const err = global.create();
@@ -359,23 +349,19 @@ export default function contextPanels(pi: ExtensionAPI) {
 		},
 	});
 
-	pi.registerCommand("context-panels", {
-		description: "Manage context panels (reset to default sizes)",
-		handler: async (_args, _ctx) => {
-			global.resize();
-			local.resize();
+	pi.registerCommand("local", {
+		description: "Toggle local panel",
+		handler: async () => {
+			if (local.isPaneAlive()) local.kill();
+			else local.create();
 		},
 	});
 
-	pi.registerCommand("git-panel", {
-		description: "Manage git panel (show/hide/refresh)",
-		handler: async (args) => {
-			const sub = args?.trim().toLowerCase();
-			if (sub === "hide") return local.kill();
-			if (sub === "refresh") return local.signal();
-			if (sub === "show") { if (!local.isPaneAlive()) local.create(); return; }
-			if (local.isPaneAlive()) local.kill();
-			else local.create();
+	pi.registerCommand("panels", {
+		description: "Reset panels to default sizes",
+		handler: async () => {
+			global.resize();
+			local.resize();
 		},
 	});
 
