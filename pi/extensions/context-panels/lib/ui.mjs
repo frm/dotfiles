@@ -39,11 +39,30 @@ export function truncate(s, maxW) {
 	return plain.slice(0, maxW - 1) + "…";
 }
 
-// ─── Shared line builders ────────────────────────────────────────────────────
+// ─── Path Truncation ─────────────────────────────────────────────────────────
+
+export function smartTruncatePath(filePath, maxW) {
+	if (filePath.length <= maxW) return filePath;
+	const parts = filePath.split("/");
+	if (parts.length === 1) return truncate(filePath, maxW);
+
+	const fileName = parts[parts.length - 1];
+	const dirs = parts.slice(0, -1);
+	for (let i = 0; i < dirs.length; i++) {
+		if (dirs[i].length > 1) dirs[i] = dirs[i][0];
+		const candidate = dirs.join("/") + "/" + fileName;
+		if (candidate.length <= maxW) return candidate;
+	}
+	const prefix = dirs.join("/") + "/";
+	const remaining = maxW - prefix.length;
+	if (remaining > 1) return prefix + truncate(fileName, remaining);
+	return truncate(filePath, maxW);
+}
+
+// ─── Text Wrapping ───────────────────────────────────────────────────────────
 
 export function wrapText(text, maxW) {
 	if (text.length <= maxW) return [text];
-	// Detect leading indent
 	const indent = text.match(/^(\s*)/)[1];
 	const lines = [];
 	let remaining = text;
@@ -56,6 +75,8 @@ export function wrapText(text, maxW) {
 	}
 	return lines;
 }
+
+// ─── Line Builders ───────────────────────────────────────────────────────────
 
 export function emptyLine(innerW) {
 	return dim("│") + " ".repeat(innerW) + dim("│");
@@ -70,7 +91,7 @@ export function dividerLine(innerW) {
 	return dim("├" + "─".repeat(innerW) + "┤");
 }
 
-// ─── Shared section rendering ────────────────────────────────────────────────
+// ─── Section Rendering ──────────────────────────────────────────────────────
 
 export function renderSectionRow(sections, item, selected, innerW) {
 	const sec = sections[item.sectionIdx];
@@ -83,7 +104,7 @@ export function renderSectionRow(sections, item, selected, innerW) {
 	write(border + content + pad + dim("│"));
 }
 
-// ─── Navigation builders ────────────────────────────────────────────────────
+// ─── Navigation Builders ────────────────────────────────────────────────────
 
 export function buildSectionNav(sections) {
 	const items = [];

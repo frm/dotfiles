@@ -1,4 +1,4 @@
-import { execFileSync } from "node:child_process";
+import { tmuxQuery } from "./tmux.mjs";
 
 // ─── Branch Parsing ──────────────────────────────────────────────────────────
 
@@ -19,10 +19,7 @@ export function extractDescription(branch) {
 export function readPiState(sessionWindow) {
 	if (!sessionWindow) return null;
 	try {
-		const raw = execFileSync("tmux", ["show-option", "-wv", "-t", sessionWindow, "@pi_state"], {
-			encoding: "utf-8", timeout: 3000, stdio: ["pipe", "pipe", "pipe"],
-		}).trim();
-		return raw || null;
+		return tmuxQuery("show-option", "-wv", "-t", sessionWindow, "@pi_state") || null;
 	} catch {
 		return null;
 	}

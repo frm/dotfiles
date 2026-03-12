@@ -1,13 +1,14 @@
-import { execFileSync } from "node:child_process";
-import { extractIssueId, extractDescription, readPiState } from "../lib/data.mjs";
-import { lookupIssue } from "../lib/linear.mjs";
-import { prList, prChecks } from "../lib/gh.mjs";
+import { extractIssueId, extractDescription, readPiState } from "../../lib/data.mjs";
+import { currentBranch } from "../../lib/git.mjs";
+import { tmuxQuery } from "../../lib/tmux.mjs";
+import { lookupIssue } from "../../lib/linear.mjs";
+import { prList, prChecks } from "../../lib/gh.mjs";
 import {
 	dim, cyan, green, yellow, magenta, red, boldRed,
 	truncate, visWidth, write, moveTo, selColor,
 	emptyLine, contentLine, renderSectionRow,
 	buildSectionNav, buildSectionVisual,
-} from "../lib/ui.mjs";
+} from "../../lib/ui.mjs";
 
 // ─── PR Lookup (per-worktree branch) ────────────────────────────────────────
 
@@ -67,9 +68,7 @@ function prSubline(pr) {
 export function fetchWorktrees() {
 	let raw;
 	try {
-		raw = execFileSync("tmux", ["list-windows", "-a", "-F", "#{session_name}\t#{window_name}\t#{pane_current_path}\t#{window_index}"], {
-			timeout: 5000, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"],
-		}).trim();
+		raw = tmuxQuery("list-windows", "-a", "-F", "#{session_name}\t#{window_name}\t#{pane_current_path}\t#{window_index}", { timeout: 5000 });
 	} catch { return []; }
 	if (!raw) return [];
 
@@ -82,11 +81,7 @@ export function fetchWorktrees() {
 		seen.add(path);
 
 		let branch;
-		try {
-			branch = execFileSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], {
-				cwd: path, timeout: 5000, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"],
-			}).trim();
-		} catch { continue; }
+		try { branch = currentBranch(path); } catch { continue; }
 
 		const pr = lookupPr(branch, path);
 		let status = "in-progress";

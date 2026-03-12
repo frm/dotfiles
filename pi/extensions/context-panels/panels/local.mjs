@@ -1,18 +1,19 @@
 #!/usr/bin/env node
-import { execFileSync, fork } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-import { git, gitRaw, gitRoot, absPath, tmux, openUrl } from "./lib/git.mjs";
+import { git, gitRaw, gitRoot, absPath, openUrl } from "../lib/git.mjs";
+import { parsePiPaneId, setup, quit, checkPiPane, handleFocusEvent, focusPiPane, forkWorker } from "../lib/panel.mjs";
+import { createVimNav } from "../lib/vim-nav.mjs";
+import { tmuxRun, tmuxInteractive } from "../lib/tmux.mjs";
 import {
-	R, dim, bgCyan, bgMuted, write,
+	dim, bgCyan, bgMuted, write,
 	enterAltScreen, exitAltScreen, hideCursor, showCursor,
 	clearScreen, moveTo, visWidth,
-	enableFocusReporting, disableFocusReporting, setPaneActive,
-} from "./lib/ui.mjs";
+} from "../lib/ui.mjs";
 
-import * as files from "./tabs/files.mjs";
-import * as checks from "./tabs/checks.mjs";
-import * as detail from "./tabs/detail.mjs";
+import * as files from "../tabs/local/files.mjs";
+import * as checks from "../tabs/local/checks.mjs";
+import * as detail from "../tabs/local/detail.mjs";
 
 // ─── Worker Mode ─────────────────────────────────────────────────────────────
 
@@ -46,6 +47,13 @@ function clampSelection() {
 	if (selectedIdx < 0) selectedIdx = 0;
 }
 
+const nav = createVimNav({
+	getIdx: () => selectedIdx,
+	setIdx: (i) => { selectedIdx = i; },
+	getLen: currentListLength,
+	render: () => render(),
+});
+
 // ─── Tmux Popup ──────────────────────────────────────────────────────────────
 
 function tmuxPopup(args) {
@@ -53,9 +61,7 @@ function tmuxPopup(args) {
 	process.stdin.pause();
 	exitAltScreen();
 	showCursor();
-	try {
-		execFileSync("tmux", ["popup", "-E", "-w", "90%", "-h", "90%", "-d", gitRoot, ...args], { stdio: "inherit" });
-	} catch {}
+	try { tmuxInteractive("popup", "-E", "-w", "90%", "-h", "90%", "-d", gitRoot, ...args); } catch {}
 	enterAltScreen();
 	hideCursor();
 	process.stdin.setRawMode(true);
@@ -97,35 +103,32 @@ function doRefresh() {
 	}
 	collectExpanded(changedFiles);
 
-	const child = fork(selfPath, ["--fetch-data"], {
-		stdio: ["pipe", "pipe", "pipe", "ipc"],
-		timeout: 30_000,
-	});
-	child.on("message", (data) => {
-		changedFiles = data.files;
-		prInfo = data.pr;
+	forkWorker(selfPath, ["--fetch-data"], {
+		onMessage: (data) => {
+			changedFiles = data.files;
+			prInfo = data.pr;
 
-		// Restore expansion
-		function restoreExpansion(nodes) {
-			if (!nodes) return;
-			for (const n of nodes) {
-				const p = n.path || n.fullPath;
-				if (expandedPaths.has(p) && n.isDir) {
-					n.expanded = true;
-					n.children = files.listDirChildren(p);
-					restoreExpansion(n.children);
+			// Restore expansion
+			function restoreExpansion(nodes) {
+				if (!nodes) return;
+				for (const n of nodes) {
+					const p = n.path || n.fullPath;
+					if (expandedPaths.has(p) && n.isDir) {
+						n.expanded = true;
+						n.children = files.listDirChildren(p);
+						restoreExpansion(n.children);
+					}
 				}
 			}
-		}
-		restoreExpansion(changedFiles);
+			restoreExpansion(changedFiles);
 
-		if (activeTab === "checks" && !prInfo) activeTab = "files";
-		clampSelection();
-		refreshing = false;
-		render();
+			if (activeTab === "checks" && !prInfo) activeTab = "files";
+			clampSelection();
+			refreshing = false;
+			render();
+		},
+		onDone: () => { if (refreshing) refreshing = false; },
 	});
-	child.on("error", () => { refreshing = false; });
-	child.on("exit", () => { if (refreshing) refreshing = false; });
 }
 
 // ─── Rendering ───────────────────────────────────────────────────────────────
@@ -223,42 +226,22 @@ function render() {
 
 // ─── Input ───────────────────────────────────────────────────────────────────
 
-let pendingG = false;
-
 function handleInput(data) {
 	const buf = Buffer.isBuffer(data) ? data : Buffer.from(data);
 	const ch = data.toString();
 
-	// Focus events
-	if (ch === "\x1b[I") { paneActive = true; setPaneActive(true); render(); return; }
-	if (ch === "\x1b[O") { paneActive = false; setPaneActive(false); render(); return; }
+	const focus = handleFocusEvent(ch);
+	if (focus !== null) { paneActive = focus; render(); return; }
 
 	if (detail.active) {
 		if (detail.handleInput(buf, ch)) {
-			if (!detail.active) render(); // closed detail view
+			if (!detail.active) render();
 		}
 		return;
 	}
 
-	// Arrows
-	if (buf.length === 3 && buf[0] === 0x1b && buf[1] === 0x5b) {
-		pendingG = false;
-		if (buf[2] === 0x41) return moveUp();
-		if (buf[2] === 0x42) return moveDown();
-	}
+	if (nav.handleKey(buf, ch)) return;
 
-	// gg
-	if (ch === "g") {
-		if (pendingG) { pendingG = false; return jumpToTop(); }
-		pendingG = true;
-		setTimeout(() => { pendingG = false; }, 500);
-		return;
-	}
-	pendingG = false;
-
-	if (ch === "k") return moveUp();
-	if (ch === "j") return moveDown();
-	if (ch === "G") return jumpToBottom();
 	if (ch === "\r" || ch === "o") return openInNvim();
 	if (ch === "d") return openDiff();
 	if (ch === " ") return toggleExpand();
@@ -270,29 +253,8 @@ function handleInput(data) {
 	if (ch === "v") return tmuxPopup(["nvim"]);
 	if (ch === "c") return triggerCommit();
 	if (ch === "r") return doRefresh();
-	if (buf.length === 1 && buf[0] === 0x04) return halfPageDown();
-	if (buf.length === 1 && buf[0] === 0x15) return halfPageUp();
-	if (buf.length === 1 && buf[0] === 0x07) return focusPiPane();
+	if (buf.length === 1 && buf[0] === 0x07) return focusPiPane(piPaneId);
 	if (ch === "q" || (buf.length === 1 && buf[0] === 0x03)) return quit();
-}
-
-// ─── Navigation ──────────────────────────────────────────────────────────────
-
-function moveUp() { selectedIdx = Math.max(0, selectedIdx - 1); render(); }
-function moveDown() { selectedIdx = Math.min(currentListLength() - 1, selectedIdx + 1); render(); }
-function jumpToTop() { selectedIdx = 0; scrollOffset = 0; render(); }
-function jumpToBottom() { selectedIdx = Math.max(0, currentListLength() - 1); render(); }
-
-function halfPageDown() {
-	const jump = Math.max(1, Math.floor((process.stdout.rows || 24) / 2));
-	selectedIdx = Math.min(currentListLength() - 1, selectedIdx + jump);
-	render();
-}
-
-function halfPageUp() {
-	const jump = Math.max(1, Math.floor((process.stdout.rows || 24) / 2));
-	selectedIdx = Math.max(0, selectedIdx - jump);
-	render();
 }
 
 function switchTab() {
@@ -363,47 +325,24 @@ function doStageAll() {
 
 function triggerCommit() {
 	if (!piPaneId) return;
-	try { tmux("send-keys", "-t", piPaneId, "/commit", "Enter"); focusPiPane(); } catch {}
+	try { tmuxRun("send-keys", "-t", piPaneId, "/commit", "Enter"); focusPiPane(piPaneId); } catch {}
 }
 
-function focusPiPane() {
-	if (!piPaneId) return;
-	try { tmux("select-pane", "-t", piPaneId); } catch {}
-}
+// ─── Lifecycle ───────────────────────────────────────────────────────────────
 
-// ─── Watchdog & Lifecycle ────────────────────────────────────────────────────
+const piPaneId = parsePiPaneId();
 
-const piPaneArg = process.argv.indexOf("--pi-pane");
-const piPaneId = piPaneArg !== -1 ? process.argv[piPaneArg + 1] : null;
-
-function checkPiPane() {
-	if (!piPaneId) return;
-	try { tmux("display-message", "-t", piPaneId, "-p", ""); } catch { quit(); }
-}
-
-function quit() {
-	disableFocusReporting(); exitAltScreen(); showCursor();
-	try { process.stdin.setRawMode(false); } catch {}
-	process.stdin.pause(); write(R);
-	const myPane = process.env.TMUX_PANE;
-	if (myPane) { try { tmux("kill-pane", "-t", myPane); } catch {} }
-	process.exit(0);
-}
-
-function setup() {
-	enterAltScreen(); hideCursor(); enableFocusReporting();
-	process.stdin.setRawMode(true);
-	process.stdin.resume();
-	process.stdin.on("data", handleInput);
-	process.on("SIGWINCH", () => render());
-	process.on("SIGTERM", () => quit());
-	process.on("SIGINT", () => quit());
-	process.on("SIGUSR1", () => doRefresh());
+function initPanel() {
+	setup({
+		onInput: handleInput,
+		onResize: () => render(),
+		onRefresh: () => doRefresh(),
+	});
 }
 
 // ─── Main ────────────────────────────────────────────────────────────────────
 
-setup();
+initPanel();
 doRefresh();
 setInterval(doRefresh, 5_000);
-setInterval(checkPiPane, 5_000);
+setInterval(() => checkPiPane(piPaneId), 5_000);

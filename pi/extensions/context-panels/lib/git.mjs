@@ -30,13 +30,43 @@ export function gitRaw(...args) {
 	});
 }
 
-// ─── Tmux/Shell Helpers ─────────────────────────────────────────────────────
-
-export function tmux(...args) {
-	return execFileSync("tmux", args, {
-		timeout: 3000, encoding: "utf-8", stdio: PIPE,
+export function gitAt(cwd, ...args) {
+	return execFileSync("git", args, {
+		timeout: 5000, encoding: "utf-8", cwd, stdio: PIPE,
 	}).trim();
 }
+
+export function gitCommonDir(cwd) {
+	return gitAt(cwd, "rev-parse", "--git-common-dir");
+}
+
+export function gitRepoRoot(cwd) {
+	const common = gitCommonDir(cwd);
+	return common.endsWith("/.git") || common.endsWith("\\.git")
+		? common.slice(0, -5)
+		: common;
+}
+
+export function currentBranch(cwd) {
+	return gitAt(cwd, "rev-parse", "--abbrev-ref", "HEAD");
+}
+
+export function branchExists(cwd, branch) {
+	try {
+		execFileSync("git", ["rev-parse", "--verify", branch], {
+			timeout: 3000, cwd, stdio: PIPE,
+		});
+		return true;
+	} catch { return false; }
+}
+
+export function worktreeDel(cwd, branch) {
+	execFileSync("git", ["worktree-del", branch], {
+		cwd, timeout: 30_000, encoding: "utf-8", stdio: PIPE,
+	});
+}
+
+// ─── Shell Helpers ───────────────────────────────────────────────────────────
 
 export function openUrl(url) {
 	try { execFileSync("open", [url], { timeout: 3000, stdio: PIPE }); } catch {}

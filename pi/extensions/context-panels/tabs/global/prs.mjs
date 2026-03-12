@@ -1,12 +1,12 @@
-import { extractIssueId } from "../lib/data.mjs";
-import { lookupIssue } from "../lib/linear.mjs";
-import { prList, getUsername } from "../lib/gh.mjs";
+import { extractIssueId } from "../../lib/data.mjs";
+import { lookupIssue } from "../../lib/linear.mjs";
+import { prList, getUsername } from "../../lib/gh.mjs";
 import {
 	dim, cyan, green, yellow, red,
 	truncate, visWidth, write, moveTo, selColor,
 	contentLine, dividerLine, renderSectionRow,
 	buildSectionNav, buildSectionVisual,
-} from "../lib/ui.mjs";
+} from "../../lib/ui.mjs";
 
 // ─── PR JSON fields requested from gh ────────────────────────────────────────
 

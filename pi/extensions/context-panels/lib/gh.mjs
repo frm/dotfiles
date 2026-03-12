@@ -27,6 +27,15 @@ export function prList(opts, cwd) {
 	} catch { return []; }
 }
 
+export function prView(json, cwd) {
+	try {
+		const raw = execFileSync("gh", ["pr", "view", "--json", json], {
+			...PIPE, cwd, timeout: 15_000,
+		}).trim();
+		return raw ? JSON.parse(raw) : null;
+	} catch { return null; }
+}
+
 export function prChecks(prNumber, cwd) {
 	try {
 		let raw;

@@ -1,17 +1,19 @@
 #!/usr/bin/env node
-import { execFileSync, fork } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-import { readPiState } from "./lib/data.mjs";
+import { readPiState } from "../lib/data.mjs";
+import { gitCommonDir, gitRepoRoot, currentBranch, branchExists, worktreeDel, openUrl } from "../lib/git.mjs";
+import { parsePiPaneId, setup, quit, checkPiPane, handleFocusEvent, focusPiPane, forkWorker } from "../lib/panel.mjs";
+import { createVimNav } from "../lib/vim-nav.mjs";
+import { tmuxRun, tmuxQuery, tmuxFormat } from "../lib/tmux.mjs";
 import {
-	R, dim, cyan, yellow, red, magenta, bgCyan, bgMuted, write,
-	enterAltScreen, exitAltScreen, hideCursor, showCursor,
+	dim, cyan, yellow, red, magenta, bgCyan, bgMuted, write,
+	hideCursor,
 	clearScreen, moveTo, visWidth, truncate, wrapText, emptyLine, contentLine,
-	enableFocusReporting, disableFocusReporting, setPaneActive,
-} from "./lib/ui.mjs";
+} from "../lib/ui.mjs";
 
-import * as wt from "./tabs/worktrees.mjs";
-import * as prs from "./tabs/prs.mjs";
+import * as wt from "../tabs/global/worktrees.mjs";
+import * as prs from "../tabs/global/prs.mjs";
 
 // ─── Worker Mode ─────────────────────────────────────────────────────────────
 
@@ -22,11 +24,11 @@ if (process.argv.includes("--fetch-worktrees")) {
 
 if (process.argv.includes("--delete-worktree")) {
 	const idx = process.argv.indexOf("--delete-worktree");
-	const gitRoot = process.argv[idx + 1];
+	const root = process.argv[idx + 1];
 	const branch = process.argv[idx + 2];
 	const sessionWindow = process.argv[idx + 3];
-	try { execFileSync("git", ["worktree-del", branch], { cwd: gitRoot, timeout: 30_000, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }); } catch {}
-	try { execFileSync("tmux", ["kill-window", "-t", sessionWindow], { timeout: 3000, stdio: ["pipe", "pipe", "pipe"] }); } catch {}
+	try { worktreeDel(root, branch); } catch {}
+	try { tmuxRun("kill-window", "-t", sessionWindow); } catch {}
 	process.exit(0);
 }
 
@@ -48,16 +50,21 @@ let spinnerFrame = 0;
 let spinnerTimer = null;
 const SPINNER = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 
-const piPaneArg = process.argv.indexOf("--pi-pane");
-const piPaneId = piPaneArg !== -1 ? process.argv[piPaneArg + 1] : null;
+const piPaneId = parsePiPaneId();
 let paneActive = false;
 
 function tab() { return activeTab === "worktrees" ? wt : prs; }
 function tabState() { return tab().state; }
 
+const nav = createVimNav({
+	getIdx: () => tabState().selectedIdx,
+	setIdx: (i) => { tabState().selectedIdx = i; },
+	getLen: () => tabState().navItems.length,
+	render: () => render(),
+});
+
 // ─── Create Worktree State ───────────────────────────────────────────────────
 
-const PIPE = ["pipe", "pipe", "pipe"];
 let creating = false;
 let createInput = "";
 let createBaseBranch = null; // default base (master/main)
@@ -67,22 +74,12 @@ let createError = null;
 let createErrorTimer = null;
 
 function detectDefaultBase() {
-	// Find any worktree path to resolve repo root
 	const entry = wt.state.sections.flatMap((s) => s.entries).find((e) => e.path);
 	if (!entry) return null;
 	try {
-		const gitCommon = execFileSync("git", ["rev-parse", "--git-common-dir"], {
-			cwd: entry.path, timeout: 5000, encoding: "utf-8", stdio: PIPE,
-		}).trim();
-		const repoRoot = gitCommon.endsWith("/.git") ? gitCommon.slice(0, -5) : gitCommon;
-		try {
-			execFileSync("git", ["rev-parse", "--verify", "master"], { cwd: repoRoot, timeout: 3000, stdio: PIPE });
-			return "master";
-		} catch {}
-		try {
-			execFileSync("git", ["rev-parse", "--verify", "main"], { cwd: repoRoot, timeout: 3000, stdio: PIPE });
-			return "main";
-		} catch {}
+		const repoRoot = gitRepoRoot(entry.path);
+		if (branchExists(repoRoot, "master")) return "master";
+		if (branchExists(repoRoot, "main")) return "main";
 	} catch {}
 	return null;
 }
@@ -90,24 +87,12 @@ function detectDefaultBase() {
 function detectPaneBranch() {
 	if (!piPaneId) return null;
 	try {
-		const paneCwd = execFileSync("tmux", ["display-message", "-t", piPaneId, "-p", "#{pane_current_path}"], {
-			encoding: "utf-8", timeout: 3000, stdio: PIPE,
-		}).trim();
+		const paneCwd = tmuxFormat("#{pane_current_path}", piPaneId);
 		if (!paneCwd) return null;
-		// Check it's a git repo
-		const branch = execFileSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], {
-			cwd: paneCwd, timeout: 3000, encoding: "utf-8", stdio: PIPE,
-		}).trim();
-		// Verify it's the same repo by checking git-common-dir matches
+		const branch = currentBranch(paneCwd);
 		const entry = wt.state.sections.flatMap((s) => s.entries).find((e) => e.path);
 		if (entry) {
-			const paneCommon = execFileSync("git", ["rev-parse", "--git-common-dir"], {
-				cwd: paneCwd, timeout: 3000, encoding: "utf-8", stdio: PIPE,
-			}).trim();
-			const entryCommon = execFileSync("git", ["rev-parse", "--git-common-dir"], {
-				cwd: entry.path, timeout: 3000, encoding: "utf-8", stdio: PIPE,
-			}).trim();
-			if (paneCommon !== entryCommon) return null;
+			if (gitCommonDir(paneCwd) !== gitCommonDir(entry.path)) return null;
 		}
 		return branch;
 	} catch { return null; }
@@ -164,22 +149,16 @@ function executeCreate() {
 	const base = createUsingPaneBranch && createPaneBranch ? createPaneBranch : createBaseBranch;
 	if (!base) return;
 
-	// Find current tmux session
 	let session;
-	try {
-		session = execFileSync("tmux", ["display-message", "-p", "#{session_name}"], {
-			encoding: "utf-8", timeout: 3000, stdio: PIPE,
-		}).trim();
-	} catch { return; }
+	try { session = tmuxFormat("#{session_name}"); } catch { return; }
 	if (!session) return;
 
 	creating = false;
 	createInput = "";
 
-	// Create new window and send commands
 	try {
-		execFileSync("tmux", ["new-window", "-t", session], { timeout: 3000, stdio: PIPE });
-		execFileSync("tmux", ["send-keys", "-t", session, `g co ${base} && g wt ${branchName} && pi`, "Enter"], { timeout: 3000, stdio: PIPE });
+		tmuxRun("new-window", "-t", session);
+		tmuxRun("send-keys", "-t", session, `g co ${base} && g wt ${branchName} && pi`, "Enter");
 	} catch {}
 
 	render();
@@ -191,37 +170,31 @@ let refreshing = false;
 const selfPath = fileURLToPath(import.meta.url);
 
 function refreshWorktreesAsync() {
-	const child = fork(selfPath, ["--fetch-worktrees"], {
-		stdio: ["pipe", "pipe", "pipe", "ipc"],
-		timeout: 30_000,
+	forkWorker(selfPath, ["--fetch-worktrees"], {
+		onMessage: (entries) => {
+			wt.applyEntries(entries);
+			loading = false;
+			refreshing = false;
+			render();
+			prsLoading = true;
+			refreshPrsAsync();
+		},
+		onDone: () => { if (refreshing) { loading = false; refreshing = false; render(); } },
 	});
-	child.on("message", (entries) => {
-		wt.applyEntries(entries);
-		loading = false;
-		refreshing = false;
-		render();
-		prsLoading = true;
-		refreshPrsAsync();
-	});
-	child.on("error", () => { loading = false; refreshing = false; });
-	child.on("exit", () => { if (refreshing) { loading = false; refreshing = false; render(); } });
 }
 
 function refreshPrsAsync() {
 	const cwd = wt.state.sections.flatMap((s) => s.entries).find((e) => e.path)?.path ?? null;
 	if (!cwd) { prsLoading = false; return; }
 
-	const child = fork(selfPath, ["--fetch-prs", cwd], {
-		stdio: ["pipe", "pipe", "pipe", "ipc"],
-		timeout: 30_000,
+	forkWorker(selfPath, ["--fetch-prs", cwd], {
+		onMessage: (data) => {
+			prs.applyData(data.reviewPrs, data.myPrs);
+			prsLoading = false;
+			render();
+		},
+		onDone: () => { if (prsLoading) { prsLoading = false; render(); } },
 	});
-	child.on("message", (data) => {
-		prs.applyData(data.reviewPrs, data.myPrs);
-		prsLoading = false;
-		render();
-	});
-	child.on("error", () => { prsLoading = false; });
-	child.on("exit", () => { if (prsLoading) { prsLoading = false; render(); } });
 }
 
 function doRefresh() {
@@ -348,9 +321,8 @@ function handleInput(data) {
 	const buf = Buffer.isBuffer(data) ? data : Buffer.from(data);
 	const str = data.toString();
 
-	// Focus events: \x1b[I = focus in, \x1b[O = focus out
-	if (str === "\x1b[I") { paneActive = true; setPaneActive(true); render(); return; }
-	if (str === "\x1b[O") { paneActive = false; setPaneActive(false); render(); return; }
+	const focus = handleFocusEvent(str);
+	if (focus !== null) { paneActive = focus; render(); return; }
 
 	if (creating) return handleCreateInput(buf, str);
 
@@ -361,21 +333,19 @@ function handleInput(data) {
 		return;
 	}
 
-	if (isCtrlShiftW(buf, str)) return focusPiPane();
+	if (isCtrlShiftW(buf, str)) return focusPiPane(piPaneId);
 
 	// Tab switching
 	if (str === "t" || (buf.length === 1 && buf[0] === 0x09)) return switchTab();
 	if (buf.length === 3 && buf[0] === 0x1b && buf[1] === 0x5b && buf[2] === 0x5a) return switchTab();
 
-	// Navigation
+	if (nav.handleKey(buf, str)) return;
+
+	// Arrow left/right for section collapse/expand
 	if (buf.length === 3 && buf[0] === 0x1b && buf[1] === 0x5b) {
-		if (buf[2] === 0x41) return moveUp();
-		if (buf[2] === 0x42) return moveDown();
 		if (buf[2] === 0x43) return expandSection();
 		if (buf[2] === 0x44) return collapseSection();
 	}
-	if (str === "k") return moveUp();
-	if (str === "j") return moveDown();
 	if (str === "\r" || str === "o") return activate();
 	if (str === "p") return openPr();
 	if (str === "c") return openPrChanges();
@@ -416,18 +386,6 @@ function handleCreateInput(buf, str) {
 
 function switchTab() {
 	activeTab = activeTab === "worktrees" ? "prs" : "worktrees";
-	render();
-}
-
-function moveUp() {
-	const s = tabState();
-	s.selectedIdx = Math.max(0, s.selectedIdx - 1);
-	render();
-}
-
-function moveDown() {
-	const s = tabState();
-	s.selectedIdx = Math.min(s.navItems.length - 1, s.selectedIdx + 1);
 	render();
 }
 
@@ -481,11 +439,8 @@ function activate() {
 		const entry = wt.getSelectedEntry();
 		if (!entry) return;
 		const target = `${entry.session}:${entry.window}`;
-		try {
-			execFileSync("tmux", ["select-window", "-t", target], { timeout: 3000, stdio: ["pipe", "pipe", "pipe"] });
-		} catch {
-			try { execFileSync("tmux", ["switch-client", "-t", target], { timeout: 3000, stdio: ["pipe", "pipe", "pipe"] }); } catch {}
-		}
+		try { tmuxRun("select-window", "-t", target); }
+		catch { try { tmuxRun("switch-client", "-t", target); } catch {} }
 	} else {
 		openPr();
 	}
@@ -493,14 +448,10 @@ function activate() {
 
 // ─── Actions ─────────────────────────────────────────────────────────────────
 
-function openUrl(url) {
-	if (!url) return;
-	try { execFileSync("open", [url], { timeout: 3000, stdio: ["pipe", "pipe", "pipe"] }); } catch {}
-}
-
 function openPr() {
 	const entry = tab().getSelectedEntry();
-	openUrl(entry?.pr?.url ?? entry?.url);
+	const url = entry?.pr?.url ?? entry?.url;
+	if (url) openUrl(url);
 }
 
 function openPrChanges() {
@@ -523,14 +474,9 @@ function promptDelete() {
 function executeDelete() {
 	const entry = wt.getSelectedEntry();
 	if (!entry) return;
-	let gitRoot;
-	try {
-		gitRoot = execFileSync("git", ["rev-parse", "--git-common-dir"], {
-			cwd: entry.path, timeout: 5000, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"],
-		}).trim();
-		if (gitRoot.endsWith("/.git") || gitRoot.endsWith("\\.git")) gitRoot = gitRoot.slice(0, -5);
-	} catch { return; }
-	if (!gitRoot) return;
+	let repoRoot;
+	try { repoRoot = gitRepoRoot(entry.path); } catch { return; }
+	if (!repoRoot) return;
 
 	deleting = true;
 	deletingBranch = entry.branch;
@@ -541,53 +487,26 @@ function executeDelete() {
 	const sessionWindow = `${entry.session}:${entry.window}`;
 	const branch = entry.branch;
 
-	// Run delete in a fork to keep UI responsive
-	const child = fork(selfPath, ["--delete-worktree", gitRoot, branch, sessionWindow], {
-		stdio: ["pipe", "pipe", "pipe", "ipc"],
+	forkWorker(selfPath, ["--delete-worktree", repoRoot, branch, sessionWindow], {
 		timeout: 60_000,
+		onDone: () => {
+			clearInterval(spinnerTimer);
+			spinnerTimer = null;
+			deleting = false;
+			wt.clearPrCache();
+			doRefresh();
+		},
 	});
-	child.on("exit", () => {
-		clearInterval(spinnerTimer);
-		spinnerTimer = null;
-		deleting = false;
-		wt.clearPrCache();
-		doRefresh();
+}
+
+// ─── Setup ───────────────────────────────────────────────────────────────────
+
+function initPanel() {
+	setup({
+		onInput: handleInput,
+		onResize: () => render(),
+		onRefresh: () => { wt.clearPrCache(); doRefresh(); },
 	});
-}
-
-// ─── Focus & Watchdog ────────────────────────────────────────────────────────
-
-function focusPiPane() {
-	if (!piPaneId) return;
-	try { execFileSync("tmux", ["select-pane", "-t", piPaneId], { timeout: 3000, stdio: ["pipe", "pipe", "pipe"] }); } catch {}
-}
-
-function checkPiPane() {
-	if (!piPaneId) return;
-	try { execFileSync("tmux", ["display-message", "-t", piPaneId, "-p", ""], { stdio: ["pipe", "pipe", "pipe"] }); }
-	catch { quit(); }
-}
-
-// ─── Setup & Cleanup ─────────────────────────────────────────────────────────
-
-function quit() {
-	disableFocusReporting(); exitAltScreen(); showCursor();
-	try { process.stdin.setRawMode(false); } catch {}
-	process.stdin.pause(); write(R);
-	const myPane = process.env.TMUX_PANE;
-	if (myPane) { try { execFileSync("tmux", ["kill-pane", "-t", myPane], { stdio: ["pipe", "pipe", "pipe"] }); } catch {} }
-	process.exit(0);
-}
-
-function setup() {
-	enterAltScreen(); hideCursor(); enableFocusReporting();
-	process.stdin.setRawMode(true);
-	process.stdin.resume();
-	process.stdin.on("data", handleInput);
-	process.on("SIGWINCH", () => render());
-	process.on("SIGTERM", () => quit());
-	process.on("SIGINT", () => quit());
-	process.on("SIGUSR1", () => { wt.clearPrCache(); doRefresh(); });
 }
 
 // ─── State Polling ───────────────────────────────────────────────────────────
@@ -597,15 +516,13 @@ let lastActiveWindow = null;
 function pollStates() {
 	let activeWindow;
 	try {
-		activeWindow = execFileSync("tmux", ["display-message", "-p", "#{session_name}:#{window_index}"], {
-			encoding: "utf-8", timeout: 3000, stdio: ["pipe", "pipe", "pipe"],
-		}).trim();
+		activeWindow = tmuxFormat("#{session_name}:#{window_index}");
 	} catch { return; }
 
 	if (activeWindow && activeWindow !== lastActiveWindow && lastActiveWindow !== null) {
 		const currentState = readPiState(activeWindow);
 		if (currentState === "idle") {
-			try { execFileSync("tmux", ["set-option", "-wu", "-t", activeWindow, "@pi_state"], { stdio: ["pipe", "pipe", "pipe"] }); } catch {}
+			try { tmuxRun("set-option", "-wu", "-t", activeWindow, "@pi_state"); } catch {}
 		}
 	}
 	lastActiveWindow = activeWindow;
@@ -622,9 +539,9 @@ function pollStates() {
 
 // ─── Main ────────────────────────────────────────────────────────────────────
 
-setup();
+initPanel();
 render();
 doRefresh();
 setInterval(doRefresh, 60_000);
 setInterval(pollStates, 2_000);
-setInterval(checkPiPane, 5_000);
+setInterval(() => checkPiPane(piPaneId), 5_000);
