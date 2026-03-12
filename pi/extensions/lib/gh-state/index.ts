@@ -33,10 +33,6 @@ let clientCachedPr: PrInfo | null = null;
 
 export const ghState = {
 	async start(pi: ExtensionAPI, cwd: string): Promise<void> {
-		const { appendFileSync } = await import("node:fs");
-		const dbg = (msg: string) => appendFileSync("/tmp/gh-state-debug.log", `${new Date().toISOString()} [${process.pid}] START: ${msg}\n`);
-		dbg(`role=${role} cwd=${cwd}`);
-
 		if (role) return; // Already started
 		piRef = pi;
 
@@ -45,18 +41,10 @@ export const ghState = {
 		lckPath = lockPath(sessionRoot);
 
 		const isLeader = tryAcquireLock(lckPath);
-		dbg(`sessionRoot=${sessionRoot} sockPath=${sockPath} lckPath=${lckPath} isLeader=${isLeader}`);
-		try {
-			if (isLeader) {
-				await startAsLeader(pi);
-				dbg(`leader started`);
-			} else {
-				await startAsClient();
-				dbg(`client started`);
-			}
-		} catch (err: any) {
-			dbg(`start error: ${err?.message ?? err}\n${err?.stack ?? ""}`);
-			throw err;
+		if (isLeader) {
+			await startAsLeader(pi);
+		} else {
+			await startAsClient();
 		}
 
 		// Periodically check if leader is still alive
@@ -170,10 +158,6 @@ async function startAsClient(): Promise<void> {
 // ── Leader Takeover ──────────────────────────────────────────────────────────
 
 async function checkAndTakeover(pi: ExtensionAPI): Promise<void> {
-	const { appendFileSync } = await import("node:fs");
-	const dbg = (msg: string) => appendFileSync("/tmp/gh-state-debug.log", `${new Date().toISOString()} [${process.pid}] ${msg}\n`);
-	dbg(`checkAndTakeover: role=${role} lckPath=${lckPath} sockPath=${sockPath} client=${!!client} connected=${client?.isConnected()}`);
-
 	if (role === "leader" || !lckPath || !sockPath) return;
 
 	// If we're a client and connection is healthy, no need to check
@@ -197,19 +181,10 @@ async function checkAndTakeover(pi: ExtensionAPI): Promise<void> {
 
 	// Socket gone — try to become leader
 	try {
-		const stale = isLockStale(lckPath, 90_000);
-		dbg(`lock stale=${stale}`);
-		if (stale) {
-			const acquired = tryAcquireLock(lckPath);
-			dbg(`lock acquired=${acquired}`);
-			if (acquired) {
-				dbg(`starting as leader...`);
-				await startAsLeader(pi);
-				dbg(`leader started successfully`);
-			}
+		if (isLockStale(lckPath, 90_000) && tryAcquireLock(lckPath)) {
+			await startAsLeader(pi);
 		}
-	} catch (err: any) {
-		dbg(`takeover error: ${err?.message ?? err}`);
+	} catch {
 		// Takeover failed — release lock if we claimed it, retry next cycle
 		if (lckPath) releaseLock(lckPath);
 		role = "client";
