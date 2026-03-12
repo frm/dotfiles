@@ -791,6 +791,7 @@ function handleListInput(buf, ch) {
 	if (buf.length === 3 && buf[0] === 0x1b && buf[1] === 0x5b && buf[2] === 0x5a) return switchTab();
 	if (ch === "a") return toggleStage();
 	if (ch === "A") return stageAll();
+	if (ch === "l") return openLazygit();
 	if (ch === "c") return triggerCommit();
 	if (ch === "r") return doRefresh();
 	// Ctrl+D (0x04) — half page down
@@ -908,6 +909,10 @@ function toggleExpand() {
 	render();
 }
 
+function openLazygit() {
+	tmuxPopup(["lazygit"]);
+}
+
 function openDiff() {
 	if (activeTab !== "files") return;
 
@@ -916,10 +921,11 @@ function openDiff() {
 	const nav = navItems[selectedIdx];
 	if (nav.isDir) return;
 
+	const esc = nav.path.replace(/'/g, "'\\''");
 	if (nav.isTopLevel && nav.node.status === "??") {
-		tmuxPopup(["git", "diff", "--no-index", "/dev/null", nav.path]);
+		tmuxPopup([`git --no-pager diff --no-index /dev/null '${esc}' | delta --paging always --pager 'less -R'`]);
 	} else {
-		tmuxPopup(["git", "diff", "HEAD", "--", nav.path]);
+		tmuxPopup([`git --no-pager diff HEAD -- '${esc}' | delta --paging always --pager 'less -R'`]);
 	}
 }
 
