@@ -366,7 +366,7 @@ export default function panels(pi: ExtensionAPI) {
 
 	// ─── Shortcuts ───────────────────────────────────────────────────────
 
-	pi.registerShortcut("alt+w", {
+	pi.registerShortcut("alt+g", {
 		description: "Toggle global panel",
 		handler: async (_ctx) => {
 			if (global.isPaneAlive()) global.kill();
@@ -374,7 +374,7 @@ export default function panels(pi: ExtensionAPI) {
 		},
 	});
 
-	pi.registerShortcut("alt+g", {
+	pi.registerShortcut("alt+l", {
 		description: "Toggle local panel",
 		handler: async () => {
 			if (local.isPaneAlive()) local.kill();
@@ -412,6 +412,11 @@ export default function panels(pi: ExtensionAPI) {
 
 	pi.registerShortcut("alt+v", {
 		description: "Toggle nvim popup",
-		handler: async () => openPopup("pi-nvim", "nvim"),
+		handler: async () => {
+			const name = popupSessionName("pi-nvim");
+			const socket = name ? `/tmp/${name}.sock` : null;
+			const cmd = socket ? `nvim --listen '${socket}'` : "nvim";
+			openPopup("pi-nvim", cmd);
+		},
 	});
 }

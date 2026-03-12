@@ -2,6 +2,7 @@
 import { fileURLToPath } from "node:url";
 
 import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 
@@ -41,6 +42,7 @@ if (process.argv.includes("--fetch-checks")) {
 const serverSessionName = "pi-srv-" + createHash("sha256").update(gitRoot).digest("hex").slice(0, 8);
 const termSessionName = "pi-term-" + createHash("sha256").update(gitRoot).digest("hex").slice(0, 8);
 const nvimSessionName = "pi-nvim-" + createHash("sha256").update(gitRoot).digest("hex").slice(0, 8);
+const nvimSocketPath = `/tmp/${nvimSessionName}.sock`;
 
 function readServerCommand() {
 	const configPath = join(gitRoot, ".pi", "config.json");
@@ -75,9 +77,12 @@ function toggleTerm() {
 	tmuxPopup([`tmux attach-session -t '=${termSessionName}' \\; set status off`]);
 }
 
-function toggleNvim() {
+function openNvim(file) {
 	if (!tmuxHasSession(nvimSessionName)) {
-		tmuxNewSession(nvimSessionName, "nvim", gitRoot, { noStatus: true });
+		const cmd = file ? `nvim --listen '${nvimSocketPath}' '${file}'` : `nvim --listen '${nvimSocketPath}'`;
+		tmuxNewSession(nvimSessionName, cmd, gitRoot, { noStatus: true });
+	} else if (file) {
+		try { execFileSync("nvim", ["--server", nvimSocketPath, "--remote", file], { timeout: 5000, stdio: ["pipe", "pipe", "pipe"] }); } catch {}
 	}
 	tmuxPopup([`tmux attach-session -t '=${nvimSessionName}' \\; set status off`]);
 }
@@ -337,7 +342,7 @@ function handleInput(data) {
 	if (ch === "s") return toggleServer();
 	if (ch === "S") return killServer();
 	if (ch === "l") return openLazygit();
-	if (ch === "v") return toggleNvim();
+	if (ch === "v") return openNvim();
 	if (ch === "c") return triggerCommit();
 	if (ch === "C") return triggerCommit(true);
 	if (ch === "r") { doRefresh(); doChecksRefresh(); return; }
@@ -389,7 +394,7 @@ function openInNvim() {
 		if (selectedIdx >= navItems.length) return;
 		const nav = navItems[selectedIdx];
 		if (nav.isDir) return toggleExpand();
-		tmuxPopup(["nvim", absPath(nav.path)]);
+		openNvim(absPath(nav.path));
 	} else {
 		const checkList = prInfo?.checks ?? [];
 		if (selectedIdx >= checkList.length) return;
