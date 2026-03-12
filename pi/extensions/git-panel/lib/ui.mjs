@@ -9,6 +9,15 @@ export const red = (t) => style("\x1b[31m", t);
 export const magenta = (t) => style("\x1b[35m", t);
 export const boldCyan = (t) => style("\x1b[1;36m", t);
 export const bgCyan = (t) => style("\x1b[46;30m", t);
+export const bgMuted = (t) => style("\x1b[48;5;238;37m", t);
+
+export const enableFocusReporting = () => write("\x1b[?1004h");
+export const disableFocusReporting = () => write("\x1b[?1004l");
+
+// Pane focus state — set by panel, read by tabs for muted rendering
+export let paneActive = false;
+export function setPaneActive(v) { paneActive = v; }
+export function selColor(t) { return paneActive ? cyan(t) : dim(t); }
 
 export const write = (s) => process.stdout.write(s);
 export const enterAltScreen = () => write("\x1b[?1049h");

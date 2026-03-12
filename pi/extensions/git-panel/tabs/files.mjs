@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { git, gitRaw, gitRoot, absPath } from "../lib/git.mjs";
 import {
 	dim, cyan, green, yellow, red, magenta,
-	visWidth, smartTruncatePath, truncate, write,
+	visWidth, smartTruncatePath, truncate, write, selColor,
 } from "../lib/ui.mjs";
 
 // ─── Data Fetching ───────────────────────────────────────────────────────────
@@ -150,25 +150,25 @@ export function renderFileEntry(file, selected, innerW) {
 			default: icon = "·"; colorFn = dim;
 		}
 	}
-	const prefix = selected ? cyan(" → ") : "   ";
+	const prefix = selected ? selColor(" → ") : "   ";
 	const stagedMark = file.staged ? green("● ") : "  ";
 	const statusStr = colorFn(icon) + " ";
 	const prefixW = visWidth(prefix) + visWidth(stagedMark) + visWidth(statusStr);
 	const displayPath = file.isDir ? file.path + "/" : file.path;
 	const path = smartTruncatePath(displayPath, innerW - prefixW);
 	const pad = " ".repeat(Math.max(0, innerW - prefixW - visWidth(path)));
-	const border = selected ? cyan("▐") : dim("│");
+	const border = selected ? selColor("▐") : dim("│");
 	write(border + prefix + stagedMark + statusStr + path + pad + dim("│"));
 }
 
 export function renderTreeNodeEntry(node, depth, selected, innerW) {
 	const indent = "  ".repeat(depth);
-	const prefix = selected ? cyan(indent + " → ") : indent + "   ";
+	const prefix = selected ? selColor(indent + " → ") : indent + "   ";
 	const icon = node.isDir ? (node.expanded ? dim("▾ ") : dim("▸ ")) : dim("· ");
 	const prefixW = visWidth(prefix) + visWidth(icon);
 	const displayName = node.isDir ? node.name + "/" : node.name;
 	const name = truncate(displayName, innerW - prefixW);
 	const pad = " ".repeat(Math.max(0, innerW - prefixW - visWidth(name)));
-	const border = selected ? cyan("▐") : dim("│");
+	const border = selected ? selColor("▐") : dim("│");
 	write(border + prefix + icon + name + pad + dim("│"));
 }

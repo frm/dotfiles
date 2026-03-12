@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { gitRoot } from "../lib/git.mjs";
-import { dim, cyan, green, yellow, red, visWidth, truncate, write } from "../lib/ui.mjs";
+import { dim, cyan, green, yellow, red, visWidth, truncate, write, selColor } from "../lib/ui.mjs";
 
 // ─── Data Fetching ───────────────────────────────────────────────────────────
 
@@ -45,11 +45,11 @@ export function renderCheckEntry(check, selected, innerW) {
 		case "pending": icon = "●"; colorFn = yellow; break;
 		default: icon = "?"; colorFn = dim;
 	}
-	const prefix = selected ? cyan(" → ") : "   ";
+	const prefix = selected ? selColor(" → ") : "   ";
 	const statusStr = colorFn(icon) + " ";
 	const prefixW = visWidth(prefix) + visWidth(statusStr);
 	const name = truncate(check.name, innerW - prefixW);
 	const pad = " ".repeat(Math.max(0, innerW - prefixW - visWidth(name)));
-	const border = selected ? cyan("▐") : dim("│");
+	const border = selected ? selColor("▐") : dim("│");
 	write(border + prefix + statusStr + name + pad + dim("│"));
 }

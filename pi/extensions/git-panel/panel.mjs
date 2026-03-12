@@ -4,9 +4,10 @@ import { fileURLToPath } from "node:url";
 
 import { git, gitRaw, gitRoot, absPath, tmux, openUrl } from "./lib/git.mjs";
 import {
-	R, dim, bgCyan, write,
+	R, dim, bgCyan, bgMuted, write,
 	enterAltScreen, exitAltScreen, hideCursor, showCursor,
 	clearScreen, moveTo, visWidth,
+	enableFocusReporting, disableFocusReporting, setPaneActive,
 } from "./lib/ui.mjs";
 
 import * as files from "./tabs/files.mjs";
@@ -32,6 +33,7 @@ let prInfo = null;
 let selectedIdx = 0;
 let scrollOffset = 0;
 let loading = true;
+let paneActive = false;
 
 function currentListLength() {
 	if (activeTab === "files") return files.buildNavItems(changedFiles).length;
@@ -141,9 +143,10 @@ function render() {
 	let row = 1;
 
 	// Header
-	const filesLabel = activeTab === "files" ? bgCyan(" Changes ") : dim(" Changes ");
+	const activeBg = paneActive ? bgCyan : bgMuted;
+	const filesLabel = activeTab === "files" ? activeBg(" Changes ") : dim(" Changes ");
 	const checksLabel = prInfo
-		? (activeTab === "checks" ? bgCyan(" Checks ") : dim(" Checks "))
+		? (activeTab === "checks" ? activeBg(" Checks ") : dim(" Checks "))
 		: "";
 	const tabBar = filesLabel + (checksLabel ? dim("│") + checksLabel : "");
 	const hFill = "─".repeat(Math.max(0, innerW - visWidth(tabBar)));
@@ -225,6 +228,10 @@ let pendingG = false;
 function handleInput(data) {
 	const buf = Buffer.isBuffer(data) ? data : Buffer.from(data);
 	const ch = data.toString();
+
+	// Focus events
+	if (ch === "\x1b[I") { paneActive = true; setPaneActive(true); render(); return; }
+	if (ch === "\x1b[O") { paneActive = false; setPaneActive(false); render(); return; }
 
 	if (detail.active) {
 		if (detail.handleInput(buf, ch)) {
@@ -375,7 +382,7 @@ function checkPiPane() {
 }
 
 function quit() {
-	exitAltScreen(); showCursor();
+	disableFocusReporting(); exitAltScreen(); showCursor();
 	try { process.stdin.setRawMode(false); } catch {}
 	process.stdin.pause(); write(R);
 	const myPane = process.env.TMUX_PANE;
@@ -384,7 +391,7 @@ function quit() {
 }
 
 function setup() {
-	enterAltScreen(); hideCursor();
+	enterAltScreen(); hideCursor(); enableFocusReporting();
 	process.stdin.setRawMode(true);
 	process.stdin.resume();
 	process.stdin.on("data", handleInput);
