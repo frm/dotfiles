@@ -399,11 +399,7 @@ function renderCreate(startRow, innerW, contentHeight) {
 
 // ─── Input ───────────────────────────────────────────────────────────────────
 
-function isCtrlShiftW(buf, str) {
-	if (buf.length === 1 && buf[0] === 0x17) return true;
-	if (str === "\x1b[119;6u" || str === "\x1b[87;6u") return true;
-	return false;
-}
+
 
 function handleInput(data) {
 	const str = data.toString();
@@ -439,8 +435,6 @@ function handleInput(data) {
 		render();
 		return;
 	}
-
-	if (isCtrlShiftW(inputBuf, inputStr)) return focusPiPane(getActivePiPane());
 
 	// Tab switching
 	if (inputStr === "t" || (inputBuf.length === 1 && inputBuf[0] === 0x09)) return switchTab();

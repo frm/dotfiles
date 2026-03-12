@@ -263,11 +263,6 @@ export default function panels(pi: ExtensionAPI) {
 		guard: isGitRepo,
 	});
 
-	function focusPi() {
-		if (!piPaneId) return;
-		try { tmuxRun("select-pane", "-t", piPaneId); } catch {}
-	}
-
 	// ─── Pi State Tracking ───────────────────────────────────────────────
 
 	let tmuxWindowTarget: string | null = null;
@@ -371,25 +366,52 @@ export default function panels(pi: ExtensionAPI) {
 
 	// ─── Shortcuts ───────────────────────────────────────────────────────
 
-	pi.registerShortcut("ctrl+shift+w", {
-		description: "Toggle worktree panel",
-		handler: async (ctx) => {
-			if (!global.isPaneAlive()) {
-				const err = global.create();
-				if (err) ctx.ui.notify(`Global panel: ${err}`, "error");
-				return;
-			}
-			if (global.isFocused()) focusPi();
-			else global.focus(piPaneId ?? undefined);
+	pi.registerShortcut("alt+w", {
+		description: "Toggle global panel",
+		handler: async (_ctx) => {
+			if (global.isPaneAlive()) global.kill();
+			else global.create(piPaneId ?? undefined);
 		},
 	});
 
-	pi.registerShortcut("ctrl+shift+g", {
-		description: "Toggle git panel focus",
+	pi.registerShortcut("alt+g", {
+		description: "Toggle local panel",
 		handler: async () => {
-			if (!local.isPaneAlive()) { local.create(); return; }
-			if (local.isFocused()) focusPi();
-			else local.focus();
+			if (local.isPaneAlive()) local.kill();
+			else local.create(piPaneId ?? undefined);
 		},
+	});
+
+	// ─── Popup Shortcuts ─────────────────────────────────────────────────
+
+	function popupSessionName(prefix: string): string | null {
+		if (!isGitRepo()) return null;
+		const root = execFileSync("git", ["rev-parse", "--show-toplevel"], {
+			timeout: 3000, ...PIPE_UTF8,
+		}).trim();
+		return `${prefix}-${createHash("sha256").update(root).digest("hex").slice(0, 8)}`;
+	}
+
+	function openPopup(sessionPrefix: string, cmd: string): void {
+		const name = popupSessionName(sessionPrefix);
+		if (!name) return;
+		if (!isSessionAlive(name)) {
+			try { tmuxRun("kill-session", "-t", `=${name}`); } catch {}
+			ensureSession(name, cmd, process.cwd());
+		}
+		try {
+			tmuxRun("popup", "-E", "-w", "90%", "-h", "90%", "-d", process.cwd(),
+				`tmux attach-session -t '=${name}' \\; set status off`);
+		} catch {}
+	}
+
+	pi.registerShortcut("alt+t", {
+		description: "Toggle terminal popup",
+		handler: async () => openPopup("pi-term", process.env.SHELL || "bash"),
+	});
+
+	pi.registerShortcut("alt+v", {
+		description: "Toggle nvim popup",
+		handler: async () => openPopup("pi-nvim", "nvim"),
 	});
 }

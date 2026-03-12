@@ -341,7 +341,7 @@ function handleInput(data) {
 	if (ch === "c") return triggerCommit();
 	if (ch === "C") return triggerCommit(true);
 	if (ch === "r") { doRefresh(); doChecksRefresh(); return; }
-	if (inputBuf.length === 1 && inputBuf[0] === 0x07) return focusPiPane(piPaneId);
+
 	if (ch === "q" || (inputBuf.length === 1 && inputBuf[0] === 0x03)) return quit();
 }
 
