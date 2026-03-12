@@ -792,6 +792,7 @@ function handleListInput(buf, ch) {
 	if (ch === "a") return toggleStage();
 	if (ch === "A") return stageAll();
 	if (ch === "l") return openLazygit();
+	if (ch === "v") return tmuxPopup(["nvim"]);
 	if (ch === "c") return triggerCommit();
 	if (ch === "r") return doRefresh();
 	// Ctrl+D (0x04) — half page down
