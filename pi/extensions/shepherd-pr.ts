@@ -3,7 +3,7 @@
  *
  * Single-file architecture with three layers:
  * 1) Widget: compact one-line status above editor
- * 2) Monitor: watches prState changes and queues actionable work
+ * 2) Monitor: watches ghState changes and queues actionable work
  * 3) Executor: runs codex subprocesses, then commits/pushes fixes
  */
 
@@ -14,7 +14,7 @@ import { spawn } from "node:child_process";
 import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
 import { Key, matchesKey, truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
 
-import { prState, type PrInfo } from "./lib/pr-state.ts";
+import { ghState, type PrInfo } from "./lib/gh-state/index.ts";
 
 type Theme = ExtensionContext["ui"]["theme"];
 
@@ -271,13 +271,12 @@ export default function shepherdPr(pi: ExtensionAPI) {
 		}
 
 		stopMonitor();
-		// Ensure prState is initialized (idempotent if dashboard already started it)
-		await prState.start(pi, ctx.cwd);
-		unsubscribePr = prState.subscribe((pr) => {
+		await ghState.start(pi, ctx.cwd);
+		unsubscribePr = ghState.subscribe((pr) => {
 			latestPr = pr;
 			requestMonitorLoop();
 		});
-		latestPr = prState.get();
+		latestPr = ghState.get();
 		renderWidget();
 		requestMonitorLoop();
 	}
@@ -287,7 +286,7 @@ export default function shepherdPr(pi: ExtensionAPI) {
 			unsubscribePr();
 			unsubscribePr = null;
 		}
-		// Don't call prState.stop() — it's a shared singleton that dashboard also uses.
+		// Don't call ghState.stop() — it's shared with context-panels.
 		// Just unsubscribe and let the lifecycle owner (dashboard) manage start/stop.
 		executorRunning = false;
 		if (dismissMergedTimer) {
@@ -404,7 +403,7 @@ export default function shepherdPr(pi: ExtensionAPI) {
 	async function inspectNewReviewComments() {
 		if (!latestPr || !latestCtx) return;
 
-		const comments = (await prState.fetchReviewComments()) as ReviewCommentLike[];
+		const comments = (await ghState.fetchReviewComments()) as ReviewCommentLike[];
 		const fresh = getNewReviewComments(comments, seenReviewCommentIds);
 		if (fresh.length === 0) return;
 
@@ -845,7 +844,7 @@ export default function shepherdPr(pi: ExtensionAPI) {
 	function widgetLine(theme: Theme): string {
 		if (!enabled) {
 			widgetMode = "off";
-			return theme.fg("muted", "💤 shepherd off");
+			return theme.fg("muted", "not shepherding");
 		}
 		if (widgetMode === "merged") {
 			return theme.fg("success", "⟐ ✓ merged!");

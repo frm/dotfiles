@@ -1,5 +1,6 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { execFileSync } from "child_process";
+import { ghState } from "../lib/gh-state/index.ts";
 import { join } from "path";
 import { fileURLToPath } from "url";
 import { existsSync } from "fs";
@@ -174,6 +175,7 @@ export default function contextPanels(pi: ExtensionAPI) {
 	pi.on("session_start", async (_event, ctx) => {
 		detectTmuxWindow();
 		clearPiState();
+		await ghState.start(pi, ctx.cwd);
 		if (!ctx.hasUI) return;
 		const globalErr = global.create();
 		if (globalErr) ctx.ui.notify(`Global panel: ${globalErr}`, "error");
@@ -192,6 +194,7 @@ export default function contextPanels(pi: ExtensionAPI) {
 		clearPiState();
 		global.kill();
 		local.kill();
+		ghState.stop();
 	});
 
 	// ─── Commands ────────────────────────────────────────────────────────
