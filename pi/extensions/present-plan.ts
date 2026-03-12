@@ -18,7 +18,7 @@ interface PlanOverlayResult {
 }
 
 interface OverlayExitState {
-	action: "approve" | "reject" | "feedback" | "comment";
+	action: "approve" | "submit" | "reject" | "feedback" | "comment";
 	cursorLine: number;
 	scrollOffset: number;
 }
@@ -169,7 +169,7 @@ async function showPlanOverlay(
 					bordered.length = usableHeight;
 
 					// Footer
-					const keys = theme.fg("muted", " j/k scroll • c comment • Enter approve • Esc reject ");
+					const keys = theme.fg("muted", " j/k scroll • c comment • Enter submit • Shift+Enter accept w/ comments • Esc reject ");
 					const footerFill = "─".repeat(Math.max(0, width - visibleWidth(keys) - 2));
 					const footer = truncateToWidth(
 						theme.fg("dim", "╰") + theme.fg("dim", footerFill) + keys + theme.fg("dim", "╯"),
@@ -195,8 +195,11 @@ async function showPlanOverlay(
 					} else if (data === "c" || data === "C") {
 						done({ action: "comment", cursorLine, scrollOffset });
 						return;
-					} else if (matchesKey(data, Key.enter)) {
+					} else if (matchesKey(data, Key.shift("enter"))) {
 						done({ action: "approve", cursorLine, scrollOffset });
+						return;
+					} else if (matchesKey(data, Key.enter)) {
+						done({ action: "submit", cursorLine, scrollOffset });
 						return;
 					} else if (data === "f" || data === "F") {
 						done({ action: "feedback", cursorLine, scrollOffset });
@@ -220,9 +223,19 @@ async function showPlanOverlay(
 		scrollOffset = exitState.scrollOffset;
 		cursorLine = exitState.cursorLine;
 
+		if (exitState.action === "submit") {
+			if (comments.size > 0) {
+				// Enter with comments = iterate (regenerate plan with feedback)
+				const md = new Markdown(plan, 1, 0, getMarkdownTheme());
+				const finalLines = md.render(80);
+				const feedback = formatCommentsAsFeedback(finalLines);
+				return { approved: false, feedback };
+			}
+			return { approved: true };
+		}
+
 		if (exitState.action === "approve") {
 			if (comments.size > 0) {
-				// Render lines one more time to get section context
 				const md = new Markdown(plan, 1, 0, getMarkdownTheme());
 				const finalLines = md.render(80);
 				const feedback = formatCommentsAsFeedback(finalLines);
