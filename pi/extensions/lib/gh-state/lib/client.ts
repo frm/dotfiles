@@ -5,6 +5,7 @@ import { encodeMessage, createLineParser } from "./protocol.ts";
 export interface GhStateClient {
 	connect(): Promise<void>;
 	disconnect(): void;
+	isConnected(): boolean;
 	request(method: string, params?: Record<string, unknown>): Promise<unknown>;
 	onPush(handler: (event: string, data: unknown) => void): void;
 }
@@ -63,6 +64,10 @@ export function createClient(sockPath: string): GhStateClient {
 			}
 			for (const p of pending.values()) p.reject(new Error("Disconnected"));
 			pending.clear();
+		},
+
+		isConnected() {
+			return socket !== null && !socket.destroyed;
 		},
 
 		request(method: string, params?: Record<string, unknown>): Promise<unknown> {

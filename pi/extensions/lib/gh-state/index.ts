@@ -159,7 +159,7 @@ async function checkAndTakeover(pi: ExtensionAPI): Promise<void> {
 	if (role === "leader" || !lckPath || !sockPath) return;
 
 	// If we're a client and connection is healthy, no need to check
-	if (client) return;
+	if (client?.isConnected()) return;
 
 	// Try to reconnect first
 	try {

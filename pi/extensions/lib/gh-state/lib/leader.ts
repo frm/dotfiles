@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, unlinkSync } from "node:fs";
+import { readFileSync, writeFileSync, unlinkSync, existsSync } from "node:fs";
 import type { LockData } from "./types.ts";
 
 function readLock(path: string): LockData | null {
@@ -21,8 +21,16 @@ function isPidAlive(pid: number): boolean {
 export function tryAcquireLock(path: string): boolean {
 	const existing = readLock(path);
 	if (existing && isPidAlive(existing.pid)) return false;
-	writeFileSync(path, JSON.stringify({ pid: process.pid, ts: Date.now() }));
-	return true;
+
+	// Remove stale lock, then use exclusive create to avoid TOCTOU races
+	try { unlinkSync(path); } catch {}
+	try {
+		writeFileSync(path, JSON.stringify({ pid: process.pid, ts: Date.now() }), { flag: "wx" });
+		return true;
+	} catch {
+		// Another process won the race
+		return false;
+	}
 }
 
 export function releaseLock(path: string): void {
