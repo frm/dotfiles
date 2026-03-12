@@ -1,14 +1,18 @@
 #!/usr/bin/env node
+import { createHash } from "node:crypto";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { readPiState } from "../lib/data.mjs";
 import { gitCommonDir, gitRepoRoot, currentBranch, branchExists, worktreeDel, openUrl } from "../lib/git.mjs";
 import { parsePiPaneId, setup, quit, checkPiPane, handleFocusEvent, focusPiPane, forkWorker } from "../lib/panel.mjs";
+import { getSessionOption } from "../lib/session.mjs";
 import { createVimNav } from "../lib/vim-nav.mjs";
-import { tmuxRun, tmuxQuery, tmuxFormat } from "../lib/tmux.mjs";
+import { tmuxRun, tmuxQuery, tmuxFormat, tmuxHasSession, tmuxNewSession } from "../lib/tmux.mjs";
 import {
-	dim, cyan, yellow, red, magenta, bgCyan, bgMuted, write,
-	hideCursor,
+	R, dim, cyan, yellow, red, magenta, bgCyan, bgMuted, write,
+	hideCursor, setPaneActive,
 	clearScreen, moveTo, visWidth, truncate, wrapText, emptyLine, contentLine,
 } from "../lib/ui.mjs";
 
@@ -51,8 +55,33 @@ let spinnerFrame = 0;
 let spinnerTimer = null;
 const SPINNER = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 
-const piPaneId = parsePiPaneId();
+const shared = process.argv.includes("--shared");
+const sessionNameIdx = process.argv.indexOf("--session");
+const sessionName = sessionNameIdx !== -1 ? process.argv[sessionNameIdx + 1] : null;
+
+// Ensure status bar is off in shared mode (set from inside the session for reliability)
+if (shared) {
+	try { tmuxRun("set-option", "status", "off"); } catch {}
+}
+
+const piPaneId = shared ? null : parsePiPaneId();
 let paneActive = false;
+let hadFocusOut = !shared; // In shared mode, ignore focus-in until first focus-out
+
+function getActivePiPane() {
+	if (!shared) return piPaneId;
+	return sessionName ? getSessionOption(sessionName, "pi_active_pane") : null;
+}
+
+function quitShared() {
+	write(R);
+	try { process.stdin.setRawMode(false); } catch {}
+	process.stdin.pause();
+	if (sessionName) {
+		try { tmuxRun("kill-session", "-t", `=${sessionName}`); } catch {}
+	}
+	process.exit(0);
+}
 
 function tab() { return activeTab === "worktrees" ? wt : prs; }
 function tabState() { return tab().state; }
@@ -86,15 +115,19 @@ function detectDefaultBase() {
 }
 
 function detectPaneBranch() {
-	if (!piPaneId) return null;
+	const pane = getActivePiPane();
+	if (!pane) return null;
 	try {
-		const paneCwd = tmuxFormat("#{pane_current_path}", piPaneId);
+		const paneCwd = tmuxFormat("#{pane_current_path}", pane);
 		if (!paneCwd) return null;
+		// Check if the pane's cwd matches a known worktree entry
+		const entries = wt.state.sections.flatMap((s) => s.entries);
+		const match = entries.find((e) => paneCwd.startsWith(e.path));
+		if (match) return match.branch;
+		// Fall back to git detection
 		const branch = currentBranch(paneCwd);
-		const entry = wt.state.sections.flatMap((s) => s.entries).find((e) => e.path);
-		if (entry) {
-			if (gitCommonDir(paneCwd) !== gitCommonDir(entry.path)) return null;
-		}
+		const entry = entries.find((e) => e.path);
+		if (entry && gitCommonDir(paneCwd) !== gitCommonDir(entry.path)) return null;
 		return branch;
 	} catch { return null; }
 }
@@ -324,7 +357,14 @@ function handleInput(data) {
 	const str = data.toString();
 
 	const focus = handleFocusEvent(str);
-	if (focus !== null) { paneActive = focus; render(); return; }
+	if (focus !== null) {
+		if (focus === false) hadFocusOut = true;
+		if (focus === true && !hadFocusOut) return; // ignore spurious focus-in before first focus-out
+		paneActive = focus;
+		setPaneActive(focus);
+		render();
+		return;
+	}
 
 	if (creating) return handleCreateInput(buf, str);
 
@@ -335,7 +375,7 @@ function handleInput(data) {
 		return;
 	}
 
-	if (isCtrlShiftW(buf, str)) return focusPiPane(piPaneId);
+	if (isCtrlShiftW(buf, str)) return focusPiPane(getActivePiPane());
 
 	// Tab switching
 	if (str === "t" || (buf.length === 1 && buf[0] === 0x09)) return switchTab();
@@ -355,7 +395,7 @@ function handleInput(data) {
 	if (str === "C") return reviewPrLocal();
 	if (str === "l") return openLinear();
 	if (str === "r") { wt.clearPrCache(); return doRefresh(); }
-	if (str === "q" || (buf.length === 1 && buf[0] === 0x03)) return quit();
+	if (str === "q" || (buf.length === 1 && buf[0] === 0x03)) return shared ? quitShared() : quit();
 
 	// Worktrees-only
 	if (activeTab === "worktrees" && str === "d") return promptDelete();
@@ -467,9 +507,30 @@ function openPrChanges() {
 function reviewPr() {
 	const entry = tab().getSelectedEntry();
 	const number = entry?.number ?? entry?.pr?.number;
-	if (!number || !piPaneId) return;
-	tmuxRun("send-keys", "-t", piPaneId, `/review-pr ${number}`, "Enter");
-	focusPiPane(piPaneId);
+	if (!number) return;
+	// For worktrees tab, send to the entry's own window (where pi is running)
+	if (activeTab === "worktrees" && entry?.sessionWindow) {
+		tmuxRun("send-keys", "-t", entry.sessionWindow, `/review-pr ${number}`, "Enter");
+		try { tmuxRun("select-window", "-t", entry.sessionWindow); } catch {}
+		return;
+	}
+	// Fallback: send to active pi pane
+	const pane = getActivePiPane();
+	if (!pane) return;
+	tmuxRun("send-keys", "-t", pane, `/review-pr ${number}`, "Enter");
+	focusPiPane(pane);
+}
+
+function ensureServer(repoRoot) {
+	const srvName = "pi-srv-" + createHash("sha256").update(repoRoot).digest("hex").slice(0, 8);
+	if (tmuxHasSession(srvName)) return;
+	const configPath = join(repoRoot, ".pi", "config.json");
+	if (!existsSync(configPath)) return;
+	try {
+		const config = JSON.parse(readFileSync(configPath, "utf-8"));
+		if (!config.server) return;
+		tmuxNewSession(srvName, config.server, repoRoot, { noStatus: true });
+	} catch {}
 }
 
 function reviewPrLocal() {
@@ -488,6 +549,7 @@ function reviewPrLocal() {
 	if (!session) return;
 
 	try {
+		ensureServer(repoRoot);
 		tmuxRun("new-window", "-t", session, "-c", repoRoot);
 		tmuxRun("send-keys", "-t", session, `git fetch && g wt ${branch} && pi "/review-pr ${number}"`, "Enter");
 	} catch {}
@@ -539,6 +601,7 @@ function initPanel() {
 		onInput: handleInput,
 		onResize: () => render(),
 		onRefresh: () => { wt.clearPrCache(); doRefresh(); },
+		delayFocus: shared ? 500 : 0,
 	});
 }
 
@@ -577,4 +640,4 @@ render();
 doRefresh();
 setInterval(doRefresh, 60_000);
 setInterval(pollStates, 2_000);
-setInterval(() => checkPiPane(piPaneId), 5_000);
+if (!shared) setInterval(() => checkPiPane(piPaneId), 5_000);

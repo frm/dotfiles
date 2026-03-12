@@ -10,7 +10,7 @@ import { parsePiPaneId, setup, quit, checkPiPane, handleFocusEvent, focusPiPane,
 import { createVimNav } from "../lib/vim-nav.mjs";
 import { tmuxRun, tmuxInteractive, tmuxHasSession, tmuxNewSession, tmuxKillSession } from "../lib/tmux.mjs";
 import {
-	dim, green, bgCyan, bgMuted, write,
+	dim, green, bgCyan, bgMuted, write, setPaneActive,
 	enterAltScreen, exitAltScreen, hideCursor, showCursor,
 	clearScreen, moveTo, visWidth,
 } from "../lib/ui.mjs";
@@ -265,7 +265,7 @@ function handleInput(data) {
 	const ch = data.toString();
 
 	const focus = handleFocusEvent(ch);
-	if (focus !== null) { paneActive = focus; render(); return; }
+	if (focus !== null) { paneActive = focus; setPaneActive(focus); render(); return; }
 
 	if (detail.active) {
 		if (detail.handleInput(buf, ch)) {

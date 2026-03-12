@@ -1,9 +1,10 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { execFileSync } from "child_process";
 import { ghState } from "../lib/gh-state/index.ts";
-import { join } from "path";
+import { join, resolve } from "path";
 import { fileURLToPath } from "url";
 import { existsSync } from "fs";
+import { createHash } from "crypto";
 
 // ─── Tmux Helpers ────────────────────────────────────────────────────────────
 
@@ -23,6 +24,54 @@ function tmuxFormat(format: string, target?: string): string {
 	if (target) args.push("-t", target);
 	args.push("-p", format);
 	return tmuxQuery(...args);
+}
+
+// ─── Shared Session Helpers ──────────────────────────────────────────────────
+
+function computeSessionName(): string | null {
+	let input: string;
+	try {
+		const sessionPath = tmuxFormat("#{session_path}");
+		const commonDir = execFileSync("git", ["rev-parse", "--git-common-dir"], {
+			encoding: "utf-8" as const, cwd: sessionPath, timeout: 3000, ...PIPE,
+		}).trim();
+		input = resolve(sessionPath, commonDir);
+	} catch {
+		try { input = tmuxFormat("#{session_name}"); }
+		catch { return null; }
+	}
+	return `_pi_state_${createHash("md5").update(input).digest("hex").slice(0, 8)}`;
+}
+
+function isSessionAlive(name: string): boolean {
+	try {
+		execFileSync("tmux", ["has-session", "-t", `=${name}`], { timeout: 3000, ...PIPE });
+		const output = tmuxQuery("list-panes", "-s", "-t", `=${name}`, "-F", "#{pane_dead}");
+		return output.trim().split("\n").some(line => line.trim() !== "1");
+	} catch { return false; }
+}
+
+function ensureSession(name: string, cmd: string, cwd: string): void {
+	if (isSessionAlive(name)) return;
+	try { tmuxRun("kill-session", "-t", `=${name}`); } catch {}
+	execFileSync("tmux", [
+		"new-session", "-d", "-s", name, "-c", cwd || ".", cmd,
+	], { timeout: 5000, ...PIPE });
+	try { tmuxRun("set-option", "-t", name, "status", "off"); } catch {}
+	try { tmuxRun("set-option", "-t", name, "focus-events", "on"); } catch {}
+	try { tmuxRun("set-option", "-t", name, "window-size", "latest"); } catch {}
+}
+
+function getSessionPanePid(name: string): number | null {
+	try {
+		const pid = tmuxQuery("list-panes", "-s", "-t", `=${name}`, "-F", "#{pane_pid}");
+		const first = pid.trim().split("\n")[0];
+		return first ? parseInt(first) : null;
+	} catch { return null; }
+}
+
+function setSessionOption(name: string, key: string, value: string): void {
+	try { tmuxRun("set-option", "-t", name, `@${key}`, value); } catch {}
 }
 
 // ─── Pane Manager ────────────────────────────────────────────────────────────
@@ -101,6 +150,90 @@ function createPaneManager(config: PaneConfig) {
 	return { isPaneAlive, create, kill, focus, isFocused, signal, resize };
 }
 
+// ─── Shared Global Pane Manager ──────────────────────────────────────────────
+
+function createGlobalPaneManager(config: PaneConfig) {
+	let paneId: string | null = null;
+	let sessionName: string | null = null;
+
+	function isPaneAlive(): boolean {
+		if (!paneId) return false;
+		try {
+			const dead = tmuxFormat("#{pane_dead}", paneId);
+			if (dead === "1") {
+				try { tmuxRun("kill-pane", "-t", paneId); } catch {}
+				paneId = null;
+				return false;
+			}
+			if (sessionName && !isSessionAlive(sessionName)) {
+				try { tmuxRun("kill-pane", "-t", paneId); } catch {}
+				paneId = null;
+				return false;
+			}
+			return true;
+		} catch {
+			paneId = null;
+			return false;
+		}
+	}
+
+	function create(): string | null {
+		kill();
+		if (!sessionName) sessionName = computeSessionName();
+		if (!sessionName) return "Could not determine shared session name";
+		if (!existsSync(config.script)) return `Panel script not found: ${config.script}`;
+		try {
+			const piPaneId = tmuxFormat("#{pane_id}");
+			const sessionPath = tmuxFormat("#{session_path}");
+			const cmd = `${process.execPath} ${config.script} --shared --session ${sessionName}`;
+			ensureSession(sessionName, cmd, sessionPath);
+			setSessionOption(sessionName, "pi_active_pane", piPaneId);
+			const attachCmd = `TMUX= exec tmux attach-session -t '=${sessionName}'`;
+			const splitFlag = config.side === "left" ? "-hbd" : "-hd";
+			paneId = tmuxQuery("split-window", splitFlag, "-l", config.size, "-P", "-F", "#{pane_id}", attachCmd);
+			return null;
+		} catch (e: any) {
+			paneId = null;
+			return e.message ?? "Unknown error creating pane";
+		}
+	}
+
+	function kill() {
+		if (!paneId) return;
+		try { tmuxRun("kill-pane", "-t", paneId); } catch {}
+		paneId = null;
+	}
+
+	function focus() {
+		if (!isPaneAlive()) return;
+		if (sessionName) {
+			const piPaneId = tmuxFormat("#{pane_id}");
+			setSessionOption(sessionName, "pi_active_pane", piPaneId);
+		}
+		try { tmuxRun("select-pane", "-t", paneId!); } catch {}
+	}
+
+	function isFocused(): boolean {
+		if (!isPaneAlive()) return false;
+		try { return tmuxFormat("#{pane_id}") === paneId; } catch { return false; }
+	}
+
+	function signal() {
+		if (!sessionName || !isSessionAlive(sessionName)) return;
+		try {
+			const pid = getSessionPanePid(sessionName);
+			if (pid) process.kill(pid, "SIGUSR1");
+		} catch {}
+	}
+
+	function resize() {
+		if (!isPaneAlive()) return;
+		try { tmuxRun("resize-pane", "-t", paneId!, "-x", config.size); } catch {}
+	}
+
+	return { isPaneAlive, create, kill, focus, isFocused, signal, resize };
+}
+
 // ─── Extension ───────────────────────────────────────────────────────────────
 
 export default function contextPanels(pi: ExtensionAPI) {
@@ -118,7 +251,7 @@ export default function contextPanels(pi: ExtensionAPI) {
 		} catch { return false; }
 	}
 
-	const global = createPaneManager({
+	const global = createGlobalPaneManager({
 		script: join(extensionDir, "panels", "global.mjs"),
 		side: "left",
 		size: "22%",

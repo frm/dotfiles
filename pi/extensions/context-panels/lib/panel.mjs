@@ -3,7 +3,7 @@ import { tmuxRun, tmuxQuery } from "./tmux.mjs";
 import {
 	R, write,
 	enterAltScreen, exitAltScreen, hideCursor, showCursor,
-	enableFocusReporting, disableFocusReporting, setPaneActive,
+	enableFocusReporting, disableFocusReporting,
 } from "./ui.mjs";
 
 export function parsePiPaneId() {
@@ -27,10 +27,11 @@ export function forkWorker(selfPath, args, { onMessage, onDone, timeout = 30_000
 	return child;
 }
 
-export function setup({ onInput, onResize, onRefresh }) {
+export function setup({ onInput, onResize, onRefresh, delayFocus = 0 }) {
 	enterAltScreen();
 	hideCursor();
-	enableFocusReporting();
+	if (delayFocus > 0) setTimeout(enableFocusReporting, delayFocus);
+	else enableFocusReporting();
 	process.stdin.setRawMode(true);
 	process.stdin.resume();
 	process.stdin.on("data", onInput);
@@ -62,7 +63,7 @@ export function checkPiPane(piPaneId) {
  * Returns true for focus-in, false for focus-out, null if not a focus event.
  */
 export function handleFocusEvent(str) {
-	if (str === "\x1b[I") { setPaneActive(true); return true; }
-	if (str === "\x1b[O") { setPaneActive(false); return false; }
+	if (str === "\x1b[I") return true;
+	if (str === "\x1b[O") return false;
 	return null;
 }
