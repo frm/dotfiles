@@ -286,7 +286,7 @@ export default function shepherdPr(pi: ExtensionAPI) {
 			unsubscribePr();
 			unsubscribePr = null;
 		}
-		// Don't call ghState.stop() — it's shared with context-panels.
+		// Don't call ghState.stop() — it's shared with panels.
 		// Just unsubscribe and let the lifecycle owner (dashboard) manage start/stop.
 		executorRunning = false;
 		if (dismissMergedTimer) {
