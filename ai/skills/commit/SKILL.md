@@ -47,17 +47,16 @@ Extract the ticket from the branch name. Branch format is typically:
 3. **Generate message**: Create a commit message following the format above
 4. **Present to user**: Display the suggested commit message in a code block
 5. **Iterate**: If the user provides feedback, refine the message accordingly
-6. **Copy to clipboard**: When approved, copy the final message to clipboard using `pbcopy` (macOS) or equivalent
+6. **Offer to commit**: Present the message and ask to commit in the same step. If the user gives feedback, iterate. In sandbox mode, copy to clipboard using `pbcopy` instead.
 
 ## Important Rules
 
-- **Don't commit by default** - Suggest the message and let the user decide
-- **Commit if asked** - If the user says "commit", "yes commit", "commit it", etc., run git commit with the approved message
+- **Offer to commit with suggestion** - When presenting the message, ask "Want me to commit, or would you like to adjust anything?"
+- **In sandbox mode** - If sandbox is active (no git write permissions), copy to clipboard instead of committing
 - **Use exact message** - Never add co-authored-by lines, AI attribution, or any other text to the commit message
 - **Be concise** in the "Why" section - anyone should understand the problem quickly
 - **Be high-level** in the "How" section - avoid implementation minutiae
 - **Wait for feedback** - The user may want to iterate on the message
-- **Copy when approved** - Once the user approves, copy the message to clipboard automatically
 
 ## Example Output
 
@@ -76,6 +75,6 @@ How:
 * Added middleware to protect authenticated routes
 ```
 
-Then ask: "Does this look good, or would you like me to adjust anything?"
+Then ask: "Want me to commit, or would you like to adjust anything?"
 
-When approved, copy to clipboard using `pbcopy` and confirm: "Copied to clipboard."
+If in sandbox mode, copy to clipboard instead of offering to commit.
