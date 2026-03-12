@@ -34,6 +34,8 @@ export function createServer(sockPath: string, poller: Poller): GhStateServer {
 				return poller.getPrView();
 			case "prLists":
 				return poller.getPrLists();
+			case "prMergeQueuePositions":
+				return poller.getMergeQueuePositions();
 			case "reviewComments":
 				return poller.getReviewComments();
 			case "worktreePr":

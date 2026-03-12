@@ -24,6 +24,7 @@ export interface Poller {
 	stop(): void;
 	getPrView(): PrInfo | null;
 	getPrLists(): { reviewPrs: unknown[]; myPrs: unknown[] };
+	getMergeQueuePositions(): Record<number, number>;
 	getReviewComments(): Promise<ReviewComment[]>;
 	getWorktreePr(branch: string, cwd: string): Promise<unknown>;
 	getUsername(): Promise<string | null>;
@@ -86,6 +87,26 @@ export function createPoller(pi: ExtensionAPI, sessionRoot: string, onChange: On
 		}
 	}
 
+	let cachedQueuePositions: Record<number, number> = {};
+
+	async function fetchMergeQueuePositions(numbers: number[]): Promise<Record<number, number>> {
+		if (numbers.length === 0 || !gitRoot) return {};
+		const aliases = numbers.map((n, i) => `pr${i}: pullRequest(number: ${n}) { number mergeQueueEntry { position } }`).join("\n");
+		const query = `query($owner: String!, $repo: String!) { repository(owner: $owner, name: $repo) { ${aliases} } }`;
+		const result = await pi.exec("gh", ["api", "graphql", "-F", "owner={owner}", "-F", "repo={repo}", "-f", `query=${query}`], { cwd: gitRoot, timeout: 15000 });
+		if (result.code !== 0) return {};
+		try {
+			const repo = JSON.parse(result.stdout)?.data?.repository;
+			if (!repo) return {};
+			const positions: Record<number, number> = {};
+			for (let i = 0; i < numbers.length; i++) {
+				const pos = repo[`pr${i}`]?.mergeQueueEntry?.position;
+				if (pos != null) positions[repo[`pr${i}`].number] = pos;
+			}
+			return positions;
+		} catch { return {}; }
+	}
+
 	async function pollPrLists(): Promise<void> {
 		if (!gitRoot) return;
 		pollCounts.prLists++;
@@ -97,6 +118,12 @@ export function createPoller(pi: ExtensionAPI, sessionRoot: string, onChange: On
 		lastFetchAt.prLists = Date.now();
 		const reviewPrs = reviewResult.code === 0 ? tryParse(reviewResult.stdout, []) : [];
 		const myPrs = myResult.code === 0 ? tryParse(myResult.stdout, []) : [];
+
+		// Fetch merge queue positions for approved PRs
+		const allPrs = [...reviewPrs, ...myPrs];
+		const approvedNumbers = [...new Set(allPrs.filter((pr: any) => pr.reviewDecision === "APPROVED").map((pr: any) => pr.number))];
+		cachedQueuePositions = await fetchMergeQueuePositions(approvedNumbers);
+
 		cachedPrLists = { reviewPrs, myPrs };
 		onChange("prLists", cachedPrLists);
 	}
@@ -204,6 +231,7 @@ export function createPoller(pi: ExtensionAPI, sessionRoot: string, onChange: On
 
 		getPrView() { return cachedPr; },
 		getPrLists() { return cachedPrLists; },
+		getMergeQueuePositions() { return cachedQueuePositions; },
 		async getReviewComments() { return cachedReviewComments; },
 		async getWorktreePr(branch: string, cwd: string) { return fetchWorktreePr(branch, cwd); },
 		async getUsername() { return fetchUsername(); },

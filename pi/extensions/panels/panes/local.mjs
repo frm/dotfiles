@@ -6,16 +6,16 @@ import { execFileSync } from "node:child_process";
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 
-import { git, gitRaw, gitRoot, absPath, openUrl } from "../lib/git.mjs";
-import { createFocusManager } from "../lib/focus.mjs";
-import { parsePiPaneId, setup, quit, checkPiPane, focusPiPane, forkWorker } from "../lib/panel.mjs";
-import { createVimNav } from "../lib/vim-nav.mjs";
-import { tmuxRun, tmuxInteractive, tmuxHasSession, tmuxNewSession, tmuxKillSession } from "../lib/tmux.mjs";
+import { git, gitRaw, gitRoot, absPath, openUrl } from "../lib/git.ts";
+import { createFocusManager } from "../lib/focus.ts";
+import { parsePiPaneId, setup, quit, checkPiPane, focusPiPane, forkWorker } from "../lib/panel.ts";
+import { createVimNav } from "../lib/vim-nav.ts";
+import { tmuxRun, tmuxInteractive, tmuxHasSession, tmuxNewSession, tmuxKillSession } from "../lib/tmux.ts";
 import {
 	dim, green, bgCyan, bgMuted, write,
 	enterAltScreen, exitAltScreen, hideCursor, showCursor,
 	clearScreen, moveTo, visWidth,
-} from "../lib/ui.mjs";
+} from "../lib/ui.ts";
 
 import * as files from "../tabs/local/files.mjs";
 import * as checks from "../tabs/local/checks.mjs";
@@ -39,9 +39,10 @@ if (process.argv.includes("--fetch-checks")) {
 
 // ─── Server ──────────────────────────────────────────────────────────────────
 
-const serverSessionName = "pi-srv-" + createHash("sha256").update(gitRoot).digest("hex").slice(0, 8);
-const termSessionName = "pi-term-" + createHash("sha256").update(gitRoot).digest("hex").slice(0, 8);
-const nvimSessionName = "pi-nvim-" + createHash("sha256").update(gitRoot).digest("hex").slice(0, 8);
+const projectHash = createHash("sha256").update(gitRoot).digest("hex").slice(0, 8);
+const serverSessionName = "pi-srv-" + projectHash;
+const termSessionName = "pi-term-" + projectHash;
+const nvimSessionName = "pi-nvim-" + projectHash;
 const nvimSocketPath = `/tmp/${nvimSessionName}.sock`;
 
 function readServerCommand() {
@@ -62,7 +63,7 @@ function toggleServer() {
 		tmuxNewSession(serverSessionName, cmd, gitRoot, { noStatus: true });
 	}
 
-	tmuxPopup(["tmux", "attach-session", "-t", `=${serverSessionName}`]);
+	tmuxPopup([`tmux attach-session -t '=${serverSessionName}' \\; set status off`]);
 }
 
 function killServer() {

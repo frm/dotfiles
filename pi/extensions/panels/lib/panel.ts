@@ -1,10 +1,10 @@
 import { fork } from "node:child_process";
-import { tmuxRun, tmuxQuery } from "./tmux.mjs";
+import { tmuxRun, tmuxQuery } from "./tmux.ts";
 import {
 	R, write,
 	enterAltScreen, exitAltScreen, hideCursor, showCursor,
 	enableFocusReporting, disableFocusReporting,
-} from "./ui.mjs";
+} from "./ui.ts";
 
 export function parsePiPaneId() {
 	const idx = process.argv.indexOf("--pi-pane");

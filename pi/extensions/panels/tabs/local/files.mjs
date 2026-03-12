@@ -1,10 +1,10 @@
 import { statSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { git, gitRaw, gitRoot, absPath } from "../../lib/git.mjs";
+import { git, gitRaw, gitRoot, absPath } from "../../lib/git.ts";
 import {
 	dim, cyan, green, yellow, red, magenta,
 	visWidth, smartTruncatePath, truncate, write, selColor,
-} from "../../lib/ui.mjs";
+} from "../../lib/ui.ts";
 
 // ─── Data Fetching ───────────────────────────────────────────────────────────
 

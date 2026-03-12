@@ -4,19 +4,19 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { readPiState } from "../lib/data.mjs";
-import { prMerge } from "../lib/gh.mjs";
-import { gitCommonDir, gitRepoRoot, currentBranch, branchExists, worktreeDel, openUrl } from "../lib/git.mjs";
-import { createFocusManager } from "../lib/focus.mjs";
-import { parsePiPaneId, setup, quit, checkPiPane, focusPiPane, forkWorker } from "../lib/panel.mjs";
-import { getSessionOption } from "../lib/session.mjs";
-import { createVimNav } from "../lib/vim-nav.mjs";
-import { tmuxRun, tmuxQuery, tmuxFormat, tmuxHasSession, tmuxNewSession } from "../lib/tmux.mjs";
+import { readPiState } from "../lib/data.ts";
+import { prMerge } from "../lib/gh.ts";
+import { gitCommonDir, gitRepoRoot, currentBranch, branchExists, worktreeDel, openUrl } from "../lib/git.ts";
+import { createFocusManager } from "../lib/focus.ts";
+import { parsePiPaneId, setup, quit, checkPiPane, focusPiPane, forkWorker } from "../lib/panel.ts";
+import { getSessionOption } from "../lib/session.ts";
+import { createVimNav } from "../lib/vim-nav.ts";
+import { tmuxRun, tmuxQuery, tmuxFormat, tmuxHasSession, tmuxNewSession } from "../lib/tmux.ts";
 import {
 	R, dim, cyan, yellow, red, boldRed, magenta, bgCyan, bgMuted, write,
 	hideCursor, createSpinner,
 	clearScreen, moveTo, visWidth, truncate, wrapText, emptyLine, contentLine,
-} from "../lib/ui.mjs";
+} from "../lib/ui.ts";
 
 import * as wt from "../tabs/global/worktrees.mjs";
 import * as prs from "../tabs/global/prs.mjs";

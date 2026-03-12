@@ -153,6 +153,16 @@ export function prMerge(number, { auto = false } = {}, cwd) {
  */
 export function prMergeQueuePositions(numbers, cwd) {
 	if (numbers.length === 0) return new Map();
+
+	// Try IPC — server returns an object { number: position }
+	const ipc = ipcRequest("prMergeQueuePositions");
+	if (ipc !== null) {
+		const result = new Map();
+		for (const [k, v] of Object.entries(ipc)) result.set(Number(k), v);
+		return result;
+	}
+
+	// Fallback: direct gh call
 	const aliases = numbers.map((n, i) => `pr${i}: pullRequest(number: ${n}) { number mergeQueueEntry { position } }`).join("\n");
 	const query = `query($owner: String!, $repo: String!) { repository(owner: $owner, name: $repo) { ${aliases} } }`;
 	try {

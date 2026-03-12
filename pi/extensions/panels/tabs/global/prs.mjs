@@ -1,12 +1,12 @@
-import { extractIssueId } from "../../lib/data.mjs";
-import { lookupIssue } from "../../lib/linear.mjs";
-import { prList, getUsername, prMergeQueuePositions } from "../../lib/gh.mjs";
+import { extractIssueId } from "../../lib/data.ts";
+import { lookupIssue } from "../../lib/linear.ts";
+import { prList, getUsername, prMergeQueuePositions } from "../../lib/gh.ts";
 import {
 	dim, cyan, green, yellow, red,
 	truncate, visWidth, write, moveTo, selColor,
 	contentLine, dividerLine, renderSectionRow,
 	buildSectionNav, buildSectionVisual,
-} from "../../lib/ui.mjs";
+} from "../../lib/ui.ts";
 
 // ─── PR JSON fields requested from gh ────────────────────────────────────────
 

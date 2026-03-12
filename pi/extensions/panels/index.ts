@@ -1,30 +1,11 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
-import { execFileSync } from "child_process";
 import { ghState } from "../lib/gh-state/index.ts";
 import { join, resolve } from "path";
 import { fileURLToPath } from "url";
 import { existsSync } from "fs";
 import { createHash } from "crypto";
-
-// ─── Tmux Helpers ────────────────────────────────────────────────────────────
-
-const PIPE = { stdio: ["pipe", "pipe", "pipe"] as const };
-const PIPE_UTF8 = { encoding: "utf-8" as const, ...PIPE };
-
-function tmuxRun(...args: string[]): void {
-	execFileSync("tmux", args, PIPE);
-}
-
-function tmuxQuery(...args: string[]): string {
-	return execFileSync("tmux", args, PIPE_UTF8).trim();
-}
-
-function tmuxFormat(format: string, target?: string): string {
-	const args = ["display-message"];
-	if (target) args.push("-t", target);
-	args.push("-p", format);
-	return tmuxQuery(...args);
-}
+import { tmuxRun, tmuxQuery, tmuxFormat, isSessionAlive, ensureSession, getSessionPanePid, setSessionOption } from "./lib/tmux.ts";
+import { isGitRepo, getGitRoot, gitCommonDir } from "./lib/git.ts";
 
 // ─── Shared Session Helpers ──────────────────────────────────────────────────
 
@@ -32,46 +13,12 @@ function computeSessionName(): string | null {
 	let input: string;
 	try {
 		const sessionPath = tmuxFormat("#{session_path}");
-		const commonDir = execFileSync("git", ["rev-parse", "--git-common-dir"], {
-			encoding: "utf-8" as const, cwd: sessionPath, timeout: 3000, ...PIPE,
-		}).trim();
-		input = resolve(sessionPath, commonDir);
+		input = resolve(sessionPath, gitCommonDir(sessionPath));
 	} catch {
 		try { input = tmuxFormat("#{session_name}"); }
 		catch { return null; }
 	}
 	return `_pi_state_${createHash("md5").update(input).digest("hex").slice(0, 8)}`;
-}
-
-function isSessionAlive(name: string): boolean {
-	try {
-		execFileSync("tmux", ["has-session", "-t", `=${name}`], { timeout: 3000, ...PIPE });
-		const output = tmuxQuery("list-panes", "-s", "-t", `=${name}`, "-F", "#{pane_dead}");
-		return output.trim().split("\n").some(line => line.trim() !== "1");
-	} catch { return false; }
-}
-
-function ensureSession(name: string, cmd: string, cwd: string): void {
-	if (isSessionAlive(name)) return;
-	try { tmuxRun("kill-session", "-t", `=${name}`); } catch {}
-	execFileSync("tmux", [
-		"new-session", "-d", "-s", name, "-c", cwd || ".", cmd,
-	], { timeout: 5000, ...PIPE });
-	try { tmuxRun("set-option", "-t", name, "status", "off"); } catch {}
-	try { tmuxRun("set-option", "-t", name, "focus-events", "on"); } catch {}
-	try { tmuxRun("set-option", "-t", name, "window-size", "latest"); } catch {}
-}
-
-function getSessionPanePid(name: string): number | null {
-	try {
-		const pid = tmuxQuery("list-panes", "-s", "-t", `=${name}`, "-F", "#{pane_pid}");
-		const first = pid.trim().split("\n")[0];
-		return first ? parseInt(first) : null;
-	} catch { return null; }
-}
-
-function setSessionOption(name: string, key: string, value: string): void {
-	try { tmuxRun("set-option", "-t", name, `@${key}`, value); } catch {}
 }
 
 // ─── Pane Manager ────────────────────────────────────────────────────────────
@@ -243,13 +190,6 @@ export default function panels(pi: ExtensionAPI) {
 		extensionDir = __dirname;
 	}
 
-	function isGitRepo(): boolean {
-		try {
-			execFileSync("git", ["rev-parse", "--is-inside-work-tree"], { timeout: 3000, ...PIPE_UTF8 });
-			return true;
-		} catch { return false; }
-	}
-
 	const global = createGlobalPaneManager({
 		script: join(extensionDir, "panes", "global.mjs"),
 		side: "left",
@@ -384,39 +324,37 @@ export default function panels(pi: ExtensionAPI) {
 
 	// ─── Popup Shortcuts ─────────────────────────────────────────────────
 
-	function popupSessionName(prefix: string): string | null {
-		if (!isGitRepo()) return null;
-		const root = execFileSync("git", ["rev-parse", "--show-toplevel"], {
-			timeout: 3000, ...PIPE_UTF8,
-		}).trim();
+	function popupSessionName(prefix: string, root: string): string {
 		return `${prefix}-${createHash("sha256").update(root).digest("hex").slice(0, 8)}`;
 	}
 
-	function openPopup(sessionPrefix: string, cmd: string): void {
-		const name = popupSessionName(sessionPrefix);
-		if (!name) return;
+	function openPopup(name: string, cmd: string, cwd: string): void {
 		if (!isSessionAlive(name)) {
 			try { tmuxRun("kill-session", "-t", `=${name}`); } catch {}
-			ensureSession(name, cmd, process.cwd());
+			ensureSession(name, cmd, cwd);
 		}
 		try {
-			tmuxRun("popup", "-E", "-w", "90%", "-h", "90%", "-d", process.cwd(),
+			tmuxRun("popup", "-E", "-w", "90%", "-h", "90%", "-d", cwd,
 				`tmux attach-session -t '=${name}' \\; set status off`);
 		} catch {}
 	}
 
 	pi.registerShortcut("alt+t", {
 		description: "Toggle terminal popup",
-		handler: async () => openPopup("pi-term", process.env.SHELL || "bash"),
+		handler: async () => {
+			const root = getGitRoot();
+			if (!root) return;
+			openPopup(popupSessionName("pi-term", root), process.env.SHELL || "bash", root);
+		},
 	});
 
 	pi.registerShortcut("alt+v", {
 		description: "Toggle nvim popup",
 		handler: async () => {
-			const name = popupSessionName("pi-nvim");
-			const socket = name ? `/tmp/${name}.sock` : null;
-			const cmd = socket ? `nvim --listen '${socket}'` : "nvim";
-			openPopup("pi-nvim", cmd);
+			const root = getGitRoot();
+			if (!root) return;
+			const name = popupSessionName("pi-nvim", root);
+			openPopup(name, `nvim --listen '/tmp/${name}.sock'`, root);
 		},
 	});
 }

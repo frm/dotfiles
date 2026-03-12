@@ -71,3 +71,23 @@ export function worktreeDel(cwd, branch) {
 export function openUrl(url) {
 	try { execFileSync("open", [url], { timeout: 3000, stdio: PIPE }); } catch {}
 }
+
+// ─── Repo Detection ──────────────────────────────────────────────────────────
+
+export function isGitRepo(cwd) {
+	try {
+		execFileSync("git", ["rev-parse", "--is-inside-work-tree"], {
+			timeout: 3000, ...(cwd ? { cwd } : {}), stdio: PIPE,
+		});
+		return true;
+	} catch { return false; }
+}
+
+export function getGitRoot(cwd) {
+	if (!isGitRepo(cwd)) return null;
+	try {
+		return execFileSync("git", ["rev-parse", "--show-toplevel"], {
+			timeout: 3000, encoding: "utf-8", ...(cwd ? { cwd } : {}), stdio: PIPE,
+		}).trim();
+	} catch { return null; }
+}

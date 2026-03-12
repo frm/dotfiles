@@ -1,6 +1,6 @@
-import { gitRoot } from "../../lib/git.mjs";
-import { prView } from "../../lib/gh.mjs";
-import { dim, cyan, green, yellow, red, visWidth, truncate, write, selColor } from "../../lib/ui.mjs";
+import { gitRoot } from "../../lib/git.ts";
+import { prView } from "../../lib/gh.ts";
+import { dim, cyan, green, yellow, red, visWidth, truncate, write, selColor } from "../../lib/ui.ts";
 
 // ─── Data Fetching ───────────────────────────────────────────────────────────
 

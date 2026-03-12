@@ -1,14 +1,14 @@
-import { extractIssueId, extractDescription, readPiState } from "../../lib/data.mjs";
-import { currentBranch } from "../../lib/git.mjs";
-import { tmuxQuery } from "../../lib/tmux.mjs";
-import { lookupIssue } from "../../lib/linear.mjs";
-import { prList, prChecks } from "../../lib/gh.mjs";
+import { extractIssueId, extractDescription, readPiState } from "../../lib/data.ts";
+import { currentBranch } from "../../lib/git.ts";
+import { tmuxQuery } from "../../lib/tmux.ts";
+import { lookupIssue } from "../../lib/linear.ts";
+import { prList, prChecks } from "../../lib/gh.ts";
 import {
 	dim, cyan, green, yellow, magenta, red, boldRed,
 	truncate, visWidth, write, moveTo, selColor,
 	emptyLine, contentLine, renderSectionRow,
 	buildSectionNav, buildSectionVisual,
-} from "../../lib/ui.mjs";
+} from "../../lib/ui.ts";
 
 // ─── PR Lookup (per-worktree branch) ────────────────────────────────────────
 

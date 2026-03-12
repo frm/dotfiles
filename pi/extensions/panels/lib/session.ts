@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { resolve } from "node:path";
-import { tmuxRun, tmuxQuery, tmuxFormat } from "./tmux.mjs";
+import { tmuxRun, tmuxQuery, tmuxFormat } from "./tmux.ts";
 
 const PIPE = ["pipe", "pipe", "pipe"];
 

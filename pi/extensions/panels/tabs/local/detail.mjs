@@ -2,7 +2,7 @@ import {
 	dim, cyan, green, red, boldCyan,
 	visWidth, truncate, write, moveTo,
 	clearScreen, hideCursor,
-} from "../../lib/ui.mjs";
+} from "../../lib/ui.ts";
 
 // ─── State ───────────────────────────────────────────────────────────────────
 

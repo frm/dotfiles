@@ -1,4 +1,4 @@
-import { setPaneActive } from "./ui.mjs";
+import { setPaneActive } from "./ui.ts";
 
 const FOCUS_IN = "\x1b[I";
 const FOCUS_OUT = "\x1b[O";

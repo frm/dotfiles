@@ -1,4 +1,4 @@
-import { tmuxQuery } from "./tmux.mjs";
+import { tmuxQuery } from "./tmux.ts";
 
 // ─── Branch Parsing ──────────────────────────────────────────────────────────
 
