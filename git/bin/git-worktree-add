@@ -177,13 +177,13 @@ __git_wt_upsert_env() {
   mv "$tmp_file" "$env_file"
 }
 
-# generate unique ports and optionally isolate DB vars for a worktree
+# generate unique ports, derive unique names, and optionally isolate vars for a worktree
 __git_wt_setup_env() {
   local worktree_path="$1"
   local env_file="${_MNDS_WORKTREE_ENV_FILE:-.envrc}"
   local full_env_path="$worktree_path/$env_file"
 
-  [ -z "$_MNDS_WORKTREE_PORTS" ] && [ -z "$_MNDS_WORKTREE_ISOLATED_VARS" ] && return 0
+  [ -z "$_MNDS_WORKTREE_PORTS" ] && [ -z "$_MNDS_WORKTREE_RESET_VARS" ] && [ -z "$_MNDS_WORKTREE_DERIVED_VARS" ] && return 0
 
   local hash
   hash=$(__git_wt_hash_id "$worktree_path") || return 1
@@ -209,9 +209,9 @@ __git_wt_setup_env() {
     done
   fi
 
-  if [ "$_RESET" = true ] && [ -n "$_MNDS_WORKTREE_ISOLATED_VARS" ]; then
-    __echo_git "isolating database vars:"
-    for var_name in $_MNDS_WORKTREE_ISOLATED_VARS; do
+  if [ "$_RESET" = true ] && [ -n "$_MNDS_WORKTREE_RESET_VARS" ]; then
+    __echo_git "isolating reset vars:"
+    for var_name in $_MNDS_WORKTREE_RESET_VARS; do
       local current_value=""
       if [ -f "$full_env_path" ]; then
         current_value=$(awk -v key="$var_name" '$0 ~ "^export " key "=" { sub("^export " key "=", ""); print }' "$full_env_path")
@@ -221,6 +221,17 @@ __git_wt_setup_env() {
         __git_wt_upsert_env "$full_env_path" "$var_name" "$new_value"
         __echo_git "  $var_name=$new_value"
       fi
+    done
+  fi
+
+  if [ -n "$_MNDS_WORKTREE_DERIVED_VARS" ]; then
+    __echo_git "deriving unique vars:"
+    for entry in $_MNDS_WORKTREE_DERIVED_VARS; do
+      local var_name="${entry%%:*}"
+      local base="${entry#*:}"
+      local unique_value="${base}_${hash}"
+      __git_wt_upsert_env "$full_env_path" "$var_name" "$unique_value"
+      __echo_git "  $var_name=$unique_value"
     done
   fi
 }
