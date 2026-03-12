@@ -48,7 +48,9 @@ export const ghState = {
 		}
 
 		// Periodically check if leader is still alive
-		stalenessTimer = setInterval(() => checkAndTakeover(pi), 60_000);
+		stalenessTimer = setInterval(() => {
+			checkAndTakeover(pi).catch(() => {});
+		}, 60_000);
 	},
 
 	stop(): void {
@@ -178,8 +180,14 @@ async function checkAndTakeover(pi: ExtensionAPI): Promise<void> {
 	}
 
 	// Socket gone — try to become leader
-	if (isLockStale(lckPath, 90_000) && tryAcquireLock(lckPath)) {
-		await startAsLeader(pi);
+	try {
+		if (isLockStale(lckPath, 90_000) && tryAcquireLock(lckPath)) {
+			await startAsLeader(pi);
+		}
+	} catch {
+		// Takeover failed — release lock if we claimed it, retry next cycle
+		if (lckPath) releaseLock(lckPath);
+		role = "client";
 	}
 }
 
