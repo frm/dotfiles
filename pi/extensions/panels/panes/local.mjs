@@ -331,6 +331,7 @@ function handleInput(data) {
 	if (ch === "l") return openLazygit();
 	if (ch === "v") return tmuxPopup(["nvim"]);
 	if (ch === "c") return triggerCommit();
+	if (ch === "C") return triggerCommit(true);
 	if (ch === "r") { doRefresh(); doChecksRefresh(); return; }
 	if (inputBuf.length === 1 && inputBuf[0] === 0x07) return focusPiPane(piPaneId);
 	if (ch === "q" || (inputBuf.length === 1 && inputBuf[0] === 0x03)) return quit();
@@ -418,9 +419,10 @@ function doStageAll() {
 	doRefresh();
 }
 
-function triggerCommit() {
+function triggerCommit(autoAccept = false) {
 	if (!piPaneId) return;
-	try { tmuxRun("send-keys", "-t", piPaneId, "/commit", "Enter"); focusPiPane(piPaneId); } catch {}
+	const cmd = autoAccept ? "/commit --auto-accept" : "/commit";
+	try { tmuxRun("send-keys", "-t", piPaneId, cmd, "Enter"); focusPiPane(piPaneId); } catch {}
 }
 
 // ─── Lifecycle ───────────────────────────────────────────────────────────────
