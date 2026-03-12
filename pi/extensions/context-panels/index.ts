@@ -102,15 +102,15 @@ function createPaneManager(config: PaneConfig) {
 		}
 	}
 
-	function create(): string | null {
+	function create(targetPaneId?: string): string | null {
 		if (config.guard && !config.guard()) return null;
 		kill();
 		if (!existsSync(config.script)) return `Panel script not found: ${config.script}`;
 		try {
-			const piPaneId = tmuxFormat("#{pane_id}");
+			const piPaneId = targetPaneId ?? tmuxFormat("#{pane_id}");
 			const splitFlag = config.side === "left" ? "-hbd" : "-hd";
 			const cmd = `${process.execPath} ${config.script} --pi-pane ${piPaneId}`;
-			paneId = tmuxQuery("split-window", splitFlag, "-l", config.size, "-P", "-F", "#{pane_id}", cmd);
+			paneId = tmuxQuery("split-window", splitFlag, "-t", piPaneId, "-l", config.size, "-P", "-F", "#{pane_id}", cmd);
 			return null;
 		} catch (e: any) {
 			paneId = null;
@@ -177,20 +177,20 @@ function createGlobalPaneManager(config: PaneConfig) {
 		}
 	}
 
-	function create(): string | null {
+	function create(targetPaneId?: string): string | null {
 		kill();
 		if (!sessionName) sessionName = computeSessionName();
 		if (!sessionName) return "Could not determine shared session name";
 		if (!existsSync(config.script)) return `Panel script not found: ${config.script}`;
 		try {
-			const piPaneId = tmuxFormat("#{pane_id}");
+			const piPaneId = targetPaneId ?? tmuxFormat("#{pane_id}");
 			const sessionPath = tmuxFormat("#{session_path}");
 			const cmd = `${process.execPath} ${config.script} --shared --session ${sessionName}`;
 			ensureSession(sessionName, cmd, sessionPath);
 			setSessionOption(sessionName, "pi_active_pane", piPaneId);
 			const attachCmd = `TMUX= exec tmux attach-session -t '=${sessionName}'`;
 			const splitFlag = config.side === "left" ? "-hbd" : "-hd";
-			paneId = tmuxQuery("split-window", splitFlag, "-l", config.size, "-P", "-F", "#{pane_id}", attachCmd);
+			paneId = tmuxQuery("split-window", splitFlag, "-t", piPaneId, "-l", config.size, "-P", "-F", "#{pane_id}", attachCmd);
 			return null;
 		} catch (e: any) {
 			paneId = null;
@@ -204,11 +204,10 @@ function createGlobalPaneManager(config: PaneConfig) {
 		paneId = null;
 	}
 
-	function focus() {
+	function focus(callerPaneId?: string) {
 		if (!isPaneAlive()) return;
-		if (sessionName) {
-			const piPaneId = tmuxFormat("#{pane_id}");
-			setSessionOption(sessionName, "pi_active_pane", piPaneId);
+		if (sessionName && callerPaneId) {
+			setSessionOption(sessionName, "pi_active_pane", callerPaneId);
 		}
 		try { tmuxRun("select-pane", "-t", paneId!); } catch {}
 	}
@@ -265,7 +264,8 @@ export default function panels(pi: ExtensionAPI) {
 	});
 
 	function focusPi() {
-		try { tmuxRun("select-pane", "-t", tmuxFormat("#{pane_id}")); } catch {}
+		if (!piPaneId) return;
+		try { tmuxRun("select-pane", "-t", piPaneId); } catch {}
 	}
 
 	// ─── Pi State Tracking ───────────────────────────────────────────────
@@ -310,13 +310,17 @@ export default function panels(pi: ExtensionAPI) {
 
 	// ─── Lifecycle ───────────────────────────────────────────────────────
 
+	// TMUX_PANE is set by tmux per-pane at creation and never changes,
+	// so it always refers to pi's pane regardless of which window is focused.
+	const piPaneId: string | null = process.env.TMUX_PANE ?? null;
+
 	pi.on("session_start", async (_event, ctx) => {
 		detectTmuxWindow();
 		clearPiState();
 		if (!ctx.hasUI) return;
-		const globalErr = global.create();
+		const globalErr = global.create(piPaneId ?? undefined);
 		if (globalErr) ctx.ui.notify(`Global panel: ${globalErr}`, "error");
-		local.create();
+		local.create(piPaneId ?? undefined);
 		// Start gh-state after panels are open — don't block panel creation
 		ghState.start(pi, ctx.cwd).catch(() => {});
 	});
@@ -376,7 +380,7 @@ export default function panels(pi: ExtensionAPI) {
 				return;
 			}
 			if (global.isFocused()) focusPi();
-			else global.focus();
+			else global.focus(piPaneId ?? undefined);
 		},
 	});
 
