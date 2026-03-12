@@ -71,7 +71,7 @@ function toggleTerm() {
 	if (!tmuxHasSession(termSessionName)) {
 		tmuxNewSession(termSessionName, process.env.SHELL || "bash", gitRoot, { noStatus: true });
 	}
-	tmuxPopup(["tmux", "attach-session", "-t", `=${termSessionName}`]);
+	tmuxPopup([`tmux attach-session -t '=${termSessionName}' \\; set status off`]);
 }
 
 // ─── UI State ────────────────────────────────────────────────────────────────
