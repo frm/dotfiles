@@ -112,6 +112,67 @@ export function prView(json, cwd) {
 	} catch { return null; }
 }
 
+export function repoMergeMethod(cwd) {
+	try {
+		const raw = execFileSync("gh", ["api", "repos/{owner}/{repo}", "--jq",
+			'if .allow_squash_merge then "squash" elif .allow_rebase_merge then "rebase" elif .allow_merge_commit then "merge" else "squash" end',
+		], { ...PIPE, cwd, timeout: 10_000 }).trim();
+		return raw || "squash";
+	} catch { return "squash"; }
+}
+
+/**
+ * Merge a PR. Tries bare merge first (merge queues), falls back to explicit strategy.
+ * Returns { ok, method } where method is "queue" | "squash" | "rebase" | "merge".
+ */
+export function prMerge(number, { auto = false } = {}, cwd) {
+	// Bare merge — works with merge queues, no strategy needed
+	const args = ["pr", "merge", String(number)];
+	if (auto) args.push("--auto");
+	try {
+		execFileSync("gh", args, { ...PIPE, cwd, timeout: 30_000 });
+		return { ok: true, method: "queue" };
+	} catch {}
+
+	// Fall back to explicit strategy + --delete-branch
+	const method = repoMergeMethod(cwd);
+	const flag = method === "merge" ? "--merge" : method === "rebase" ? "--rebase" : "--squash";
+	const fallbackArgs = ["pr", "merge", String(number), flag, "--delete-branch"];
+	if (auto) fallbackArgs.push("--auto");
+	try {
+		execFileSync("gh", fallbackArgs, { ...PIPE, cwd, timeout: 30_000 });
+		return { ok: true, method };
+	} catch (e) {
+		return { ok: false, method, error: e.stderr?.trim() || e.message || "merge failed" };
+	}
+}
+
+/**
+ * Batch-fetch merge queue positions for multiple PR numbers.
+ * Returns a Map<number, number> of prNumber -> queue position.
+ */
+export function prMergeQueuePositions(numbers, cwd) {
+	if (numbers.length === 0) return new Map();
+	const aliases = numbers.map((n, i) => `pr${i}: pullRequest(number: ${n}) { number mergeQueueEntry { position } }`).join("\n");
+	const query = `query($owner: String!, $repo: String!) { repository(owner: $owner, name: $repo) { ${aliases} } }`;
+	try {
+		const raw = execFileSync("gh", ["api", "graphql",
+			"-F", "owner={owner}", "-F", "repo={repo}",
+			"-f", `query=${query}`,
+		], { ...PIPE, cwd, timeout: 15_000 }).trim();
+		const data = JSON.parse(raw);
+		const repo = data?.data?.repository;
+		if (!repo) return new Map();
+		const result = new Map();
+		for (let i = 0; i < numbers.length; i++) {
+			const entry = repo[`pr${i}`];
+			const pos = entry?.mergeQueueEntry?.position;
+			if (pos != null) result.set(entry.number, pos);
+		}
+		return result;
+	} catch { return new Map(); }
+}
+
 export function prChecks(prNumber, cwd) {
 	// Try IPC
 	const ipc = ipcRequest("prChecks", { prNumber });

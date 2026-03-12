@@ -76,6 +76,36 @@ export function wrapText(text, maxW) {
 	return lines;
 }
 
+// ─── Spinner ─────────────────────────────────────────────────────────────
+
+const SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+
+export function createSpinner(onRender) {
+	let frame = 0;
+	let timer = null;
+	let _message = "";
+	let _colorFn = cyan;
+	return {
+		get frame() { return SPINNER_FRAMES[frame]; },
+		get message() { return _message; },
+		get colorFn() { return _colorFn; },
+		start(message = "", colorFn = cyan) {
+			frame = 0;
+			_message = message;
+			_colorFn = colorFn;
+			timer = setInterval(() => { frame = (frame + 1) % SPINNER_FRAMES.length; onRender(); }, 80);
+		},
+		update(message, colorFn) {
+			_message = message;
+			if (colorFn) _colorFn = colorFn;
+		},
+		stop() {
+			if (timer) { clearInterval(timer); timer = null; }
+			_message = "";
+		},
+	};
+}
+
 // ─── Line Builders ───────────────────────────────────────────────────────────
 
 export function emptyLine(innerW) {

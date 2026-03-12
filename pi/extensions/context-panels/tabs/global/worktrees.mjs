@@ -13,7 +13,7 @@ import {
 // ─── PR Lookup (per-worktree branch) ────────────────────────────────────────
 
 const prCache = new Map();
-const PR_CACHE_TTL = 30_000;
+const PR_CACHE_TTL = 90_000;
 
 export function clearPrCache() { prCache.clear(); }
 

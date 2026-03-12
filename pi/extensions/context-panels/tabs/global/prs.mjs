@@ -1,6 +1,6 @@
 import { extractIssueId } from "../../lib/data.mjs";
 import { lookupIssue } from "../../lib/linear.mjs";
-import { prList, getUsername } from "../../lib/gh.mjs";
+import { prList, getUsername, prMergeQueuePositions } from "../../lib/gh.mjs";
 import {
 	dim, cyan, green, yellow, red,
 	truncate, visWidth, write, moveTo, selColor,
@@ -38,8 +38,12 @@ function checkSummary(pr) {
 	return { status, passing, total };
 }
 
-function classifyReviewerPr(pr, myLogin) {
-	if (pr.autoMergeRequest && pr.reviewDecision === "APPROVED" && pr.mergeable !== "CONFLICTING") return "rv-queued";
+function isQueued(pr, queuePositions) {
+	return (pr.autoMergeRequest || queuePositions.has(pr.number)) && pr.reviewDecision === "APPROVED" && pr.mergeable !== "CONFLICTING";
+}
+
+function classifyReviewerPr(pr, myLogin, queuePositions) {
+	if (isQueued(pr, queuePositions)) return "rv-queued";
 
 	const stillRequested = pr.reviewRequests?.some((r) =>
 		(r.__typename === "User" && r.login === myLogin) || r.__typename === "Team"
@@ -61,9 +65,9 @@ function classifyReviewerPr(pr, myLogin) {
 	return "rv-needs-review";
 }
 
-function classifyMyPr(pr) {
+function classifyMyPr(pr, queuePositions) {
 	if (pr.mergeable === "CONFLICTING") return "my-needs-attention";
-	if (pr.autoMergeRequest && pr.reviewDecision === "APPROVED" && pr.mergeable !== "CONFLICTING") return "my-queued";
+	if (isQueued(pr, queuePositions)) return "my-queued";
 	if (pr.reviewDecision === "APPROVED") return "my-approved";
 
 	const failed = hasCheckFailure(pr);
@@ -98,8 +102,13 @@ export function fetchPrData(cwd) {
 	const rawReview = prList({ search: "review-requested:@me is:open", json: JSON_FIELDS, limit: 50 }, cwd);
 	const rawMy = prList({ author: "@me", state: "open", json: JSON_FIELDS, limit: 50 }, cwd);
 
-	const reviewPrs = rawReview.map((pr) => buildEntry(pr, classifyReviewerPr(pr, myLogin)));
-	const myPrs = rawMy.map((pr) => buildEntry(pr, classifyMyPr(pr)));
+	// Batch-fetch merge queue positions for all approved PRs
+	const allPrs = [...rawReview, ...rawMy];
+	const approvedNumbers = [...new Set(allPrs.filter((pr) => pr.reviewDecision === "APPROVED").map((pr) => pr.number))];
+	const queuePositions = approvedNumbers.length > 0 ? prMergeQueuePositions(approvedNumbers, cwd) : new Map();
+
+	const reviewPrs = rawReview.map((pr) => buildEntry(pr, classifyReviewerPr(pr, myLogin, queuePositions)));
+	const myPrs = rawMy.map((pr) => buildEntry(pr, classifyMyPr(pr, queuePositions)));
 	return { reviewPrs, myPrs };
 }
 
@@ -245,11 +254,13 @@ function renderDetailRow(sections, item, innerW) {
 	if (entry.attentionType === "conflicts") prefix = red("⇄") + " ";
 	else if (entry.attentionType === "build") prefix = red("✗") + " ";
 	else if (entry.attentionType === "review") prefix = yellow("✎") + " ";
+	else if (entry.status === "rv-queued" || entry.status === "my-queued") prefix = yellow("⧖") + " ";
 	else if (entry.checks?.status === "fail") prefix = red("✗") + " ";
 	else if (entry.checks?.status === "pass") prefix = green("✓") + " ";
 	else if (entry.checks?.status === "pending") prefix = "⧖ ";
 
-	let prPart = prefix + cyan(`#${entry.number}`);
+	const prColor = (entry.status === "rv-queued" || entry.status === "my-queued") ? yellow : cyan;
+	let prPart = prefix + prColor(`#${entry.number}`);
 	if (entry.checks?.total > 0) prPart += dim(` (${entry.checks.passing}/${entry.checks.total})`);
 	parts.push(prPart);
 

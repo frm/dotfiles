@@ -5,14 +5,15 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { readPiState } from "../lib/data.mjs";
+import { prMerge } from "../lib/gh.mjs";
 import { gitCommonDir, gitRepoRoot, currentBranch, branchExists, worktreeDel, openUrl } from "../lib/git.mjs";
 import { parsePiPaneId, setup, quit, checkPiPane, handleFocusEvent, focusPiPane, forkWorker } from "../lib/panel.mjs";
 import { getSessionOption } from "../lib/session.mjs";
 import { createVimNav } from "../lib/vim-nav.mjs";
 import { tmuxRun, tmuxQuery, tmuxFormat, tmuxHasSession, tmuxNewSession } from "../lib/tmux.mjs";
 import {
-	R, dim, cyan, yellow, red, magenta, bgCyan, bgMuted, write,
-	hideCursor, setPaneActive,
+	R, dim, cyan, yellow, red, boldRed, magenta, bgCyan, bgMuted, write,
+	hideCursor, setPaneActive, createSpinner,
 	clearScreen, moveTo, visWidth, truncate, wrapText, emptyLine, contentLine,
 } from "../lib/ui.mjs";
 
@@ -36,6 +37,16 @@ if (process.argv.includes("--delete-worktree")) {
 	process.exit(0);
 }
 
+if (process.argv.includes("--merge-pr")) {
+	const idx = process.argv.indexOf("--merge-pr");
+	const number = process.argv[idx + 1];
+	const auto = process.argv.includes("--auto");
+	const cwd = process.argv[process.argv.length - 1];
+	const result = prMerge(number, { auto }, cwd);
+	process.send(result);
+	process.exit(0);
+}
+
 if (process.argv.includes("--fetch-prs")) {
 	const cwd = process.argv[process.argv.indexOf("--fetch-prs") + 1] ?? null;
 	process.send(prs.fetchPrData(cwd));
@@ -49,11 +60,12 @@ let loading = true;
 let prsLoading = true;
 let prsLoadedOnce = false;
 let confirmingDelete = false;
+let confirmingMerge = false;
+let confirmingAutoMerge = false;
+let merging = false;
 let deleting = false;
-let deletingBranch = "";
-let spinnerFrame = 0;
-let spinnerTimer = null;
-const SPINNER = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+
+const spinner = createSpinner(() => render());
 
 const shared = process.argv.includes("--shared");
 const sessionNameIdx = process.argv.indexOf("--session");
@@ -269,10 +281,19 @@ function render() {
 	const contentHeight = Math.max(1, height - 2);
 	let contentRow = 0;
 
-	if (deleting) {
-		const spin = yellow(SPINNER[spinnerFrame]);
-		const msg = ` Deleting ${deletingBranch}`;
-		moveTo(row, 1); write(contentLine(" " + spin + truncate(msg, innerW - 2), innerW));
+	if (merging) {
+		moveTo(row, 1); write(contentLine(" " + spinner.colorFn(spinner.frame) + " " + truncate(spinner.message, innerW - 3), innerW));
+		contentRow = 1;
+	} else if (confirmingMerge || confirmingAutoMerge) {
+		const entry = tab().getSelectedEntry();
+		const number = entry?.number ?? entry?.pr?.number ?? "?";
+		const action = confirmingAutoMerge ? "Enable auto-merge" : "Merge";
+		moveTo(row++, 1); write(contentLine(boldRed(` ${action} #${number}?`), innerW)); contentRow++;
+		moveTo(row++, 1); write(contentLine(" " + truncate(entry?.title ?? "", innerW - 2), innerW)); contentRow++;
+		moveTo(row++, 1); write(emptyLine(innerW)); contentRow++;
+		moveTo(row++, 1); write(contentLine(dim(" y/n"), innerW)); contentRow++;
+	} else if (deleting) {
+		moveTo(row, 1); write(contentLine(" " + spinner.colorFn(spinner.frame) + " " + truncate(spinner.message, innerW - 3), innerW));
 		contentRow = 1;
 	} else if (creating) {
 		contentRow = renderCreate(row, innerW, contentHeight);
@@ -382,6 +403,20 @@ function handleInput(data) {
 		return;
 	}
 
+	if (confirmingMerge) {
+		if (str === "y" || str === "Y") executeMerge(false);
+		confirmingMerge = false;
+		render();
+		return;
+	}
+
+	if (confirmingAutoMerge) {
+		if (str === "y" || str === "Y") executeMerge(true);
+		confirmingAutoMerge = false;
+		render();
+		return;
+	}
+
 	if (isCtrlShiftW(buf, str)) return focusPiPane(getActivePiPane());
 
 	// Tab switching
@@ -401,6 +436,8 @@ function handleInput(data) {
 	if (str === "c") return reviewPr();
 	if (str === "C") return reviewPrLocal();
 	if (str === "l") return openLinear();
+	if (str === "m") return promptMerge();
+	if (str === "M") return promptAutoMerge();
 	if (str === "r") { wt.clearPrCache(); return doRefresh(); }
 	if (str === "q" || (buf.length === 1 && buf[0] === 0x03)) return shared ? quitShared() : quit();
 
@@ -566,6 +603,54 @@ function openLinear() {
 	if (entry?.linearIssue) openUrl(`https://linear.app/issue/${entry.linearIssue.identifier}`);
 }
 
+function promptMerge() {
+	const entry = tab().getSelectedEntry();
+	if (!entry?.number && !entry?.pr?.number) return;
+	confirmingMerge = true;
+	render();
+}
+
+function promptAutoMerge() {
+	const entry = tab().getSelectedEntry();
+	if (!entry?.number && !entry?.pr?.number) return;
+	confirmingAutoMerge = true;
+	render();
+}
+
+function executeMerge(auto) {
+	const entry = tab().getSelectedEntry();
+	const number = entry?.number ?? entry?.pr?.number;
+	if (!number) return;
+
+	const wtEntry = wt.state.sections.flatMap((s) => s.entries).find((e) => e.path);
+	if (!wtEntry?.path) return;
+
+	merging = true;
+	confirmingMerge = false;
+	confirmingAutoMerge = false;
+	render();
+	spinner.start(`Merging #${number}...`, yellow);
+
+	forkWorker(selfPath, ["--merge-pr", String(number), auto ? "--auto" : "", wtEntry.path].filter(Boolean), {
+		timeout: 60_000,
+		onMessage: (result) => {
+			spinner.stop();
+			if (result?.ok) {
+				merging = false;
+			} else {
+				spinner.start(result?.error ?? "merge failed", red);
+				setTimeout(() => { spinner.stop(); merging = false; render(); }, 3000);
+			}
+		},
+		onDone: () => {
+			spinner.stop();
+			merging = false;
+			wt.clearPrCache();
+			doRefresh();
+		},
+	});
+}
+
 function promptDelete() {
 	if (activeTab !== "worktrees" || !wt.getSelectedEntry()) return;
 	confirmingDelete = true;
@@ -580,10 +665,8 @@ function executeDelete() {
 	if (!repoRoot) return;
 
 	deleting = true;
-	deletingBranch = entry.branch;
-	spinnerFrame = 0;
 	render();
-	spinnerTimer = setInterval(() => { spinnerFrame = (spinnerFrame + 1) % SPINNER.length; render(); }, 80);
+	spinner.start(`Deleting ${entry.branch}`, yellow);
 
 	const sessionWindow = `${entry.session}:${entry.window}`;
 	const branch = entry.branch;
@@ -591,8 +674,7 @@ function executeDelete() {
 	forkWorker(selfPath, ["--delete-worktree", repoRoot, branch, sessionWindow], {
 		timeout: 60_000,
 		onDone: () => {
-			clearInterval(spinnerTimer);
-			spinnerTimer = null;
+			spinner.stop();
 			deleting = false;
 			wt.clearPrCache();
 			doRefresh();

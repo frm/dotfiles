@@ -4,7 +4,7 @@ import type { PrInfo, ReviewComment, CacheEntry } from "./types.ts";
 const PR_FIELDS = "number,title,body,state,baseRefName,headRefName,additions,deletions,statusCheckRollup,reviews,reviewDecision,mergeable,mergedAt,mergedBy,url,comments";
 const PR_LIST_FIELDS = "number,title,headRefName,url,reviewDecision,latestReviews,reviewRequests,statusCheckRollup,mergeStateStatus,autoMergeRequest,mergeable";
 
-const PR_VIEW_INTERVAL = 30_000;
+const PR_VIEW_INTERVAL = 60_000;
 const PR_LISTS_INTERVAL = 60_000;
 const REVIEW_COMMENTS_INTERVAL = 60_000;
 const ON_DEMAND_CACHE_TTL = 30_000;
