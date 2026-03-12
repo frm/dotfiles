@@ -25,8 +25,13 @@ const selfPath = fileURLToPath(import.meta.url);
 
 if (process.argv.includes("--fetch-data")) {
 	const changedFiles = files.fetchChangedFiles();
+	process.send({ files: changedFiles });
+	process.exit(0);
+}
+
+if (process.argv.includes("--fetch-checks")) {
 	const prInfo = checks.fetchPrInfo();
-	process.send({ files: changedFiles, pr: prInfo });
+	process.send({ pr: prInfo });
 	process.exit(0);
 }
 
@@ -126,6 +131,8 @@ function doRefresh() {
 			clampSelection();
 			loading = false;
 			render();
+			// Schedule the first checks refresh after initial load
+			scheduleChecksRefresh();
 		}, 0);
 		return;
 	}
@@ -148,7 +155,6 @@ function doRefresh() {
 	forkWorker(selfPath, ["--fetch-data"], {
 		onMessage: (data) => {
 			changedFiles = data.files;
-			prInfo = data.pr;
 
 			// Restore expansion
 			function restoreExpansion(nodes) {
@@ -171,6 +177,28 @@ function doRefresh() {
 		},
 		onDone: () => { if (refreshing) refreshing = false; },
 	});
+}
+
+let checksRefreshing = false;
+
+function doChecksRefresh() {
+	if (checksRefreshing) return;
+	checksRefreshing = true;
+
+	forkWorker(selfPath, ["--fetch-checks"], {
+		onMessage: (data) => {
+			prInfo = data.pr;
+			if (activeTab === "checks" && !prInfo) activeTab = "files";
+			clampSelection();
+			checksRefreshing = false;
+			render();
+		},
+		onDone: () => { if (checksRefreshing) checksRefreshing = false; },
+	});
+}
+
+function scheduleChecksRefresh() {
+	setInterval(doChecksRefresh, 60_000);
 }
 
 // ─── Rendering ───────────────────────────────────────────────────────────────
@@ -298,7 +326,7 @@ function handleInput(data) {
 	if (ch === "l") return openLazygit();
 	if (ch === "v") return tmuxPopup(["nvim"]);
 	if (ch === "c") return triggerCommit();
-	if (ch === "r") return doRefresh();
+	if (ch === "r") { doRefresh(); doChecksRefresh(); return; }
 	if (buf.length === 1 && buf[0] === 0x07) return focusPiPane(piPaneId);
 	if (ch === "q" || (buf.length === 1 && buf[0] === 0x03)) return quit();
 }
