@@ -40,6 +40,7 @@ if (process.argv.includes("--fetch-checks")) {
 
 const serverSessionName = "pi-srv-" + createHash("sha256").update(gitRoot).digest("hex").slice(0, 8);
 const termSessionName = "pi-term-" + createHash("sha256").update(gitRoot).digest("hex").slice(0, 8);
+const nvimSessionName = "pi-nvim-" + createHash("sha256").update(gitRoot).digest("hex").slice(0, 8);
 
 function readServerCommand() {
 	const configPath = join(gitRoot, ".pi", "config.json");
@@ -72,6 +73,13 @@ function toggleTerm() {
 		tmuxNewSession(termSessionName, process.env.SHELL || "bash", gitRoot, { noStatus: true });
 	}
 	tmuxPopup([`tmux attach-session -t '=${termSessionName}' \\; set status off`]);
+}
+
+function toggleNvim() {
+	if (!tmuxHasSession(nvimSessionName)) {
+		tmuxNewSession(nvimSessionName, "nvim", gitRoot, { noStatus: true });
+	}
+	tmuxPopup([`tmux attach-session -t '=${nvimSessionName}' \\; set status off`]);
 }
 
 // ─── UI State ────────────────────────────────────────────────────────────────
@@ -329,7 +337,7 @@ function handleInput(data) {
 	if (ch === "s") return toggleServer();
 	if (ch === "S") return killServer();
 	if (ch === "l") return openLazygit();
-	if (ch === "v") return tmuxPopup(["nvim"]);
+	if (ch === "v") return toggleNvim();
 	if (ch === "c") return triggerCommit();
 	if (ch === "C") return triggerCommit(true);
 	if (ch === "r") { doRefresh(); doChecksRefresh(); return; }
