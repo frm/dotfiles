@@ -15,6 +15,14 @@
 set -e
 
 #
+# configs
+#
+
+_ELIXIR_ARTIFACTS="_build .elixir_ls"
+_JS_ARTIFACTS="node_modules"
+_BUILD_ARTIFACTS="$_ELIXIR_ARTIFACTS $_JS_ARTIFACTS deps"
+
+#
 # aux functions
 #
 
@@ -58,6 +66,9 @@ __git_nuke_remove_worktree() {
 
   if [ -n "$worktree_path" ]; then
     __echo_git "removing worktree at $worktree_path"
+    for artifact in $_BUILD_ARTIFACTS; do
+      find "$worktree_path" -maxdepth 3 -type d -name "$artifact" -exec rm -rf {} + 2>/dev/null
+    done
     git worktree remove "$worktree_path" --force
   fi
 }
