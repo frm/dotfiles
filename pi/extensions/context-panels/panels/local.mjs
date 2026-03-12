@@ -174,7 +174,6 @@ function render() {
 	const height = process.stdout.rows || 24;
 	const innerW = Math.max(1, width - 2);
 
-	clearScreen();
 	hideCursor();
 
 	let row = 1;
@@ -282,7 +281,8 @@ function handleInput(data) {
 	if (ch === " ") return toggleExpand();
 	if (ch === "\t" || ch === "t") return switchTab();
 	if (buf.length === 3 && buf[0] === 0x1b && buf[1] === 0x5b && buf[2] === 0x5a) return switchTab();
-	if (ch === "a") return doToggleStage();
+	if (ch === "a") return doStageFile();
+	if (ch === "u") return doUnstageFile();
 	if (ch === "A") return doStageAll();
 	if (ch === "s") return toggleServer();
 	if (ch === "S") return killServer();
@@ -346,12 +346,28 @@ function openInNvim() {
 	}
 }
 
-function doToggleStage() {
+let lastStageAction = 0;
+
+function doStageFile() {
 	if (activeTab !== "files") return;
 	const navItems = files.buildNavItems(changedFiles);
 	if (selectedIdx >= navItems.length) return;
-	files.toggleStage(navItems[selectedIdx]);
-	doRefresh();
+	const nav = navItems[selectedIdx];
+	if (nav.isTopLevel) nav.node.staged = true;
+	files.stage(nav);
+	lastStageAction = Date.now();
+	render();
+}
+
+function doUnstageFile() {
+	if (activeTab !== "files") return;
+	const navItems = files.buildNavItems(changedFiles);
+	if (selectedIdx >= navItems.length) return;
+	const nav = navItems[selectedIdx];
+	if (nav.isTopLevel) nav.node.staged = false;
+	files.unstage(nav);
+	lastStageAction = Date.now();
+	render();
 }
 
 function doStageAll() {
@@ -381,5 +397,8 @@ function initPanel() {
 
 initPanel();
 doRefresh();
-setInterval(doRefresh, 5_000);
+setInterval(() => {
+	if (Date.now() - lastStageAction < 2_000) return;
+	doRefresh();
+}, 5_000);
 setInterval(() => checkPiPane(piPaneId), 5_000);

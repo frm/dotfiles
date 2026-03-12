@@ -110,22 +110,12 @@ function appendChildren(items, children, depth) {
 
 // ─── Staging ─────────────────────────────────────────────────────────────────
 
-export function toggleStage(nav) {
-	const filePath = nav.path;
-	let shouldUnstage = false;
-	if (nav.isTopLevel) {
-		shouldUnstage = nav.node.staged && !nav.node.hasWorkingTreeChanges;
-	} else {
-		try {
-			const isStagedChild = git("diff", "--cached", "--name-only", "--", filePath).length > 0;
-			const hasWtChanges = git("diff", "--name-only", "--", filePath).length > 0;
-			shouldUnstage = isStagedChild && !hasWtChanges;
-		} catch { shouldUnstage = false; }
-	}
-	try {
-		if (shouldUnstage) gitRaw("restore", "--staged", "--", filePath);
-		else gitRaw("add", "--", filePath);
-	} catch {}
+export function stage(nav) {
+	try { gitRaw("add", "--", nav.path); } catch {}
+}
+
+export function unstage(nav) {
+	try { gitRaw("restore", "--staged", "--", nav.path); } catch {}
 }
 
 export function stageAll() {
