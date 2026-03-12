@@ -33,6 +33,7 @@ if (process.argv.includes("--fetch-data")) {
 // ─── Server ──────────────────────────────────────────────────────────────────
 
 const serverSessionName = "pi-srv-" + createHash("sha256").update(gitRoot).digest("hex").slice(0, 8);
+const termSessionName = "pi-term-" + createHash("sha256").update(gitRoot).digest("hex").slice(0, 8);
 
 function readServerCommand() {
 	const configPath = join(gitRoot, ".pi", "config.json");
@@ -58,6 +59,13 @@ function toggleServer() {
 function killServer() {
 	tmuxKillSession(serverSessionName);
 	render();
+}
+
+function toggleTerm() {
+	if (!tmuxHasSession(termSessionName)) {
+		tmuxNewSession(termSessionName, process.env.SHELL || "bash", gitRoot, { noStatus: true });
+	}
+	tmuxPopup(["tmux", "attach-session", "-t", `=${termSessionName}`]);
 }
 
 // ─── UI State ────────────────────────────────────────────────────────────────
@@ -279,7 +287,8 @@ function handleInput(data) {
 	if (ch === "\r" || ch === "o") return openInNvim();
 	if (ch === "d") return openDiff();
 	if (ch === " ") return toggleExpand();
-	if (ch === "\t" || ch === "t") return switchTab();
+	if (ch === "\t") return switchTab();
+	if (ch === "t") return toggleTerm();
 	if (buf.length === 3 && buf[0] === 0x1b && buf[1] === 0x5b && buf[2] === 0x5a) return switchTab();
 	if (ch === "a") return doStageFile();
 	if (ch === "u") return doUnstageFile();
