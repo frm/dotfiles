@@ -93,7 +93,12 @@ function createPaneManager(config: PaneConfig) {
 		} catch {}
 	}
 
-	return { isPaneAlive, create, kill, focus, isFocused, signal };
+	function resize() {
+		if (!isPaneAlive()) return;
+		try { tmuxRun("resize-pane", "-t", paneId!, config.side === "left" ? "-x" : "-x", config.size); } catch {}
+	}
+
+	return { isPaneAlive, create, kill, focus, isFocused, signal, resize };
 }
 
 // ─── Extension ───────────────────────────────────────────────────────────────
@@ -218,6 +223,14 @@ export default function contextPanels(pi: ExtensionAPI) {
 				const err = global.create();
 				if (err) ctx.ui.notify(`Global panel: ${err}`, "error");
 			}
+		},
+	});
+
+	pi.registerCommand("context-panels", {
+		description: "Manage context panels (reset to default sizes)",
+		handler: async (_args, _ctx) => {
+			global.resize();
+			local.resize();
 		},
 	});
 
