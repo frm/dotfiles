@@ -13,55 +13,57 @@ window_dir="${pane_path##*/}"
 session_name=$(tmux display-message -p '#S')
 
 # Look up PR number for the current branch, with file-based caching (5 min TTL)
+# Disabled: redundant with context-panels which already show PR status.
+# TODO: consider using gh-state IPC cache instead of direct gh calls.
 pr_prefix=""
 branch=$(git -C "$pane_path" rev-parse --abbrev-ref HEAD 2>/dev/null)
 
-if [[ -n "$branch" ]]; then
-  cache_dir="${TMPDIR:-/tmp}/tmux_pr_cache"
-  mkdir -p "$cache_dir"
-
-  repo_id=$(git -C "$pane_path" rev-parse --show-toplevel 2>/dev/null | tr '/' '_')
-  cache_file="$cache_dir/${repo_id}_${branch}"
-
-  if [[ -f "$cache_file" ]] && [[ $(( $(date +%s) - $(stat -f %m "$cache_file") )) -lt 300 ]]; then
-    pr_info=$(cat "$cache_file")
-  else
-    pr_info=$(gh pr view "$branch" --repo "$(git -C "$pane_path" remote get-url origin 2>/dev/null)" --json number,state -q '"\(.number) \(.state)"' 2>/dev/null)
-    echo "${pr_info:-}" > "$cache_file"
-  fi
-
-  pr_number="${pr_info%% *}"
-  pr_state="${pr_info#* }"
-
-  if [[ -n "$pr_number" ]]; then
-    case "$pr_state" in
-      MERGED) pr_prefix="(⇑ #$pr_number) " ;;
-      CLOSED) pr_prefix="(⊘ #$pr_number) " ;;
-      QUEUED) pr_prefix="(⧖ #$pr_number) " ;;
-      OPEN)
-        # Check CI status for open PRs
-        checks_cache_file="$cache_dir/${repo_id}_${branch}_checks"
-        if [[ -f "$checks_cache_file" ]] && [[ $(( $(date +%s) - $(stat -f %m "$checks_cache_file") )) -lt 300 ]]; then
-          checks_status=$(cat "$checks_cache_file")
-        else
-          checks_status=$(gh pr checks "$pr_number" --repo "$(git -C "$pane_path" remote get-url origin 2>/dev/null)" 2>/dev/null | awk '{print $2}' | sort -u | tr '\n' ',')
-          echo "${checks_status:-}" > "$checks_cache_file"
-        fi
-
-        if echo "$checks_status" | grep -q "fail"; then
-          pr_prefix="(✗ #$pr_number) "
-        elif echo "$checks_status" | grep -q "pending"; then
-          pr_prefix="(⧖ #$pr_number) "
-        elif echo "$checks_status" | grep -q "pass"; then
-          pr_prefix="(✓ #$pr_number) "
-        else
-          pr_prefix="(#$pr_number) "
-        fi
-        ;;
-      *)      pr_prefix="(#$pr_number) " ;;
-    esac
-  fi
-fi
+# if [[ -n "$branch" ]]; then
+#   cache_dir="${TMPDIR:-/tmp}/tmux_pr_cache"
+#   mkdir -p "$cache_dir"
+#
+#   repo_id=$(git -C "$pane_path" rev-parse --show-toplevel 2>/dev/null | tr '/' '_')
+#   cache_file="$cache_dir/${repo_id}_${branch}"
+#
+#   if [[ -f "$cache_file" ]] && [[ $(( $(date +%s) - $(stat -f %m "$cache_file") )) -lt 300 ]]; then
+#     pr_info=$(cat "$cache_file")
+#   else
+#     pr_info=$(gh pr view "$branch" --repo "$(git -C "$pane_path" remote get-url origin 2>/dev/null)" --json number,state -q '"\(.number) \(.state)"' 2>/dev/null)
+#     echo "${pr_info:-}" > "$cache_file"
+#   fi
+#
+#   pr_number="${pr_info%% *}"
+#   pr_state="${pr_info#* }"
+#
+#   if [[ -n "$pr_number" ]]; then
+#     case "$pr_state" in
+#       MERGED) pr_prefix="(⇑ #$pr_number) " ;;
+#       CLOSED) pr_prefix="(⊘ #$pr_number) " ;;
+#       QUEUED) pr_prefix="(⧖ #$pr_number) " ;;
+#       OPEN)
+#         # Check CI status for open PRs
+#         checks_cache_file="$cache_dir/${repo_id}_${branch}_checks"
+#         if [[ -f "$checks_cache_file" ]] && [[ $(( $(date +%s) - $(stat -f %m "$checks_cache_file") )) -lt 300 ]]; then
+#           checks_status=$(cat "$checks_cache_file")
+#         else
+#           checks_status=$(gh pr checks "$pr_number" --repo "$(git -C "$pane_path" remote get-url origin 2>/dev/null)" 2>/dev/null | awk '{print $2}' | sort -u | tr '\n' ',')
+#           echo "${checks_status:-}" > "$checks_cache_file"
+#         fi
+#
+#         if echo "$checks_status" | grep -q "fail"; then
+#           pr_prefix="(✗ #$pr_number) "
+#         elif echo "$checks_status" | grep -q "pending"; then
+#           pr_prefix="(⧖ #$pr_number) "
+#         elif echo "$checks_status" | grep -q "pass"; then
+#           pr_prefix="(✓ #$pr_number) "
+#         else
+#           pr_prefix="(#$pr_number) "
+#         fi
+#         ;;
+#       *)      pr_prefix="(#$pr_number) " ;;
+#     esac
+#   fi
+# fi
 
 if [[ "$session_name" == "$window_dir" ]]; then
   echo "${pr_prefix}${branch:-$window_dir}"
