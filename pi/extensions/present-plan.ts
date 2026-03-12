@@ -245,12 +245,6 @@ async function showPlanOverlay(
 		}
 
 		if (exitState.action === "reject") {
-			if (comments.size > 0) {
-				const md = new Markdown(plan, 1, 0, getMarkdownTheme());
-				const finalLines = md.render(80);
-				const feedback = formatCommentsAsFeedback(finalLines);
-				return { approved: false, feedback };
-			}
 			return { approved: false };
 		}
 
