@@ -103,6 +103,14 @@ let createPaneBranch = null; // branch from pi pane's cwd
 let createError = null;
 let createErrorTimer = null;
 
+function getPiSession() {
+	const pane = getActivePiPane();
+	if (pane) {
+		try { return tmuxFormat("#{session_name}", pane); } catch {}
+	}
+	try { return tmuxFormat("#{session_name}"); } catch { return null; }
+}
+
 function detectDefaultBase() {
 	const entry = wt.state.sections.flatMap((s) => s.entries).find((e) => e.path);
 	if (!entry) return null;
@@ -183,16 +191,15 @@ function executeCreate() {
 	const base = createUsingPaneBranch && createPaneBranch ? createPaneBranch : createBaseBranch;
 	if (!base) return;
 
-	let session;
-	try { session = tmuxFormat("#{session_name}"); } catch { return; }
+	const session = getPiSession();
 	if (!session) return;
 
 	creating = false;
 	createInput = "";
 
 	try {
-		tmuxRun("new-window", "-t", session);
-		tmuxRun("send-keys", "-t", session, `g co ${base} && g wt ${branchName} && pi`, "Enter");
+		const newPane = tmuxQuery("new-window", "-t", `${session}:`, "-P", "-F", "#{pane_id}");
+		tmuxRun("send-keys", "-t", newPane, `g co ${base} && g wt ${branchName} && pi`, "Enter");
 	} catch {}
 
 	render();
@@ -544,14 +551,13 @@ function reviewPrLocal() {
 	try { repoRoot = gitRepoRoot(wtEntry?.path); } catch { return; }
 	if (!repoRoot) return;
 
-	let session;
-	try { session = tmuxFormat("#{session_name}"); } catch { return; }
+	const session = getPiSession();
 	if (!session) return;
 
 	try {
 		ensureServer(repoRoot);
-		tmuxRun("new-window", "-t", session, "-c", repoRoot);
-		tmuxRun("send-keys", "-t", session, `git fetch && g wt ${branch} && pi "/review-pr ${number}"`, "Enter");
+		const newPane = tmuxQuery("new-window", "-t", `${session}:`, "-c", repoRoot, "-P", "-F", "#{pane_id}");
+		tmuxRun("send-keys", "-t", newPane, `git fetch && g wt ${branch} && pi "/review-pr ${number}"`, "Enter");
 	} catch {}
 }
 
