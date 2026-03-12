@@ -35,23 +35,23 @@ export function createClient(sockPath: string): GhStateClient {
 	return {
 		connect() {
 			return new Promise<void>((resolve, reject) => {
+				let settled = false;
 				socket = connect(sockPath);
 				const parser = createLineParser(handleIncoming);
 
-				socket.on("connect", () => resolve());
+				socket.on("connect", () => {
+					if (!settled) { settled = true; resolve(); }
+				});
 				socket.on("data", parser);
 				socket.on("error", (err) => {
-					if (!socket?.connecting) {
-						// Connection lost — reject all pending
-						for (const p of pending.values()) p.reject(err);
-						pending.clear();
-					} else {
-						reject(err);
-					}
+					for (const p of pending.values()) p.reject(err);
+					pending.clear();
+					if (!settled) { settled = true; reject(err); }
 				});
 				socket.on("close", () => {
 					for (const p of pending.values()) p.reject(new Error("Connection closed"));
 					pending.clear();
+					if (!settled) { settled = true; reject(new Error("Connection closed")); }
 					socket = null;
 				});
 			});

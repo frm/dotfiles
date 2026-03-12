@@ -43,6 +43,7 @@ if (process.argv.includes("--fetch-prs")) {
 let activeTab = "worktrees";
 let loading = true;
 let prsLoading = true;
+let prsLoadedOnce = false;
 let confirmingDelete = false;
 let deleting = false;
 let deletingBranch = "";
@@ -191,6 +192,7 @@ function refreshPrsAsync() {
 		onMessage: (data) => {
 			prs.applyData(data.reviewPrs, data.myPrs);
 			prsLoading = false;
+			prsLoadedOnce = true;
 			render();
 		},
 		onDone: () => { if (prsLoading) { prsLoading = false; render(); } },
@@ -244,7 +246,7 @@ function render() {
 		contentRow = 1;
 	} else if (activeTab === "worktrees") {
 		contentRow = wt.renderTab(row, innerW, contentHeight, confirmingDelete);
-	} else if (prsLoading) {
+	} else if (prsLoading && !prsLoadedOnce) {
 		const msg = " Fetching pull requests...";
 		moveTo(row, 1); write(dim("│") + dim(msg) + " ".repeat(Math.max(0, innerW - msg.length)) + dim("│"));
 		contentRow = 1;

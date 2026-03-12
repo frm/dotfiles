@@ -2,7 +2,7 @@
   "lastChangelogVersion": "0.57.1",
   "defaultProvider": "anthropic",
   "defaultModel": "claude-opus-4-6",
-  "defaultThinkingLevel": "medium",
+  "defaultThinkingLevel": "high",
   "skills": [
     "~/.claude/skills"
   ]

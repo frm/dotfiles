@@ -13,6 +13,8 @@ export interface GhStateServer {
 	start(): Promise<void>;
 	stop(): void;
 	pushToSubscribers(event: string, data: unknown): void;
+	getClientCount(): number;
+	getSubscriberCount(): number;
 }
 
 export function createServer(sockPath: string, poller: Poller): GhStateServer {
@@ -40,6 +42,8 @@ export function createServer(sockPath: string, poller: Poller): GhStateServer {
 				return poller.getUsername();
 			case "prChecks":
 				return poller.getPrChecks(params?.prNumber as number);
+			case "leaderStatus":
+				return { clients: connections.size, subscribers: subscribers.length, poller: poller.getStatus() };
 			default:
 				throw new Error(`Unknown method: ${method}`);
 		}
@@ -102,6 +106,9 @@ export function createServer(sockPath: string, poller: Poller): GhStateServer {
 				try { unlinkSync(sockPath); } catch {}
 			}
 		},
+
+		getClientCount() { return connections.size; },
+		getSubscriberCount() { return subscribers.length; },
 
 		pushToSubscribers(event: string, data: unknown) {
 			const msg = encodeMessage({ event, data });

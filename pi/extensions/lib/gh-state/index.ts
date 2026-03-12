@@ -2,9 +2,11 @@ import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import type { PrInfo, ReviewComment } from "./lib/types.ts";
 import { getSessionRoot, socketPath, lockPath } from "./lib/protocol.ts";
 import { tryAcquireLock, releaseLock, isLockStale, startHeartbeat } from "./lib/leader.ts";
-import { createPoller, type Poller } from "./lib/poller.ts";
+import { createPoller, type Poller, type PollerStatus } from "./lib/poller.ts";
 import { createServer, type GhStateServer } from "./lib/server.ts";
 import { createClient, type GhStateClient } from "./lib/client.ts";
+import { readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 
 export type { PrInfo, PrComment, ReviewComment } from "./lib/types.ts";
 
@@ -22,6 +24,7 @@ let stopHeartbeat: (() => void) | null = null;
 let stalenessTimer: ReturnType<typeof setInterval> | null = null;
 
 let piRef: ExtensionAPI | null = null;
+let startedAt: number | null = null;
 
 type Subscriber = (pr: PrInfo | null) => void;
 const subscribers = new Set<Subscriber>();
@@ -35,10 +38,13 @@ export const ghState = {
 	async start(pi: ExtensionAPI, cwd: string): Promise<void> {
 		if (role) return; // Already started
 		piRef = pi;
+		startedAt = Date.now();
 
 		sessionRoot = getSessionRoot(cwd);
 		sockPath = socketPath(sessionRoot);
 		lckPath = lockPath(sessionRoot);
+
+		registerCommands(pi);
 
 		const isLeader = tryAcquireLock(lckPath);
 		if (isLeader) {
@@ -70,6 +76,7 @@ export const ghState = {
 		server = null;
 		client = null;
 		piRef = null;
+		startedAt = null;
 		subscribers.clear();
 	},
 
@@ -110,7 +117,182 @@ export const ghState = {
 		}
 		return null;
 	},
+
+	async status(): Promise<GhStateStatus> {
+		const pr = ghState.get();
+		const base: GhStateStatus = {
+			role: role ?? "stopped",
+			sessionRoot,
+			socketPath: sockPath,
+			lockPath: lckPath,
+			uptime: startedAt ? Date.now() - startedAt : null,
+			leaderWindow: resolveLeaderTmuxWindow(),
+			cachedPr: pr ? { number: pr.number, title: pr.title } : null,
+		};
+
+		if (role === "leader") {
+			base.clients = server?.getClientCount() ?? 0;
+			base.subscribers = server?.getSubscriberCount() ?? 0;
+			base.poller = poller?.getStatus() ?? null;
+		} else if (role === "client") {
+			base.connected = client?.isConnected() ?? false;
+			// Ask leader for its stats
+			if (client?.isConnected()) {
+				try {
+					base.leaderStats = (await client.request("leaderStatus")) as Record<string, unknown>;
+				} catch {}
+			}
+		}
+
+		return base;
+	},
 };
+
+export interface GhStateStatus {
+	role: "leader" | "client" | "stopped";
+	sessionRoot: string | null;
+	socketPath: string | null;
+	lockPath: string | null;
+	uptime: number | null;
+	leaderWindow: string | null;
+	cachedPr: { number: number; title: string } | null;
+	// Leader fields
+	clients?: number;
+	subscribers?: number;
+	poller?: PollerStatus | null;
+	// Client fields
+	connected?: boolean;
+	leaderStats?: Record<string, unknown>;
+}
+
+// ── Command Registration ─────────────────────────────────────────────────────
+
+let commandsRegistered = false;
+
+function registerCommands(pi: ExtensionAPI): void {
+	if (commandsRegistered) return;
+	commandsRegistered = true;
+
+	pi.registerCommand("gh-state", {
+		description: "Show gh-state status (role, clients, cache ages, poll stats)",
+		handler: async (_args, ctx) => {
+			const status = await ghState.status();
+			const lines: string[] = [];
+
+			const uptime = status.uptime ? formatDuration(status.uptime) : "n/a";
+			lines.push(`Role: ${status.role}${status.leaderWindow ? ` (leader window: ${status.leaderWindow})` : ""}`);
+			lines.push(`Uptime: ${uptime}`);
+			lines.push(`Session root: ${status.sessionRoot ?? "n/a"}`);
+			lines.push(`Socket: ${status.socketPath ?? "n/a"}`);
+
+			if (status.cachedPr) {
+				lines.push(`Cached PR: #${status.cachedPr.number} ${status.cachedPr.title}`);
+			} else {
+				lines.push("Cached PR: none");
+			}
+
+			if (status.role === "leader") {
+				lines.push("");
+				lines.push(`Connected clients: ${status.clients ?? 0}`);
+				lines.push(`Push subscribers: ${status.subscribers ?? 0}`);
+				if (status.poller) {
+					const p = status.poller;
+					lines.push(`Branch: ${p.branch ?? "n/a"}`);
+					lines.push(`Git root: ${p.gitRoot ?? "n/a"}`);
+					lines.push("");
+					lines.push("Poll counts:");
+					lines.push(`  prView: ${p.pollCounts.prView}  prLists: ${p.pollCounts.prLists}  reviewComments: ${p.pollCounts.reviewComments}`);
+					lines.push("Cache ages:");
+					lines.push(`  prView: ${formatAge(p.lastFetchAt.prView)}  prLists: ${formatAge(p.lastFetchAt.prLists)}  reviewComments: ${formatAge(p.lastFetchAt.reviewComments)}`);
+					lines.push(`On-demand caches: worktreePr=${p.onDemandCacheSizes.worktreePr} entries, prChecks=${p.onDemandCacheSizes.prChecks} entries`);
+				}
+			} else if (status.role === "client") {
+				lines.push("");
+				lines.push(`Connected to leader: ${status.connected ? "yes" : "no"}`);
+				if (status.leaderStats) {
+					const ls = status.leaderStats as any;
+					lines.push(`Leader clients: ${ls.clients ?? "?"}, subscribers: ${ls.subscribers ?? "?"}`);
+					if (ls.poller) {
+						lines.push(`Leader branch: ${ls.poller.branch ?? "n/a"}`);
+						lines.push("Leader poll counts:");
+						lines.push(`  prView: ${ls.poller.pollCounts?.prView}  prLists: ${ls.poller.pollCounts?.prLists}  reviewComments: ${ls.poller.pollCounts?.reviewComments}`);
+						lines.push("Leader cache ages:");
+						lines.push(`  prView: ${formatAge(ls.poller.lastFetchAt?.prView)}  prLists: ${formatAge(ls.poller.lastFetchAt?.prLists)}  reviewComments: ${formatAge(ls.poller.lastFetchAt?.reviewComments)}`);
+					}
+				}
+			}
+
+			ctx.ui.notify(lines.join("\n"), "info");
+		},
+	});
+}
+
+function formatDuration(ms: number): string {
+	const s = Math.floor(ms / 1000);
+	if (s < 60) return `${s}s`;
+	const m = Math.floor(s / 60);
+	if (m < 60) return `${m}m ${s % 60}s`;
+	const h = Math.floor(m / 60);
+	return `${h}h ${m % 60}m`;
+}
+
+function formatAge(ts: number | null | undefined): string {
+	if (ts == null) return "never";
+	return `${formatDuration(Date.now() - ts)} ago`;
+}
+
+// ── Leader Window Resolution ─────────────────────────────────────────────────
+
+function resolveLeaderTmuxWindow(): string | null {
+	if (!lckPath) return null;
+
+	// Read the lock file to get leader PID
+	let leaderPid: number;
+	try {
+		const lock = JSON.parse(readFileSync(lckPath, "utf-8"));
+		leaderPid = lock.pid;
+	} catch {
+		return null;
+	}
+
+	// If we're the leader, just get our own window name
+	if (role === "leader") {
+		try {
+			return execFileSync("tmux", ["display-message", "-p", "#{window_name}"], { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim() || null;
+		} catch {
+			return null;
+		}
+	}
+
+	// For clients: find which tmux pane holds the leader PID (or its children)
+	try {
+		const panes = execFileSync("tmux", ["list-panes", "-a", "-F", "#{pane_pid} #{window_name}"], { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
+		for (const line of panes.split("\n")) {
+			const [pidStr, ...rest] = line.split(" ");
+			const panePid = parseInt(pidStr);
+			if (!panePid) continue;
+			// Check if leader PID is the pane PID or a descendant
+			if (panePid === leaderPid || isDescendant(leaderPid, panePid)) {
+				return rest.join(" ") || null;
+			}
+		}
+	} catch {}
+	return null;
+}
+
+function isDescendant(pid: number, ancestorPid: number): boolean {
+	// Walk up the process tree from pid to see if ancestorPid is an ancestor
+	try {
+		let current = pid;
+		for (let i = 0; i < 10; i++) {
+			const ppid = parseInt(execFileSync("ps", ["-o", "ppid=", "-p", String(current)], { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim());
+			if (!ppid || ppid <= 1) return false;
+			if (ppid === ancestorPid) return true;
+			current = ppid;
+		}
+	} catch {}
+	return false;
+}
 
 // ── Leader Setup ─────────────────────────────────────────────────────────────
 

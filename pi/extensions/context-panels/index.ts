@@ -175,11 +175,12 @@ export default function contextPanels(pi: ExtensionAPI) {
 	pi.on("session_start", async (_event, ctx) => {
 		detectTmuxWindow();
 		clearPiState();
-		await ghState.start(pi, ctx.cwd);
 		if (!ctx.hasUI) return;
 		const globalErr = global.create();
 		if (globalErr) ctx.ui.notify(`Global panel: ${globalErr}`, "error");
 		local.create();
+		// Start gh-state after panels are open — don't block panel creation
+		ghState.start(pi, ctx.cwd).catch(() => {});
 	});
 
 	pi.on("session_switch", async (_event, ctx) => {

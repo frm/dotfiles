@@ -11,6 +11,14 @@ const ON_DEMAND_CACHE_TTL = 30_000;
 
 export type OnChange = (key: string, data: unknown) => void;
 
+export interface PollerStatus {
+	branch: string | null;
+	gitRoot: string | null;
+	pollCounts: { prView: number; prLists: number; reviewComments: number };
+	lastFetchAt: { prView: number | null; prLists: number | null; reviewComments: number | null };
+	onDemandCacheSizes: { worktreePr: number; prChecks: number };
+}
+
 export interface Poller {
 	start(): void;
 	stop(): void;
@@ -21,6 +29,7 @@ export interface Poller {
 	getUsername(): Promise<string | null>;
 	getPrChecks(prNumber: number): Promise<unknown>;
 	refresh(): Promise<PrInfo | null>;
+	getStatus(): PollerStatus;
 }
 
 export function createPoller(pi: ExtensionAPI, sessionRoot: string, onChange: OnChange): Poller {
@@ -34,6 +43,9 @@ export function createPoller(pi: ExtensionAPI, sessionRoot: string, onChange: On
 	let cachedUsername: string | null = null;
 	const worktreePrCache = new Map<string, CacheEntry<unknown>>();
 	const prChecksCache = new Map<number, CacheEntry<unknown>>();
+
+	const pollCounts = { prView: 0, prLists: 0, reviewComments: 0 };
+	const lastFetchAt: { prView: number | null; prLists: number | null; reviewComments: number | null } = { prView: null, prLists: null, reviewComments: null };
 
 	let prViewTimer: ReturnType<typeof setInterval> | null = null;
 	let prListsTimer: ReturnType<typeof setInterval> | null = null;
@@ -58,7 +70,9 @@ export function createPoller(pi: ExtensionAPI, sessionRoot: string, onChange: On
 
 	async function pollPrView(): Promise<void> {
 		if (!gitRoot || !branch) return;
+		pollCounts.prView++;
 		const result = await pi.exec("gh", ["pr", "view", branch, "--json", PR_FIELDS], { cwd: gitRoot, timeout: 15000 });
+		lastFetchAt.prView = Date.now();
 		if (result.code !== 0) {
 			cachedPr = null;
 			onChange("prView", null);
@@ -74,11 +88,13 @@ export function createPoller(pi: ExtensionAPI, sessionRoot: string, onChange: On
 
 	async function pollPrLists(): Promise<void> {
 		if (!gitRoot) return;
+		pollCounts.prLists++;
 		const [reviewResult, myResult] = await Promise.all([
 			pi.exec("gh", ["pr", "list", "--search", "review-requested:@me is:open", "--json", PR_LIST_FIELDS, "--limit", "50"], { cwd: gitRoot, timeout: 15000 }),
 			pi.exec("gh", ["pr", "list", "--author", "@me", "--state", "open", "--json", PR_LIST_FIELDS, "--limit", "50"], { cwd: gitRoot, timeout: 15000 }),
 		]);
 
+		lastFetchAt.prLists = Date.now();
 		const reviewPrs = reviewResult.code === 0 ? tryParse(reviewResult.stdout, []) : [];
 		const myPrs = myResult.code === 0 ? tryParse(myResult.stdout, []) : [];
 		cachedPrLists = { reviewPrs, myPrs };
@@ -87,7 +103,9 @@ export function createPoller(pi: ExtensionAPI, sessionRoot: string, onChange: On
 
 	async function pollReviewComments(): Promise<void> {
 		if (!gitRoot || !cachedPr) return;
+		pollCounts.reviewComments++;
 		const result = await pi.exec("gh", ["api", `/repos/{owner}/{repo}/pulls/${cachedPr.number}/comments`, "--paginate"], { cwd: gitRoot, timeout: 15000 });
+		lastFetchAt.reviewComments = Date.now();
 		if (result.code !== 0) return;
 		try {
 			cachedReviewComments = JSON.parse(result.stdout);
@@ -195,6 +213,16 @@ export function createPoller(pi: ExtensionAPI, sessionRoot: string, onChange: On
 			branch = await detectBranch();
 			await pollPrView();
 			return cachedPr;
+		},
+
+		getStatus(): PollerStatus {
+			return {
+				branch,
+				gitRoot,
+				pollCounts: { ...pollCounts },
+				lastFetchAt: { ...lastFetchAt },
+				onDemandCacheSizes: { worktreePr: worktreePrCache.size, prChecks: prChecksCache.size },
+			};
 		},
 	};
 }
