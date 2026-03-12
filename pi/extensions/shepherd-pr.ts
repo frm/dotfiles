@@ -595,10 +595,33 @@ export default function shepherdPr(pi: ExtensionAPI) {
 	}
 
 	async function executeConflictItem(item: WorkItem, ctx: ExtensionContext, pr: PrInfo): Promise<boolean> {
+		// Try a clean rebase first — avoids spawning Claude when conflicts resolve trivially
+		widgetFixProgress = "fetching base…";
+		renderWidget();
+		await runExec(ctx.cwd, "git", ["fetch", "origin", pr.baseRefName], 30000);
+
+		widgetFixProgress = "rebasing…";
+		renderWidget();
+		const rebase = await runExec(ctx.cwd, "git", ["rebase", `origin/${pr.baseRefName}`], 60000);
+
+		if (rebase.code === 0) {
+			widgetFixProgress = "pushing…";
+			renderWidget();
+			const push = await runExec(ctx.cwd, "git", ["push", "--force-with-lease", "origin", "HEAD"], 45000);
+			if (push.code === 0) {
+				stats.rerun++;
+				return true;
+			}
+			ctx.ui.notify("Rebase succeeded but push failed", "error");
+			return false;
+		}
+
+		// Rebase produced conflicts — let Claude resolve them in-place and continue the rebase
 		const prompt = [
-			"There are merge conflicts on this branch that need resolving.",
+			"A git rebase is in progress and has hit conflicts.",
 			"Use the solve-conflicts skill to resolve them. Auto-accept the plan — do not ask for approval.",
-			"After resolving, stage the resolved files, commit, and push to origin HEAD.",
+			"After resolving each step, run `git rebase --continue` and repeat until the rebase completes.",
+			"Then force-push with: git push --force-with-lease origin HEAD",
 			"",
 			`PR #${pr.number}: ${pr.title}`,
 			`Base: ${pr.baseRefName}`,
@@ -617,7 +640,6 @@ export default function shepherdPr(pi: ExtensionAPI) {
 			return false;
 		}
 
-		await ensurePushed(ctx.cwd);
 		return true;
 	}
 
