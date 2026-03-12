@@ -1,145 +1,64 @@
-# Review Output Template
+# Review Comment Guidelines
 
-Use this structure for all PR reviews.
+Guidelines for writing PR review comments. Used internally during Step 5-6 of the review skill.
 
-## Output Format
-
-```markdown
-## Context
-
-**PR:** #<number> - <title>
-**Author:** <author>
-**Base:** <baseRefName> <- **Head:** <headRefName>
-**Files changed:** <count> (+<additions>/-<deletions>)
-**Review type:** <Direct Reviewer | Team Reviewer | Codeowner>
-
-### Goals
-[What this PR is trying to accomplish - from description and linked issues]
-
-### Linked Issues
-- #<issue> - <title>: <brief context>
-
----
-
-## Strengths
-
-[What's well done - be specific with file:line references]
-
-- <file>:<line> - <what's good and why>
-
----
-
-## Issues
-
-### Critical (Must Fix)
-[Bugs, security issues, data loss risks, broken functionality]
-
-1. **<Issue title>**
-   - File: `<file>:<line>`
-   - What: <description of the problem>
-   - Why: <why this matters>
-   - Fix: <how to fix it>
-
-### Important (Should Fix)
-[Architecture problems, missing features, poor error handling, test gaps]
-
-1. **<Issue title>**
-   - File: `<file>:<line>`
-   - What: <description>
-   - Why: <impact>
-   - Fix: <suggestion>
-
-### Minor (Nice to Have)
-[Code style, optimization opportunities, documentation improvements]
-
-1. **<Issue title>**
-   - File: `<file>:<line>`
-   - What: <description>
-
----
-
-## Codeowner Section
-<!-- Only include this section for codeowner reviews -->
-
-**Owned files changed:**
-- `<file>` - <summary of changes>
-
-**Implications for owned code:**
-[Analysis of how changes affect the owned codebase]
-
-**Backward compatibility:**
-[Any concerns about breaking changes]
-
----
-
-## Recommendations
-
-[Improvements beyond fixing issues - architecture, patterns, future considerations]
-
----
-
-## Assessment
-
-**Ready to approve?** [Yes / No / With fixes]
-
-**Reasoning:** [1-2 sentence technical assessment]
-
----
-
-## Existing Feedback
-<!-- Note any existing comments that were considered -->
-[Summary of existing review comments you've accounted for]
-```
-
-## Review Checklist
-
-Use this checklist internally when reviewing:
-
-### Code Quality
-- [ ] Clean separation of concerns?
-- [ ] Proper error handling?
-- [ ] Type safety (if applicable)?
-- [ ] DRY principle followed?
-- [ ] Edge cases handled?
-
-### Architecture
-- [ ] Sound design decisions?
-- [ ] Scalability considerations?
-- [ ] Performance implications?
-- [ ] Security concerns?
-
-### Testing
-- [ ] Tests actually test logic (not just mocks)?
-- [ ] Edge cases covered?
-- [ ] Integration tests where needed?
-- [ ] All tests passing?
-
-### Requirements
-- [ ] All requirements from linked issues met?
-- [ ] Implementation matches spec?
-- [ ] No scope creep?
-- [ ] Breaking changes documented?
-
-### Production Readiness
-- [ ] Migration strategy (if schema changes)?
-- [ ] Backward compatibility considered?
-- [ ] Documentation complete?
-- [ ] No obvious bugs?
-
-## Review Rules
+## Comment Quality Rules
 
 **DO:**
-- Categorize by actual severity (not everything is Critical)
-- Be specific (file:line, not vague)
-- Explain WHY issues matter
-- Acknowledge strengths
-- Give a clear verdict
-- Consider existing review comments
+- Be specific — reference exact file:line, function names, variable names
+- Explain WHY something matters, not just what's wrong
+- Suggest a concrete fix or ask a clarifying question
+- Prefix minor style/naming issues with "nit:"
+- Keep comments concise — one paragraph max unless the issue is complex
+- Consider existing review comments to avoid duplicating feedback
+- Acknowledge strengths in the review body when warranted
 
 **DON'T:**
-- Say "looks good" without actually checking
-- Mark nitpicks as Critical
-- Give feedback on code you didn't review
-- Be vague ("improve error handling" - say WHERE and HOW)
-- Avoid giving a clear verdict
-- Duplicate feedback already given by others
+- Be vague ("improve error handling" — say WHERE and HOW)
+- Mark nitpicks as critical
+- Comment on code you didn't actually review or understand
+- Be unnecessarily harsh — ask questions when intent is unclear
+- Add comments that don't require action or response
+
+## Severity Levels
+
+Use these consistently:
+
+| Severity | When to use | Examples |
+|----------|-------------|---------|
+| **Critical** | Bugs, security issues, data loss, broken functionality | Missing auth check, SQL injection, race condition causing data corruption |
+| **Important** | Missing validation, breaking changes, test gaps, wrong behavior | Removed error code clients depend on, unhandled error path |
+| **Nit** | Style, naming, docs, minor improvements | Stale docstring, could use a helper function |
+
+## Review Event Selection
+
+- **APPROVE** — No critical or important issues. Nits only, or no comments at all.
+- **COMMENT** — Has important issues or questions that need answers, but not blocking.
+- **REQUEST_CHANGES** — Has critical issues that must be fixed before merge.
+
+## Internal Checklist
+
+Use this internally when analyzing the PR (don't include in output):
+
+### Code Quality
+- Clean separation of concerns?
+- Proper error handling?
+- Type safety (if applicable)?
+- DRY principle followed?
+- Edge cases handled?
+
+### Architecture
+- Sound design decisions?
+- Scalability considerations?
+- Performance implications?
+- Security concerns?
+
+### Testing
+- Tests actually test logic (not just mocks)?
+- Edge cases covered?
+- Integration tests where needed?
+
+### Production Readiness
+- Migration strategy (if schema changes)?
+- Backward compatibility considered?
+- Breaking changes documented?

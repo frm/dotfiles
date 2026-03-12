@@ -6,7 +6,7 @@ argument-hint: <pr-number-or-branch-or-url>
 
 # PR Review Skill
 
-Review a pull request with context-aware depth based on your relationship to the PR.
+Review a pull request and present proposed inline comments for the user to approve before posting.
 
 ## Setup
 
@@ -30,6 +30,14 @@ gh pr list --head $ARGUMENTS --json number --jq '.[0].number'
 # Then use that number
 ```
 
+**If the GraphQL API is rate-limited**, fall back to the REST API:
+```bash
+gh api repos/{owner}/{repo}/pulls/{number} --jq '{number, title, body, base: .base.ref, head: .head.ref, additions, deletions}'
+gh api repos/{owner}/{repo}/pulls/{number}/files --paginate --jq '.[].filename'
+gh api repos/{owner}/{repo}/pulls/{number}/requested_reviewers --jq '{users: [.users[].login], teams: [.teams[].slug]}'
+gh api repos/{owner}/{repo}/pulls/{number}/reviews --jq '[.[] | {user: .user.login, state: .state, body: .body}]'
+```
+
 ## Step 2: Determine Reviewer Relationship
 
 Check in this order:
@@ -48,15 +56,15 @@ Check in this order:
 # Fetch the branches
 git fetch origin <baseRefName> <headRefName>
 
-# Get the diff
-gh pr diff $PR
+# Get the full diff
+git diff origin/<baseRefName>...origin/<headRefName>
 ```
 
 ## Step 4: Gather Context
 
 **Existing comments** (to avoid duplicating feedback):
 ```bash
-gh pr view $PR --json comments,reviews
+gh api repos/{owner}/{repo}/pulls/{number}/reviews --jq '[.[] | {user: .user.login, state: .state, body: .body}]'
 ```
 
 **Linked issues** (parse from PR body for "Fixes #", "Closes #", etc.):
@@ -64,19 +72,91 @@ gh pr view $PR --json comments,reviews
 gh issue view <ISSUE_NUMBER> --json title,body
 ```
 
-## Step 5: Generate Review
+## Step 5: Analyze and Validate Comment Positions
 
-Follow the template in [review-template.md](review-template.md) for output format.
+Read changed files to understand the full context (not just the diff hunks).
 
-**Focus based on relationship:**
+For each finding, determine the **exact diff-commentable line**:
 
-| Relationship | Primary Focus |
-|--------------|---------------|
-| Direct reviewer | Implementation details, code quality, testing, edge cases |
-| Team reviewer | Architecture impact, integration points, team conventions |
-| Codeowner | Owned files analysis, implications of changes, backward compatibility |
+```bash
+# Get diff hunks with line ranges for each file
+gh api repos/{owner}/{repo}/pulls/{number}/files --jq '.[] | {filename, patch}'
+```
 
-## Step 6: Local Checkout (on request)
+**Rules for comment placement:**
+- Every comment MUST target a line that appears in the diff (within a `@@` hunk range on the RIGHT side)
+- If a finding is about code that isn't in the diff (e.g., unchanged line 45 in a file where only line 1 changed), place the comment on the nearest changed line in that file and reference the actual line in the comment body
+- If there are no nearby changed lines in the file, the comment cannot be inline — note it for the review body instead
+
+## Step 6: Present Proposed Comments
+
+Use `present_plan` to show the user all proposed comments before posting. Format:
+
+```markdown
+## PR Review: #<number> - <title>
+
+**Author:** <author> | **Review type:** <type> | **Existing reviews:** <summary>
+
+### Summary
+[1-2 sentences on what the PR does and overall assessment]
+
+### Proposed Comments
+
+#### Comment 1 — <severity: Critical / Important / Nit>
+**File:** `<file>` line <N>
+> <exact comment body to post>
+
+#### Comment 2 — <severity>
+**File:** `<file>` line <N>
+> <exact comment body to post>
+
+...
+
+### Review Action
+**Event:** COMMENT / APPROVE / REQUEST_CHANGES
+**Review body:** <optional top-level review summary, or empty>
+```
+
+The user will approve, reject, or give feedback to iterate on individual comments (wording, tone, whether to include them).
+
+## Step 7: Post Comments
+
+After the user approves, post all comments as a **single GitHub review** using the REST API:
+
+```bash
+# Get the head commit SHA
+HEAD_SHA=$(gh api repos/{owner}/{repo}/pulls/{number} --jq '.head.sha')
+
+# Post review with inline comments
+gh api repos/{owner}/{repo}/pulls/{number}/reviews \
+  --method POST \
+  -f event=<COMMENT|APPROVE|REQUEST_CHANGES> \
+  -f body="<review body>" \
+  -f commit_id="$HEAD_SHA" \
+  --input - <<'EOF'
+{
+  "comments": [
+    {
+      "path": "<file>",
+      "line": <line_number>,
+      "side": "RIGHT",
+      "body": "<comment body>"
+    }
+  ]
+}
+EOF
+
+# Then submit if it was created as PENDING
+gh api repos/{owner}/{repo}/pulls/{number}/reviews/{review_id}/events \
+  --method POST \
+  -f event=<COMMENT|APPROVE|REQUEST_CHANGES>
+```
+
+**If a comment fails with 422 "Line could not be resolved":**
+- The line is not in the diff. Post it as part of the review body instead.
+- Do NOT post it as a standalone `gh pr comment` — keep everything in one review.
+
+## Step 8: Local Checkout (on request)
 
 When the user asks to "check it locally" or "set up a worktree":
 
@@ -91,3 +171,11 @@ This creates a worktree and copies build artifacts automatically.
 ```bash
 g co <branch_name>
 ```
+
+## Review Focus by Relationship
+
+| Relationship | Primary Focus |
+|--------------|---------------|
+| Direct reviewer | Implementation details, code quality, testing, edge cases |
+| Team reviewer | Architecture impact, integration points, team conventions |
+| Codeowner | Owned files analysis, implications of changes, backward compatibility |
