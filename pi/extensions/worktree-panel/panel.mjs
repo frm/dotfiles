@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import { readPiState } from "./lib/data.mjs";
 import {
-	R, dim, cyan, red, magenta, bgCyan, bgMuted, write,
+	R, dim, cyan, yellow, red, magenta, bgCyan, bgMuted, write,
 	enterAltScreen, exitAltScreen, hideCursor, showCursor,
 	clearScreen, moveTo, visWidth, truncate, wrapText, emptyLine, contentLine,
 	enableFocusReporting, disableFocusReporting, setPaneActive,
@@ -20,6 +20,16 @@ if (process.argv.includes("--fetch-worktrees")) {
 	process.exit(0);
 }
 
+if (process.argv.includes("--delete-worktree")) {
+	const idx = process.argv.indexOf("--delete-worktree");
+	const gitRoot = process.argv[idx + 1];
+	const branch = process.argv[idx + 2];
+	const sessionWindow = process.argv[idx + 3];
+	try { execFileSync("git", ["worktree-del", branch], { cwd: gitRoot, timeout: 30_000, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }); } catch {}
+	try { execFileSync("tmux", ["kill-window", "-t", sessionWindow], { timeout: 3000, stdio: ["pipe", "pipe", "pipe"] }); } catch {}
+	process.exit(0);
+}
+
 if (process.argv.includes("--fetch-prs")) {
 	const cwd = process.argv[process.argv.indexOf("--fetch-prs") + 1] ?? null;
 	process.send(prs.fetchPrData(cwd));
@@ -32,6 +42,11 @@ let activeTab = "worktrees";
 let loading = true;
 let prsLoading = true;
 let confirmingDelete = false;
+let deleting = false;
+let deletingBranch = "";
+let spinnerFrame = 0;
+let spinnerTimer = null;
+const SPINNER = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 
 const piPaneArg = process.argv.indexOf("--pi-pane");
 const piPaneId = piPaneArg !== -1 ? process.argv[piPaneArg + 1] : null;
@@ -239,7 +254,12 @@ function render() {
 	const contentHeight = Math.max(1, height - 2);
 	let contentRow = 0;
 
-	if (creating) {
+	if (deleting) {
+		const spin = yellow(SPINNER[spinnerFrame]);
+		const msg = ` Deleting ${deletingBranch}`;
+		moveTo(row, 1); write(contentLine(" " + spin + truncate(msg, innerW - 2), innerW));
+		contentRow = 1;
+	} else if (creating) {
 		contentRow = renderCreate(row, innerW, contentHeight);
 	} else if (loading && activeTab === "worktrees") {
 		const msg = " Finding worktrees...";
@@ -512,11 +532,27 @@ function executeDelete() {
 	} catch { return; }
 	if (!gitRoot) return;
 
-	try { execFileSync("git", ["worktree-del", entry.branch], { cwd: gitRoot, timeout: 30_000, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }); } catch {}
-	try { execFileSync("tmux", ["kill-window", "-t", `${entry.session}:${entry.window}`], { timeout: 3000, stdio: ["pipe", "pipe", "pipe"] }); } catch {}
+	deleting = true;
+	deletingBranch = entry.branch;
+	spinnerFrame = 0;
+	render();
+	spinnerTimer = setInterval(() => { spinnerFrame = (spinnerFrame + 1) % SPINNER.length; render(); }, 80);
 
-	wt.clearPrCache();
-	doRefresh();
+	const sessionWindow = `${entry.session}:${entry.window}`;
+	const branch = entry.branch;
+
+	// Run delete in a fork to keep UI responsive
+	const child = fork(selfPath, ["--delete-worktree", gitRoot, branch, sessionWindow], {
+		stdio: ["pipe", "pipe", "pipe", "ipc"],
+		timeout: 60_000,
+	});
+	child.on("exit", () => {
+		clearInterval(spinnerTimer);
+		spinnerTimer = null;
+		deleting = false;
+		wt.clearPrCache();
+		doRefresh();
+	});
 }
 
 // ─── Focus & Watchdog ────────────────────────────────────────────────────────
