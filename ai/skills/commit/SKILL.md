@@ -39,6 +39,7 @@ How:
 Extract the ticket from the branch name. Branch format is typically:
 - `<initials>/<ticket>/<description>` (e.g., `frm/proj-123/feature-name`)
 - If no ticket, use whatever is between initials and description as a namespace
+- If no ticket or namespace can be extracted (e.g., `main`, `master`), use a short scope derived from the area of the codebase being changed (e.g., `pi`, `nvim`, `zsh`)
 
 ## Process
 
