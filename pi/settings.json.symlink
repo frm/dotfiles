@@ -3,7 +3,9 @@
   "defaultProvider": "anthropic",
   "defaultModel": "claude-opus-4-6",
   "defaultThinkingLevel": "high",
+  "shellPath": "/opt/homebrew/bin/zsh",
+  "shellCommandPrefix": "source ~/.pi/shell/zshrc.min",
   "skills": [
-    "~/.claude/skills"
+    "~/.dotfiles/ai/skills"
   ]
 }
