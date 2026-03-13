@@ -142,3 +142,7 @@ set -g @powerkit_plugin_git_branch_max_length "0"
 # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
 run '~/.tmux/plugins/tpm/tpm'
 
+# tmux-sensible enables extended-keys, which breaks paste in nvim/pi —
+# newlines get encoded as CSI u sequences (\e[106;5u) instead of \n.
+set -s extended-keys off
+
