@@ -112,7 +112,7 @@ Use the parallel agent pipeline:
    - `reviewer-risk` — migrations, breaking changes, deployment concerns
 3. **Chain step 2** — Run `reviewer-synthesizer` with all agent outputs to produce the final review
 
-The synthesizer uses `present_plan` to show the review to the user.
+The synthesizer returns the review markdown. The **main agent** then calls `present_plan` to show it to the user. This keeps all PR context in the main conversation so the user can give feedback and iterate.
 
 For team reviews, pass only the scoped diff to the analysis agents in step 2.
 
@@ -126,6 +126,7 @@ Use `present_plan` to show the review. The output follows this structure:
 
 ```markdown
 ## PR Review: #<number> — <title>
+<pr_url>
 
 **Author:** <author> | **Review type:** <direct|team> | **Existing reviews:** <summary>
 
@@ -152,7 +153,8 @@ Praise exceptional work rarely — if something is genuinely well done, a brief 
 
 #### Comment 1 — <severity: Critical / Important / Nit>
 **File:** `<file>` line <N>
-> <exact comment body to post>
+**Comment to post:**
+> <exact text that will be posted as a GitHub inline comment>
 
 [If no inline comments: "No inline comments — the implementation is clean."]
 
@@ -204,6 +206,15 @@ EOF
 **If a comment fails with 422 "Line could not be resolved":**
 - The line is not in the diff. Add it to the review body instead.
 - Do NOT post it as a standalone `gh pr comment` — keep everything in one review.
+
+After posting, capture and display the review URL so the user can open it in a browser:
+```bash
+# The review URL is returned in the response
+REVIEW_URL=$(gh api repos/{owner}/{repo}/pulls/{number}/reviews \
+  --method POST ... --jq '.html_url')
+```
+
+Display: `Review posted: <URL>`
 
 ## Step 10: Local Checkout (on request)
 

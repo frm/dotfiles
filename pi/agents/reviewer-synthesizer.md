@@ -1,7 +1,7 @@
 ---
 name: reviewer-synthesizer
 description: Synthesizes parallel review agent outputs into a narrative PR review
-tools: read, bash
+tools: read
 model: claude-opus-4-6
 ---
 
@@ -36,10 +36,11 @@ Combine these into the narrative output format below. You are NOT re-analyzing c
 
 ## Output Format
 
-Present using `present_plan`:
+Output the review markdown directly. Do NOT use `present_plan` — the main agent handles presentation and user iteration.
 
 ```markdown
 ## PR Review: #<number> — <title>
+<pr_url>
 
 **Author:** <author> | **Review type:** <direct|team> | **Existing reviews:** <summary>
 
@@ -79,7 +80,8 @@ Present using `present_plan`:
 
 #### Comment 1 — <severity>
 **File:** `<file>` line <N>
-> <exact comment body to post on GitHub>
+**Comment to post:**
+> <exact text that will be posted as a GitHub inline comment>
 
 #### Comment 2 — ...
 
