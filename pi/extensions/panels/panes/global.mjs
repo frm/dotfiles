@@ -18,6 +18,7 @@ import {
 	R, dim, cyan, yellow, red, boldRed, magenta, bgCyan, bgMuted, write,
 	hideCursor, createSpinner, flash, bottomBorder,
 	clearScreen, moveTo, visWidth, truncate, wrapText, emptyLine, contentLine,
+	bTL, bTR, bTopN, bSide,
 } from "../lib/ui.ts";
 
 import * as wt from "../tabs/global/worktrees.mjs";
@@ -302,9 +303,9 @@ function render() {
 	const wtLabel = activeTab === "worktrees" ? activeBg(" Worktrees ") : dim(" Worktrees ");
 	const prLabel = activeTab === "prs" ? activeBg(" Pull Requests ") : dim(" Pull Requests ");
 	const tabBar = wtLabel + dim("│") + prLabel;
-	const hFill = "─".repeat(Math.max(0, innerW - visWidth(tabBar)));
+	const hFill = Math.max(0, innerW - visWidth(tabBar));
 	moveTo(row++, 1);
-	write(dim("╭") + tabBar + dim(hFill + "╮"));
+	write(bTL() + tabBar + bTopN(hFill) + bTR());
 
 	const contentHeight = Math.max(1, height - 2);
 	let contentRow = 0;
@@ -327,17 +328,17 @@ function render() {
 		contentRow = renderCreate(row, innerW, contentHeight);
 	} else if (loading && activeTab === "worktrees") {
 		const msg = " Finding worktrees...";
-		moveTo(row, 1); write(dim("│") + dim(msg) + " ".repeat(Math.max(0, innerW - msg.length)) + dim("│"));
+		moveTo(row, 1); write(bSide() + dim(msg) + " ".repeat(Math.max(0, innerW - msg.length)) + bSide());
 		contentRow = 1;
 	} else if (loading && activeTab === "prs") {
 		const msg = " Fetching pull requests...";
-		moveTo(row, 1); write(dim("│") + dim(msg) + " ".repeat(Math.max(0, innerW - msg.length)) + dim("│"));
+		moveTo(row, 1); write(bSide() + dim(msg) + " ".repeat(Math.max(0, innerW - msg.length)) + bSide());
 		contentRow = 1;
 	} else if (activeTab === "worktrees") {
 		contentRow = wt.renderTab(row, innerW, contentHeight, confirmingDelete);
 	} else if (prsLoading && !prsLoadedOnce) {
 		const msg = " Fetching pull requests...";
-		moveTo(row, 1); write(dim("│") + dim(msg) + " ".repeat(Math.max(0, innerW - msg.length)) + dim("│"));
+		moveTo(row, 1); write(bSide() + dim(msg) + " ".repeat(Math.max(0, innerW - msg.length)) + bSide());
 		contentRow = 1;
 	} else {
 		contentRow = prs.renderTab(row, innerW, contentHeight);

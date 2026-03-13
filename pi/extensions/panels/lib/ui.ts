@@ -29,6 +29,17 @@ export let paneActive = false;
 export function setPaneActive(v) { paneActive = v; }
 export function selColor(t) { return paneActive ? cyan(t) : dim(t); }
 
+// Border characters — double-line cyan when focused, single-line dim when not
+export function bTop()  { return paneActive ? cyan("═") : dim("─"); }
+export function bSide() { return paneActive ? cyan("║") : dim("│"); }
+export function bTL()   { return paneActive ? cyan("╔") : dim("╭"); }
+export function bTR()   { return paneActive ? cyan("╗") : dim("╮"); }
+export function bBL()   { return paneActive ? cyan("╚") : dim("╰"); }
+export function bBR()   { return paneActive ? cyan("╝") : dim("╯"); }
+export function bLT()   { return paneActive ? cyan("╠") : dim("├"); }
+export function bRT()   { return paneActive ? cyan("╣") : dim("┤"); }
+export function bTopN(n: number) { return paneActive ? cyan("═".repeat(n)) : dim("─".repeat(n)); }
+
 export function stripAnsi(s) { return s.replace(/\x1b\[[0-9;]*m/g, ""); }
 export function visWidth(s) { return stripAnsi(s).length; }
 
@@ -125,24 +136,24 @@ export function bottomBorder(innerW: number) {
 	if (msg) {
 		const label = ` ${msg} `;
 		const dashes = Math.max(0, innerW - visWidth(label));
-		return dim("╰") + green(label) + dim("─".repeat(dashes) + "╯");
+		return bBL() + green(label) + bTopN(dashes) + bBR();
 	}
-	return dim("╰" + "─".repeat(innerW) + "╯");
+	return bBL() + bTopN(innerW) + bBR();
 }
 
 // ─── Line Builders ───────────────────────────────────────────────────────────
 
 export function emptyLine(innerW) {
-	return dim("│") + " ".repeat(innerW) + dim("│");
+	return bSide() + " ".repeat(innerW) + bSide();
 }
 
 export function contentLine(content, innerW) {
 	const pad = " ".repeat(Math.max(0, innerW - visWidth(content)));
-	return dim("│") + content + pad + dim("│");
+	return bSide() + content + pad + bSide();
 }
 
 export function dividerLine(innerW) {
-	return dim("├" + "─".repeat(innerW) + "┤");
+	return bLT() + bTopN(innerW) + bRT();
 }
 
 // ─── Section Rendering ──────────────────────────────────────────────────────
@@ -154,8 +165,8 @@ export function renderSectionRow(sections, item, selected, innerW) {
 	const content = ` ${arrow} ${icon} ${bold(sec.label)} ${dim(`(${sec.entries.length})`)}`;
 	const contentW = visWidth(content);
 	const pad = " ".repeat(Math.max(0, innerW - contentW));
-	const border = selected ? selColor("▐") : dim("│");
-	write(border + content + pad + dim("│"));
+	const border = selected ? selColor("▐") : bSide();
+	write(border + content + pad + bSide());
 }
 
 // ─── Navigation Builders ────────────────────────────────────────────────────

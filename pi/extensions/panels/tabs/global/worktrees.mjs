@@ -8,6 +8,7 @@ import {
 	truncate, visWidth, write, moveTo, selColor,
 	emptyLine, contentLine, renderSectionRow,
 	buildSectionNav, buildSectionVisual,
+	bSide,
 } from "../../lib/ui.ts";
 
 // ─── PR Lookup (per-worktree branch) ────────────────────────────────────────
@@ -191,7 +192,7 @@ function renderEntryRow(item, selected, innerW) {
 	else if (entry.piState === "question") { stateIcon = cyan("⁇") + " "; stateW = 2; }
 	const name = truncate(extractDescription(entry.branch), innerW - 3 - stateW);
 	const pad = " ".repeat(Math.max(0, innerW - 3 - stateW - visWidth(name)));
-	write(dim("│") + " " + cursor + stateIcon + name + pad + dim("│"));
+	write(bSide() + " " + cursor + stateIcon + name + pad + bSide());
 }
 
 function renderDetailRow(item, innerW) {
@@ -203,5 +204,5 @@ function renderDetailRow(item, innerW) {
 	const indent = "     ";
 	const full = indent + parts.join(dim(" • "));
 	const pad = " ".repeat(Math.max(0, innerW - visWidth(full)));
-	write(dim("│") + full + pad + dim("│"));
+	write(bSide() + full + pad + bSide());
 }

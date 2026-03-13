@@ -2,6 +2,7 @@ import {
 	dim, cyan, green, red, boldCyan,
 	visWidth, truncate, write, moveTo,
 	clearScreen, hideCursor,
+	bTL, bTR, bBL, bBR, bTopN, bSide,
 } from "../../lib/ui.ts";
 
 // ─── State ───────────────────────────────────────────────────────────────────
@@ -39,9 +40,9 @@ export function render() {
 
 	// Header
 	const hTitle = boldCyan(` ${title} `);
-	const hFill = "─".repeat(Math.max(0, innerW - visWidth(hTitle)));
+	const hFill = Math.max(0, innerW - visWidth(hTitle));
 	moveTo(row++, 1);
-	write(dim("╭") + hTitle + dim(hFill + "╮"));
+	write(bTL() + hTitle + bTopN(hFill) + bTR());
 
 	const contentHeight = Math.max(1, height - 2);
 	const maxScroll = Math.max(0, lines.length - contentHeight);
@@ -60,7 +61,7 @@ export function render() {
 
 	while (contentRow < contentHeight) {
 		moveTo(row++, 1);
-		write(dim("│") + " ".repeat(innerW) + dim("│"));
+		write(bSide() + " ".repeat(innerW) + bSide());
 		contentRow++;
 	}
 
@@ -69,9 +70,9 @@ export function render() {
 		? `${scroll + 1}-${scroll + visibleCount}/${lines.length}`
 		: "0/0";
 	const hint = dim(` ${pos}  q:back  j/k:scroll  g/G:top/bottom `);
-	const fFill = "─".repeat(Math.max(0, innerW - visWidth(hint)));
+	const fFill = Math.max(0, innerW - visWidth(hint));
 	moveTo(row++, 1);
-	write(dim("╰") + hint + dim(fFill + "╯"));
+	write(bBL() + hint + bTopN(fFill) + bBR());
 }
 
 function renderLine(line, innerW) {
@@ -86,7 +87,7 @@ function renderLine(line, innerW) {
 	else if (line.startsWith("diff ") || line.startsWith("index ")) colored = dim(content);
 	else colored = content;
 
-	write(dim("│") + colored + pad + dim("│"));
+	write(bSide() + colored + pad + bSide());
 }
 
 // ─── Input ───────────────────────────────────────────────────────────────────

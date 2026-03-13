@@ -1,6 +1,6 @@
 import { gitRoot } from "../../lib/git.ts";
 import { prView } from "../../lib/gh.ts";
-import { dim, cyan, green, yellow, red, visWidth, truncate, write, selColor } from "../../lib/ui.ts";
+import { dim, cyan, green, yellow, red, visWidth, truncate, write, selColor, bSide } from "../../lib/ui.ts";
 
 // ─── Data Fetching ───────────────────────────────────────────────────────────
 
@@ -42,6 +42,6 @@ export function renderCheckEntry(check, selected, innerW) {
 	const prefixW = visWidth(prefix) + visWidth(statusStr);
 	const name = truncate(check.name, innerW - prefixW);
 	const pad = " ".repeat(Math.max(0, innerW - prefixW - visWidth(name)));
-	const border = selected ? selColor("▐") : dim("│");
-	write(border + prefix + statusStr + name + pad + dim("│"));
+	const border = selected ? selColor("▐") : bSide();
+	write(border + prefix + statusStr + name + pad + bSide());
 }

@@ -4,6 +4,7 @@ import { git, gitRaw, gitRoot, absPath } from "../../lib/git.ts";
 import {
 	dim, cyan, green, yellow, red, magenta,
 	visWidth, smartTruncatePath, truncate, write, selColor,
+	bSide,
 } from "../../lib/ui.ts";
 
 // ─── Data Fetching ───────────────────────────────────────────────────────────
@@ -147,8 +148,8 @@ export function renderFileEntry(file, selected, innerW) {
 	const displayPath = file.isDir ? file.path + "/" : file.path;
 	const path = smartTruncatePath(displayPath, innerW - prefixW);
 	const pad = " ".repeat(Math.max(0, innerW - prefixW - visWidth(path)));
-	const border = selected ? selColor("▐") : dim("│");
-	write(border + prefix + stagedMark + statusStr + path + pad + dim("│"));
+	const border = selected ? selColor("▐") : bSide();
+	write(border + prefix + stagedMark + statusStr + path + pad + bSide());
 }
 
 export function renderTreeNodeEntry(node, depth, selected, innerW) {
@@ -159,6 +160,6 @@ export function renderTreeNodeEntry(node, depth, selected, innerW) {
 	const displayName = node.isDir ? node.name + "/" : node.name;
 	const name = truncate(displayName, innerW - prefixW);
 	const pad = " ".repeat(Math.max(0, innerW - prefixW - visWidth(name)));
-	const border = selected ? selColor("▐") : dim("│");
-	write(border + prefix + icon + name + pad + dim("│"));
+	const border = selected ? selColor("▐") : bSide();
+	write(border + prefix + icon + name + pad + bSide());
 }

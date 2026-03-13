@@ -1,11 +1,43 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { ghState } from "../lib/gh-state/index.ts";
 import { join, resolve } from "path";
+import { homedir } from "os";
 import { fileURLToPath } from "url";
-import { existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
+import { execFileSync } from "child_process";
 import { createHash } from "crypto";
 import { tmuxRun, tmuxQuery, tmuxFormat, isSessionAlive, ensureSession, getSessionPanePid, setSessionOption } from "./lib/tmux.ts";
 import { isGitRepo, getGitRoot, gitCommonDir } from "./lib/git.ts";
+
+// ─── Tmux Pane Border Helpers ─────────────────────────────────────────────────
+
+function getTerminalBg(): string | null {
+	try {
+		const theme = tmuxQuery("show-options", "-gv", "@powerkit_theme");
+		const variant = tmuxQuery("show-options", "-gv", "@powerkit_theme_variant");
+		const themeFile = join(homedir(), ".tmux/plugins/tmux-powerkit/src/themes", theme, `${variant}.sh`);
+		if (!existsSync(themeFile)) return null;
+		const content = readFileSync(themeFile, "utf-8");
+		const match = content.match(/\[background\]="(#[0-9a-fA-F]{6})"/);
+		return match ? match[1] : null;
+	} catch { return null; }
+}
+
+function hidePaneBorders(windowTarget: string) {
+	const bg = getTerminalBg();
+	if (!bg) return;
+	try {
+		tmuxRun("set-option", "-w", "-t", windowTarget, "pane-border-style", `fg=${bg}`);
+		tmuxRun("set-option", "-w", "-t", windowTarget, "pane-active-border-style", `fg=${bg}`);
+	} catch {}
+}
+
+function restorePaneBorders(windowTarget: string) {
+	try {
+		tmuxRun("set-option", "-wu", "-t", windowTarget, "pane-border-style");
+		tmuxRun("set-option", "-wu", "-t", windowTarget, "pane-active-border-style");
+	} catch {}
+}
 
 // ─── Shared Session Helpers ──────────────────────────────────────────────────
 
@@ -256,6 +288,7 @@ export default function panels(pi: ExtensionAPI) {
 		const globalErr = global.create(piPaneId ?? undefined);
 		if (globalErr) ctx.ui.notify(`Global panel: ${globalErr}`, "error");
 		local.create(piPaneId ?? undefined);
+		if (tmuxWindowTarget) hidePaneBorders(tmuxWindowTarget);
 		// Start gh-state after panels are open — don't block panel creation
 		ghState.start(pi, ctx.cwd).catch(() => {});
 	});
@@ -270,6 +303,7 @@ export default function panels(pi: ExtensionAPI) {
 
 	pi.on("session_shutdown", async () => {
 		clearPiState();
+		if (tmuxWindowTarget) restorePaneBorders(tmuxWindowTarget);
 		global.kill();
 		local.kill();
 		ghState.stop();

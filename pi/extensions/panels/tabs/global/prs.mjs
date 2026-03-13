@@ -6,6 +6,7 @@ import {
 	truncate, visWidth, write, moveTo, selColor,
 	contentLine, dividerLine, renderSectionRow,
 	buildSectionNav, buildSectionVisual,
+	bSide,
 } from "../../lib/ui.ts";
 
 // ─── PR JSON fields requested from gh ────────────────────────────────────────
@@ -243,7 +244,7 @@ function renderEntryRow(sections, item, selected, innerW) {
 	const cursor = selected ? selColor("→ ") : "  ";
 	const title = truncate(entry.title, innerW - 3);
 	const pad = " ".repeat(Math.max(0, innerW - 3 - visWidth(title)));
-	write(dim("│") + " " + cursor + title + pad + dim("│"));
+	write(bSide() + " " + cursor + title + pad + bSide());
 }
 
 function renderDetailRow(sections, item, innerW) {
@@ -269,5 +270,5 @@ function renderDetailRow(sections, item, innerW) {
 	const indent = "     ";
 	const full = indent + parts.join(dim(" • "));
 	const pad = " ".repeat(Math.max(0, innerW - visWidth(full)));
-	write(dim("│") + full + pad + dim("│"));
+	write(bSide() + full + pad + bSide());
 }

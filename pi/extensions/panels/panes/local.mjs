@@ -15,6 +15,7 @@ import {
 	dim, green, bgCyan, bgMuted, write,
 	enterAltScreen, exitAltScreen, hideCursor, showCursor,
 	clearScreen, moveTo, visWidth,
+	bTL, bTR, bBL, bBR, bTopN, bSide,
 } from "../lib/ui.ts";
 
 import * as files from "../tabs/local/files.mjs";
@@ -237,9 +238,9 @@ function render() {
 		: "";
 	const srvIndicator = serverRunning() ? " " + green("●") + dim(" srv") : "";
 	const tabBar = filesLabel + (checksLabel ? dim("│") + checksLabel : "") + srvIndicator;
-	const hFill = "─".repeat(Math.max(0, innerW - visWidth(tabBar)));
+	const hFill = Math.max(0, innerW - visWidth(tabBar));
 	moveTo(row++, 1);
-	write(dim("╭") + tabBar + dim(hFill + "╮"));
+	write(bTL() + tabBar + bTopN(hFill) + bTR());
 
 	const contentHeight = Math.max(1, height - 2);
 	let contentRow = 0;
@@ -248,7 +249,7 @@ function render() {
 		moveTo(row++, 1);
 		const msg = dim(" Loading...");
 		const pad = " ".repeat(Math.max(0, innerW - visWidth(msg)));
-		write(dim("│") + msg + pad + dim("│"));
+		write(bSide() + msg + pad + bSide());
 		contentRow++;
 	} else if (activeTab === "files") {
 		const navItems = files.buildNavItems(changedFiles);
@@ -256,7 +257,7 @@ function render() {
 			moveTo(row++, 1);
 			const msg = dim(" Working tree clean");
 			const pad = " ".repeat(Math.max(0, innerW - visWidth(msg)));
-			write(dim("│") + msg + pad + dim("│"));
+			write(bSide() + msg + pad + bSide());
 			contentRow++;
 		} else {
 			const maxVisible = Math.max(1, contentHeight);
@@ -281,7 +282,7 @@ function render() {
 			moveTo(row++, 1);
 			const msg = dim(" No checks");
 			const pad = " ".repeat(Math.max(0, innerW - visWidth(msg)));
-			write(dim("│") + msg + pad + dim("│"));
+			write(bSide() + msg + pad + bSide());
 			contentRow++;
 		} else {
 			const maxVisible = Math.max(1, contentHeight);
@@ -301,12 +302,12 @@ function render() {
 
 	while (contentRow < contentHeight) {
 		moveTo(row++, 1);
-		write(dim("│") + " ".repeat(innerW) + dim("│"));
+		write(bSide() + " ".repeat(innerW) + bSide());
 		contentRow++;
 	}
 
 	moveTo(row++, 1);
-	write(dim("╰" + "─".repeat(innerW) + "╯"));
+	write(bBL() + bTopN(innerW) + bBR());
 }
 
 // ─── Input ───────────────────────────────────────────────────────────────────
