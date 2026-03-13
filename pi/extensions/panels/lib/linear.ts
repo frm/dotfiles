@@ -19,6 +19,10 @@ function loadAuth() {
 	}
 }
 
+export function linearIssueUrl(identifier: string): string {
+	return `https://linear.app/issue/${identifier}`;
+}
+
 export function lookupIssue(identifier) {
 	const cached = cache.get(identifier);
 	if (cached && Date.now() - cached.ts < CACHE_TTL) return cached.result;

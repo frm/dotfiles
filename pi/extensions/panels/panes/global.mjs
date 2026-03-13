@@ -7,6 +7,8 @@ import { fileURLToPath } from "node:url";
 import { readPiState } from "../lib/data.ts";
 import { prMerge } from "../lib/gh.ts";
 import { gitCommonDir, gitRepoRoot, currentBranch, branchExists, worktreeDel, openUrl } from "../lib/git.ts";
+import { copyToClipboard } from "../lib/clipboard.ts";
+import { linearIssueUrl } from "../lib/linear.ts";
 import { createFocusManager } from "../lib/focus.ts";
 import { parsePiPaneId, setup, quit, checkPiPane, focusPiPane, forkWorker } from "../lib/panel.ts";
 import { getSessionOption } from "../lib/session.ts";
@@ -14,7 +16,7 @@ import { createVimNav } from "../lib/vim-nav.ts";
 import { tmuxRun, tmuxQuery, tmuxFormat, tmuxHasSession, tmuxNewSession } from "../lib/tmux.ts";
 import {
 	R, dim, cyan, yellow, red, boldRed, magenta, bgCyan, bgMuted, write,
-	hideCursor, createSpinner,
+	hideCursor, createSpinner, flash, bottomBorder,
 	clearScreen, moveTo, visWidth, truncate, wrapText, emptyLine, contentLine,
 } from "../lib/ui.ts";
 
@@ -65,6 +67,7 @@ let confirmingMerge = false;
 let confirmingAutoMerge = false;
 let merging = false;
 let deleting = false;
+
 
 const spinner = createSpinner(() => render());
 
@@ -347,7 +350,7 @@ function render() {
 	}
 
 	moveTo(row + contentRow, 1);
-	write(dim("╰" + "─".repeat(innerW) + "╯"));
+	write(bottomBorder(innerW));
 }
 
 // ─── Create Worktree Rendering ───────────────────────────────────────────────
@@ -453,6 +456,8 @@ function handleInput(data) {
 	if (inputStr === "c") return reviewPr();
 	if (inputStr === "C") return reviewPrLocal();
 	if (inputStr === "l") return openLinear();
+	if (inputStr === "y") return copyPrUrl();
+	if (inputStr === "L") return copyLinearUrl();
 	if (inputStr === "m") return promptMerge();
 	if (inputStr === "M") return promptAutoMerge();
 	if (inputStr === "r") { wt.clearPrCache(); return doRefresh(); }
@@ -553,6 +558,17 @@ function activate() {
 
 // ─── Actions ─────────────────────────────────────────────────────────────────
 
+function copyPrUrl() {
+	const entry = tab().getSelectedEntry();
+	const url = entry?.pr?.url ?? entry?.url;
+	if (url && copyToClipboard(url)) flash("Copied PR link", render);
+}
+
+function copyLinearUrl() {
+	const entry = tab().getSelectedEntry();
+	if (entry?.linearIssue && copyToClipboard(linearIssueUrl(entry.linearIssue.identifier))) flash("Copied Linear link", render);
+}
+
 function openPr() {
 	const entry = tab().getSelectedEntry();
 	const url = entry?.pr?.url ?? entry?.url;
@@ -617,7 +633,7 @@ function reviewPrLocal() {
 
 function openLinear() {
 	const entry = tab().getSelectedEntry();
-	if (entry?.linearIssue) openUrl(`https://linear.app/issue/${entry.linearIssue.identifier}`);
+	if (entry?.linearIssue) openUrl(linearIssueUrl(entry.linearIssue.identifier));
 }
 
 function promptMerge() {

@@ -106,6 +106,30 @@ export function createSpinner(onRender) {
 	};
 }
 
+// ─── Flash Messages ──────────────────────────────────────────────────────────
+
+let _flashMessage: string | null = null;
+let _flashTimer: ReturnType<typeof setTimeout> | null = null;
+
+export function flash(msg: string, renderFn: () => void, duration = 1500) {
+	_flashMessage = msg;
+	if (_flashTimer) clearTimeout(_flashTimer);
+	_flashTimer = setTimeout(() => { _flashMessage = null; _flashTimer = null; renderFn(); }, duration);
+	renderFn();
+}
+
+export function getFlashMessage(): string | null { return _flashMessage; }
+
+export function bottomBorder(innerW: number) {
+	const msg = _flashMessage;
+	if (msg) {
+		const label = ` ${msg} `;
+		const dashes = Math.max(0, innerW - visWidth(label));
+		return dim("╰") + green(label) + dim("─".repeat(dashes) + "╯");
+	}
+	return dim("╰" + "─".repeat(innerW) + "╯");
+}
+
 // ─── Line Builders ───────────────────────────────────────────────────────────
 
 export function emptyLine(innerW) {
