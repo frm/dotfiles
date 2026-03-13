@@ -279,6 +279,7 @@ gln -srf pi/instructions.md ~/.pi/agent/instructions.md
 dirlink pi/agents ~/.pi/agent/agents
 dirlink pi/prompts ~/.pi/agent/prompts
 dirlink pi/extensions ~/.pi/agent/extensions
+dirlink pi/shell ~/.pi/shell
 
 pp_info "sentry" "installing sentry cli..."
 curl https://cli.sentry.dev/install -fsS | bash
