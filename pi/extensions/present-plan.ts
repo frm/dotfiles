@@ -143,17 +143,35 @@ async function showPlanOverlay(
 							width,
 						));
 
-						// Show inline comment preview below the line
+						// Show inline comment preview below the line, wrapping long comments
 						if (hasComment) {
 							const commentText = comments.get(absIdx)!;
-							const preview = commentText.length > contentWidth - 4
-								? commentText.slice(0, contentWidth - 7) + "..."
-								: commentText;
-							const commentLine = theme.fg("dim", "│  ") +
-								theme.fg("warning", "↳ " + preview) +
-								" ".repeat(Math.max(0, contentWidth - visibleWidth("↳ " + preview))) +
-								theme.fg("dim", " │");
-							bordered.push(truncateToWidth(commentLine, width));
+							const wrapWidth = contentWidth - 4; // "↳ " prefix + padding
+							const commentLines = commentText.split("\n");
+							const wrappedLines: string[] = [];
+							for (const cl of commentLines) {
+								if (cl.length <= wrapWidth) {
+									wrappedLines.push(cl);
+								} else {
+									let remaining = cl;
+									while (remaining.length > 0) {
+										if (remaining.length <= wrapWidth) { wrappedLines.push(remaining); break; }
+										let breakAt = remaining.lastIndexOf(" ", wrapWidth);
+										if (breakAt <= 0) breakAt = wrapWidth;
+										wrappedLines.push(remaining.slice(0, breakAt));
+										remaining = remaining.slice(breakAt).replace(/^ /, "");
+									}
+								}
+							}
+							for (let ci = 0; ci < wrappedLines.length; ci++) {
+								const prefix = ci === 0 ? "↳ " : "  ";
+								const line = prefix + wrappedLines[ci];
+								const commentLine = theme.fg("dim", "│  ") +
+									theme.fg("warning", line) +
+									" ".repeat(Math.max(0, contentWidth - visibleWidth(line))) +
+									theme.fg("dim", " │");
+								bordered.push(truncateToWidth(commentLine, width));
+							}
 						}
 					}
 
@@ -270,7 +288,7 @@ async function showPlanOverlay(
 		if (exitState.action === "comment") {
 			const existing = comments.get(cursorLine);
 			const prompt = existing ? "Edit comment (empty to remove):" : "Add comment:";
-			const input = await ctx.ui.input(prompt, existing ?? "");
+			const input = await ctx.ui.editor(prompt, existing ?? "");
 
 			if (input !== undefined) {
 				if (input.trim()) {
