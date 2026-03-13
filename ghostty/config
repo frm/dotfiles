@@ -16,5 +16,5 @@ macos-option-as-alt = true
 macos-titlebar-style = hidden
 
 keybind = global:cmd+ctrl+t=toggle_quick_terminal
-keybind = shift+enter=csi:13;2u
+
 

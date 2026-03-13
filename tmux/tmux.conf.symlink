@@ -4,17 +4,16 @@ set -g prefix C-a
 
 set -g default-terminal "tmux-256color"
 
-# Forward Shift+Enter as CSI u sequence into the pane
-bind -n S-Enter send-keys Escape "[13;2u"
+# Extended keys with Ghostty — lets tmux negotiate key encoding natively
+set -s extended-keys always
+set -s extended-keys-format csi-u
+set -as terminal-features 'xterm-ghostty:extkeys'
 
-# Fix cursor change in nvim
-set -g -a terminal-overrides ',*:Ss=\E[%p1%d q:Se=\E[2 q'
+# Enable hyperlink support (OSC 8)
+set -as terminal-features ",*:hyperlinks"
 
 # Enable passthrough for OSC sequences (hyperlinks, images, etc)
 set -g allow-passthrough on
-
-# Enable hyperlink support (OSC 8)
-set -ga terminal-features ",*:hyperlinks"
 
 # Bind splits to C-A s/S
 bind-key s split-window -h -c '#{pane_current_path}'
@@ -141,8 +140,4 @@ set -g @powerkit_plugin_git_branch_max_length "0"
 
 # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
 run '~/.tmux/plugins/tpm/tpm'
-
-# tmux-sensible enables extended-keys, which breaks paste in nvim/pi —
-# newlines get encoded as CSI u sequences (\e[106;5u) instead of \n.
-set -s extended-keys off
 
