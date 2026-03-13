@@ -139,15 +139,35 @@ export function createQuestionnaireOverlay(questions: Question[], isMulti: boole
 			}
 
 			// Option navigation
-			if (matchesKey(data, Key.up)) {
+			if (matchesKey(data, Key.up) || data === "k") {
 				optionIndex = Math.max(0, optionIndex - 1);
 				refresh();
 				return;
 			}
-			if (matchesKey(data, Key.down)) {
+			if (matchesKey(data, Key.down) || data === "j") {
 				optionIndex = Math.min(opts.length - 1, optionIndex + 1);
 				refresh();
 				return;
+			}
+
+			// Number keys to select option directly
+			if (q && data >= "1" && data <= "9") {
+				const idx = parseInt(data) - 1;
+				if (idx < opts.length) {
+					const opt = opts[idx];
+					if (opt.isOther || opt.allowInput) {
+						inputMode = true;
+						inputQuestionId = q.id;
+						inputOptionLabel = opt.isOther ? undefined : opt.label;
+						inputOptionValue = opt.isOther ? undefined : opt.value;
+						editor.setText(opt.inputPlaceholder ?? "");
+						refresh();
+						return;
+					}
+					saveAnswer(q.id, opt.value, opt.label, false, idx + 1);
+					advanceAfterAnswer();
+					return;
+				}
 			}
 
 			// Select option
@@ -276,8 +296,8 @@ export function createQuestionnaireOverlay(questions: Question[], isMulti: boole
 			lines.push("");
 			if (!inputMode) {
 				const help = isMulti
-					? " Tab/←→ navigate • ↑↓ select • Enter confirm • Esc cancel"
-					: " ↑↓ navigate • Enter select • Esc cancel";
+					? " Tab/←→ navigate • ↑↓ select • 1-9 pick • Enter confirm • Esc cancel"
+					: " ↑↓ navigate • 1-9 pick • Enter select • Esc cancel";
 				add(theme.fg("dim", help));
 			}
 			add(theme.fg("accent", "─".repeat(width)));
