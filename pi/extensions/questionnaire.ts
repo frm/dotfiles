@@ -6,7 +6,7 @@
  */
 
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
-import { Editor, type EditorTheme, Key, matchesKey, Text, truncateToWidth } from "@mariozechner/pi-tui";
+import { Editor, type EditorTheme, Key, matchesKey, Text, truncateToWidth, wrapTextWithAnsi } from "@mariozechner/pi-tui";
 import { Type } from "@sinclair/typebox";
 
 // Types
@@ -281,6 +281,13 @@ export default function questionnaire(pi: ExtensionAPI) {
 
 					// Helper to add truncated line
 					const add = (s: string) => lines.push(truncateToWidth(s, width));
+					// Helper to add wrapped lines (for long text like prompts)
+					const addWrapped = (s: string, indent = "") => {
+						const wrapped = wrapTextWithAnsi(s, width);
+						for (let i = 0; i < wrapped.length; i++) {
+							lines.push(i > 0 && indent ? indent + wrapped[i] : wrapped[i]);
+						}
+					};
 
 					add(theme.fg("accent", "─".repeat(width)));
 
@@ -323,14 +330,14 @@ export default function questionnaire(pi: ExtensionAPI) {
 								add(prefix + theme.fg(color, `${i + 1}. ${opt.label}`));
 							}
 							if (opt.description) {
-								add(`     ${theme.fg("muted", opt.description)}`);
+								addWrapped(`     ${theme.fg("muted", opt.description)}`, "     ");
 							}
 						}
 					}
 
 					// Content
 					if (inputMode && q) {
-						add(theme.fg("text", ` ${q.prompt}`));
+						addWrapped(theme.fg("text", ` ${q.prompt}`), " ");
 						lines.push("");
 						// Show options for reference
 						renderOptions();
@@ -362,7 +369,7 @@ export default function questionnaire(pi: ExtensionAPI) {
 							add(theme.fg("warning", ` Unanswered: ${missing}`));
 						}
 					} else if (q) {
-						add(theme.fg("text", ` ${q.prompt}`));
+						addWrapped(theme.fg("text", ` ${q.prompt}`), " ");
 						lines.push("");
 						renderOptions();
 					}
