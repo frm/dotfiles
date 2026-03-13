@@ -727,10 +727,16 @@ function initPanel() {
 let lastActiveWindow = null;
 
 function pollStates() {
-	let activeWindow;
-	try {
-		activeWindow = tmuxFormat("#{session_name}:#{window_index}");
-	} catch { return; }
+	let activeWindow = null;
+	const pane = getActivePiPane();
+	if (pane) {
+		try {
+			// Get the user's session name from the pi pane, then query the session
+			// for its active window (targeting a session resolves to its active window)
+			const userSession = tmuxFormat("#{session_name}", pane);
+			if (userSession) activeWindow = tmuxFormat("#{session_name}:#{window_index}", userSession);
+		} catch {}
+	}
 
 	if (activeWindow && activeWindow !== lastActiveWindow && lastActiveWindow !== null) {
 		const currentState = readPiState(activeWindow);
