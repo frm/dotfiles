@@ -14,7 +14,7 @@ mouse-shift-capture = never
 macos-auto-secure-input = true
 macos-option-as-alt = true
 macos-titlebar-style = hidden
+macos-icon = glass
 
 keybind = global:cmd+ctrl+t=toggle_quick_terminal
-
 
