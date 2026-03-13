@@ -43,6 +43,13 @@ bind v copy-mode
 setw -g mode-keys vi
 bind -T copy-mode-vi v send-keys -X begin-selection
 
+# copy mode mouse selection: keep selection visible (prevent auto-cancel after select)
+bind-key -T copy-mode-vi MouseDown1Pane select-pane \; send-keys -X cancel
+bind-key -T copy-mode-vi DoubleClick1Pane send-keys -X select-word
+bind-key -T copy-mode-vi TripleClick1Pane send-keys -X select-line
+bind-key -T root DoubleClick1Pane select-pane -t = \; if-shell -F "#{||:#{pane_in_mode},#{mouse_any_flag}}" "send-keys -M" "copy-mode -H ; send-keys -X select-word"
+bind-key -T root TripleClick1Pane select-pane -t = \; if-shell -F "#{||:#{pane_in_mode},#{mouse_any_flag}}" "send-keys -M" "copy-mode -H ; send-keys -X select-line"
+
 # Resizing windows
 bind -n S-Left  resize-pane -L 1
 bind -n S-Right resize-pane -R 1
@@ -66,7 +73,7 @@ set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-battery'
 set -g @plugin 'tmux-plugins/tmux-cpu'
 set -g @plugin 'tmux-plugins/tmux-sensible'
-set -g @plugin 'tmux-plugins/tmux-yank'
+
 set -g @plugin 'wfxr/tmux-fzf-url'
 set -g @plugin 'christoomey/vim-tmux-navigator'
 set -g @plugin 'fabioluciano/tmux-powerkit'
@@ -138,6 +145,6 @@ set -g @powerkit_show_options_key "None"
 set -g @powerkit_plugin_git_show_files "true"
 set -g @powerkit_plugin_git_branch_max_length "0"
 
-# Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
+# Initialize TMUX plugin manager
 run '~/.tmux/plugins/tpm/tpm'
 
