@@ -255,6 +255,7 @@ export default function shepherdPr(pi: ExtensionAPI) {
 			enabled = !enabled;
 			if (enabled) {
 				await reconnectMonitor(ctx);
+				await maybeEnableAutoMerge(ctx);
 				ctx.ui.notify("Shepherd enabled", "success");
 			} else {
 				stopMonitor();
@@ -263,6 +264,40 @@ export default function shepherdPr(pi: ExtensionAPI) {
 			}
 		},
 	});
+
+	async function maybeEnableAutoMerge(ctx: ExtensionContext) {
+		if (!latestPr || latestPr.mergedAt) return;
+
+		const autoMerge = await execStdout(ctx.cwd, "gh", [
+			"pr", "view", String(latestPr.number), "--json", "autoMergeRequest", "-q", ".autoMergeRequest",
+		]);
+		if (autoMerge.trim()) return; // already enabled
+
+		const answer = await ctx.ui.select("Auto-merge is not enabled. Turn it on?", ["Yes", "No"]);
+		if (!answer || answer === "No") return;
+
+		// Bare merge — works with merge queues (no strategy needed)
+		const bare = await runExec(ctx.cwd, "gh", ["pr", "merge", String(latestPr.number), "--auto"], 30000);
+		if (bare.code === 0) {
+			ctx.ui.notify("Auto-merge enabled", "success");
+			return;
+		}
+
+		// Fall back to explicit strategy for repos without merge queues
+		const strategy = await ctx.ui.select("Pick merge strategy", ["Squash and merge", "Rebase and merge", "Merge commit", "Cancel"]);
+		if (!strategy || strategy === "Cancel") return;
+
+		const strategyFlag = strategy === "Squash and merge" ? "--squash"
+			: strategy === "Rebase and merge" ? "--rebase"
+			: "--merge";
+
+		const result = await runExec(ctx.cwd, "gh", ["pr", "merge", String(latestPr.number), "--auto", strategyFlag], 30000);
+		if (result.code === 0) {
+			ctx.ui.notify("Auto-merge enabled", "success");
+		} else {
+			ctx.ui.notify(`Failed to enable auto-merge: ${result.stderr.trim()}`, "error");
+		}
+	}
 
 	async function reconnectMonitor(ctx: ExtensionContext) {
 		if (!enabled) {
