@@ -23,13 +23,62 @@ interface OverlayExitState {
 	scrollOffset: number;
 }
 
+const DIFF_BG = "\x1b[48;5;22m"; // dark green background
+const RESET = "\x1b[0m";
+
+function stripAnsi(s: string): string {
+	return s.replace(/\x1b\[[0-9;]*m/g, "");
+}
+
+/** LCS-based diff: returns set of indices in newLines that are added/changed */
+function computeChangedLines(oldLines: string[], newLines: string[]): Set<number> {
+	const oldStripped = oldLines.map(stripAnsi);
+	const newStripped = newLines.map(stripAnsi);
+	const m = oldStripped.length;
+	const n = newStripped.length;
+
+	// Build LCS table
+	const dp: number[][] = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+	for (let i = 1; i <= m; i++) {
+		for (let j = 1; j <= n; j++) {
+			if (oldStripped[i - 1] === newStripped[j - 1]) {
+				dp[i][j] = dp[i - 1][j - 1] + 1;
+			} else {
+				dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+			}
+		}
+	}
+
+	// Backtrack to find matched lines in newLines
+	const matched = new Set<number>();
+	let i = m, j = n;
+	while (i > 0 && j > 0) {
+		if (oldStripped[i - 1] === newStripped[j - 1]) {
+			matched.add(j - 1);
+			i--; j--;
+		} else if (dp[i - 1][j] > dp[i][j - 1]) {
+			i--;
+		} else {
+			j--;
+		}
+	}
+
+	const changed = new Set<number>();
+	for (let k = 0; k < n; k++) {
+		if (!matched.has(k)) changed.add(k);
+	}
+	return changed;
+}
+
 async function showPlanOverlay(
 	plan: string,
 	ctx: ExtensionContext,
+	previousPlan?: string | null,
 ): Promise<PlanOverlayResult> {
 	const comments = new Map<number, string>(); // rendered line index → comment text
 	let cursorLine = 0;
 	let scrollOffset = 0;
+	let showDiff = !!previousPlan;
 
 	// Map rendered line indices back to nearest section heading in the raw plan
 	function findSectionForLine(lineIdx: number, allLines: string[]): string | null {
@@ -67,17 +116,29 @@ async function showPlanOverlay(
 		const exitState = await ctx.ui.custom<OverlayExitState>((tui, theme, _kb, done) => {
 			const mdTheme = getMarkdownTheme();
 			let allLines: string[] = [];
+			let changedLines: Set<number> = new Set();
 			let lastWidth = 0;
 			let cachedHeight = 0;
+			let usableHeight = 20;
+			let pendingG = false;
 			scrollOffset = savedScroll;
 			cursorLine = savedCursor;
 
 			function renderMarkdown(width: number) {
 				if (width !== lastWidth) {
-					const contentWidth = Math.max(20, width - 6); // 6 = gutter(2) + borders(4)
+					const contentWidth = Math.max(20, width - 5); // 5 = gutter(2) + borders(3: │ + ` │`)
 					const md = new Markdown(plan, 1, 0, mdTheme);
 					allLines = md.render(contentWidth);
 					lastWidth = width;
+
+					// Compute diff against previous plan
+					if (previousPlan) {
+						const prevMd = new Markdown(previousPlan, 1, 0, mdTheme);
+						const prevLines = prevMd.render(contentWidth);
+						changedLines = computeChangedLines(prevLines, allLines);
+					} else {
+						changedLines = new Set();
+					}
 				}
 			}
 
@@ -85,11 +146,11 @@ async function showPlanOverlay(
 				render(width: number): string[] {
 					renderMarkdown(width);
 					const gutterWidth = 2;
-					const contentWidth = Math.max(20, width - 4 - gutterWidth);
+					const contentWidth = Math.max(20, width - 3 - gutterWidth);
 					const screenH = tui.screenHeight > 0 ? tui.screenHeight : 40;
 					// Lock height on first render to prevent oscillation
 					if (cachedHeight === 0) cachedHeight = Math.max(5, screenH - 2);
-					const usableHeight = cachedHeight;
+					usableHeight = cachedHeight;
 
 					// Clamp cursor
 					if (cursorLine >= allLines.length) cursorLine = Math.max(0, allLines.length - 1);
@@ -107,8 +168,9 @@ async function showPlanOverlay(
 
 					// Header
 					const commentCount = comments.size;
-					const commentBadge = commentCount > 0 ? theme.fg("warning", ` 💬 ${commentCount} `) : "";
-					const title = theme.fg("accent", theme.bold(" Plan Review ")) + commentBadge;
+					const commentBadge = commentCount > 0 ? theme.fg("warning", ` ${commentCount} comment${commentCount > 1 ? "s" : ""} `) : "";
+					const diffBadge = showDiff && previousPlan ? theme.fg("success", " diff ") : "";
+					const title = theme.fg("accent", theme.bold(" Plan Review ")) + commentBadge + diffBadge;
 					const rangeEnd = Math.min(scrollOffset + usableHeight, allLines.length);
 					const scrollInfo = theme.fg("dim", ` ${scrollOffset + 1}-${rangeEnd}/${allLines.length} `);
 					const headerFill = "─".repeat(Math.max(0, width - visibleWidth(title) - visibleWidth(scrollInfo) - 4));
@@ -127,26 +189,32 @@ async function showPlanOverlay(
 						// Gutter: cursor marker or comment marker
 						let gutter: string;
 						if (isCursor && hasComment) {
-							gutter = theme.fg("warning", "▶💬");
+							gutter = theme.fg("warning", "▶•");
 						} else if (isCursor) {
 							gutter = theme.fg("accent", "▶ ");
 						} else if (hasComment) {
-							gutter = theme.fg("warning", "💬");
+							gutter = theme.fg("warning", " •");
 						} else {
 							gutter = "  ";
 						}
 
 						const line = visibleLines[i];
+						const isChanged = showDiff && changedLines.has(absIdx);
 						const pad = " ".repeat(Math.max(0, contentWidth - visibleWidth(line)));
+						const content = isChanged
+							? DIFF_BG + gutter + line + pad + RESET
+							: gutter + line + pad;
 						bordered.push(truncateToWidth(
-							theme.fg("dim", "│") + gutter + line + pad + theme.fg("dim", " │"),
+							theme.fg("dim", "│") + content + theme.fg("dim", " │"),
 							width,
 						));
 
 						// Show inline comment preview below the line, wrapping long comments
 						if (hasComment) {
 							const commentText = comments.get(absIdx)!;
-							const wrapWidth = contentWidth - 4; // "↳ " prefix + padding
+							const firstPrefix = "↳ ";  // 3 chars
+							const contPrefix = "   ";   // 3 chars, aligns with text after ↳
+							const wrapWidth = contentWidth - 3; // account for prefix width
 							const commentLines = commentText.split("\n");
 							const wrappedLines: string[] = [];
 							for (const cl of commentLines) {
@@ -164,13 +232,13 @@ async function showPlanOverlay(
 								}
 							}
 							for (let ci = 0; ci < wrappedLines.length; ci++) {
-								const prefix = ci === 0 ? "↳ " : "  ";
-								const line = prefix + wrappedLines[ci];
+								const prefix = ci === 0 ? firstPrefix : contPrefix;
+								const cl = prefix + wrappedLines[ci];
 								const commentLine = theme.fg("dim", "│  ") +
-									theme.fg("warning", line) +
-									" ".repeat(Math.max(0, contentWidth - visibleWidth(line))) +
+									theme.fg("warning", cl) +
+									" ".repeat(Math.max(0, contentWidth - visibleWidth(cl))) +
 									theme.fg("dim", " │");
-								bordered.push(truncateToWidth(commentLine, width));
+								bordered.push(commentLine);
 							}
 						}
 					}
@@ -179,7 +247,7 @@ async function showPlanOverlay(
 					while (bordered.length < usableHeight) {
 						bordered.push(
 							truncateToWidth(
-								theme.fg("dim", "│ ") + " ".repeat(contentWidth + gutterWidth) + theme.fg("dim", " │"),
+								theme.fg("dim", "│") + " ".repeat(contentWidth + gutterWidth) + theme.fg("dim", " │"),
 								width,
 							),
 						);
@@ -187,7 +255,8 @@ async function showPlanOverlay(
 					bordered.length = usableHeight;
 
 					// Footer
-					const keys = theme.fg("muted", " j/k scroll • c comment • Enter submit • Shift+Enter accept w/ comments • Esc reject ");
+					const diffKey = previousPlan ? "d diff • " : "";
+					const keys = theme.fg("muted", ` ${diffKey}c comment • Enter submit • S-Enter approve • Esc reject `);
 					const footerFill = "─".repeat(Math.max(0, width - visibleWidth(keys) - 2));
 					const footer = truncateToWidth(
 						theme.fg("dim", "╰") + theme.fg("dim", footerFill) + keys + theme.fg("dim", "╯"),
@@ -198,19 +267,26 @@ async function showPlanOverlay(
 				},
 
 				handleInput(data: string) {
-					if (data === "j" || matchesKey(data, Key.down)) {
+					if (matchesKey(data, "j") || matchesKey(data, Key.down)) {
 						cursorLine = Math.min(cursorLine + 1, allLines.length - 1);
-					} else if (data === "k" || matchesKey(data, Key.up)) {
+					} else if (matchesKey(data, "k") || matchesKey(data, Key.up)) {
 						cursorLine = Math.max(0, cursorLine - 1);
-					} else if (data === "d" || matchesKey(data, "pagedown") || matchesKey(data, Key.shift("down"))) {
-						cursorLine = Math.min(cursorLine + 10, allLines.length - 1);
-					} else if (data === "u" || matchesKey(data, "pageup") || matchesKey(data, Key.shift("up"))) {
-						cursorLine = Math.max(0, cursorLine - 10);
-					} else if (data === "g" || matchesKey(data, Key.home)) {
-						cursorLine = 0;
-					} else if (data === "G" || matchesKey(data, Key.end)) {
+					} else if (matchesKey(data, "d")) {
+						if (previousPlan) { showDiff = !showDiff; }
+					} else if (matchesKey(data, Key.ctrl("d")) || matchesKey(data, "pagedown") || matchesKey(data, Key.shift("down"))) {
+						cursorLine = Math.min(cursorLine + Math.floor(usableHeight / 2), allLines.length - 1);
+					} else if (matchesKey(data, Key.ctrl("u")) || matchesKey(data, "pageup") || matchesKey(data, Key.shift("up"))) {
+						cursorLine = Math.max(0, cursorLine - Math.floor(usableHeight / 2));
+					} else if (matchesKey(data, "g")) {
+						if (pendingG) { cursorLine = 0; pendingG = false; }
+						else { pendingG = true; setTimeout(() => { pendingG = false; }, 500); }
+						if (pendingG) { return; }
+					} else if (matchesKey(data, Key.shift("g")) || matchesKey(data, Key.end)) {
 						cursorLine = allLines.length - 1;
-					} else if (data === "c" || data === "C") {
+						pendingG = false;
+					} else if (matchesKey(data, Key.home)) {
+						cursorLine = 0;
+					} else if (matchesKey(data, "c") || matchesKey(data, Key.shift("c"))) {
 						done({ action: "comment", cursorLine, scrollOffset });
 						return;
 					} else if (matchesKey(data, Key.shift("enter"))) {
@@ -219,7 +295,7 @@ async function showPlanOverlay(
 					} else if (matchesKey(data, Key.enter)) {
 						done({ action: "submit", cursorLine, scrollOffset });
 						return;
-					} else if (data === "f" || data === "F") {
+					} else if (matchesKey(data, "f") || matchesKey(data, Key.shift("f"))) {
 						done({ action: "feedback", cursorLine, scrollOffset });
 						return;
 					} else if (matchesKey(data, Key.escape)) {
@@ -305,10 +381,14 @@ async function showPlanOverlay(
 
 export default function presentPlan(pi: ExtensionAPI) {
 	let latestPlan: string | null = null;
+	let previousPlan: string | null = null;
+	let hasPresentedThisSession = false;
 
 	// Restore latest plan from session on start
 	pi.on("session_start", async (_event, ctx) => {
 		latestPlan = null;
+		previousPlan = null;
+		hasPresentedThisSession = false;
 		for (const entry of ctx.sessionManager.getEntries()) {
 			if (entry.type === "custom" && entry.customType === ENTRY_TYPE) {
 				latestPlan = (entry as any).data?.plan ?? null;
@@ -318,6 +398,8 @@ export default function presentPlan(pi: ExtensionAPI) {
 
 	pi.on("session_switch", async (_event, ctx) => {
 		latestPlan = null;
+		previousPlan = null;
+		hasPresentedThisSession = false;
 		for (const entry of ctx.sessionManager.getEntries()) {
 			if (entry.type === "custom" && entry.customType === ENTRY_TYPE) {
 				latestPlan = (entry as any).data?.plan ?? null;
@@ -344,12 +426,16 @@ export default function presentPlan(pi: ExtensionAPI) {
 		async execute(toolCallId, params, signal, onUpdate, ctx) {
 			const { plan } = params;
 
+			// Track previous for diff — only from plans shown this session
+			previousPlan = hasPresentedThisSession ? latestPlan : null;
+			hasPresentedThisSession = true;
+
 			// Persist
 			latestPlan = plan;
 			pi.appendEntry(ENTRY_TYPE, { plan });
 
 			// Show overlay
-			const result = await showPlanOverlay(plan, ctx);
+			const result = await showPlanOverlay(plan, ctx, previousPlan);
 
 			let text: string;
 			if (result.approved && result.feedback) {
@@ -408,7 +494,7 @@ export default function presentPlan(pi: ExtensionAPI) {
 				ctx.ui.notify("No plan has been presented yet", "warning");
 				return;
 			}
-			await showPlanOverlay(latestPlan, ctx);
+			await showPlanOverlay(latestPlan, ctx, previousPlan);
 		},
 	});
 }
