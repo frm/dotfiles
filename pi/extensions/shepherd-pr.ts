@@ -392,7 +392,7 @@ export default function shepherdPr(pi: ExtensionAPI) {
 			widgetMode = pendingAmbiguous > 0 ? "needs-review" : "watching";
 			if (widgetMode === "watching") {
 				const reviewCount = pendingAmbiguous > 0 ? pendingAmbiguous : pendingReviewCount(latestPr);
-				widgetFixProgress = `✓${checks.passed} ✗${checks.failed} ⟡${reviewCount}`;
+				widgetFixProgress = `✓ ${checks.passed} · ✗ ${checks.failed} · ⟡  ${reviewCount}`;
 			}
 		}
 		renderWidget();
@@ -869,19 +869,19 @@ export default function shepherdPr(pi: ExtensionAPI) {
 			return theme.fg("muted", "not shepherding");
 		}
 		if (widgetMode === "merged") {
-			return theme.fg("success", "⟐ ✓ merged!");
+			return theme.fg("success", "⟐  ✓ merged!");
 		}
 		if (widgetMode === "fixing") {
 			const right = widgetFixProgress ? theme.fg("dim", ` · ${widgetFixProgress}`) : "";
-			return theme.fg("accent", `⟐ fixing ${widgetFixLabel} …`) + right;
+			return theme.fg("accent", `⟐  fixing ${widgetFixLabel} …`) + right;
 		}
 		const pendingAmbiguous = ambiguousReviews.filter((a) => !a.handled).length;
 		if (pendingAmbiguous > 0) {
-			return theme.fg("warning", `⟐ ⚠ ${pendingAmbiguous} needs review`);
+			return theme.fg("warning", `⟐  ⚠ ${pendingAmbiguous} needs review`);
 		}
 		const checks = summarizeChecks((latestPr?.statusCheckRollup ?? []) as StatusCheckLike[]);
 		const reviewCount = latestPr ? pendingReviewCount(latestPr) : 0;
-		return theme.fg("accent", "⟐ watching") + theme.fg("dim", ` · ✓${checks.passed} ✗${checks.failed} ⟡${reviewCount}`);
+		return theme.fg("accent", "⟐  watching") + theme.fg("dim", ` · ✓ ${checks.passed} · ✗ ${checks.failed} · ⟡  ${reviewCount}`);
 	}
 }
 
