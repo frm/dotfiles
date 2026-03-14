@@ -1,0 +1,11 @@
+{
+  "self-improvement": {
+    "enabled": true,
+    "showEndOfSessionSummary": true,
+    "showEmergingPatterns": false,
+    "minEntriesForSummary": 0,
+    "minEntriesForSuggestion": 2,
+    "minEntriesForResurface": 3,
+    "ignoredArtifacts": []
+  }
+}
