@@ -47,6 +47,10 @@ A context document containing PR metadata, the diff, and review scope. Analyze o
 **What:** [Description of the structural concern]
 **Why it matters:** [Impact on maintainability, extensibility, or system coherence]
 **Context:** [How the existing codebase handles similar cases]
+**Diff:**
+```diff
+[relevant diff hunk from the PR showing the structural change, with a few lines of surrounding context]
+```
 
 ### Finding 2 — ...
 

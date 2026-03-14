@@ -51,6 +51,10 @@ A context document containing PR metadata, the diff, and review scope. Analyze o
 **What:** [Description of the risk]
 **Impact:** [What happens if this goes wrong]
 **Mitigation:** [How to reduce the risk — feature flag, staged rollout, etc.]
+**Diff:**
+```diff
+[relevant diff hunk from the PR showing the risky change, with a few lines of surrounding context]
+```
 
 ### Risk 2 — ...
 

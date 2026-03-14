@@ -45,7 +45,8 @@ export default function presentPlan(pi: ExtensionAPI) {
 			"Present an implementation plan to the user for review and approval. " +
 			"Use this when you have a complete plan ready for the user to review. " +
 			"The plan will be displayed in a scrollable overlay. " +
-			"The user will approve or reject it. Returns their decision.",
+			"The user will approve or reject it. Returns their decision. " +
+			"Optionally pass contexts to enable context-aware comment editing on specific sections.",
 		promptGuidelines: [
 			"Use present_plan when you have a complete implementation plan to show the user.",
 			"Write the plan in markdown format with clear sections and structure.",
@@ -53,6 +54,11 @@ export default function presentPlan(pi: ExtensionAPI) {
 		],
 		parameters: Type.Object({
 			plan: Type.String({ description: "The full implementation plan in markdown format" }),
+			contexts: Type.Optional(Type.Array(Type.Object({
+				rawStart: Type.Number({ description: "First line in raw markdown (1-indexed)" }),
+				rawEnd: Type.Number({ description: "Last line in raw markdown (1-indexed)" }),
+				content: Type.String({ description: "Markdown to render in the context-aware comment editor" }),
+			}), { description: "Context blocks for inline comment editing. Each maps a range of plan lines to content shown when the user writes a comment on those lines." })),
 		}),
 		async execute(toolCallId, params, signal, onUpdate, ctx) {
 			const { plan } = params;
@@ -66,7 +72,7 @@ export default function presentPlan(pi: ExtensionAPI) {
 			pi.appendEntry(ENTRY_TYPE, { plan });
 
 			// Show overlay
-			const result = await showPlanOverlay(plan, ctx, previousPlan);
+			const result = await showPlanOverlay(plan, ctx, previousPlan, params.contexts);
 
 			let text: string;
 			if (result.approved && result.feedback) {

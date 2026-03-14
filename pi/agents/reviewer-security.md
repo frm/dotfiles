@@ -76,6 +76,10 @@ Only report findings where you're >80% confident of actual exploitability. For e
 **What:** [Description of the vulnerability]
 **Attack path:** [Concrete exploitation scenario]
 **Recommendation:** [How to fix]
+**Diff:**
+```diff
+[relevant diff hunk from the PR showing the vulnerable code, with a few lines of surrounding context]
+```
 
 ### Finding 2 — ...
 

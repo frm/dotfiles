@@ -153,8 +153,11 @@ Praise exceptional work rarely — if something is genuinely well done, a brief 
 
 #### Comment 1 — <severity: Critical / Important / Nit>
 **File:** `<file>` line <N>
-**Comment to post:**
-> <exact text that will be posted as a GitHub inline comment>
+**Suggested comment:**
+> <suggested text for the GitHub inline comment>
+```diff
+[diff hunk showing the code being commented on]
+```
 
 [If no inline comments: "No inline comments — the implementation is clean."]
 
@@ -163,7 +166,11 @@ Praise exceptional work rarely — if something is genuinely well done, a brief 
 **Review body:** <top-level review summary, or empty>
 ```
 
+When calling `present_plan`, pass a `contexts` array alongside the plan. Each inline comment gets a context entry with `rawStart` and `rawEnd` (line numbers in the plan markdown covering the comment's diff hunk and suggested comment) and `content` (the diff hunk + suggested comment as markdown). This enables the context-aware comment editor in the plan overlay.
+
 The user will approve, reject, or give feedback to iterate.
+
+When the user provides inline comments on the Inline Comments section, use their text verbatim as the GitHub comment body — do not rephrase, summarise, or edit it.
 
 ## Step 8: Validate Comment Positions
 

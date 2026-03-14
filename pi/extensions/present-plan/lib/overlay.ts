@@ -1,7 +1,9 @@
 import { Markdown, matchesKey, Key, truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
 import { getMarkdownTheme } from "@mariozechner/pi-coding-agent";
 import type { ExtensionContext } from "@mariozechner/pi-coding-agent";
-import type { PlanOverlayResult, OverlayExitState } from "./types.ts";
+import type { PlanContext, PlanOverlayResult, OverlayExitState } from "./types.ts";
+import { buildRawToRenderedMap, mapContextsToRendered, findContextForLine, type RenderedContext } from "./context.ts";
+import { showContextEditor } from "./context-editor.ts";
 import { DIFF_BG, RESET, computeChangedLines } from "./diff.ts";
 import { formatCommentsAsFeedback } from "./comments.ts";
 
@@ -9,8 +11,10 @@ export async function showPlanOverlay(
 	plan: string,
 	ctx: ExtensionContext,
 	previousPlan?: string | null,
+	contexts?: PlanContext[],
 ): Promise<PlanOverlayResult> {
 	const comments = new Map<number, string>(); // rendered line index → comment text
+	let renderedContexts: RenderedContext[] = [];
 	let cursorLine = 0;
 	let scrollOffset = 0;
 	let showDiff = !!previousPlan;
@@ -45,6 +49,16 @@ export async function showPlanOverlay(
 						changedLines = computeChangedLines(prevLines, allLines);
 					} else {
 						changedLines = new Set();
+					}
+
+					// Map raw contexts to rendered line ranges
+					if (contexts && contexts.length > 0) {
+						const renderForMapping = (mdText: string) => {
+							const m = new Markdown(mdText, 1, 0, mdTheme);
+							return m.render(contentWidth);
+						};
+						const rawToRendered = buildRawToRenderedMap(plan, renderForMapping);
+						renderedContexts = mapContextsToRendered(contexts, rawToRendered, allLines.length);
 					}
 				}
 			}
@@ -119,8 +133,8 @@ export async function showPlanOverlay(
 						// Show inline comment preview below the line, wrapping long comments
 						if (hasComment) {
 							const commentText = comments.get(absIdx)!;
-							const firstPrefix = "↳ ";  // 3 chars
-							const contPrefix = "   ";   // 3 chars, aligns with text after ↳
+							const firstPrefix = "↳  ";  // 3 visual cols (↳=1 + 2 spaces)
+							const contPrefix = "   ";   // 3 visual cols, aligns with text after ↳
 							const wrapWidth = contentWidth - 3; // account for prefix width
 							const commentLines = commentText.split("\n");
 							const wrappedLines: string[] = [];
@@ -270,8 +284,15 @@ export async function showPlanOverlay(
 
 		if (exitState.action === "comment") {
 			const existing = comments.get(cursorLine);
-			const prompt = existing ? "Edit comment (empty to remove):" : "Add comment:";
-			const input = await ctx.ui.editor(prompt, existing ?? "");
+			const contextBlock = findContextForLine(cursorLine, renderedContexts);
+
+			let input: string | undefined;
+			if (contextBlock) {
+				input = await showContextEditor(ctx, contextBlock.content, existing);
+			} else {
+				const prompt = existing ? "Edit comment (empty to remove):" : "Add comment:";
+				input = await ctx.ui.editor(prompt, existing ?? "");
+			}
 
 			if (input !== undefined) {
 				if (input.trim()) {

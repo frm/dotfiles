@@ -51,6 +51,10 @@ Be thorough. Read every file you need to. If you're unsure whether a caller is a
 **What:** [Description of the issue]
 **Why it matters:** [What breaks, what edge case is missed, what caller is affected]
 **Trace:** [How you found this — which callers you checked, which paths you followed]
+**Diff:**
+```diff
+[relevant diff hunk from the PR showing the problematic change, with a few lines of surrounding context]
+```
 
 ### Finding 2 — ...
 

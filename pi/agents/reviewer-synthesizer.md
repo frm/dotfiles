@@ -55,15 +55,27 @@ Output the review markdown directly. Do NOT use `present_plan` — the main agen
 
 #### Correctness
 - `file.ts:42` — [issue description and why it matters]
+```diff
+[diff hunk from the specialist agent's finding]
+```
 
 #### Architecture
 - `file.ts:100` — [structural concern and impact]
+```diff
+[diff hunk]
+```
 
 #### Security
 - `file.ts:150` — [vulnerability, attack path, recommendation]
+```diff
+[diff hunk]
+```
 
 #### Quality
 - `file.ts:200` — [nit description and suggestion]
+```diff
+[diff hunk]
+```
 
 #### ❤️ Well Done
 - `file.ts:250` — [what's exceptional and why]
@@ -80,8 +92,11 @@ Output the review markdown directly. Do NOT use `present_plan` — the main agen
 
 #### Comment 1 — <severity>
 **File:** `<file>` line <N>
-**Comment to post:**
-> <exact text that will be posted as a GitHub inline comment>
+**Suggested comment:**
+> <suggested text for the GitHub inline comment>
+```diff
+[diff hunk showing the code being commented on]
+```
 
 #### Comment 2 — ...
 

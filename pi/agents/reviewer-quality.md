@@ -58,6 +58,10 @@ Use a brief, human note: ❤️, "nice", "well done" — not a paragraph of prai
 **File:** `<file>` line <N>
 **What:** [Description]
 **Suggestion:** [How to improve]
+**Diff:**
+```diff
+[relevant diff hunk from the PR showing the code in question, with a few lines of surrounding context]
+```
 
 ### Praise 1 — ❤️
 **File:** `<file>` line <N>
