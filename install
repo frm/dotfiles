@@ -274,6 +274,7 @@ cp -r ai/skills/* ~/.codex/skills/
 cp ai/me.md.sample ai/me.md
 
 # pi setup
+gln -srf pi/config.json.symlink ~/.pi/config.json
 gln -srf pi/settings.json.symlink ~/.pi/agent/settings.json
 gln -srf pi/instructions.md ~/.pi/agent/instructions.md
 dirlink pi/agents ~/.pi/agent/agents
