@@ -14,7 +14,7 @@ import { spawn } from "node:child_process";
 import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
 import { Key, matchesKey, truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
 
-import { ghState, type PrInfo } from "./lib/gh-state/index.ts";
+import { ghState, type PrInfo } from "./lib/gh/index.ts";
 
 type Theme = ExtensionContext["ui"]["theme"];
 

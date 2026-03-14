@@ -1,5 +1,5 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
-import { ghState } from "../lib/gh-state/index.ts";
+import { ghState } from "../lib/gh/index.ts";
 import { join, resolve } from "path";
 import { homedir } from "os";
 import { fileURLToPath } from "url";
@@ -289,7 +289,7 @@ export default function panels(pi: ExtensionAPI) {
 		if (globalErr) ctx.ui.notify(`Global panel: ${globalErr}`, "error");
 		local.create(piPaneId ?? undefined);
 		if (tmuxWindowTarget) hidePaneBorders(tmuxWindowTarget);
-		// Start gh-state after panels are open — don't block panel creation
+		// Start gh after panels are open — don't block panel creation
 		ghState.start(pi, ctx.cwd).catch(() => {});
 	});
 

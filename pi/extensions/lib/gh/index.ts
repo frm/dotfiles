@@ -1,10 +1,7 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import type { PrInfo, ReviewComment } from "./lib/types.ts";
-import { getSessionRoot, socketPath, lockPath } from "./lib/protocol.ts";
-import { tryAcquireLock, releaseLock, isLockStale, startHeartbeat } from "./lib/leader.ts";
+import { createSingleton, getSessionRoot, type Singleton, type PushFn } from "../singleton/index.ts";
 import { createPoller, type Poller, type PollerStatus } from "./lib/poller.ts";
-import { createServer, type GhStateServer } from "./lib/server.ts";
-import { createClient, type GhStateClient } from "./lib/client.ts";
 import { readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 
@@ -12,19 +9,20 @@ export type { PrInfo, PrComment, ReviewComment } from "./lib/types.ts";
 
 // ── State ────────────────────────────────────────────────────────────────────
 
-let role: "leader" | "client" | null = null;
-let sessionRoot: string | null = null;
-let sockPath: string | null = null;
-let lckPath: string | null = null;
+interface GhService {
+	prView(params?: Record<string, unknown>): PrInfo | null;
+	prLists(params?: Record<string, unknown>): { reviewPrs: unknown[]; myPrs: unknown[] };
+	prMergeQueuePositions(params?: Record<string, unknown>): Record<number, number>;
+	reviewComments(params?: Record<string, unknown>): Promise<ReviewComment[]>;
+	worktreePr(params?: Record<string, unknown>): Promise<unknown>;
+	username(params?: Record<string, unknown>): Promise<string | null>;
+	prChecks(params?: Record<string, unknown>): Promise<unknown>;
+	refresh(params?: Record<string, unknown>): Promise<PrInfo | null>;
+	leaderStatus(params?: Record<string, unknown>): Record<string, unknown>;
+}
 
-let poller: Poller | null = null;
-let server: GhStateServer | null = null;
-let client: GhStateClient | null = null;
-let stopHeartbeat: (() => void) | null = null;
-let stalenessTimer: ReturnType<typeof setInterval> | null = null;
-
-let piRef: ExtensionAPI | null = null;
-let startedAt: number | null = null;
+let singleton: Singleton<GhService> | null = null;
+let pollerRef: Poller | null = null;
 
 type Subscriber = (pr: PrInfo | null) => void;
 const subscribers = new Set<Subscriber>();
@@ -36,52 +34,67 @@ let clientCachedPr: PrInfo | null = null;
 
 export const ghState = {
 	async start(pi: ExtensionAPI, cwd: string): Promise<void> {
-		if (role) return; // Already started
-		piRef = pi;
-		startedAt = Date.now();
+		if (singleton) return;
 
-		sessionRoot = getSessionRoot(cwd);
-		sockPath = socketPath(sessionRoot);
-		lckPath = lockPath(sessionRoot);
+		const sessionRoot = getSessionRoot(cwd);
+
+		singleton = createSingleton<GhService>({
+			name: "gh",
+			sessionRoot,
+			createService(push: PushFn): GhService {
+				const poller = createPoller(pi, sessionRoot, (event, data) => {
+					push(event, data);
+				});
+				poller.start();
+				pollerRef = poller;
+
+				return {
+					prView: () => poller.getPrView(),
+					prLists: () => poller.getPrLists(),
+					prMergeQueuePositions: () => poller.getMergeQueuePositions(),
+					reviewComments: () => poller.getReviewComments(),
+					worktreePr: (p) => poller.getWorktreePr(p?.branch as string, p?.cwd as string),
+					username: () => poller.getUsername(),
+					prChecks: (p) => poller.getPrChecks(p?.prNumber as number),
+					refresh: () => poller.refresh(),
+					leaderStatus: () => ({ poller: poller.getStatus() }),
+					[Symbol.dispose]: () => poller.stop(),
+				} as GhService;
+			},
+		});
+
+		// Subscribe to push events for local notification
+		singleton.subscribe("prView", (data) => {
+			if (singleton?.role() === "client") {
+				clientCachedPr = data as PrInfo | null;
+			}
+			notify();
+		});
 
 		registerCommands(pi);
+		await singleton.start();
 
-		const isLeader = tryAcquireLock(lckPath);
-		if (isLeader) {
-			await startAsLeader(pi);
+		// Deliver initial state for clients
+		if (singleton.role() === "client") {
+			try {
+				clientCachedPr = (await singleton.call("prView")) as PrInfo | null;
+				notify();
+			} catch {}
 		} else {
-			await startAsClient();
+			notify();
 		}
-
-		// Periodically check if leader is still alive
-		stalenessTimer = setInterval(() => {
-			checkAndTakeover(pi).catch(() => {});
-		}, 60_000);
 	},
 
 	stop(): void {
-		if (stalenessTimer) { clearInterval(stalenessTimer); stalenessTimer = null; }
-
-		if (role === "leader") {
-			poller?.stop();
-			server?.stop();
-			if (stopHeartbeat) { stopHeartbeat(); stopHeartbeat = null; }
-			if (lckPath) releaseLock(lckPath);
-		} else if (role === "client") {
-			client?.disconnect();
-		}
-
-		role = null;
-		poller = null;
-		server = null;
-		client = null;
-		piRef = null;
-		startedAt = null;
+		singleton?.stop();
+		singleton = null;
+		pollerRef = null;
 		subscribers.clear();
+		clientCachedPr = null;
 	},
 
 	get(): PrInfo | null {
-		if (role === "leader") return poller?.getPrView() ?? null;
+		if (singleton?.role() === "leader") return pollerRef?.getPrView() ?? null;
 		return clientCachedPr;
 	},
 
@@ -93,76 +106,78 @@ export const ghState = {
 	},
 
 	async fetchReviewComments(): Promise<ReviewComment[]> {
-		if (role === "leader") return poller?.getReviewComments() ?? [];
-		if (client) {
-			try {
-				return (await client.request("reviewComments")) as ReviewComment[];
-			} catch {
-				return [];
-			}
+		if (!singleton) return [];
+		try {
+			return (await singleton.call("reviewComments")) as ReviewComment[];
+		} catch {
+			return [];
 		}
-		return [];
 	},
 
 	async refresh(): Promise<PrInfo | null> {
-		if (role === "leader") return poller?.refresh() ?? null;
-		if (client) {
-			try {
-				clientCachedPr = (await client.request("prView")) as PrInfo | null;
+		if (!singleton) return null;
+		try {
+			const pr = (await singleton.call("refresh")) as PrInfo | null;
+			if (singleton.role() === "client") {
+				clientCachedPr = pr;
 				notify();
-				return clientCachedPr;
-			} catch {
-				return clientCachedPr;
 			}
+			return pr;
+		} catch {
+			return ghState.get();
 		}
-		return null;
 	},
 
-	async status(): Promise<GhStateStatus> {
+	async status(): Promise<GhStatus> {
+		const base = singleton?.status() ?? {
+			role: null as "leader" | "client" | null,
+			sessionRoot: null as string | null,
+			socketPath: null as string | null,
+			lockPath: null as string | null,
+			uptime: null as number | null,
+		};
+
 		const pr = ghState.get();
-		const base: GhStateStatus = {
-			role: role ?? "stopped",
-			sessionRoot,
-			socketPath: sockPath,
-			lockPath: lckPath,
-			uptime: startedAt ? Date.now() - startedAt : null,
-			leaderWindow: resolveLeaderTmuxWindow(),
+		const result: GhStatus = {
+			...base,
+			leaderWindow: resolveLeaderTmuxWindow(base.lockPath),
 			cachedPr: pr ? { number: pr.number, title: pr.title } : null,
 		};
 
-		if (role === "leader") {
-			base.clients = server?.getClientCount() ?? 0;
-			base.subscribers = server?.getSubscriberCount() ?? 0;
-			base.poller = poller?.getStatus() ?? null;
-		} else if (role === "client") {
-			base.connected = client?.isConnected() ?? false;
-			// Ask leader for its stats
-			if (client?.isConnected()) {
+		if (base.role === "leader") {
+			result.poller = pollerRef?.getStatus() ?? null;
+		} else if (base.role === "client") {
+			if (singleton) {
 				try {
-					base.leaderStats = (await client.request("leaderStatus")) as Record<string, unknown>;
+					result.leaderStats = (await singleton.call("leaderStatus")) as Record<string, unknown>;
 				} catch {}
 			}
 		}
 
-		return base;
+		return result;
 	},
 };
 
-export interface GhStateStatus {
-	role: "leader" | "client" | "stopped";
+export interface GhStatus {
+	role: "leader" | "client" | null;
 	sessionRoot: string | null;
 	socketPath: string | null;
 	lockPath: string | null;
 	uptime: number | null;
 	leaderWindow: string | null;
 	cachedPr: { number: number; title: string } | null;
-	// Leader fields
 	clients?: number;
 	subscribers?: number;
-	poller?: PollerStatus | null;
-	// Client fields
 	connected?: boolean;
+	poller?: PollerStatus | null;
 	leaderStats?: Record<string, unknown>;
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function notify(): void {
+	const pr = ghState.get();
+	for (const cb of subscribers) cb(pr);
 }
 
 // ── Command Registration ─────────────────────────────────────────────────────
@@ -173,8 +188,8 @@ function registerCommands(pi: ExtensionAPI): void {
 	if (commandsRegistered) return;
 	commandsRegistered = true;
 
-	pi.registerCommand("gh-state", {
-		description: "Show gh-state status (role, clients, cache ages, poll stats)",
+	pi.registerCommand("gh", {
+		description: "Show gh status (role, clients, cache ages, poll stats)",
 		handler: async (_args, ctx) => {
 			const status = await ghState.status();
 			const lines: string[] = [];
@@ -243,20 +258,18 @@ function formatAge(ts: number | null | undefined): string {
 
 // ── Leader Window Resolution ─────────────────────────────────────────────────
 
-function resolveLeaderTmuxWindow(): string | null {
-	if (!lckPath) return null;
+function resolveLeaderTmuxWindow(lockPathStr: string | null): string | null {
+	if (!lockPathStr) return null;
 
-	// Read the lock file to get leader PID
 	let leaderPid: number;
 	try {
-		const lock = JSON.parse(readFileSync(lckPath, "utf-8"));
+		const lock = JSON.parse(readFileSync(lockPathStr, "utf-8"));
 		leaderPid = lock.pid;
 	} catch {
 		return null;
 	}
 
-	// If we're the leader, just get our own window name
-	if (role === "leader") {
+	if (singleton?.role() === "leader") {
 		try {
 			return execFileSync("tmux", ["display-message", "-p", "#{window_name}"], { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim() || null;
 		} catch {
@@ -264,14 +277,12 @@ function resolveLeaderTmuxWindow(): string | null {
 		}
 	}
 
-	// For clients: find which tmux pane holds the leader PID (or its children)
 	try {
 		const panes = execFileSync("tmux", ["list-panes", "-a", "-F", "#{pane_pid} #{window_name}"], { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
 		for (const line of panes.split("\n")) {
 			const [pidStr, ...rest] = line.split(" ");
 			const panePid = parseInt(pidStr);
 			if (!panePid) continue;
-			// Check if leader PID is the pane PID or a descendant
 			if (panePid === leaderPid || isDescendant(leaderPid, panePid)) {
 				return rest.join(" ") || null;
 			}
@@ -281,7 +292,6 @@ function resolveLeaderTmuxWindow(): string | null {
 }
 
 function isDescendant(pid: number, ancestorPid: number): boolean {
-	// Walk up the process tree from pid to see if ancestorPid is an ancestor
 	try {
 		let current = pid;
 		for (let i = 0; i < 10; i++) {
@@ -292,90 +302,4 @@ function isDescendant(pid: number, ancestorPid: number): boolean {
 		}
 	} catch {}
 	return false;
-}
-
-// ── Leader Setup ─────────────────────────────────────────────────────────────
-
-async function startAsLeader(pi: ExtensionAPI): Promise<void> {
-	role = "leader";
-
-	poller = createPoller(pi, sessionRoot!, (event, data) => {
-		if (event === "prView") {
-			notify();
-		}
-		server?.pushToSubscribers(event, data);
-	});
-
-	server = createServer(sockPath!, poller);
-	await server.start();
-	await poller.start();
-	stopHeartbeat = startHeartbeat(lckPath!, 30_000);
-}
-
-// ── Client Setup ─────────────────────────────────────────────────────────────
-
-async function startAsClient(): Promise<void> {
-	role = "client";
-
-	client = createClient(sockPath!);
-	try {
-		await client.connect();
-		// Subscribe to push events
-		await client.request("subscribe", { events: ["prView", "reviewComments"] });
-		client.onPush((event, data) => {
-			if (event === "prView") {
-				clientCachedPr = data as PrInfo | null;
-				notify();
-			}
-		});
-		// Fetch initial state
-		clientCachedPr = (await client.request("prView")) as PrInfo | null;
-		notify();
-	} catch {
-		// Server not ready — will retry via staleness checker
-		client = null;
-	}
-}
-
-// ── Leader Takeover ──────────────────────────────────────────────────────────
-
-async function checkAndTakeover(pi: ExtensionAPI): Promise<void> {
-	if (role === "leader" || !lckPath || !sockPath) return;
-
-	// If we're a client and connection is healthy, no need to check
-	if (client?.isConnected()) return;
-
-	// Try to reconnect first
-	try {
-		client = createClient(sockPath);
-		await client.connect();
-		await client.request("subscribe", { events: ["prView", "reviewComments"] });
-		client.onPush((event, data) => {
-			if (event === "prView") {
-				clientCachedPr = data as PrInfo | null;
-				notify();
-			}
-		});
-		return;
-	} catch {
-		client = null;
-	}
-
-	// Socket gone — try to become leader
-	try {
-		if (isLockStale(lckPath, 90_000) && tryAcquireLock(lckPath)) {
-			await startAsLeader(pi);
-		}
-	} catch {
-		// Takeover failed — release lock if we claimed it, retry next cycle
-		if (lckPath) releaseLock(lckPath);
-		role = "client";
-	}
-}
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-function notify(): void {
-	const pr = ghState.get();
-	for (const cb of subscribers) cb(pr);
 }

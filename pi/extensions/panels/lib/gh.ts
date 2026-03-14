@@ -1,52 +1,9 @@
 import { execFileSync } from "node:child_process";
-import { createHash } from "node:crypto";
+import { createClient } from "../../lib/gh/sync.ts";
 
 const PIPE = { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] };
 
-// ── Socket Path Resolution ───────────────────────────────────────────────────
-
-let cachedSocketPath = null;
-
-function getSocketPath() {
-	if (cachedSocketPath) return cachedSocketPath;
-	let sessionRoot;
-	try {
-		sessionRoot = execFileSync("tmux", ["display-message", "-p", "#{session_path}"], {
-			...PIPE, timeout: 2000,
-		}).trim();
-	} catch {
-		sessionRoot = process.cwd();
-	}
-	const id = createHash("sha256").update(sessionRoot).digest("hex").slice(0, 12);
-	cachedSocketPath = `/tmp/gh-state-${id}.sock`;
-	return cachedSocketPath;
-}
-
-// ── Sync IPC Helper ──────────────────────────────────────────────────────────
-
-function ipcRequest(method, params) {
-	const sockPath = getSocketPath();
-	const request = JSON.stringify({ id: 1, method, params });
-	const script = `
-const net=require('net');
-const s=net.connect(${JSON.stringify(sockPath)});
-s.write(${JSON.stringify(request)}+'\\n');
-let d='';
-s.on('data',c=>{d+=c;const i=d.indexOf('\\n');if(i>=0){process.stdout.write(d.slice(0,i));s.destroy();}});
-s.on('error',()=>process.exit(1));
-setTimeout(()=>process.exit(1),700);
-`.trim();
-
-	try {
-		const raw = execFileSync("node", ["-e", script], { ...PIPE, timeout: 800 }).trim();
-		if (!raw) return null;
-		const response = JSON.parse(raw);
-		if (response.error) return null;
-		return response.data;
-	} catch {
-		return null;
-	}
-}
+const gh = createClient(process.cwd());
 
 // ── Exported API (same signatures as before) ─────────────────────────────────
 
@@ -56,7 +13,7 @@ export function getUsername() {
 	if (cachedUsername) return cachedUsername;
 
 	// Try IPC
-	const ipc = ipcRequest("username");
+	const ipc = gh.request("username");
 	if (ipc) { cachedUsername = ipc; return cachedUsername; }
 
 	// Fallback: direct gh call
@@ -72,13 +29,13 @@ export function prList(opts, cwd) {
 	// prList has complex params — try IPC for the common cases
 	// For worktree lookups (opts.head), try worktreePr method
 	if (opts.head && opts.state === "all" && opts.limit === 1) {
-		const ipc = ipcRequest("worktreePr", { branch: opts.head, cwd });
+		const ipc = gh.request("worktreePr", { branch: opts.head, cwd });
 		if (ipc !== null) return ipc ? [ipc] : [];
 	}
 
 	// For PR lists (search/author), try prLists method
 	if ((opts.search && opts.search.includes("review-requested")) || opts.author === "@me") {
-		const ipc = ipcRequest("prLists");
+		const ipc = gh.request("prLists");
 		if (ipc) {
 			if (opts.search && opts.search.includes("review-requested")) return ipc.reviewPrs ?? [];
 			if (opts.author === "@me") return ipc.myPrs ?? [];
@@ -100,7 +57,7 @@ export function prList(opts, cwd) {
 
 export function prView(json, cwd) {
 	// Try IPC
-	const ipc = ipcRequest("prView", { fields: json });
+	const ipc = gh.request("prView", { fields: json });
 	if (ipc !== null) return ipc;
 
 	// Fallback: direct gh call
@@ -155,7 +112,7 @@ export function prMergeQueuePositions(numbers, cwd) {
 	if (numbers.length === 0) return new Map();
 
 	// Try IPC — server returns an object { number: position }
-	const ipc = ipcRequest("prMergeQueuePositions");
+	const ipc = gh.request("prMergeQueuePositions");
 	if (ipc !== null) {
 		const result = new Map();
 		for (const [k, v] of Object.entries(ipc)) result.set(Number(k), v);
@@ -185,7 +142,7 @@ export function prMergeQueuePositions(numbers, cwd) {
 
 export function prChecks(prNumber, cwd) {
 	// Try IPC
-	const ipc = ipcRequest("prChecks", { prNumber });
+	const ipc = gh.request("prChecks", { prNumber });
 	if (ipc !== null) return ipc;
 
 	// Fallback: direct gh call

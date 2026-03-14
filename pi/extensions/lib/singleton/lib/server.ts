@@ -1,6 +1,5 @@
 import { createServer as netCreateServer, type Server, type Socket } from "node:net";
 import { unlinkSync } from "node:fs";
-import type { Poller } from "./poller.ts";
 import type { RpcRequest } from "./types.ts";
 import { encodeMessage, createLineParser } from "./protocol.ts";
 
@@ -9,7 +8,7 @@ interface Subscriber {
 	events: Set<string>;
 }
 
-export interface GhStateServer {
+export interface SingletonServer {
 	start(): Promise<void>;
 	stop(): void;
 	pushToSubscribers(event: string, data: unknown): void;
@@ -17,7 +16,7 @@ export interface GhStateServer {
 	getSubscriberCount(): number;
 }
 
-export function createServer(sockPath: string, poller: Poller): GhStateServer {
+export function createServer(sockPath: string, service: Record<string, Function>): SingletonServer {
 	let server: Server | null = null;
 	const connections = new Set<Socket>();
 	const subscribers: Subscriber[] = [];
@@ -29,26 +28,12 @@ export function createServer(sockPath: string, poller: Poller): GhStateServer {
 	}
 
 	async function dispatch(method: string, params?: Record<string, unknown>): Promise<unknown> {
-		switch (method) {
-			case "prView":
-				return poller.getPrView();
-			case "prLists":
-				return poller.getPrLists();
-			case "prMergeQueuePositions":
-				return poller.getMergeQueuePositions();
-			case "reviewComments":
-				return poller.getReviewComments();
-			case "worktreePr":
-				return poller.getWorktreePr(params?.branch as string, params?.cwd as string);
-			case "username":
-				return poller.getUsername();
-			case "prChecks":
-				return poller.getPrChecks(params?.prNumber as number);
-			case "leaderStatus":
-				return { clients: connections.size, subscribers: subscribers.length, poller: poller.getStatus() };
-			default:
-				throw new Error(`Unknown method: ${method}`);
+		if (method === "leaderStatus") {
+			return { clients: connections.size, subscribers: subscribers.length };
 		}
+		const fn = service[method];
+		if (typeof fn !== "function") throw new Error(`Unknown method: ${method}`);
+		return fn(params);
 	}
 
 	async function handleMessage(socket: Socket, msg: RpcRequest) {

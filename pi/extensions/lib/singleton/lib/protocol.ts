@@ -21,12 +21,12 @@ export function computeId(sessionRoot: string): string {
 	return createHash("sha256").update(sessionRoot).digest("hex").slice(0, 12);
 }
 
-export function socketPath(sessionRoot: string): string {
-	return `/tmp/gh-state-${computeId(sessionRoot)}.sock`;
+export function socketPath(name: string, sessionRoot: string): string {
+	return `/tmp/${name}-${computeId(sessionRoot)}.sock`;
 }
 
-export function lockPath(sessionRoot: string): string {
-	return `/tmp/gh-state-${computeId(sessionRoot)}.lock`;
+export function lockPath(name: string, sessionRoot: string): string {
+	return `/tmp/${name}-${computeId(sessionRoot)}.lock`;
 }
 
 export function encodeMessage(msg: object): string {

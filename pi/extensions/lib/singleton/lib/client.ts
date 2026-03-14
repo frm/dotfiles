@@ -2,7 +2,7 @@ import { connect, type Socket } from "node:net";
 import type { RpcResponse, RpcPush } from "./types.ts";
 import { encodeMessage, createLineParser } from "./protocol.ts";
 
-export interface GhStateClient {
+export interface SingletonClient {
 	connect(): Promise<void>;
 	disconnect(): void;
 	isConnected(): boolean;
@@ -10,7 +10,7 @@ export interface GhStateClient {
 	onPush(handler: (event: string, data: unknown) => void): void;
 }
 
-export function createClient(sockPath: string): GhStateClient {
+export function createClient(sockPath: string): SingletonClient {
 	let socket: Socket | null = null;
 	let nextId = 1;
 	const pending = new Map<number, { resolve: (v: unknown) => void; reject: (e: Error) => void }>();
