@@ -9,6 +9,7 @@ export const cyan = (t) => style("\x1b[36m", t);
 export const green = (t) => style("\x1b[32m", t);
 export const red = (t) => style("\x1b[31m", t);
 export const magenta = (t) => style("\x1b[35m", t);
+export const orange = (t) => style("\x1b[38;5;214m", t);
 export const boldCyan = (t) => style("\x1b[1;36m", t);
 export const boldRed = (t) => style("\x1b[1;31m", t);
 export const bgCyan = (t) => style("\x1b[46;30m", t);

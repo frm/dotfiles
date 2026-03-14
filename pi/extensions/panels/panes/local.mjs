@@ -411,7 +411,7 @@ function doStageFile() {
 	const navItems = files.buildNavItems(changedFiles);
 	if (selectedIdx >= navItems.length) return;
 	const nav = navItems[selectedIdx];
-	if (nav.isTopLevel) nav.node.staged = true;
+	if (nav.isTopLevel) { nav.node.staged = true; nav.node.hasWorkingTreeChanges = false; }
 	files.stage(nav);
 	lastStageAction = Date.now();
 	render();

@@ -2,7 +2,7 @@ import { statSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { git, gitRaw, gitRoot, absPath } from "../../lib/git.ts";
 import {
-	dim, cyan, green, yellow, red, magenta,
+	dim, cyan, green, yellow, red, magenta, orange,
 	visWidth, smartTruncatePath, truncate, write, selColor,
 	bSide,
 } from "../../lib/ui.ts";
@@ -142,7 +142,9 @@ export function renderFileEntry(file, selected, innerW) {
 		}
 	}
 	const prefix = selected ? selColor(" → ") : "   ";
-	const stagedMark = file.staged ? green("● ") : "  ";
+	const stagedMark = file.staged
+		? (file.hasWorkingTreeChanges ? orange("● ") : green("● "))
+		: "  ";
 	const statusStr = colorFn(icon) + " ";
 	const prefixW = visWidth(prefix) + visWidth(stagedMark) + visWidth(statusStr);
 	const displayPath = file.isDir ? file.path + "/" : file.path;
