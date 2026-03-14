@@ -1,9 +1,9 @@
 ---
-name: unit-testing-guidelines
-description: "Guidelines for writing Elixir unit tests. Follow these conventions when generating, reviewing, or modifying ExUnit tests."
+name: elixir-testing-guide
+description: "Guide for writing Elixir unit tests. Follow these conventions when generating, reviewing, or modifying ExUnit tests. Read @anti-patterns.md when writing mocks or test helpers."
 ---
 
-# Elixir Unit Testing Guidelines
+# Elixir Testing Guide
 
 ## Test Case Classification
 
@@ -14,7 +14,7 @@ Always explicitly mark `async`. Default to `async: true` unless the test require
 use ExUnit.Case, async: true
 
 # DB-interacting modules
-use YourApp.DataCase, async: true
+use MyApp.DataCase, async: true
 ```
 
 Use `async: false` only when the test uses patterns that require synchronous execution:
@@ -25,9 +25,22 @@ Use `async: false` only when the test uses patterns that require synchronous exe
 
 When a test file mixes async-compatible and async-incompatible tests, split them into separate files so the async-safe tests can run in parallel.
 
+### Module dependency analysis
+
+When classifying a module, check for these dependency types — each affects how you set up and isolate the test:
+
+- **Repo / Ecto** — DB queries, changesets, transactions
+- **GenServer / supervised processes** — stateful processes, global names
+- **Oban** — job insertion or queue draining
+- **PubSub** — broadcast or subscribe calls
+- **ETS / Cachex** — cache reads or writes
+- **HTTP clients** — outbound HTTP calls
+- **Feature flags** — feature flag checks
+- **Registry** — process registry lookups
+
 ## Test Data Setup
 
-Use [ex_machina](https://github.com/beam-community/ex_machina) factories for DB state. Never call business logic to build test state.
+Use factories for DB state. Never call business logic to build test state.
 
 ```elixir
 # GOOD: factory sets up DB state directly
@@ -144,6 +157,18 @@ refute user.active
 refute user.active
 ```
 
+### Prefer `refute` over `assert is_nil`
+
+When asserting absence or falsiness, use `refute`. Reserve `assert is_nil(foo)` for when nil specifically matters.
+
+```elixir
+# GOOD
+refute user.active
+
+# Avoid (unless nil specifically matters)
+assert is_nil(user.active)
+```
+
 ## Test Structure
 
 - **One behavior per test.** If the name has "and", split it.
@@ -198,7 +223,29 @@ end
 - `use Mimic` after `use DataCase`
 - `Mimic.expect/3` sets expectations that are verified automatically
 - `Mimic.stub/3` for fire-and-forget replacements (no verification)
+- `Mimic.copy(Module)` must be called before stubbing a module not set up in `mimic.ex`
 - Mimic uses private mode by default and is async-safe
+
+### Mimic.copy + stub for isolating dependencies
+
+When testing a module that depends on another internal module (e.g., an API client that depends on an auth module), use `Mimic.copy` + `Mimic.stub` to isolate the dependency:
+
+```elixir
+defmodule MyApp.Vendor.ApiClientTest do
+  use MyApp.DataCase, async: true
+  use Mimic
+
+  alias MyApp.Vendor.ApiClient
+  alias MyApp.Vendor.Auth
+
+  test "retrieves documents" do
+    Mimic.copy(Auth)
+    Mimic.stub(Auth, :fetch_token, fn -> {:ok, "test_token"} end)
+
+    # ... stub HTTP response, call ApiClient, assert on result
+  end
+end
+```
 
 ### What to Mock vs What Not To
 
