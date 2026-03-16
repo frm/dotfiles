@@ -3,7 +3,7 @@ import { getMarkdownTheme } from "@mariozechner/pi-coding-agent";
 import type { ExtensionContext } from "@mariozechner/pi-coding-agent";
 import type { PlanContext, PlanOverlayResult, OverlayExitState } from "./types.ts";
 import { buildRawToRenderedMap, mapContextsToRendered, findContextForLine, type RenderedContext } from "./context.ts";
-import { showContextEditor } from "./context-editor.ts";
+import { showContextEditor, showSimpleEditor } from "./context-editor.ts";
 import { DIFF_BG, RESET, computeChangedLines } from "./diff.ts";
 import { formatCommentsAsFeedback } from "./comments.ts";
 
@@ -269,17 +269,15 @@ export async function showPlanOverlay(
 			const finalLines = md.render(80);
 			const inlineComments = comments.size > 0 ? formatCommentsAsFeedback(comments, finalLines) : "";
 
-			const editorFeedback = await ctx.ui.editor("Plan feedback:", "");
+			const editorFeedback = await showSimpleEditor(ctx, "Plan feedback");
 			if (editorFeedback !== undefined && editorFeedback.trim()) {
 				const combined = inlineComments
 					? `${inlineComments}\n\n---\n\nGeneral feedback:\n${editorFeedback.trim()}`
 					: editorFeedback.trim();
 				return { approved: false, feedback: combined };
 			}
-			if (inlineComments) {
-				return { approved: false, feedback: inlineComments };
-			}
-			return { approved: false };
+			// Esc or empty — go back to the plan overlay
+			continue;
 		}
 
 		if (exitState.action === "comment") {
@@ -290,8 +288,8 @@ export async function showPlanOverlay(
 			if (contextBlock) {
 				input = await showContextEditor(ctx, contextBlock.content, existing);
 			} else {
-				const prompt = existing ? "Edit comment (empty to remove):" : "Add comment:";
-				input = await ctx.ui.editor(prompt, existing ?? "");
+				const title = existing ? "Edit comment (empty to remove)" : "Add comment";
+				input = await showSimpleEditor(ctx, title, existing);
 			}
 
 			if (input !== undefined) {
