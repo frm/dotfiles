@@ -160,7 +160,7 @@ export function createQuestionnaireOverlay(questions: Question[], isMulti: boole
 						inputQuestionId = q.id;
 						inputOptionLabel = opt.isOther ? undefined : opt.label;
 						inputOptionValue = opt.isOther ? undefined : opt.value;
-						editor.setText(opt.inputPlaceholder ?? "");
+						editor.setText("");
 						refresh();
 						return;
 					}
@@ -178,7 +178,7 @@ export function createQuestionnaireOverlay(questions: Question[], isMulti: boole
 					inputQuestionId = q.id;
 					inputOptionLabel = opt.isOther ? undefined : opt.label;
 					inputOptionValue = opt.isOther ? undefined : opt.value;
-					editor.setText(opt.inputPlaceholder ?? "");
+					editor.setText("");
 					refresh();
 					return;
 				}
