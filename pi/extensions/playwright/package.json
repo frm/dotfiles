@@ -1,0 +1,7 @@
+{
+  "name": "pi-playwright-extension",
+  "private": true,
+  "dependencies": {
+    "playwright": "^1.52.0"
+  }
+}
