@@ -343,6 +343,33 @@ export default function panels(pi: ExtensionAPI) {
 
 	// ─── Shortcuts ───────────────────────────────────────────────────────
 
+	// Alt+1-9: jump to worktree by index
+	for (let i = 1; i <= 9; i++) {
+		pi.registerShortcut(`alt+${i}`, {
+			description: `Switch to worktree ${i}`,
+			handler: async () => {
+				try {
+					const raw = tmuxQuery("list-windows", "-a", "-F", "#{session_name}\t#{pane_current_path}\t#{window_index}");
+					if (!raw) return;
+					const seen = new Set<string>();
+					const entries: { session: string; windowIndex: string }[] = [];
+					for (const line of raw.split("\n")) {
+						const [session, path, windowIndex] = line.split("\t");
+						if (!session || !path || !path.includes(".worktrees/")) continue;
+						if (seen.has(path)) continue;
+						seen.add(path);
+						entries.push({ session, windowIndex });
+					}
+					const entry = entries[i - 1];
+					if (!entry) return;
+					const target = `${entry.session}:${entry.windowIndex}`;
+					try { tmuxRun("select-window", "-t", target); }
+					catch { try { tmuxRun("switch-client", "-t", target); } catch {} }
+				} catch {}
+			},
+		});
+	}
+
 	pi.registerShortcut("alt+g", {
 		description: "Toggle global panel",
 		handler: async (_ctx) => {
