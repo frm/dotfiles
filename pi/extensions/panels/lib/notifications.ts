@@ -1,0 +1,21 @@
+import { createClient } from "../../lib/notifications/sync.ts";
+
+const client = createClient(process.cwd());
+
+export function listNotifications() {
+	return client.request("list") ?? [];
+}
+
+export function dismissNotification(id: string) {
+	return client.request("dismiss", { id });
+}
+
+export function dismissAll(notifications: { id: string }[]) {
+	for (const n of notifications) {
+		client.request("dismiss", { id: n.id });
+	}
+}
+
+export function executeAction(id: string) {
+	return client.request("executeAction", { id });
+}

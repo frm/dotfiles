@@ -121,12 +121,14 @@ export function createSpinner(onRender) {
 // ─── Flash Messages ──────────────────────────────────────────────────────────
 
 let _flashMessage: string | null = null;
+let _flashColor: ((s: string) => string) | null = null;
 let _flashTimer: ReturnType<typeof setTimeout> | null = null;
 
-export function flash(msg: string, renderFn: () => void, duration = 1500) {
+export function flash(msg: string, renderFn: () => void, duration = 1500, colorFn?: (s: string) => string) {
 	_flashMessage = msg;
+	_flashColor = colorFn ?? null;
 	if (_flashTimer) clearTimeout(_flashTimer);
-	_flashTimer = setTimeout(() => { _flashMessage = null; _flashTimer = null; renderFn(); }, duration);
+	_flashTimer = setTimeout(() => { _flashMessage = null; _flashColor = null; _flashTimer = null; renderFn(); }, duration);
 	renderFn();
 }
 
@@ -135,9 +137,10 @@ export function getFlashMessage(): string | null { return _flashMessage; }
 export function bottomBorder(innerW: number) {
 	const msg = _flashMessage;
 	if (msg) {
+		const colorFn = _flashColor ?? green;
 		const label = ` ${msg} `;
 		const dashes = Math.max(0, innerW - visWidth(label));
-		return bBL() + green(label) + bTopN(dashes) + bBR();
+		return bBL() + colorFn(label) + bTopN(dashes) + bBR();
 	}
 	return bBL() + bTopN(innerW) + bBR();
 }

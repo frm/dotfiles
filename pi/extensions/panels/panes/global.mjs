@@ -23,6 +23,7 @@ import {
 
 import * as wt from "../tabs/global/worktrees.mjs";
 import * as prs from "../tabs/global/prs.mjs";
+import * as notif from "../tabs/global/notifications.mjs";
 
 // ─── Worker Mode ─────────────────────────────────────────────────────────────
 
@@ -57,11 +58,20 @@ if (process.argv.includes("--fetch-prs")) {
 	process.exit(0);
 }
 
+if (process.argv.includes("--fetch-notifications")) {
+	process.send(notif.fetchNotifications());
+	process.exit(0);
+}
+
 // ─── Tab State ───────────────────────────────────────────────────────────────
 
-let activeTab = "worktrees";
+const TABS = ["worktrees", "prs", "notifications"];
+let activeTabIdx = 0;
+let activeTab = TABS[0];
 let loading = true;
 let prsLoading = true;
+let notifLoading = true;
+let notifLoadedOnce = false;
 let prsLoadedOnce = false;
 let confirmingDelete = false;
 let confirmingMerge = false;
@@ -99,7 +109,11 @@ function quitShared() {
 	process.exit(0);
 }
 
-function tab() { return activeTab === "worktrees" ? wt : prs; }
+function tab() {
+	if (activeTab === "worktrees") return wt;
+	if (activeTab === "prs") return prs;
+	return notif;
+}
 function tabState() { return tab().state; }
 
 const nav = createVimNav({
@@ -255,6 +269,19 @@ function refreshPrsAsync() {
 	});
 }
 
+function refreshNotificationsAsync() {
+	notifLoading = true;
+	forkWorker(selfPath, ["--fetch-notifications"], {
+		onMessage: (data) => {
+			notif.applyData(data);
+			notifLoading = false;
+			notifLoadedOnce = true;
+			render();
+		},
+		onDone: () => { if (notifLoading) { notifLoading = false; notifLoadedOnce = true; render(); } },
+	});
+}
+
 function refreshAfterAction(cleanup) {
 	refreshing = true;
 	forkWorker(selfPath, ["--fetch-worktrees"], {
@@ -284,6 +311,7 @@ function doRefresh() {
 	if (refreshing) return;
 	refreshing = true;
 	refreshWorktreesAsync();
+	refreshNotificationsAsync();
 }
 
 // ─── Rendering ───────────────────────────────────────────────────────────────
@@ -302,7 +330,12 @@ function render() {
 	const activeBg = focus.active ? bgCyan : bgMuted;
 	const wtLabel = activeTab === "worktrees" ? activeBg(" Worktrees ") : dim(" Worktrees ");
 	const prLabel = activeTab === "prs" ? activeBg(" Pull Requests ") : dim(" Pull Requests ");
-	const tabBar = wtLabel + dim("│") + prLabel;
+	const notifCount = notif.state.notifications.length;
+	const notifBadge = notifCount > 0 ? ` (${notifCount})` : "";
+	const notifLabel = activeTab === "notifications"
+		? activeBg(` Notif${notifBadge} `)
+		: dim(` Notif${notifBadge} `);
+	const tabBar = wtLabel + dim("│") + prLabel + dim("│") + notifLabel;
 	const hFill = Math.max(0, innerW - visWidth(tabBar));
 	moveTo(row++, 1);
 	write(bTL() + tabBar + bTopN(hFill) + bTR());
@@ -336,12 +369,18 @@ function render() {
 		contentRow = 1;
 	} else if (activeTab === "worktrees") {
 		contentRow = wt.renderTab(row, innerW, contentHeight, confirmingDelete);
-	} else if (prsLoading && !prsLoadedOnce) {
+	} else if (activeTab === "prs" && prsLoading && !prsLoadedOnce) {
 		const msg = " Fetching pull requests...";
 		moveTo(row, 1); write(bSide() + dim(msg) + " ".repeat(Math.max(0, innerW - msg.length)) + bSide());
 		contentRow = 1;
-	} else {
+	} else if (activeTab === "prs") {
 		contentRow = prs.renderTab(row, innerW, contentHeight);
+	} else if (activeTab === "notifications" && notifLoading && !notifLoadedOnce) {
+		const msg = " Fetching notifications...";
+		moveTo(row, 1); write(bSide() + dim(msg) + " ".repeat(Math.max(0, innerW - msg.length)) + bSide());
+		contentRow = 1;
+	} else if (activeTab === "notifications") {
+		contentRow = notif.renderTab(row, innerW, contentHeight);
 	}
 
 	while (contentRow < contentHeight) {
@@ -451,7 +490,7 @@ function handleInput(data) {
 		if (inputBuf[2] === 0x43) return expandSection();
 		if (inputBuf[2] === 0x44) return collapseSection();
 	}
-	if (inputStr === "\r" || inputStr === "o") return activate();
+	if (activeTab !== "notifications" && (inputStr === "\r" || inputStr === "o")) return activate();
 	if (inputStr === "p") return openPr();
 	if (inputStr === "f") return openPrChanges();
 	if (inputStr === "c") return reviewPr();
@@ -467,6 +506,29 @@ function handleInput(data) {
 	// Worktrees-only
 	if (activeTab === "worktrees" && inputStr === "d") return promptDelete();
 	if (activeTab === "worktrees" && inputStr === "a") return startCreate();
+
+	// Notifications-only
+	if (activeTab === "notifications" && (inputStr === "\r" || inputStr === "o")) {
+		notif.toggleExpand();
+		render();
+		return;
+	}
+	if (activeTab === "notifications" && inputStr === "a") {
+		const result = notif.acceptAction();
+		if (!result?.ok) flash(result?.error ?? "Action failed", render, 2000, red);
+		render();
+		return;
+	}
+	if (activeTab === "notifications" && inputStr === "d") {
+		notif.dismissSelected();
+		render();
+		return;
+	}
+	if (activeTab === "notifications" && inputStr === "D") {
+		notif.dismissAllNotifications();
+		render();
+		return;
+	}
 }
 
 function handleCreateInput(buf, str) {
@@ -496,7 +558,8 @@ function handleCreateInput(buf, str) {
 }
 
 function switchTab() {
-	activeTab = activeTab === "worktrees" ? "prs" : "worktrees";
+	activeTabIdx = (activeTabIdx + 1) % TABS.length;
+	activeTab = TABS[activeTabIdx];
 	render();
 }
 

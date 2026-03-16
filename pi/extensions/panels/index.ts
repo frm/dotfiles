@@ -1,5 +1,6 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { ghState } from "../lib/gh/index.ts";
+import { notificationsState } from "../lib/notifications/index.ts";
 import { join, resolve } from "path";
 import { homedir } from "os";
 import { fileURLToPath } from "url";
@@ -291,6 +292,7 @@ export default function panels(pi: ExtensionAPI) {
 		if (tmuxWindowTarget) hidePaneBorders(tmuxWindowTarget);
 		// Start gh after panels are open — don't block panel creation
 		ghState.start(pi, ctx.cwd).catch(() => {});
+		notificationsState.start(pi, ctx.cwd).catch(() => {});
 	});
 
 	pi.on("session_switch", async (_event, ctx) => {
@@ -307,6 +309,7 @@ export default function panels(pi: ExtensionAPI) {
 		global.kill();
 		local.kill();
 		ghState.stop();
+		notificationsState.stop();
 	});
 
 	// ─── Commands ────────────────────────────────────────────────────────

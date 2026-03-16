@@ -31,9 +31,15 @@ s.on('error',()=>process.exit(1));
 setTimeout(()=>process.exit(1),700);
 `.trim();
 
+			let raw: string;
 			try {
-				const raw = execFileSync("node", ["-e", script], { ...PIPE, timeout: 800 }).trim();
+				raw = execFileSync("node", ["-e", script], { ...PIPE, timeout: 800 }).trim();
+			} catch (err: any) {
+				// Child may exit non-zero (timeout) but still have valid stdout
+				raw = (typeof err?.stdout === "string" ? err.stdout : "").trim();
 				if (!raw) return null;
+			}
+			try {
 				const response = JSON.parse(raw);
 				if (response.error) return null;
 				return response.data;
