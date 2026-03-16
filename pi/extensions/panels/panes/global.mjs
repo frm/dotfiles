@@ -331,11 +331,14 @@ function render() {
 	const wtLabel = activeTab === "worktrees" ? activeBg(" Worktrees ") : dim(" Worktrees ");
 	const prLabel = activeTab === "prs" ? activeBg(" Pull Requests ") : dim(" Pull Requests ");
 	const notifCount = notif.state.notifications.length;
-	const notifBadge = notifCount > 0 ? ` (${notifCount})` : "";
-	const notifLabel = activeTab === "notifications"
-		? activeBg(` Notif${notifBadge} `)
-		: dim(` Notif${notifBadge} `);
-	const tabBar = wtLabel + dim("│") + prLabel + dim("│") + notifLabel;
+	let tabBar = wtLabel + dim("│") + prLabel;
+	if (notifCount > 0 || activeTab === "notifications") {
+		const notifBadge = notifCount > 0 ? ` (${notifCount})` : "";
+		const notifLabel = activeTab === "notifications"
+			? activeBg(` Notif${notifBadge} `)
+			: dim(` Notif${notifBadge} `);
+		tabBar += dim("│") + notifLabel;
+	}
 	const hFill = Math.max(0, innerW - visWidth(tabBar));
 	moveTo(row++, 1);
 	write(bTL() + tabBar + bTopN(hFill) + bTR());
@@ -503,7 +506,6 @@ function handleInput(data) {
 	if (inputStr === "r") { wt.clearPrCache(); return doRefresh(); }
 	if (inputStr === "q" || (inputBuf.length === 1 && inputBuf[0] === 0x03)) return shared ? quitShared() : quit();
 
-	// Worktrees-only
 	if (activeTab === "worktrees" && inputStr === "d") return promptDelete();
 	if (activeTab === "worktrees" && inputStr === "a") return startCreate();
 
@@ -558,7 +560,9 @@ function handleCreateInput(buf, str) {
 }
 
 function switchTab() {
-	activeTabIdx = (activeTabIdx + 1) % TABS.length;
+	const hasNotifs = notif.state.notifications.length > 0;
+	const maxTabs = hasNotifs ? TABS.length : 2;
+	activeTabIdx = (activeTabIdx + 1) % maxTabs;
 	activeTab = TABS[activeTabIdx];
 	render();
 }
