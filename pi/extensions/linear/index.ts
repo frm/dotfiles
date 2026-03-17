@@ -4,28 +4,27 @@
  * Command: /linear <issue-id> [notes] — fetch issue and send to agent
  *
  * Tools (LLM-callable):
- *   linear_fetch_issue  — fetch a single issue by identifier
- *   linear_create_issue — create an issue (or sub-issue via parentId)
- *   linear_update_issue — update issue attributes (state, assignee, description, etc.)
- *   linear_list_issues  — list issues with filters (assignee, state, team)
+ *   linear_fetch_issue       — fetch a single issue by identifier
+ *   linear_create_issue      — create an issue (or sub-issue via parentId)
+ *   linear_update_issue      — update issue attributes (state, assignee, description, etc.)
+ *   linear_list_issues       — list issues with filters (assignee, state, team)
+ *   linear_list_my_projects  — list projects where the current user is a member or lead
  */
 
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
-import { Type, type Static } from "@sinclair/typebox";
+import { Type } from "@sinclair/typebox";
 import { StringEnum } from "@mariozechner/pi-ai";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-const GQL = "https://api.linear.app/graphql";
+import type { LinearSettings } from "./lib/types.js";
+import { CREATE_ISSUE, LIST_ISSUES, LIST_MY_PROJECTS, UPDATE_ISSUE } from "./lib/queries.js";
+import { gql, resolveTeamId, resolveStateId, fetchIssueByIdentifier } from "./lib/client.js";
+import { formatIssue, formatIssueCompact } from "./lib/format.js";
 
 // ---------------------------------------------------------------------------
 // Settings
 // ---------------------------------------------------------------------------
-
-interface LinearSettings {
-	apiKey: string | null;
-	defaultTeamKey: string | null;
-}
 
 function loadSettings(): LinearSettings {
 	try {
@@ -34,139 +33,11 @@ function loadSettings(): LinearSettings {
 		return {
 			apiKey: s?.linear?.["api-key"] ?? null,
 			defaultTeamKey: s?.linear?.["default-team"] ?? null,
+			userId: s?.linear?.["user-id"] ?? null,
 		};
 	} catch {
-		return { apiKey: null, defaultTeamKey: null };
+		return { apiKey: null, defaultTeamKey: null, userId: null };
 	}
-}
-
-// ---------------------------------------------------------------------------
-// GQL helpers
-// ---------------------------------------------------------------------------
-
-async function gql(apiKey: string, query: string, variables: Record<string, any> = {}): Promise<any> {
-	const res = await fetch(GQL, {
-		method: "POST",
-		headers: { "Content-Type": "application/json", Authorization: apiKey },
-		body: JSON.stringify({ query, variables }),
-	});
-	if (!res.ok) throw new Error(`Linear API ${res.status}: ${await res.text()}`);
-	const json = (await res.json()) as any;
-	if (json.errors?.length) throw new Error(json.errors.map((e: any) => e.message).join("; "));
-	return json.data;
-}
-
-// ---------------------------------------------------------------------------
-// Queries & Mutations
-// ---------------------------------------------------------------------------
-
-const ISSUE_FIELDS = `
-  id identifier title description url priority priorityLabel
-  createdAt updatedAt
-  state { id name type }
-  assignee { id name displayName }
-  team { id key name }
-  parent { id identifier title }
-  labels { nodes { id name } }
-`;
-
-const FETCH_ISSUE = `
-  query($filter: IssueFilter) {
-    issues(filter: $filter, first: 1) { nodes { ${ISSUE_FIELDS} } }
-  }
-`;
-
-const LIST_ISSUES = `
-  query($filter: IssueFilter, $first: Int) {
-    issues(filter: $filter, first: $first) {
-      nodes { ${ISSUE_FIELDS} }
-    }
-  }
-`;
-
-const CREATE_ISSUE = `
-  mutation($input: IssueCreateInput!) {
-    issueCreate(input: $input) {
-      success
-      issue { ${ISSUE_FIELDS} }
-    }
-  }
-`;
-
-const UPDATE_ISSUE = `
-  mutation($id: String!, $input: IssueUpdateInput!) {
-    issueUpdate(id: $id, input: $input) {
-      success
-      issue { ${ISSUE_FIELDS} }
-    }
-  }
-`;
-
-const RESOLVE_TEAM = `
-  query($filter: TeamFilter) {
-    teams(filter: $filter, first: 1) { nodes { id key name } }
-  }
-`;
-
-const RESOLVE_STATES = `
-  query($filter: WorkflowStateFilter) {
-    workflowStates(filter: $filter) {
-      nodes { id name type }
-    }
-  }
-`;
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-async function resolveTeamId(apiKey: string, teamKey: string): Promise<string> {
-	const data = await gql(apiKey, RESOLVE_TEAM, { filter: { key: { eq: teamKey.toUpperCase() } } });
-	const team = data.teams?.nodes?.[0];
-	if (!team) throw new Error(`Team "${teamKey}" not found`);
-	return team.id;
-}
-
-async function resolveStateId(apiKey: string, teamId: string, stateName: string): Promise<string> {
-	const data = await gql(apiKey, RESOLVE_STATES, { filter: { team: { id: { eq: teamId } } } });
-	const states = data.workflowStates?.nodes ?? [];
-	// Try exact match first, then case-insensitive
-	const match = states.find((s: any) => s.name === stateName)
-		?? states.find((s: any) => s.name.toLowerCase() === stateName.toLowerCase());
-	if (!match) {
-		const available = states.map((s: any) => s.name).join(", ");
-		throw new Error(`State "${stateName}" not found. Available: ${available}`);
-	}
-	return match.id;
-}
-
-async function fetchIssueByIdentifier(apiKey: string, identifier: string) {
-	const [teamKey, numberStr] = identifier.toUpperCase().split("-");
-	if (!teamKey || !numberStr) return null;
-	const num = parseInt(numberStr, 10);
-	if (isNaN(num)) return null;
-	const data = await gql(apiKey, FETCH_ISSUE, {
-		filter: { team: { key: { eq: teamKey } }, number: { eq: num } },
-	});
-	return data.issues?.nodes?.[0] ?? null;
-}
-
-function formatIssue(issue: any): string {
-	const lines = [
-		`**${issue.identifier}** — ${issue.title}`,
-		`State: ${issue.state?.name ?? "?"}  |  Priority: ${issue.priorityLabel ?? "None"}  |  Assignee: ${issue.assignee?.displayName ?? "Unassigned"}`,
-		`Team: ${issue.team?.key ?? "?"}  |  URL: ${issue.url}`,
-	];
-	if (issue.parent) lines.push(`Parent: ${issue.parent.identifier} — ${issue.parent.title}`);
-	if (issue.labels?.nodes?.length) lines.push(`Labels: ${issue.labels.nodes.map((l: any) => l.name).join(", ")}`);
-	if (issue.description) lines.push("", issue.description);
-	return lines.join("\n");
-}
-
-function formatIssueCompact(issue: any): string {
-	const assignee = issue.assignee?.displayName ?? "Unassigned";
-	const state = issue.state?.name ?? "?";
-	return `${issue.identifier}  ${state}  ${assignee}  ${issue.title}`;
 }
 
 function requireApiKey(): string {
@@ -180,7 +51,7 @@ function requireApiKey(): string {
 // ---------------------------------------------------------------------------
 
 export default function linearExtension(pi: ExtensionAPI) {
-	// ── /linear command (existing) ──────────────────────────────────────
+	// ── /linear command ─────────────────────────────────────────────────
 	pi.registerCommand("linear", {
 		description: "Fetch a Linear issue and send to agent — /linear <issue-id> [notes]",
 		handler: async (args, ctx) => {
@@ -210,9 +81,9 @@ export default function linearExtension(pi: ExtensionAPI) {
 		},
 	});
 
-	// ── linear_fetch_issue tool ─────────────────────────────────────────
+	// ── linear__fetch_issue tool ─────────────────────────────────────────
 	pi.registerTool({
-		name: "linear_fetch_issue",
+		name: "linear__fetch_issue",
 		label: "Linear: Fetch Issue",
 		description: "Fetch a Linear issue by its identifier (e.g. ENG-123). Returns full details including description.",
 		parameters: Type.Object({
@@ -229,9 +100,9 @@ export default function linearExtension(pi: ExtensionAPI) {
 		},
 	});
 
-	// ── linear_create_issue tool ────────────────────────────────────────
+	// ── linear__create_issue tool ────────────────────────────────────────
 	pi.registerTool({
-		name: "linear_create_issue",
+		name: "linear__create_issue",
 		label: "Linear: Create Issue",
 		description:
 			"Create a Linear issue. Set parentIdentifier to create a sub-issue. " +
@@ -283,9 +154,9 @@ export default function linearExtension(pi: ExtensionAPI) {
 		},
 	});
 
-	// ── linear_update_issue tool ────────────────────────────────────────
+	// ── linear__update_issue tool ────────────────────────────────────────
 	pi.registerTool({
-		name: "linear_update_issue",
+		name: "linear__update_issue",
 		label: "Linear: Update Issue",
 		description:
 			"Update a Linear issue's attributes. Only include fields you want to change. " +
@@ -327,18 +198,20 @@ export default function linearExtension(pi: ExtensionAPI) {
 		},
 	});
 
-	// ── linear_list_issues tool ─────────────────────────────────────────
+	// ── linear__list_issues tool ─────────────────────────────────────────
 	pi.registerTool({
-		name: "linear_list_issues",
+		name: "linear__list_issues",
 		label: "Linear: List Issues",
 		description:
 			"List Linear issues with filters. Defaults to issues assigned to the current user. " +
-			"Combine filters with AND logic.",
+			"Combine filters with AND logic. Use projectId to filter by project, unassigned to find unassigned issues.",
 		parameters: Type.Object({
 			assignedToMe: Type.Optional(Type.Boolean({ description: "Filter to issues assigned to the current user. Defaults to true." })),
 			stateName: Type.Optional(Type.String({ description: "Filter by workflow state name, e.g. 'In Progress'" })),
 			stateType: Type.Optional(StringEnum(["triage", "backlog", "unstarted", "started", "completed", "cancelled"] as const)),
 			teamKey: Type.Optional(Type.String({ description: "Filter by team key, e.g. ENG" })),
+			projectId: Type.Optional(Type.String({ description: "Filter issues by Linear project ID" })),
+			unassigned: Type.Optional(Type.Boolean({ description: "When true, filter to issues with no assignee" })),
 			limit: Type.Optional(Type.Number({ description: "Max results (default 25, max 50)" })),
 		}),
 		async execute(_id, params) {
@@ -359,6 +232,12 @@ export default function linearExtension(pi: ExtensionAPI) {
 			if (params.teamKey) {
 				filters.push({ team: { key: { eq: params.teamKey.toUpperCase() } } });
 			}
+			if (params.projectId) {
+				filters.push({ project: { id: { eq: params.projectId } } });
+			}
+			if (params.unassigned) {
+				filters.push({ assignee: { null: true } });
+			}
 
 			const filter = filters.length > 1 ? { and: filters } : filters[0] ?? {};
 			const limit = Math.min(params.limit ?? 25, 50);
@@ -375,6 +254,33 @@ export default function linearExtension(pi: ExtensionAPI) {
 			return {
 				content: [{ type: "text", text }],
 				details: { issues },
+			};
+		},
+	});
+
+	// ── linear__list_my_projects tool ────────────────────────────────────
+	pi.registerTool({
+		name: "linear__list_my_projects",
+		label: "Linear: List My Projects",
+		description: "List Linear projects where the current user is a member or lead.",
+		parameters: Type.Object({
+			limit: Type.Optional(Type.Number({ description: "Max results (default 25, max 50)" })),
+		}),
+		async execute(_id, params) {
+			const apiKey = requireApiKey();
+			const limit = Math.min(params.limit ?? 25, 50);
+			const data = await gql(apiKey, LIST_MY_PROJECTS, { first: limit });
+			const projects = data.projects?.nodes ?? [];
+
+			if (projects.length === 0) {
+				return { content: [{ type: "text", text: "No projects found." }], details: { projects: [] } };
+			}
+
+			const lines = projects.map((p: any) => `${p.name} (${p.state}) — ID: ${p.id}`);
+			const text = `Found ${projects.length} project${projects.length > 1 ? "s" : ""}:\n\n${lines.join("\n")}`;
+			return {
+				content: [{ type: "text", text }],
+				details: { projects },
 			};
 		},
 	});

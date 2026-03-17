@@ -7,158 +7,47 @@
  * 3) Executor: runs codex subprocesses, then commits/pushes fixes
  */
 
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { spawn } from "node:child_process";
 
 import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
 import { Key, matchesKey, truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
 
-import { ghState, type PrInfo } from "./lib/gh/index.ts";
+import { ghState, type PrInfo } from "../lib/gh/index.ts";
+
+import type {
+	WidgetMode,
+	WorkItem,
+	AmbiguousReview,
+	ShepherdStats,
+	CodexRunResult,
+} from "./lib/types.ts";
+import { summarizeChecks, extractFailingTestFiles, isLikelyFlakyFailure } from "./lib/checks.ts";
+import type { StatusCheckLike } from "./lib/checks.ts";
+import { getNewReviewComments, classifyReviewComment, pendingReviewCount } from "./lib/reviews.ts";
+import type { ReviewCommentLike } from "./lib/reviews.ts";
+import {
+	findFailedRun,
+	getFailedRunLogs,
+	getPrChangedFiles,
+	rerunFailedJobs,
+	readContextLines,
+	postReply,
+	isWorktreeClean,
+	execStdout,
+	runExec,
+} from "./lib/gh-helpers.ts";
+
+export { summarizeChecks, extractFailingTestFiles, isLikelyFlakyFailure, getNewReviewComments };
+export type { StatusCheckLike, ReviewCommentLike };
 
 type Theme = ExtensionContext["ui"]["theme"];
 
 const WIDGET_ID = "shepherd-pr";
 const REVIEW_OVERLAY_WIDTH = 95;
 
-
-// ---- Exported helper types/functions (unit-tested) ----
-
-export interface StatusCheckLike {
-	name: string;
-	status: string;
-	conclusion: string;
-}
-
-export interface ReviewCommentLike {
-	id: number;
-	user: { login: string };
-	body: string;
-	path: string;
-	line: number | null;
-	original_line: number | null;
-	created_at: string;
-	diff_hunk: string;
-}
-
-export function summarizeChecks(checks: StatusCheckLike[]): { passed: number; failed: number; pending: number } {
-	let passed = 0;
-	let failed = 0;
-	let pending = 0;
-
-	for (const check of checks) {
-		if (check.conclusion === "SUCCESS" || check.conclusion === "NEUTRAL") {
-			passed++;
-			continue;
-		}
-		if (check.conclusion === "FAILURE" || check.conclusion === "CANCELLED") {
-			failed++;
-			continue;
-		}
-		if (check.status === "IN_PROGRESS" || check.status === "QUEUED" || check.status === "PENDING") {
-			pending++;
-		}
-	}
-
-	return { passed, failed, pending };
-}
-
-export function extractFailingTestFiles(log: string): string[] {
-	const files = new Set<string>();
-	const regex = /(?:^|\s)(\/?[\w./-]+\.(?:test|spec)\.[cm]?[jt]sx?)(?::\d+(?::\d+)?)?/gm;
-
-	for (const line of log.split("\n")) {
-		const failMatch = line.match(/^FAIL\s+(.+\.(?:test|spec)\.[cm]?[jt]sx?)/);
-		if (failMatch?.[1]) {
-			files.add(normalizePathForCompare(failMatch[1]));
-		}
-
-		let match: RegExpExecArray | null;
-		while ((match = regex.exec(line)) !== null) {
-			if (match[1]) files.add(normalizePathForCompare(match[1]));
-		}
-	}
-
-	return [...files].filter(Boolean).sort();
-}
-
-export function isLikelyFlakyFailure(failingFiles: string[], changedFiles: string[]): boolean {
-	if (failingFiles.length === 0) return false;
-
-	const normalizedChanged = new Set(changedFiles.map((f) => normalizePathForCompare(f)));
-	for (const failing of failingFiles.map((f) => normalizePathForCompare(f))) {
-		for (const changed of normalizedChanged) {
-			if (failing === changed || failing.endsWith(changed) || changed.endsWith(failing)) {
-				return false;
-			}
-		}
-	}
-	return true;
-}
-
-export function getNewReviewComments(comments: ReviewCommentLike[], seen: Set<number>): ReviewCommentLike[] {
-	const fresh: ReviewCommentLike[] = [];
-	for (const comment of comments) {
-		if (!Number.isFinite(comment.id)) continue;
-		if (seen.has(comment.id)) continue;
-		seen.add(comment.id);
-		fresh.push(comment);
-	}
-	return fresh;
-}
-
-function normalizePathForCompare(input: string): string {
-	let path = input.trim().replaceAll("\\", "/");
-	if (path.startsWith("./")) path = path.slice(2);
-	path = path.replace(/:(\d+)(?::\d+)?$/, "");
-
-	const src = path.indexOf("/src/");
-	if (src > 0) return path.slice(src + 1);
-	const tests = path.indexOf("/tests/");
-	if (tests > 0) return path.slice(tests + 1);
-	return path.replace(/^\/+/, "");
-}
-
 // ---- Internal extension state ----
 
-type WidgetMode = "off" | "watching" | "fixing" | "needs-review" | "merged";
-type WorkItemKind = "ci_failure" | "review_actionable" | "merge_conflict";
-
-interface WorkItem {
-	id: string;
-	kind: WorkItemKind;
-	label: string;
-	checkName?: string;
-	runId?: number;
-	comment?: ReviewCommentLike;
-	queuedAt: string;
-}
-
-interface AmbiguousReview {
-	comment: ReviewCommentLike;
-	reason: string;
-	handled: boolean;
-}
-
-interface RunContext {
-	cwd: string;
-}
-
-interface CodexRunResult {
-	exitCode: number;
-	stderr: string;
-	messages: string[];
-}
-
-// Claude stream-json events are parsed as generic Records — no fixed interface needed
-
-interface ShepherdStats {
-	fixed: number;
-	rerun: number;
-	skipped: number;
-	failed: number;
-}
-
+const FIX_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
 
 export default function shepherdPr(pi: ExtensionAPI) {
 	let enabled = false;
@@ -920,174 +809,10 @@ export default function shepherdPr(pi: ExtensionAPI) {
 	}
 }
 
-// ---- Monitor/executor helpers ----
+// ---- Private helpers (stay in index) ----
 
-function pendingReviewCount(pr: PrInfo): number {
-	const latestByAuthor = new Map<string, string>();
-	for (const review of pr.reviews ?? []) latestByAuthor.set(review.author.login, review.state);
-	let pending = 0;
-	for (const state of latestByAuthor.values()) {
-		if (state === "COMMENTED" || state === "CHANGES_REQUESTED") pending++;
-	}
-	if (pending === 0 && pr.reviewDecision === "REVIEW_REQUIRED") return 1;
-	return pending;
-}
-
-async function classifyReviewComment(
-	comment: ReviewCommentLike,
-	runCtx: RunContext,
-): Promise<{ classification: "actionable" | "ambiguous"; reason: string }> {
-	const prompt = [
-		'Classify this PR review comment. Return ONLY a JSON object: {"classification":"ACTIONABLE"|"AMBIGUOUS","reason":"short reason"}',
-		"ACTIONABLE = clear concrete code change (fix bug, rename, add check, style fix).",
-		"AMBIGUOUS = question, opinion, architectural concern, praise, or vague suggestion.",
-		"",
-		`${comment.path}:${comment.line ?? comment.original_line ?? "?"} — ${comment.body}`,
-	].join("\n");
-
-	const result = await new Promise<string>((resolve) => {
-		const child = spawn("claude", [
-			"-p",
-			"--dangerously-skip-permissions",
-			"--output-format", "json",
-			"--max-turns", "1",
-			"--tools", "",
-			prompt,
-		], {
-			cwd: runCtx.cwd,
-			stdio: ["ignore", "pipe", "pipe"],
-		});
-
-		const timeout = setTimeout(() => child.kill("SIGTERM"), 30000);
-		let stdout = "";
-		child.stdout.on("data", (d: Buffer) => { stdout += d.toString(); });
-		child.on("close", () => { clearTimeout(timeout); resolve(stdout); });
-		child.on("error", () => { clearTimeout(timeout); resolve(""); });
-	});
-
-	if (!result.trim()) {
-		return { classification: "ambiguous", reason: "classifier failed" };
-	}
-
-	// Claude --output-format json wraps response in {"result": "..."}
-	let text = result;
-	try {
-		const wrapper = JSON.parse(result);
-		if (wrapper.result) text = wrapper.result;
-	} catch {}
-
-	const parsed = tryParseJsonObject(text);
-	const cls = String(parsed?.classification ?? "").toUpperCase();
-	if (cls === "ACTIONABLE") {
-		return { classification: "actionable", reason: String(parsed?.reason ?? "clear requested change") };
-	}
-	if (cls === "AMBIGUOUS") {
-		return { classification: "ambiguous", reason: String(parsed?.reason ?? "needs human review") };
-	}
-
-	// Fallback heuristic if classification parsing fails
-	const heuristic = /\?$/.test(comment.body.trim()) || /\b(opinion|prefer|maybe|consider)\b/i.test(comment.body);
-	return heuristic
-		? { classification: "ambiguous", reason: "open-ended feedback" }
-		: { classification: "actionable", reason: "appears concrete" };
-}
-
-function tryParseJsonObject(raw: string): Record<string, unknown> | null {
-	const trimmed = raw.trim();
-	try {
-		return JSON.parse(trimmed);
-	} catch {}
-
-	const start = trimmed.indexOf("{");
-	const end = trimmed.lastIndexOf("}");
-	if (start >= 0 && end > start) {
-		try {
-			return JSON.parse(trimmed.slice(start, end + 1));
-		} catch {}
-	}
-	return null;
-}
-
-async function findFailedRun(
-	cwd: string,
-	headBranch: string,
-	checkName: string,
-): Promise<{ id: number; name: string } | null> {
-	const raw = await execStdout(
-		cwd,
-		"gh",
-		["run", "list", "--branch", headBranch, "--limit", "30", "--json", "databaseId,name,status,conclusion"],
-	);
-	if (!raw.trim()) return null;
-
-	let runs: Array<{ databaseId: number; name: string; status: string; conclusion: string }> = [];
-	try {
-		runs = JSON.parse(raw);
-	} catch {
-		return null;
-	}
-
-	const failed = runs.filter((run) =>
-		(run.status === "completed" || run.status === "COMPLETED") &&
-		(run.conclusion === "failure" || run.conclusion === "cancelled" || run.conclusion === "FAILURE" || run.conclusion === "CANCELLED")
-	);
-	const exact = failed.find((run) => run.name === checkName);
-	const picked = exact ?? failed[0];
-	if (!picked?.databaseId) return null;
-
-	return { id: picked.databaseId, name: picked.name };
-}
-
-async function getFailedRunLogs(cwd: string, runId: number): Promise<string> {
-	return await execStdout(cwd, "gh", ["run", "view", String(runId), "--log-failed"]);
-}
-
-async function getPrChangedFiles(cwd: string, prNumber: number, baseRefName: string): Promise<string[]> {
-	const ghOut = await execStdout(cwd, "gh", ["pr", "diff", String(prNumber), "--name-only"]);
-	if (ghOut.trim()) {
-		return ghOut.split("\n").map((line) => line.trim()).filter(Boolean);
-	}
-	const gitOut = await execStdout(cwd, "git", ["diff", "--name-only", `${baseRefName}...HEAD`]);
-	return gitOut.split("\n").map((line) => line.trim()).filter(Boolean);
-}
-
-async function rerunFailedJobs(cwd: string, runId: number): Promise<boolean> {
-	const result = await runExec(cwd, "gh", ["run", "rerun", String(runId), "--failed"], 30000);
-	return result.code === 0;
-}
-
-async function readContextLines(cwd: string, relPath: string, aroundLine: number, radius: number): Promise<string> {
-	try {
-		const absolute = join(cwd, relPath);
-		const src = await readFile(absolute, "utf8");
-		const lines = src.split("\n");
-		const line = Math.max(1, aroundLine);
-		const start = Math.max(1, line - radius);
-		const end = Math.min(lines.length, line + radius);
-		const out: string[] = [];
-		for (let i = start; i <= end; i++) {
-			const marker = i === line ? ">" : " ";
-			out.push(`${marker}${String(i).padStart(4, " ")} | ${lines[i - 1] ?? ""}`);
-		}
-		return out.join("\n");
-	} catch {
-		return "";
-	}
-}
-
-async function postReply(cwd: string, prNumber: number, commentId: number, body: string): Promise<boolean> {
-	const result = await runExec(
-		cwd,
-		"gh",
-		["api", `repos/{owner}/{repo}/pulls/${prNumber}/comments/${commentId}/replies`, "-f", `body=${body}`],
-		20000,
-	);
-	return result.code === 0;
-}
-
-async function isWorktreeClean(cwd: string): Promise<boolean> {
-	const status = await execStdout(cwd, "git", ["status", "--porcelain"]);
-	return status.trim().length === 0;
+function truncatePlain(msg: string, max: number): string {
+	return msg.length <= max ? msg : `${msg.slice(0, max - 1)}…`;
 }
 
 async function ensurePushed(cwd: string): Promise<void> {
@@ -1096,13 +821,6 @@ async function ensurePushed(cwd: string): Promise<void> {
 		await runExec(cwd, "git", ["push", "origin", "HEAD"], 45000);
 	}
 }
-
-
-function truncatePlain(msg: string, max: number): string {
-	return msg.length <= max ? msg : `${msg.slice(0, max - 1)}…`;
-}
-
-const FIX_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
 
 async function runCodex(
 	prompt: string,
@@ -1194,44 +912,6 @@ async function runCodex(
 				stderr,
 				messages,
 			});
-		});
-	});
-}
-
-async function execStdout(cwd: string, cmd: string, args: string[]): Promise<string> {
-	const result = await runExec(cwd, cmd, args, 20000);
-	return result.code === 0 ? result.stdout : "";
-}
-
-async function runExec(
-	cwd: string,
-	cmd: string,
-	args: string[],
-	timeout: number,
-): Promise<{ code: number; stdout: string; stderr: string }> {
-	return await new Promise((resolve) => {
-		const child = spawn(cmd, args, { cwd, stdio: ["ignore", "pipe", "pipe"] });
-		const timer = setTimeout(() => {
-			child.kill("SIGTERM");
-		}, timeout);
-
-		let stdout = "";
-		let stderr = "";
-
-		child.stdout.on("data", (data: Buffer) => {
-			stdout += data.toString();
-		});
-		child.stderr.on("data", (data: Buffer) => {
-			stderr += data.toString();
-		});
-
-		child.on("error", (err) => {
-			clearTimeout(timer);
-			resolve({ code: 1, stdout: "", stderr: String(err) });
-		});
-		child.on("close", (code) => {
-			clearTimeout(timer);
-			resolve({ code: code ?? 1, stdout, stderr });
 		});
 	});
 }
