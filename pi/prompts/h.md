@@ -43,6 +43,7 @@ Display this help reference exactly as written:
 | `linear_update_issue` | Update a Linear issue |
 | `linear_list_issues` | List/filter Linear issues |
 | `linear_list_my_projects` | List Linear projects where you're a member |
+| `ping` | Notify user with sound + macOS banner. Use when user says "ping me when ready" |
 
 ## Prompt Templates
 
