@@ -203,7 +203,7 @@ IMPORTANT: Do NOT mention these during the conversation. Only after you have ful
 				.map(
 					(s) =>
 						`**${s.artifact}** (${s.entryCount} entries)\n` +
-						s.patterns.map((p) => `  - ${p.pattern}`).join("\n")
+						s.patterns.map((p) => `  - [${p.id}] ${p.pattern}`).join("\n")
 				)
 				.join("\n\n");
 
