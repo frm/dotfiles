@@ -100,13 +100,9 @@ function getActivePiPane() {
 }
 
 function quitShared() {
-	write(R);
-	try { process.stdin.setRawMode(false); } catch {}
-	process.stdin.pause();
-	if (sessionName) {
-		try { tmuxRun("kill-session", "-t", `=${sessionName}`); } catch {}
-	}
-	process.exit(0);
+	// Detach from the shared session instead of killing it, so state is
+	// preserved and the next toggle reattaches instantly.
+	try { tmuxRun("detach-client", "-s", `=${sessionName}`); } catch {}
 }
 
 function tab() {
