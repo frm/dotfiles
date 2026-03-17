@@ -30,6 +30,7 @@ interface FrictionEntry {
 	id: string;
 	timestamp: string;
 	sessionId: string;
+	scope: string;          // "user" or "project:<cwd>"
 	artifact: string;
 	pattern: string;
 	suggestion: string;
@@ -38,12 +39,18 @@ interface FrictionEntry {
 	dismissedAt?: string;
 }
 
+interface SeverityThresholds {
+	high: number;
+	medium: number;
+	low: number;
+}
+
 interface Config {
 	enabled: boolean;
 	showEndOfSessionSummary: boolean;
 	showEmergingPatterns: boolean;
 	minEntriesForSummary: number;
-	minEntriesForSuggestion: number;
+	minEntriesForSuggestion: SeverityThresholds;
 	minEntriesForResurface: number;
 	ignoredArtifacts: string[];
 }
@@ -62,13 +69,29 @@ function loadConfig(): Config {
 		showEndOfSessionSummary: raw.showEndOfSessionSummary ?? true,
 		showEmergingPatterns: raw.showEmergingPatterns ?? false,
 		minEntriesForSummary: raw.minEntriesForSummary ?? 0,
-		minEntriesForSuggestion: raw.minEntriesForSuggestion ?? 2,
+		minEntriesForSuggestion: (typeof raw.minEntriesForSuggestion === "object" && raw.minEntriesForSuggestion)
+			? raw.minEntriesForSuggestion
+			: { high: 1, medium: 2, low: 3 },
 		minEntriesForResurface: raw.minEntriesForResurface ?? 3,
 		ignoredArtifacts: raw.ignoredArtifacts ?? [],
 	};
 }
 
 // ── Log Operations ───────────────────────────────────────────────────────────
+
+function getSuggestionThreshold(config: Config, severity: "low" | "medium" | "high"): number {
+	return config.minEntriesForSuggestion[severity];
+}
+
+function meetsThreshold(config: Config, entries: FrictionEntry[]): boolean {
+	const bySeverity = { high: 0, medium: 0, low: 0 };
+	for (const e of entries) bySeverity[e.severity]++;
+	return (
+		bySeverity.high >= getSuggestionThreshold(config, "high") ||
+		bySeverity.medium >= getSuggestionThreshold(config, "medium") ||
+		bySeverity.low >= getSuggestionThreshold(config, "low")
+	);
+}
 
 function ensureLogDir(): void {
 	const dir = dirname(LOG_PATH);
@@ -120,14 +143,16 @@ interface SuggestionGroup {
 	currentContent: string | null;
 }
 
-function groupSuggestions(config: Config): { actionable: SuggestionGroup[]; emerging: SuggestionGroup[] } {
+function groupSuggestions(config: Config, scope?: string): { actionable: SuggestionGroup[]; emerging: SuggestionGroup[] } {
 	const entries = readLog();
 	const ignored = new Set(config.ignoredArtifacts);
+	const scopeFilter = scope ?? "user";
 
 	// Filter active entries
 	const active: FrictionEntry[] = [];
 	for (const entry of entries) {
 		if (ignored.has(entry.artifact)) continue;
+		if ((entry.scope ?? "user") !== scopeFilter) continue;
 
 		if (entry.status === "pending") {
 			active.push(entry);
@@ -137,6 +162,7 @@ function groupSuggestions(config: Config): { actionable: SuggestionGroup[]; emer
 				(e) =>
 					e.artifact === entry.artifact &&
 					e.status === "pending" &&
+					(e.scope ?? "user") === scopeFilter &&
 					e.timestamp > entry.dismissedAt!
 			);
 			if (postDismissal.length >= config.minEntriesForResurface) {
@@ -172,7 +198,7 @@ function groupSuggestions(config: Config): { actionable: SuggestionGroup[]; emer
 
 		const group: SuggestionGroup = { artifact, entries: groupEntries, currentContent: content };
 
-		if (groupEntries.length >= config.minEntriesForSuggestion) {
+		if (meetsThreshold(config, groupEntries)) {
 			// Skip if artifact was deleted
 			if (content !== null) {
 				actionable.push(group);
@@ -187,34 +213,48 @@ function groupSuggestions(config: Config): { actionable: SuggestionGroup[]; emer
 
 // ── Pending Count (lightweight — skips artifact file reads) ──────────────────
 
-function countPendingSuggestions(config: Config): { count: number; artifacts: string[] } {
+function countPendingSuggestions(config: Config, scope?: string): { count: number; artifacts: string[] } {
 	const entries = readLog();
 	const ignored = new Set(config.ignoredArtifacts);
+	const scopeFilter = scope ?? "user";
 
-	// Collect pending entries per artifact (same logic as groupSuggestions, but no file I/O)
-	const pendingByArtifact = new Map<string, number>();
+	// Collect pending entries per artifact, grouped by severity
+	const pendingBySeverity = new Map<string, { high: number; medium: number; low: number }>();
+	const dismissedArtifacts: { artifact: string; dismissedAt: string }[] = [];
+
 	for (const entry of entries) {
 		if (ignored.has(entry.artifact)) continue;
+		if ((entry.scope ?? "user") !== scopeFilter) continue;
 		if (entry.status === "pending") {
-			pendingByArtifact.set(entry.artifact, (pendingByArtifact.get(entry.artifact) || 0) + 1);
-		}
-	}
-
-	// Also check for resurfaced dismissed entries
-	for (const entry of entries) {
-		if (ignored.has(entry.artifact)) continue;
-		if (entry.status === "dismissed" && entry.dismissedAt) {
-			const postDismissal = entries.filter(
-				(e) => e.artifact === entry.artifact && e.status === "pending" && e.timestamp > entry.dismissedAt!
-			).length;
-			if (postDismissal >= config.minEntriesForResurface) {
-				pendingByArtifact.set(entry.artifact, Math.max(pendingByArtifact.get(entry.artifact) || 0, postDismissal));
+			if (!pendingBySeverity.has(entry.artifact)) {
+				pendingBySeverity.set(entry.artifact, { high: 0, medium: 0, low: 0 });
 			}
+			pendingBySeverity.get(entry.artifact)![entry.severity]++;
+		} else if (entry.status === "dismissed" && entry.dismissedAt) {
+			dismissedArtifacts.push({ artifact: entry.artifact, dismissedAt: entry.dismissedAt });
 		}
 	}
 
-	const actionableArtifacts = [...pendingByArtifact.entries()]
-		.filter(([_, count]) => count >= config.minEntriesForSuggestion)
+	// For dismissed artifacts, check if enough post-dismissal pending entries exist to resurface.
+	// Severity counts are already correct from the pending loop above — this only ensures
+	// the artifact stays in the map (which it already does if it has pending entries).
+	for (const { artifact, dismissedAt } of dismissedArtifacts) {
+		if (pendingBySeverity.has(artifact)) continue;
+		const postDismissal = entries.filter(
+			(e) => e.artifact === artifact && e.status === "pending" && e.timestamp > dismissedAt
+				&& (e.scope ?? "user") === scopeFilter
+		).length;
+		if (postDismissal >= config.minEntriesForResurface) {
+			pendingBySeverity.set(artifact, { high: 0, medium: 0, low: 0 });
+		}
+	}
+
+	const actionableArtifacts = [...pendingBySeverity.entries()]
+		.filter(([_, counts]) =>
+			counts.high >= getSuggestionThreshold(config, "high") ||
+			counts.medium >= getSuggestionThreshold(config, "medium") ||
+			counts.low >= getSuggestionThreshold(config, "low")
+		)
 		.map(([artifact]) => artifact);
 
 	return { count: actionableArtifacts.length, artifacts: actionableArtifacts };
@@ -249,10 +289,12 @@ export default function (pi: ExtensionAPI) {
 	let sessionFrictionCount = 0;
 	const sessionArtifacts = new Set<string>();
 	let sessionId = randomUUID();
+	let currentCwd: string = process.cwd();
 
 	// ── Auto-prune on session start ─────────────────────────────────────
 
-	pi.on("session_start", async () => {
+	pi.on("session_start", async (_event, ctx) => {
+		currentCwd = ctx.cwd;
 		const config = loadConfig();
 		if (!config.enabled) return;
 		autoPrune();
@@ -270,16 +312,21 @@ You have a \`self_improvement__log_friction\` tool. Call it silently (don't ment
 2. You're working around a gap or outdated instruction in a skill/prompt
 3. A skill's output consistently needs the same manual fix
 
-Log the artifact path, the pattern, and your suggested fix. Do not interrupt the user's workflow — just log and continue with the task.`;
+Log the artifact path, the pattern, and your suggested fix. Do not interrupt the user's workflow — just log and continue with the task.
 
-		// Check for pending suggestions
-		const { count, artifacts } = countPendingSuggestions(config);
-		if (count > 0) {
-			const artifactList = artifacts.slice(0, 5).join(", ");
+When the friction relates to project-level AI files (.ai/, .pi/agents/, agents.md, AGENTS.md), set scope to "project". For user-level files (skills, prompts, extensions under ~/.dotfiles or ~/.pi), use scope "user" (the default).`;
+
+		// Check for pending suggestions across both scopes
+		const { count: userCount, artifacts: userArtifacts } = countPendingSuggestions(config, "user");
+		const projectScope = `project:${currentCwd}`;
+		const { count: projectCount, artifacts: projectArtifacts } = countPendingSuggestions(config, projectScope);
+		const totalCount = userCount + projectCount;
+		if (totalCount > 0) {
+			const allArtifacts = [...userArtifacts, ...projectArtifacts].slice(0, 5).join(", ");
 			injection += `
 
-There are ${count} pending improvement suggestion${count > 1 ? "s" : ""} for: ${artifactList}.
-IMPORTANT: Do NOT mention these during the conversation. Only after you have fully completed the user's request and delivered your final response, add a brief note: "I have ${count} improvement suggestion${count > 1 ? "s" : ""} for your AI config. Want to review them?" Never bring this up while work is in progress.`;
+There are ${totalCount} pending improvement suggestion${totalCount > 1 ? "s" : ""} for: ${allArtifacts}.
+IMPORTANT: Do NOT mention these during the conversation. Only after you have fully completed the user's request and delivered your final response, add a brief note: "I have ${totalCount} improvement suggestion${totalCount > 1 ? "s" : ""} for your AI config. Want to review them?" Never bring this up while work is in progress.`;
 		}
 
 		return {
@@ -309,12 +356,22 @@ IMPORTANT: Do NOT mention these during the conversation. Only after you have ful
 			severity: StringEnum(["low", "medium", "high"] as const, {
 				description: "How much friction this causes",
 			}),
+			scope: Type.Optional(
+				StringEnum(["user", "project"] as const, {
+					description: 'Scope: "user" for user-level files, "project" for project-level AI files (.ai/, .pi/agents/, agents.md). Defaults to "user".',
+				})
+			),
 		}),
 		async execute(_id, params) {
+			const resolvedScope = params.scope === "project"
+				? `project:${currentCwd}`
+				: "user";
+
 			const entry: FrictionEntry = {
 				id: randomUUID(),
 				timestamp: new Date().toISOString(),
 				sessionId,
+				scope: resolvedScope,
 				artifact: params.artifact,
 				pattern: params.pattern,
 				suggestion: params.suggestion,
@@ -348,10 +405,19 @@ IMPORTANT: Do NOT mention these during the conversation. Only after you have ful
 			"Review pending improvement suggestions. Returns grouped friction patterns " +
 			"with current artifact content. Present results to the user via questionnaire " +
 			"with options: Approve, Dismiss, Skip, or Give instructions.",
-		parameters: Type.Object({}),
-		async execute() {
+		parameters: Type.Object({
+			scope: Type.Optional(
+				StringEnum(["user", "project"] as const, {
+					description: 'Filter by scope. Defaults to "user".',
+				})
+			),
+		}),
+		async execute(_id, params) {
 			const config = loadConfig();
-			const { actionable, emerging } = groupSuggestions(config);
+			const resolvedScope = params.scope === "project"
+				? `project:${currentCwd}`
+				: "user";
+			const { actionable, emerging } = groupSuggestions(config, resolvedScope);
 
 			if (actionable.length === 0 && (!config.showEmergingPatterns || emerging.length === 0)) {
 				return {
