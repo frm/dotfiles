@@ -7,5 +7,12 @@
     "minEntriesForSuggestion": { "high": 1, "medium": 2, "low": 3 },
     "minEntriesForResurface": 3,
     "ignoredArtifacts": []
+  },
+  "stale-prs": {
+    "enabled": true,
+    "reviewOwedHours": 24,
+    "ownPrStaleHours": 48,
+    "pollIntervalMinutes": 60,
+    "snoozeDurationHours": 4
   }
 }

@@ -19,6 +19,7 @@ export async function syncNotification(config: Config, scope: string): Promise<v
 			title: `${count} improvement suggestion${count > 1 ? "s" : ""} for ${label}`,
 			summary: `Patterns detected in: ${artifactList}`,
 			priority: "suggestion",
+			snoozeDuration: 24 * 60 * 60 * 1000, // 24h
 			suggestedAction: {
 				label: "Review suggestions",
 				handler: "self-improvement:review",

@@ -59,6 +59,11 @@ export const notificationsState = {
 						if (ok) pushList();
 						return ok;
 					},
+					snooze(p) {
+						const ok = store.snooze(p?.id as string);
+						if (ok) pushList();
+						return ok;
+					},
 					async executeAction(p) {
 						const id = p?.id as string;
 						const notification = store.get(id);
@@ -121,6 +126,13 @@ export const notificationsState = {
 		try {
 			return (await singleton.call("list")) as Notification[];
 		} catch { return []; }
+	},
+
+	async snooze(id: string): Promise<boolean> {
+		if (!singleton) return false;
+		try {
+			return (await singleton.call("snooze", { id })) as boolean;
+		} catch { return false; }
 	},
 
 	async executeAction(id: string): Promise<{ ok: boolean; error?: string }> {

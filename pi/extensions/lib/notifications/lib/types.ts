@@ -17,6 +17,8 @@ export interface Notification {
 	createdAt: number;
 	updatedAt: number;
 	expiresAt?: number;
+	snoozeDuration?: number;   // ms — set by publisher
+	snoozedUntil?: number;     // epoch ms — set when user snoozes
 	suggestedAction?: SuggestedAction;
 }
 
@@ -27,6 +29,7 @@ export interface PublishParams {
 	fingerprint: string;
 	priority: Priority;
 	expiresAt?: number;
+	snoozeDuration?: number;
 	suggestedAction?: SuggestedAction;
 }
 
@@ -35,5 +38,6 @@ export interface NotificationsService {
 	list(params?: Record<string, unknown>): Notification[];
 	dismiss(params?: Record<string, unknown>): boolean;
 	dismissByFingerprint(params?: Record<string, unknown>): boolean;
+	snooze(params?: Record<string, unknown>): boolean;
 	executeAction(params?: Record<string, unknown>): Promise<{ ok: boolean; error?: string }>;
 }

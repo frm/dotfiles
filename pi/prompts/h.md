@@ -84,6 +84,18 @@ Display this help reference exactly as written:
 | `speech` | "/speech" | Toggle speech mode |
 | `sync-codex-skills` | Sync skills | Copy dotfiles skills to Codex |
 
+## Background Extensions
+
+These run automatically without user interaction:
+
+| Extension | Description |
+|-----------|-------------|
+| `custom-instructions` | Injects custom instructions into the system prompt on every agent start |
+| `self-improvement` | Detects friction patterns and publishes notifications when suggestions accumulate |
+| `stale-prs` | Checks for stale PRs every hour, nudges to review or ping reviewers |
+| `shepherd-pr` | Monitors CI, reviews, and conflicts on the active PR (toggled via `/shepherd`) |
+| `panels` | Manages global and local tmux panels showing worktrees, PRs, and notifications |
+
 ## Keyboard Shortcuts
 
 | Shortcut | Action |

@@ -17,6 +17,7 @@ export interface NotificationStore {
 	list(): Notification[];
 	dismiss(id: string): boolean;
 	dismissByFingerprint(source: string, fingerprint: string): boolean;
+	snooze(id: string): boolean;
 	get(id: string): Notification | undefined;
 	restore(): void;
 }
@@ -59,12 +60,18 @@ export function createStore(persistPath: string): NotificationStore {
 			);
 
 			if (existing) {
+				// Skip update if snoozed
+				if (existing.snoozedUntil && existing.snoozedUntil > now) {
+					return existing;
+				}
+
 				existing.count++;
 				existing.updatedAt = now;
 				existing.title = params.title;
 				if (params.summary !== undefined) existing.summary = params.summary;
 				existing.priority = params.priority;
 				if (params.expiresAt !== undefined) existing.expiresAt = params.expiresAt;
+				if (params.snoozeDuration !== undefined) existing.snoozeDuration = params.snoozeDuration;
 				if (params.suggestedAction !== undefined) existing.suggestedAction = params.suggestedAction;
 
 				const lastWrite = lastWriteByKey.get(key) ?? 0;
@@ -86,6 +93,7 @@ export function createStore(persistPath: string): NotificationStore {
 				createdAt: now,
 				updatedAt: now,
 				expiresAt: params.expiresAt,
+				snoozeDuration: params.snoozeDuration,
 				suggestedAction: params.suggestedAction,
 			};
 			notifications.push(notification);
@@ -96,7 +104,13 @@ export function createStore(persistPath: string): NotificationStore {
 
 		list(): Notification[] {
 			filterExpired();
-			return sorted();
+			const now = Date.now();
+			const visible = notifications.filter(n => !n.snoozedUntil || n.snoozedUntil <= now);
+			return [...visible].sort((a, b) => {
+				const pd = PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority];
+				if (pd !== 0) return pd;
+				return b.updatedAt - a.updatedAt;
+			});
 		},
 
 		dismiss(id: string): boolean {
@@ -113,6 +127,15 @@ export function createStore(persistPath: string): NotificationStore {
 			);
 			if (notifications.length !== before) { persist(); return true; }
 			return false;
+		},
+
+		snooze(id: string): boolean {
+			const n = notifications.find(n => n.id === id);
+			if (!n) return false;
+			const duration = n.snoozeDuration ?? 4 * 60 * 60 * 1000; // default 4h
+			n.snoozedUntil = Date.now() + duration;
+			persist();
+			return true;
 		},
 
 		get(id: string): Notification | undefined {

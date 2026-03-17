@@ -16,6 +16,10 @@ export function dismissAll(notifications: { id: string }[]) {
 	}
 }
 
+export function snoozeNotification(id: string) {
+	return client.request("snooze", { id });
+}
+
 export function executeAction(id: string) {
 	return client.request("executeAction", { id });
 }

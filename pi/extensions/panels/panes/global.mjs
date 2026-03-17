@@ -75,6 +75,7 @@ let notifLoadedOnce = false;
 let prsLoadedOnce = false;
 let confirmingDelete = false;
 let confirmingMerge = false;
+let confirmingPing = null; // { number, body } when confirming a ping comment
 let confirmingAutoMerge = false;
 let merging = false;
 let deleting = false;
@@ -331,8 +332,8 @@ function render() {
 	if (notifCount > 0 || activeTab === "notifications") {
 		const notifBadge = notifCount > 0 ? ` (${notifCount})` : "";
 		const notifLabel = activeTab === "notifications"
-			? activeBg(` Notif${notifBadge} `)
-			: dim(` Notif${notifBadge} `);
+			? activeBg(` Inbox${notifBadge} `)
+			: dim(` Inbox${notifBadge} `);
 		tabBar += dim("│") + notifLabel;
 	}
 	const hFill = Math.max(0, innerW - visWidth(tabBar));
@@ -351,6 +352,11 @@ function render() {
 		const action = confirmingAutoMerge ? "Enable auto-merge" : "Merge";
 		moveTo(row++, 1); write(contentLine(boldRed(` ${action} #${number}?`), innerW)); contentRow++;
 		moveTo(row++, 1); write(contentLine(" " + truncate(entry?.title ?? "", innerW - 2), innerW)); contentRow++;
+		moveTo(row++, 1); write(emptyLine(innerW)); contentRow++;
+		moveTo(row++, 1); write(contentLine(dim(" y/n"), innerW)); contentRow++;
+	} else if (confirmingPing) {
+		moveTo(row++, 1); write(contentLine(yellow(` Post comment on PR #${confirmingPing.number}?`), innerW)); contentRow++;
+		moveTo(row++, 1); write(contentLine(" " + truncate(confirmingPing.body, innerW - 2), innerW)); contentRow++;
 		moveTo(row++, 1); write(emptyLine(innerW)); contentRow++;
 		moveTo(row++, 1); write(contentLine(dim(" y/n"), innerW)); contentRow++;
 	} else if (deleting) {
@@ -379,7 +385,18 @@ function render() {
 		moveTo(row, 1); write(bSide() + dim(msg) + " ".repeat(Math.max(0, innerW - msg.length)) + bSide());
 		contentRow = 1;
 	} else if (activeTab === "notifications") {
-		contentRow = notif.renderTab(row, innerW, contentHeight);
+		contentRow = notif.renderTab(row, innerW, contentHeight - 1);
+		// Fill empty space, then footer on last line
+		while (contentRow < contentHeight - 1) {
+			moveTo(row + contentRow, 1);
+			write(emptyLine(innerW));
+			contentRow++;
+		}
+		moveTo(row + contentRow, 1);
+		const hasNotifs = notif.state.notifications.length > 0;
+		const hint = hasNotifs ? dim(" (o)pen (a)ction (s)nooze (d)ismiss") : "";
+		write(contentLine(hint, innerW));
+		contentRow++;
 	}
 
 	while (contentRow < contentHeight) {
@@ -478,6 +495,17 @@ function handleInput(data) {
 		return;
 	}
 
+	if (confirmingPing) {
+		if (inputStr === "y" || inputStr === "Y") {
+			const result = notif.acceptAction();
+			if (!result?.ok) flash(result?.error ?? "Ping failed", render, 2000, red);
+			else flash("Comment posted", render);
+		}
+		confirmingPing = null;
+		render();
+		return;
+	}
+
 	// Tab switching
 	if (inputStr === "t" || (inputBuf.length === 1 && inputBuf[0] === 0x09)) return switchTab();
 	if (inputBuf.length === 3 && inputBuf[0] === 0x1b && inputBuf[1] === 0x5b && inputBuf[2] === 0x5a) return switchTab();
@@ -512,8 +540,24 @@ function handleInput(data) {
 		return;
 	}
 	if (activeTab === "notifications" && inputStr === "a") {
+		const entry = notif.getSelectedEntry();
+		if (entry?.suggestedAction?.handler === "stale-prs:ping-reviewers") {
+			const params = entry.suggestedAction.params;
+			const reviewers = (params.reviewers ?? []).map(r => `@${r}`).join(" ");
+			confirmingPing = {
+				number: params.prNumber,
+				body: `${reviewers} friendly ping — this PR has been waiting for review`,
+			};
+			render();
+			return;
+		}
 		const result = notif.acceptAction();
 		if (!result?.ok) flash(result?.error ?? "Action failed", render, 2000, red);
+		render();
+		return;
+	}
+	if (activeTab === "notifications" && inputStr === "s") {
+		notif.snoozeSelected();
 		render();
 		return;
 	}

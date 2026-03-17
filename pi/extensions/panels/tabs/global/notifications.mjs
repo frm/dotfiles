@@ -1,4 +1,4 @@
-import { listNotifications, dismissNotification, dismissAll, executeAction } from "../../lib/notifications.ts";
+import { listNotifications, dismissNotification, dismissAll, snoozeNotification, executeAction } from "../../lib/notifications.ts";
 import {
 	dim, cyan, yellow, red, style,
 	truncate, visWidth, write, moveTo, selColor,
@@ -16,7 +16,7 @@ export const state = {
 	visualRows: [],
 	selectedIdx: 0,
 	scrollOffset: 0,
-	expandedId: null,
+	expandedIds: new Set(),
 };
 
 // ── Priority Rendering ───────────────────────────────────────────────────────
@@ -26,13 +26,6 @@ const PRIORITY_INDICATOR = {
 	"needs-decision": () => yellow("●"),
 	suggestion: () => cyan("●"),
 	info: () => dim("○"),
-};
-
-const PRIORITY_BADGE = {
-	blocked: () => red("[blocked]"),
-	"needs-decision": () => yellow("[decision]"),
-	suggestion: () => cyan("[suggestion]"),
-	info: () => dim("[info]"),
 };
 
 // ── Data ─────────────────────────────────────────────────────────────────────
@@ -52,19 +45,22 @@ export function rebuildNav() {
 	const rows = [];
 	for (let i = 0; i < state.notifications.length; i++) {
 		const n = state.notifications[i];
+		const expanded = state.expandedIds.has(n.id);
+
 		rows.push({ kind: "entry", navIdx: i, data: n });
 
-		// Detail line: action label + count
-		const parts = [];
-		if (n.suggestedAction) parts.push(n.suggestedAction.label);
-		if (n.count > 1) parts.push(`(${n.count}x)`);
-		if (parts.length > 0) {
-			rows.push({ kind: "detail", navIdx: i, text: parts.join("  ") });
+		// When expanded: wrapped continuation of title + summary
+		if (expanded) {
+			// Title continuation lines are added at render time (first line is in entry row)
+			rows.push({ kind: "title-wrap", navIdx: i, text: n.title });
+			if (n.summary) {
+				rows.push({ kind: "summary", navIdx: i, text: n.summary });
+			}
 		}
 
-		// Expanded summary (wrapped at render time)
-		if (state.expandedId === n.id && n.summary) {
-			rows.push({ kind: "summary", navIdx: i, text: n.summary });
+		// Detail line: action label
+		if (n.suggestedAction) {
+			rows.push({ kind: "detail", navIdx: i, text: n.suggestedAction.label });
 		}
 	}
 	state.visualRows = rows;
@@ -84,7 +80,11 @@ export function getSelectedEntry() {
 export function toggleExpand() {
 	const entry = getSelectedEntry();
 	if (!entry) return;
-	state.expandedId = state.expandedId === entry.id ? null : entry.id;
+	if (state.expandedIds.has(entry.id)) {
+		state.expandedIds.delete(entry.id);
+	} else {
+		state.expandedIds.add(entry.id);
+	}
 	rebuildNav();
 }
 
@@ -92,6 +92,16 @@ export function dismissSelected() {
 	const entry = getSelectedEntry();
 	if (!entry) return;
 	dismissNotification(entry.id);
+	state.expandedIds.delete(entry.id);
+	state.notifications = state.notifications.filter(n => n.id !== entry.id);
+	rebuildNav();
+}
+
+export function snoozeSelected() {
+	const entry = getSelectedEntry();
+	if (!entry) return;
+	snoozeNotification(entry.id);
+	state.expandedIds.delete(entry.id);
 	state.notifications = state.notifications.filter(n => n.id !== entry.id);
 	rebuildNav();
 }
@@ -99,6 +109,7 @@ export function dismissSelected() {
 export function dismissAllNotifications() {
 	dismissAll(state.notifications);
 	state.notifications = [];
+	state.expandedIds.clear();
 	rebuildNav();
 }
 
@@ -107,6 +118,7 @@ export function acceptAction() {
 	if (!entry?.suggestedAction) return { ok: false, error: "No action available" };
 	const result = executeAction(entry.id);
 	if (result?.ok) {
+		state.expandedIds.delete(entry.id);
 		state.notifications = state.notifications.filter(n => n.id !== entry.id);
 		rebuildNav();
 	}
@@ -138,22 +150,35 @@ export function renderTab(startRow, innerW, contentHeight) {
 	for (let vi = 0; vi < visibleCount; vi++) {
 		if (contentRow >= contentHeight) break;
 		const vr = state.visualRows[state.scrollOffset + vi];
-		const selected = vr.navIdx === state.selectedIdx;
 
 		if (vr.kind === "entry") {
 			moveTo(row++, 1); contentRow++;
-			renderEntryRow(vr.data, selected, innerW);
+			renderEntryRow(vr.data, vr.navIdx === state.selectedIdx, innerW);
 		} else if (vr.kind === "detail") {
 			moveTo(row++, 1); contentRow++;
 			renderDetailRow(vr.text, innerW);
+		} else if (vr.kind === "title-wrap") {
+			// Render continuation lines of the title (line 1 is already in the entry row)
+			const prefix = "    "; // aligns with text after "→ ● "
+			const wrapW = Math.max(1, innerW - visWidth(prefix));
+			const lines = wrapText(vr.text, wrapW);
+			for (let li = 1; li < lines.length; li++) {
+				if (contentRow >= contentHeight) break;
+				moveTo(row++, 1); contentRow++;
+				write(contentLine(prefix + lines[li], innerW));
+			}
 		} else if (vr.kind === "summary") {
 			const indent = "     ";
 			const wrapW = Math.max(1, innerW - indent.length);
-			const lines = wrapText(vr.text, wrapW);
-			for (const line of lines) {
-				if (contentRow >= contentHeight) break;
-				moveTo(row++, 1); contentRow++;
-				write(contentLine(subdued(indent + line), innerW));
+			// Split on newlines first, then wrap each paragraph
+			const paragraphs = vr.text.split("\n");
+			for (const para of paragraphs) {
+				const lines = wrapText(para, wrapW);
+				for (const line of lines) {
+					if (contentRow >= contentHeight) break;
+					moveTo(row++, 1); contentRow++;
+					write(contentLine(subdued(indent + line), innerW));
+				}
 			}
 		}
 	}
@@ -163,15 +188,14 @@ export function renderTab(startRow, innerW, contentHeight) {
 
 function renderEntryRow(n, selected, innerW) {
 	const indicator = (PRIORITY_INDICATOR[n.priority] ?? PRIORITY_INDICATOR.info)();
-	const badge = (PRIORITY_BADGE[n.priority] ?? PRIORITY_BADGE.info)();
-	const cursor = selected ? selColor("▶ ") : "  ";
-	const badgeW = visWidth(badge);
-	const titleW = Math.max(1, innerW - 4 - badgeW - 1);
-	const title = truncate(n.title, titleW);
-	const usedW = visWidth(cursor + indicator + " " + title);
-	const gap = " ".repeat(Math.max(1, innerW - usedW - badgeW));
-	const line = cursor + indicator + " " + title + gap + badge;
-	write(bSide() + line + " ".repeat(Math.max(0, innerW - visWidth(line))) + bSide());
+	const cursor = selected ? selColor("→ ") : "  ";
+	const prefixW = visWidth(cursor + indicator + " ");
+	const titleW = Math.max(1, innerW - prefixW);
+	// Use wrapText for first line so it splits consistently with continuation lines
+	const lines = wrapText(n.title, titleW);
+	const firstLine = lines[0] ?? "";
+	const pad = " ".repeat(Math.max(0, innerW - prefixW - visWidth(firstLine)));
+	write(bSide() + cursor + indicator + " " + firstLine + pad + bSide());
 }
 
 function renderDetailRow(text, innerW) {
@@ -179,5 +203,3 @@ function renderDetailRow(text, innerW) {
 	const full = dim(truncate(indent + text, innerW));
 	write(contentLine(full, innerW));
 }
-
-
