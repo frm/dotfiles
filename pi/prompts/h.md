@@ -12,9 +12,13 @@ Display this help reference exactly as written:
 | `/linear <id>` | Fetch a Linear issue and send to agent |
 | `/plan` | Reopen the last presented plan |
 | `/shepherd` | Toggle autonomous PR shepherding (CI, reviews, conflicts) |
-| `/worktrees` | Toggle worktrees context panel |
-| `/git-panel` | Toggle git context panel |
-| `/context-panels` | Toggle both context panels |
+| `/global` | Toggle the global (left) panel |
+| `/local` | Toggle the local (right) panel |
+| `/panels` | Re-initialize or refresh all panels |
+| `/music` | Toggle the music widget |
+| `/self-improvement prune` | Remove applied/dismissed friction entries |
+| `/self-improvement status` | Show friction log stats |
+| `/gh` | Show GitHub singleton status (role, uptime, cache) |
 
 ## Tools
 
@@ -23,6 +27,17 @@ Display this help reference exactly as written:
 | `present_plan` | Display a plan in a scrollable overlay for review/approval |
 | `questionnaire` | Structured multi-choice prompts (single or tabbed) |
 | `subagent` | Delegate to specialized agents (single, parallel, or chain) |
+| `fetch_config` | Read a value from `.pi/config.json` (dot-notation key) |
+| `self_improvement__log_friction` | Silently log a friction pattern (user or project scope) |
+| `self_improvement__review` | Review pending friction suggestions grouped by artifact |
+| `self_improvement__update` | Update friction entry statuses (applied/dismissed/skipped) |
+| `browser_launch` | Launch a browser for manual testing |
+| `browser_navigate` | Navigate to a URL |
+| `browser_click` | Click an element by selector or text |
+| `browser_type` | Type text into an input field |
+| `browser_screenshot` | Take a screenshot of the current page |
+| `browser_read_page` | Read page content (visible text, DOM structure) |
+| `browser_close` | Close the browser |
 | `linear_fetch_issue` | Fetch a Linear issue by identifier |
 | `linear_create_issue` | Create a Linear issue or sub-issue |
 | `linear_update_issue` | Update a Linear issue |
@@ -62,7 +77,9 @@ Display this help reference exactly as written:
 | `review-pr` | PR review requests | Context-aware PR review with inline comments |
 | `solve-conflicts` | Git conflicts | Structured conflict resolution |
 | `codex-plan-review` | "review the plan" | External plan review via Codex CLI |
-| `unit-testing-guidelines` | Writing Elixir tests | ExUnit conventions (ex_machina, Mimic) |
+| `code-patterns` | Writing new code | Code structure and organization patterns (general + per-language) |
+| `elixir-testing-guide` | Writing Elixir tests | ExUnit conventions, Mimic, anti-patterns |
+| `manual-testing` | "manually test" | Drive a browser to test UI changes |
 | `speech` | "/speech" | Toggle speech mode |
 | `sync-codex-skills` | Sync skills | Copy dotfiles skills to Codex |
 
@@ -70,5 +87,11 @@ Display this help reference exactly as written:
 
 | Shortcut | Action |
 |----------|--------|
-| `ctrl+shift+w` | Toggle worktrees panel |
-| `ctrl+shift+g` | Toggle git panel |
+| `alt+1` – `alt+9` | Switch to worktree by index |
+| `alt+g` | Toggle global (left) panel |
+| `alt+l` | Toggle local (right) panel |
+| `alt+t` | Open terminal popup |
+| `alt+v` | Open nvim popup |
+| `alt+m` | Toggle music widget |
+| `alt+k` | Cycle music visualizer |
+| `alt+j` | Toggle lyrics |
