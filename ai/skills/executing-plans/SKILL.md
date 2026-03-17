@@ -30,6 +30,8 @@ For each task:
 3. Run verifications as specified
 4. Mark as completed
 
+**Git operations:** Never commit, push, or create PRs automatically — even if the plan includes commit steps. Instead, ask the user if they want to commit at the end of each batch. If they say yes, use `/commit`.
+
 ### Step 3: Report
 When batch complete:
 - Show what was implemented
