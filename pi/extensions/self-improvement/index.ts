@@ -19,269 +19,13 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 import { StringEnum } from "@mariozechner/pi-ai";
-import { readFileSync, writeFileSync, appendFileSync, existsSync, mkdirSync } from "node:fs";
-import { join, dirname } from "node:path";
 import { randomUUID } from "node:crypto";
-import { readConfig } from "../lib/config.ts";
 
-// ── Types ────────────────────────────────────────────────────────────────────
-
-interface FrictionEntry {
-	id: string;
-	timestamp: string;
-	sessionId: string;
-	scope: string;          // "user" or "project:<cwd>"
-	artifact: string;
-	pattern: string;
-	suggestion: string;
-	severity: "low" | "medium" | "high";
-	status: "pending" | "applied" | "dismissed" | "skipped";
-	dismissedAt?: string;
-}
-
-interface SeverityThresholds {
-	high: number;
-	medium: number;
-	low: number;
-}
-
-interface Config {
-	enabled: boolean;
-	showEndOfSessionSummary: boolean;
-	showEmergingPatterns: boolean;
-	minEntriesForSummary: number;
-	minEntriesForSuggestion: SeverityThresholds;
-	minEntriesForResurface: number;
-	ignoredArtifacts: string[];
-}
-
-// ── Constants ────────────────────────────────────────────────────────────────
-
-const LOG_PATH = join(process.env.HOME || "", ".pi", "logs", "friction.jsonl");
-const AUTO_PRUNE_DAYS = 30;
-
-// ── Config ───────────────────────────────────────────────────────────────────
-
-function loadConfig(): Config {
-	const raw = readConfig("self-improvement");
-	return {
-		enabled: raw.enabled ?? true,
-		showEndOfSessionSummary: raw.showEndOfSessionSummary ?? true,
-		showEmergingPatterns: raw.showEmergingPatterns ?? false,
-		minEntriesForSummary: raw.minEntriesForSummary ?? 0,
-		minEntriesForSuggestion: (typeof raw.minEntriesForSuggestion === "object" && raw.minEntriesForSuggestion)
-			? raw.minEntriesForSuggestion
-			: { high: 1, medium: 2, low: 3 },
-		minEntriesForResurface: raw.minEntriesForResurface ?? 3,
-		ignoredArtifacts: raw.ignoredArtifacts ?? [],
-	};
-}
-
-// ── Log Operations ───────────────────────────────────────────────────────────
-
-function getSuggestionThreshold(config: Config, severity: "low" | "medium" | "high"): number {
-	return config.minEntriesForSuggestion[severity];
-}
-
-function meetsThreshold(config: Config, entries: FrictionEntry[]): boolean {
-	const bySeverity = { high: 0, medium: 0, low: 0 };
-	for (const e of entries) bySeverity[e.severity]++;
-	return (
-		bySeverity.high >= getSuggestionThreshold(config, "high") ||
-		bySeverity.medium >= getSuggestionThreshold(config, "medium") ||
-		bySeverity.low >= getSuggestionThreshold(config, "low")
-	);
-}
-
-function ensureLogDir(): void {
-	const dir = dirname(LOG_PATH);
-	if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-}
-
-function readLog(): FrictionEntry[] {
-	if (!existsSync(LOG_PATH)) return [];
-	const lines = readFileSync(LOG_PATH, "utf-8").trim().split("\n").filter(Boolean);
-	const entries: FrictionEntry[] = [];
-	for (const line of lines) {
-		try {
-			entries.push(JSON.parse(line));
-		} catch {
-			// skip malformed lines
-		}
-	}
-	return entries;
-}
-
-function writeLog(entries: FrictionEntry[]): void {
-	ensureLogDir();
-	const content = entries.map((e) => JSON.stringify(e)).join("\n") + (entries.length ? "\n" : "");
-	writeFileSync(LOG_PATH, content);
-}
-
-function appendEntry(entry: FrictionEntry): void {
-	ensureLogDir();
-	appendFileSync(LOG_PATH, JSON.stringify(entry) + "\n");
-}
-
-function autoPrune(): number {
-	const entries = readLog();
-	const cutoff = new Date(Date.now() - AUTO_PRUNE_DAYS * 24 * 60 * 60 * 1000).toISOString();
-	const kept = entries.filter((e) => {
-		if (e.status === "applied" && e.timestamp < cutoff) return false;
-		return true;
-	});
-	const pruned = entries.length - kept.length;
-	if (pruned > 0) writeLog(kept);
-	return pruned;
-}
-
-// ── Suggestion Grouping ──────────────────────────────────────────────────────
-
-interface SuggestionGroup {
-	artifact: string;
-	entries: FrictionEntry[];
-	currentContent: string | null;
-}
-
-function groupSuggestions(config: Config, scope?: string): { actionable: SuggestionGroup[]; emerging: SuggestionGroup[] } {
-	const entries = readLog();
-	const ignored = new Set(config.ignoredArtifacts);
-	const scopeFilter = scope ?? "user";
-
-	// Filter active entries
-	const active: FrictionEntry[] = [];
-	for (const entry of entries) {
-		if (ignored.has(entry.artifact)) continue;
-		if ((entry.scope ?? "user") !== scopeFilter) continue;
-
-		if (entry.status === "pending") {
-			active.push(entry);
-		} else if (entry.status === "dismissed" && entry.dismissedAt) {
-			// Count post-dismissal pending entries for the same artifact
-			const postDismissal = entries.filter(
-				(e) =>
-					e.artifact === entry.artifact &&
-					e.status === "pending" &&
-					(e.scope ?? "user") === scopeFilter &&
-					e.timestamp > entry.dismissedAt!
-			);
-			if (postDismissal.length >= config.minEntriesForResurface) {
-				active.push(...postDismissal);
-			}
-		}
-	}
-
-	// Group by artifact
-	const groups = new Map<string, FrictionEntry[]>();
-	for (const entry of active) {
-		const existing = groups.get(entry.artifact) || [];
-		// Deduplicate by id
-		if (!existing.some((e) => e.id === entry.id)) {
-			existing.push(entry);
-		}
-		groups.set(entry.artifact, existing);
-	}
-
-	const actionable: SuggestionGroup[] = [];
-	const emerging: SuggestionGroup[] = [];
-
-	for (const [artifact, groupEntries] of groups) {
-		let content: string | null = null;
-		try {
-			const resolvedPath = artifact.replace(/^~/, process.env.HOME || "");
-			if (existsSync(resolvedPath)) {
-				content = readFileSync(resolvedPath, "utf-8");
-			}
-		} catch {
-			// artifact may have been deleted
-		}
-
-		const group: SuggestionGroup = { artifact, entries: groupEntries, currentContent: content };
-
-		if (meetsThreshold(config, groupEntries)) {
-			// Skip if artifact was deleted
-			if (content !== null) {
-				actionable.push(group);
-			}
-		} else {
-			emerging.push(group);
-		}
-	}
-
-	return { actionable, emerging };
-}
-
-// ── Pending Count (lightweight — skips artifact file reads) ──────────────────
-
-function countPendingSuggestions(config: Config, scope?: string): { count: number; artifacts: string[] } {
-	const entries = readLog();
-	const ignored = new Set(config.ignoredArtifacts);
-	const scopeFilter = scope ?? "user";
-
-	// Collect pending entries per artifact, grouped by severity
-	const pendingBySeverity = new Map<string, { high: number; medium: number; low: number }>();
-	const dismissedArtifacts: { artifact: string; dismissedAt: string }[] = [];
-
-	for (const entry of entries) {
-		if (ignored.has(entry.artifact)) continue;
-		if ((entry.scope ?? "user") !== scopeFilter) continue;
-		if (entry.status === "pending") {
-			if (!pendingBySeverity.has(entry.artifact)) {
-				pendingBySeverity.set(entry.artifact, { high: 0, medium: 0, low: 0 });
-			}
-			pendingBySeverity.get(entry.artifact)![entry.severity]++;
-		} else if (entry.status === "dismissed" && entry.dismissedAt) {
-			dismissedArtifacts.push({ artifact: entry.artifact, dismissedAt: entry.dismissedAt });
-		}
-	}
-
-	// For dismissed artifacts, check if enough post-dismissal pending entries exist to resurface.
-	// Severity counts are already correct from the pending loop above — this only ensures
-	// the artifact stays in the map (which it already does if it has pending entries).
-	for (const { artifact, dismissedAt } of dismissedArtifacts) {
-		if (pendingBySeverity.has(artifact)) continue;
-		const postDismissal = entries.filter(
-			(e) => e.artifact === artifact && e.status === "pending" && e.timestamp > dismissedAt
-				&& (e.scope ?? "user") === scopeFilter
-		).length;
-		if (postDismissal >= config.minEntriesForResurface) {
-			pendingBySeverity.set(artifact, { high: 0, medium: 0, low: 0 });
-		}
-	}
-
-	const actionableArtifacts = [...pendingBySeverity.entries()]
-		.filter(([_, counts]) =>
-			counts.high >= getSuggestionThreshold(config, "high") ||
-			counts.medium >= getSuggestionThreshold(config, "medium") ||
-			counts.low >= getSuggestionThreshold(config, "low")
-		)
-		.map(([artifact]) => artifact);
-
-	return { count: actionableArtifacts.length, artifacts: actionableArtifacts };
-}
-
-// ── Status Update ────────────────────────────────────────────────────────────
-
-function updateEntryStatuses(updates: { id: string; status: "applied" | "dismissed" | "skipped" }[]): number {
-	const entries = readLog();
-	const updateMap = new Map(updates.map((u) => [u.id, u.status]));
-	const now = new Date().toISOString();
-	let updated = 0;
-
-	for (const entry of entries) {
-		const newStatus = updateMap.get(entry.id);
-		if (newStatus) {
-			entry.status = newStatus;
-			if (newStatus === "dismissed") {
-				entry.dismissedAt = now;
-			}
-			updated++;
-		}
-	}
-
-	if (updated > 0) writeLog(entries);
-	return updated;
-}
+import type { FrictionEntry } from "./lib/types.ts";
+import { loadConfig } from "./lib/config.ts";
+import { readLog, writeLog, appendEntry, autoPrune, updateEntryStatuses } from "./lib/store.ts";
+import { groupSuggestions, countPendingSuggestions } from "./lib/suggestions.ts";
+import { syncNotification } from "./lib/notifications.ts";
 
 // ── Extension ────────────────────────────────────────────────────────────────
 
@@ -298,6 +42,10 @@ export default function (pi: ExtensionAPI) {
 		const config = loadConfig();
 		if (!config.enabled) return;
 		autoPrune();
+
+		// Sync notifications for both scopes
+		syncNotification(config, "user").catch(() => {});
+		syncNotification(config, `project:${currentCwd}`).catch(() => {});
 	});
 
 	// ── Inject friction detection instruction ───────────────────────────
@@ -382,6 +130,10 @@ IMPORTANT: Do NOT mention these during the conversation. Only after you have ful
 			appendEntry(entry);
 			sessionFrictionCount++;
 			sessionArtifacts.add(params.artifact);
+
+			// Publish/update notification if threshold is met
+			const config = loadConfig();
+			syncNotification(config, resolvedScope).catch(() => {});
 
 			return {
 				content: [{ type: "text", text: JSON.stringify({ logged: true }) }],
@@ -492,7 +244,14 @@ IMPORTANT: Do NOT mention these during the conversation. Only after you have ful
 			),
 		}),
 		async execute(_id, params) {
-			const updated = updateEntryStatuses(params.updates);
+			const { updated, affectedScopes } = updateEntryStatuses(params.updates);
+
+			// Dismiss notifications for scopes that no longer have actionable entries
+			const config = loadConfig();
+			for (const scope of affectedScopes) {
+				syncNotification(config, scope).catch(() => {});
+			}
+
 			return {
 				content: [{ type: "text", text: `Updated ${updated} entries.` }],
 				details: { updated },

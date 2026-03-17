@@ -83,6 +83,12 @@ A single high-severity entry is enough to surface a suggestion, while low-severi
 
 The agent is instructed to choose the appropriate scope automatically based on which file the friction relates to.
 
+## Notifications
+
+When friction entries cross the severity threshold for an artifact, the extension publishes a notification to the [notifications inbox](../lib/notifications/README.md). The notification includes a "Review suggestions" action and updates its count as more patterns are logged.
+
+Notifications are automatically dismissed when entries are resolved (applied or dismissed via the `update` tool). On session start, notifications are synced for both user and project scopes — stale notifications from resolved entries are cleaned up.
+
 ## Storage
 
 All entries are stored in `~/.pi/logs/friction.jsonl` as newline-delimited JSON. Entries older than 30 days with `applied` status are auto-pruned on session start.
