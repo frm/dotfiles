@@ -57,9 +57,10 @@ When you have credentials, look at the page for a login form. Use `browser_read_
 
 Try in order:
 1. Config: `fetch_config` with key `manual-testing.baseUrl`
-2. Check project config files for port/host settings (e.g. `config/dev.exs`, `.env`, `next.config.js`, `vite.config.ts`)
-3. Check running processes for common dev server ports
-4. Fall back to common defaults: `http://localhost:4000` (Phoenix), `http://localhost:3000` (Next/Rails), `http://localhost:5173` (Vite)
+2. Check `.env` in the project root for port overrides (e.g. `PORT`, `VITE_DEV_PORT`). **Worktrees often have their own `.env` with unique ports to avoid conflicts** — always check this before falling back to config defaults.
+3. Check project config files for port/host settings (e.g. `config/dev.exs`, `next.config.js`, `vite.config.ts`) — these often reference env vars found in step 2
+4. Check running processes for common dev server ports
+5. Fall back to common defaults: `http://localhost:4000` (Phoenix), `http://localhost:3000` (Next/Rails), `http://localhost:5173` (Vite)
 
 ## Test Summary
 
