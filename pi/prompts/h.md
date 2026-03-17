@@ -42,6 +42,7 @@ Display this help reference exactly as written:
 | `linear_create_issue` | Create a Linear issue or sub-issue |
 | `linear_update_issue` | Update a Linear issue |
 | `linear_list_issues` | List/filter Linear issues |
+| `linear_list_my_projects` | List Linear projects where you're a member |
 
 ## Prompt Templates
 
