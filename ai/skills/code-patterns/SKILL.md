@@ -80,6 +80,10 @@ Flatten control flow by returning early for error/edge cases. The main logic sho
 
 Don't leave commented-out code, unused imports, or unreachable branches. If something isn't used, delete it. Version control remembers.
 
+### Read conventions before creating files
+
+Before creating new files in a directory, check for `AGENTS.md`, `README.md`, or other convention files that dictate structure (e.g., folder layout, naming, required companion files like READMEs or prompt updates). Follow what's already established — don't guess.
+
 ### Name things for what they represent, not how they work
 
 Variable and function names describe *what* the thing is or does, not the implementation mechanism. `fetchMergeQueuePositions` not `graphqlBatchQuery`. `createFocusManager` not `makeInputParser`.

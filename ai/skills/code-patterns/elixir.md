@@ -123,6 +123,26 @@ def get_owner_of_device(%Device{id: id})
 
 Reserve `get_*` for functions that return `resource | nil`. Use `fetch_*` for functions that return `{:ok, resource} | {:error, :not_found}`.
 
+### Bang propagation
+
+If a private function calls a `!` function (one that raises on failure), the caller should also have `!` in its name. This makes it obvious from the call site that the function can raise.
+
+```elixir
+# Good: bang propagates up
+defp create_user!(attrs) do
+  %User{}
+  |> User.changeset(attrs)
+  |> Repo.insert!()
+end
+
+# Bad: hides the raise
+defp create_user(attrs) do
+  %User{}
+  |> User.changeset(attrs)
+  |> Repo.insert!()
+end
+```
+
 ### Boundary hygiene
 
 - Predicate functions end in `?`. Reserve `is_*` names for guards only.
