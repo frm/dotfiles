@@ -1,6 +1,7 @@
 import { extractIssueId } from "../../lib/data.ts";
 import { lookupIssue } from "../../lib/linear.ts";
 import { prList, getUsername, prMergeQueuePositions } from "../../lib/gh.ts";
+import { readConfig } from "../../../lib/config.ts";
 import {
 	dim, cyan, green, yellow, red,
 	truncate, visWidth, write, moveTo, selColor,
@@ -11,7 +12,7 @@ import {
 
 // ─── PR JSON fields requested from gh ────────────────────────────────────────
 
-const JSON_FIELDS = "number,title,headRefName,url,reviewDecision,latestReviews,reviewRequests,statusCheckRollup,mergeStateStatus,autoMergeRequest,mergeable";
+const JSON_FIELDS = "number,title,headRefName,url,reviewDecision,latestReviews,reviewRequests,statusCheckRollup,mergeStateStatus,autoMergeRequest,mergeable,isDraft,labels";
 
 // ─── Classification ──────────────────────────────────────────────────────────
 
@@ -81,6 +82,22 @@ function classifyMyPr(pr, queuePositions) {
 	return "my-waiting-feedback";
 }
 
+// ─── PR Filtering ────────────────────────────────────────────────────────────
+
+const DEFAULT_SKIPPABLE_LABELS = ["do not merge", "don't merge", "do-not-merge", "dont-merge"];
+
+function getSkippableLabels() {
+	const config = readConfig("panels");
+	return config?.skippablePRLabels ?? DEFAULT_SKIPPABLE_LABELS;
+}
+
+function shouldSkipPr(pr) {
+	if (pr.isDraft) return true;
+	const skippableLabels = getSkippableLabels().map((l) => l.toLowerCase());
+	const prLabels = (pr.labels ?? []).map((l) => (l.name ?? l).toLowerCase());
+	return prLabels.some((label) => skippableLabels.includes(label));
+}
+
 // ─── Fetch ───────────────────────────────────────────────────────────────────
 
 function buildEntry(pr, status) {
@@ -100,8 +117,8 @@ export function fetchPrData(cwd) {
 	if (!cwd) return { reviewPrs: [], myPrs: [] };
 	const myLogin = getUsername();
 
-	const rawReview = prList({ search: "review-requested:@me is:open", json: JSON_FIELDS, limit: 50 }, cwd);
-	const rawMy = prList({ author: "@me", state: "open", json: JSON_FIELDS, limit: 50 }, cwd);
+	const rawReview = prList({ search: "review-requested:@me is:open", json: JSON_FIELDS, limit: 50 }, cwd).filter((pr) => !shouldSkipPr(pr));
+	const rawMy = prList({ author: "@me", state: "open", json: JSON_FIELDS, limit: 50 }, cwd).filter((pr) => !shouldSkipPr(pr));
 
 	// Batch-fetch merge queue positions for all approved PRs
 	const allPrs = [...rawReview, ...rawMy];
