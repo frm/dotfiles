@@ -45,7 +45,7 @@ Display this help reference exactly as written:
 | `linear__list_my_projects` | List Linear projects where you're a member |
 | `work__setup` | Create a worktree + tmux window for a Linear ticket |
 | `calendar__list_events` | List upcoming Google Calendar events |
-| `ping` | Notify user with sound + macOS banner. Use when user says "ping me when ready" |
+| `ping` | Notify user with sound + macOS banner. Pass a short message (strip branch prefixes: `frm/rvr-123/build-api` → `build-api finished`) |
 
 ## Prompt Templates
 

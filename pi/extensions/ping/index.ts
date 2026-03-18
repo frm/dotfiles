@@ -6,7 +6,7 @@ export default function (pi: ExtensionAPI) {
 		name: "ping",
 		label: "Ping",
 		description:
-			"Notify the user with a sound and macOS notification. Use when the user says 'ping me when ready' or similar.",
+			"Notify the user with a sound and macOS notification. Use when the user says 'ping me when ready' or similar. Pass a short, meaningful message describing what finished — e.g. 'build-new-api finished'. For branch names, strip user and ticket prefixes (frm/rvr-123/build-new-api → 'build-new-api').",
 		parameters: {
 			message: { type: "string", description: "Short message describing what's done", required: true },
 		},
