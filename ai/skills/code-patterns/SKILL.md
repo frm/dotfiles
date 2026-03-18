@@ -80,6 +80,10 @@ Flatten control flow by returning early for error/edge cases. The main logic sho
 
 Don't leave commented-out code, unused imports, or unreachable branches. If something isn't used, delete it. Version control remembers.
 
+### Update tests and docs when changing signatures
+
+When renaming functions, changing module interfaces, or modifying public APIs, check for corresponding tests and documentation that need updating. Tests often mirror the module structure — grep for test files that call changed functions. Also update docstrings, type annotations, and any README or inline documentation that references the old signature. Don't leave tests broken or docs out of sync.
+
 ### Read conventions before creating files
 
 Before creating new files in a directory, check for `AGENTS.md`, `README.md`, or other convention files that dictate structure (e.g., folder layout, naming, required companion files like READMEs or prompt updates). Follow what's already established — don't guess.
