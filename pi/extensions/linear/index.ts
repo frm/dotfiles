@@ -14,30 +14,23 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 import { StringEnum } from "@mariozechner/pi-ai";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-
 import type { LinearSettings } from "./lib/types.js";
 import { CREATE_ISSUE, LIST_ISSUES, LIST_MY_PROJECTS, UPDATE_ISSUE } from "./lib/queries.js";
 import { gql, resolveTeamId, resolveStateId, fetchIssueByIdentifier } from "./lib/client.js";
 import { formatIssue, formatIssueCompact } from "./lib/format.js";
+import { readAuth } from "../lib/config.ts";
 
 // ---------------------------------------------------------------------------
 // Settings
 // ---------------------------------------------------------------------------
 
 function loadSettings(): LinearSettings {
-	try {
-		const p = join(process.env.HOME || "", ".pi", "agent", "auth.json");
-		const s = JSON.parse(readFileSync(p, "utf-8"));
-		return {
-			apiKey: s?.linear?.["api-key"] ?? null,
-			defaultTeamKey: s?.linear?.["default-team"] ?? null,
-			userId: s?.linear?.["user-id"] ?? null,
-		};
-	} catch {
-		return { apiKey: null, defaultTeamKey: null, userId: null };
-	}
+	const s = readAuth("linear");
+	return {
+		apiKey: s?.["api-key"] ?? null,
+		defaultTeamKey: s?.["default-team"] ?? null,
+		userId: s?.["user-id"] ?? null,
+	};
 }
 
 function requireApiKey(): string {

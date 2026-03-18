@@ -1,22 +1,15 @@
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { readAuth } from "../../lib/config.ts";
 
-const HOME = process.env.HOME ?? "";
 const cache = new Map();
 const CACHE_TTL = 120_000;
 
-function loadAuth() {
-	try {
-		const raw = readFileSync(join(HOME, ".pi", "agent", "auth.json"), "utf-8");
-		const data = JSON.parse(raw);
-		return {
-			apiKey: data?.linear?.["api-key"] ?? null,
-			defaultTeam: data?.linear?.["default-team"] ?? null,
-		};
-	} catch {
-		return { apiKey: null, defaultTeam: null };
-	}
+function loadLinearAuth() {
+	const s = readAuth("linear");
+	return {
+		apiKey: s?.["api-key"] ?? null,
+		defaultTeam: s?.["default-team"] ?? null,
+	};
 }
 
 export function linearIssueUrl(identifier: string): string {
@@ -27,7 +20,7 @@ export function lookupIssue(identifier) {
 	const cached = cache.get(identifier);
 	if (cached && Date.now() - cached.ts < CACHE_TTL) return cached.result;
 
-	const auth = loadAuth();
+	const auth = loadLinearAuth();
 	if (!auth.apiKey) return null;
 
 	const [teamKey, numStr] = identifier.split("-");

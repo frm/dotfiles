@@ -1,9 +1,9 @@
 /**
  * Shared Config Library
  *
- * Resolves .pi/config.json by walking up the directory tree from CWD to $HOME.
- * Merges all found configs with nearest-wins precedence (like direnv/mise).
- * Falls back to ~/.pi/config.json as the global default.
+ * Resolves .pi/config.json and .pi/agent/auth.json by walking up the directory
+ * tree from CWD to $HOME. Merges all found files with nearest-wins precedence
+ * (like direnv/mise). Falls back to ~/.pi/ as the global default.
  */
 
 import { readFileSync, existsSync } from "node:fs";
@@ -11,13 +11,13 @@ import { join, dirname, resolve } from "node:path";
 
 const HOME = process.env.HOME || "";
 
-function findConfigFiles(startDir: string): string[] {
+function findJsonFiles(startDir: string, relativePath: string): string[] {
 	const files: string[] = [];
 	let dir = resolve(startDir);
 	const homeResolved = resolve(HOME);
 
 	while (true) {
-		const candidate = join(dir, ".pi", "config.json");
+		const candidate = join(dir, ".pi", relativePath);
 		if (existsSync(candidate)) {
 			files.push(candidate);
 		}
@@ -30,10 +30,10 @@ function findConfigFiles(startDir: string): string[] {
 		dir = parent;
 	}
 
-	// Ensure ~/.pi/config.json is included as global fallback
-	const globalConfig = join(HOME, ".pi", "config.json");
-	if (!files.includes(globalConfig) && existsSync(globalConfig)) {
-		files.push(globalConfig);
+	// Ensure global fallback is included
+	const globalFile = join(HOME, ".pi", relativePath);
+	if (!files.includes(globalFile) && existsSync(globalFile)) {
+		files.push(globalFile);
 	}
 
 	return files;
@@ -59,8 +59,8 @@ function deepMerge(target: Record<string, any>, source: Record<string, any>): Re
 	return result;
 }
 
-function loadMergedConfig(startDir: string): Record<string, any> {
-	const files = findConfigFiles(startDir);
+function loadMerged(relativePath: string): Record<string, any> {
+	const files = findJsonFiles(process.cwd(), relativePath);
 
 	// Merge furthest-first so nearest-wins via overwrite
 	let merged: Record<string, any> = {};
@@ -89,7 +89,15 @@ export function getByPath(obj: Record<string, any>, path: string): any {
 export function readConfig(): Record<string, any>;
 export function readConfig(namespace: string): Record<string, any>;
 export function readConfig(namespace?: string): Record<string, any> {
-	const config = loadMergedConfig(process.cwd());
+	const config = loadMerged("config.json");
 	if (!namespace) return config;
 	return (getByPath(config, namespace) as Record<string, any>) ?? {};
+}
+
+export function readAuth(): Record<string, any>;
+export function readAuth(namespace: string): Record<string, any>;
+export function readAuth(namespace?: string): Record<string, any> {
+	const auth = loadMerged("agent/auth.json");
+	if (!namespace) return auth;
+	return (getByPath(auth, namespace) as Record<string, any>) ?? {};
 }
