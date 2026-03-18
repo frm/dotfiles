@@ -38,11 +38,13 @@ Display this help reference exactly as written:
 | `browser_screenshot` | Take a screenshot of the current page |
 | `browser_read_page` | Read page content (visible text, DOM structure) |
 | `browser_close` | Close the browser |
-| `linear_fetch_issue` | Fetch a Linear issue by identifier |
-| `linear_create_issue` | Create a Linear issue or sub-issue |
-| `linear_update_issue` | Update a Linear issue |
-| `linear_list_issues` | List/filter Linear issues |
-| `linear_list_my_projects` | List Linear projects where you're a member |
+| `linear__fetch_issue` | Fetch a Linear issue by identifier |
+| `linear__create_issue` | Create a Linear issue or sub-issue |
+| `linear__update_issue` | Update a Linear issue |
+| `linear__list_issues` | List/filter Linear issues |
+| `linear__list_my_projects` | List Linear projects where you're a member |
+| `work__setup` | Create a worktree + tmux window for a Linear ticket |
+| `calendar__list_events` | List upcoming Google Calendar events |
 | `ping` | Notify user with sound + macOS banner. Use when user says "ping me when ready" |
 
 ## Prompt Templates
@@ -83,6 +85,9 @@ Display this help reference exactly as written:
 | `elixir-testing-guide` | Writing Elixir tests | ExUnit conventions, Mimic, anti-patterns |
 | `manual-testing` | "manually test" | Drive a browser to test UI changes |
 | `speech` | "/speech" | Toggle speech mode |
+| `find-work` | "find work", "get started" | Find Linear tickets and set up worktrees |
+| `triage` | "triage my work", "/triage" | Prioritize work from Linear + Calendar + ad-hoc |
+| `review-challenge` | "review challenge" | Review candidate take-home challenges (sandboxed) |
 | `sync-codex-skills` | Sync skills | Copy dotfiles skills to Codex |
 
 ## Background Extensions

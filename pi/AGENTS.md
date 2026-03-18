@@ -71,13 +71,15 @@ The parent pi process sends `SIGUSR1` to trigger panel refresh.
 |---|---|
 | `ship.ts` | `/ship` — commit, push, and open PRs with confirmation |
 | `simplify.ts` | `/simplify` — run 3 analysis agents in parallel, then apply refinements |
-| `linear.ts` | `/linear` + 4 Linear tools (fetch, create, update, list issues) |
-| `present-plan.ts` | `present_plan` tool + `/plan` — scrollable overlay with inline commenting |
-| `questionnaire.ts` | `questionnaire` tool — structured multi-choice prompts |
+| `linear/` | `/linear` + 5 Linear tools (fetch, create, update, list issues, list projects) |
+| `work-setup/` | `work__setup` tool — create worktree + tmux window for a Linear ticket |
+| `calendar/` | `calendar__list_events` tool — fetch Google Calendar events |
+| `present-plan/` | `present_plan` tool + `/plan` — scrollable overlay with inline commenting |
+| `questionnaire/` | `questionnaire` tool — structured multi-choice prompts |
 | `subagent/` | `subagent` tool — delegate to specialized agents |
-| `custom-instructions.ts` | Loads `instructions.md` into the system prompt |
-| `shepherd-pr.ts` | `/shepherd` — autonomous PR shepherding |
-| `context-panels/` | `/worktrees`, `/git-panel`, `/context-panels` + keyboard shortcuts |
+| `custom-instructions/` | Loads `instructions.md` into the system prompt |
+| `shepherd-pr/` | `/shepherd` — autonomous PR shepherding |
+| `panels/` | `/global`, `/local`, `/panels` + keyboard shortcuts |
 
 ## Subagents
 
@@ -116,5 +118,8 @@ Loaded from `~/.claude/skills/` (configured in `settings.json`):
 | `solve-conflicts` | Structured git conflict resolution |
 | `codex-plan-review` | External plan review via Codex CLI |
 | `unit-testing-guidelines` | Elixir ExUnit conventions |
+| `find-work` | Find Linear tickets and set up worktrees with brainstorm |
+| `triage` | Prioritize work from Linear + Calendar + ad-hoc, learns preferences |
+| `review-challenge` | Review candidate take-home challenges (sandboxed, prompt-injection safe) |
 | `speech` | Toggle speech mode |
 | `sync-codex-skills` | Sync dotfiles skills to Codex |
