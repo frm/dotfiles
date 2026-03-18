@@ -95,11 +95,6 @@ export async function postReply(cwd: string, prNumber: number, commentId: number
 	return result.code === 0;
 }
 
-export async function isWorktreeClean(cwd: string): Promise<boolean> {
-	const status = await execStdout(cwd, "git", ["status", "--porcelain"]);
-	return status.trim().length === 0;
-}
-
 export async function execStdout(cwd: string, cmd: string, args: string[]): Promise<string> {
 	const result = await runExec(cwd, cmd, args, 20000);
 	return result.code === 0 ? result.stdout : "";

@@ -2,6 +2,10 @@ import type { StatusCheckLike } from "./types.ts";
 
 export type { StatusCheckLike };
 
+export const FAILURE_CONCLUSIONS = new Set([
+	"FAILURE", "CANCELLED", "STARTUP_FAILURE", "TIMED_OUT", "ACTION_REQUIRED", "STALE",
+]);
+
 export function summarizeChecks(checks: StatusCheckLike[]): { passed: number; failed: number; pending: number } {
 	let passed = 0;
 	let failed = 0;
@@ -12,7 +16,7 @@ export function summarizeChecks(checks: StatusCheckLike[]): { passed: number; fa
 			passed++;
 			continue;
 		}
-		if (check.conclusion === "FAILURE" || check.conclusion === "CANCELLED") {
+		if (FAILURE_CONCLUSIONS.has(check.conclusion)) {
 			failed++;
 			continue;
 		}

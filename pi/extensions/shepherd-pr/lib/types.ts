@@ -40,12 +40,6 @@ export interface RunContext {
 	cwd: string;
 }
 
-export interface CodexRunResult {
-	exitCode: number;
-	stderr: string;
-	messages: string[];
-}
-
 export interface ShepherdStats {
 	fixed: number;
 	rerun: number;

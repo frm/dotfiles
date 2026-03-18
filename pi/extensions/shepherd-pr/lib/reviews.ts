@@ -3,7 +3,7 @@ import { spawn } from "node:child_process";
 import type { PrInfo } from "../../lib/gh/index.ts";
 
 import type { ReviewCommentLike, RunContext } from "./types.ts";
-import { tryParseJsonObject } from "./gh-helpers.ts";
+import { tryParseJsonObject } from "./exec.ts";
 
 export type { ReviewCommentLike };
 
@@ -42,12 +42,10 @@ export async function classifyReviewComment(
 	].join("\n");
 
 	const result = await new Promise<string>((resolve) => {
-		const child = spawn("claude", [
+		const child = spawn("pi", [
 			"-p",
-			"--dangerously-skip-permissions",
-			"--output-format", "json",
-			"--max-turns", "1",
-			"--tools", "",
+			"--no-session",
+			"--no-tools",
 			prompt,
 		], {
 			cwd: runCtx.cwd,
@@ -65,12 +63,7 @@ export async function classifyReviewComment(
 		return { classification: "ambiguous", reason: "classifier failed" };
 	}
 
-	// Claude --output-format json wraps response in {"result": "..."}
-	let text = result;
-	try {
-		const wrapper = JSON.parse(result);
-		if (wrapper.result) text = wrapper.result;
-	} catch {}
+	const text = result;
 
 	const parsed = tryParseJsonObject(text);
 	const cls = String(parsed?.classification ?? "").toUpperCase();
