@@ -49,67 +49,17 @@ If tickets are found, proceed based on mode. If none found, go to **Fallback** (
 
 ## Setup Step
 
-Once a ticket is selected:
+Once a ticket is selected, use the `work__setup` tool to create the worktree and tmux window:
 
-1. **Detect the default branch:**
-   ```bash
-   git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'
-   ```
-   If this fails, try `main`, then `master`.
+- **Browse mode:** `work__setup(identifier: "<TICKET-ID>", brainstorm: true)`
+- **Setup mode:** `work__setup(identifier: "<TICKET-ID>", brainstorm: false)`
+- **Full mode:** `work__setup(identifier: "<TICKET-ID>", brainstorm: true, planAfterBrainstorm: true)`
 
-2. **Generate the branch name:** `frm/<ticket-id>/<slug>`
-   - `<ticket-id>` is the Linear identifier lowercased (e.g., `rvr-123`)
-   - `<slug>` is a kebab-case summary of the ticket title (e.g., `fix-login-redirect`), max 50 chars
-
-3. **Get the tmux session name:**
-   ```bash
-   tmux display-message -p '#{session_name}'
-   ```
-
-4. **Build the initial prompt for pi** (Browse and Full modes only):
-
-   Compose a message that pi will receive on startup. This triggers the `brainstorm` skill in the new session. Include the full ticket context:
-   ```
-   /brainstorm <TICKET-ID> — <title>
-
-   <ticket description>
-
-   URL: <ticket url>
-   ```
-
-   For **Full** mode, append to the prompt:
-   ```
-   After the brainstorm is complete and the design is written, use the writing-plans skill to create an execution plan.
-   ```
-
-5. **Create worktree in a new tmux window:**
-
-   For **Browse** or **Full** mode (with brainstorm):
-   ```bash
-   tmux new-window -t "<session>:"
-   tmux send-keys -t "<session>:" "g co <default-branch> && g wt <branch-name> && pi '<prompt>'" Enter
-   ```
-
-   For **Setup** mode (no brainstorm):
-   ```bash
-   tmux new-window -t "<session>:"
-   tmux send-keys -t "<session>:" "g co <default-branch> && g wt <branch-name> && pi" Enter
-   ```
-
-   This creates a new window in the current tmux session, checks out the default branch, creates a worktree (which copies artifacts and compiles), then starts pi in the new worktree.
-
-   **Important:** The prompt passed to pi must be properly escaped for the shell. Use single quotes around the prompt and escape any single quotes within it (`'\\''`).
-
-6. **Update the ticket on Linear:**
-   - Read `user-id` from the Linear config in `auth.json` via `fetch_config`.
-   - If the ticket isn't already assigned to you, call `linear__update_issue` with `assigneeId: <user-id>`.
-   - Call `linear__update_issue` with `stateName: "In Progress"`.
-
-7. Tell the user: "Set up worktree for <TICKET-ID> — <title>. Switched to In Progress. Pi is starting with a brainstorm." (or without the brainstorm note for Setup mode).
+The `work__setup` tool handles everything: fetching the ticket, detecting the default branch, generating the branch name (`frm/<ticket-id>/<slug>`), creating a tmux window with a worktree, launching pi with `/brainstorm` if requested, assigning the ticket, and moving it to In Progress.
 
 ## Brainstorm → Plan Flow (Full Mode)
 
-In Full mode, the pi instance in the new worktree receives a `/brainstorm` prompt with the ticket details, plus an instruction to follow up with `/writing-plans` after the brainstorm design is written. Both skills run in the new pi session — the current session's job is done after the worktree is set up.
+In Full mode, `work__setup` launches pi with a `/brainstorm` prompt and an instruction to follow up with `/writing-plans` after the design is written. Both skills run in the new pi session — the current session's job is done after setup.
 
 ## Fallback: No Assigned Tickets
 
@@ -132,8 +82,5 @@ If no tickets found across all projects: "No unassigned tickets found in your pr
 
 ## Important
 
-- The `g` command is a zsh function wrapping git. In tmux `send-keys`, use the full commands as shown — the shell in the new window will have `g` available.
-- The `g wt` command (git worktree-add) handles everything: creating the worktree directory, copying build artifacts, compiling, and cd'ing into it. It outputs the worktree path as its last line.
-- The `g co` command (git checkout-worktree) checks out a branch or cd's into an existing worktree for that branch.
 - Never auto-pick unassigned tickets. Always ask.
 - Blocked = has a `relations` node with `type: "blocks"` where the related issue's state type is not `completed` or `cancelled`.
