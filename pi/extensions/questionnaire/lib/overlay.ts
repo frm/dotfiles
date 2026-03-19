@@ -204,7 +204,8 @@ export function createQuestionnaireOverlay(questions: Question[], isMulti: boole
 			const addWrapped = (s: string, indent = "") => {
 				const wrapped = wrapTextWithAnsi(s, width);
 				for (let i = 0; i < wrapped.length; i++) {
-					lines.push(i > 0 && indent ? indent + wrapped[i] : wrapped[i]);
+					const line = i > 0 && indent ? indent + wrapped[i] : wrapped[i];
+					lines.push(truncateToWidth(line, width));
 				}
 			};
 
