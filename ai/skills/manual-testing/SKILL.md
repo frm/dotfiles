@@ -20,6 +20,23 @@ Determine what to test based on context:
 2. **Current changes** — User says "manually test" and there are staged/unstaged changes → run `git diff HEAD` to understand what changed, reason about which UI flows are affected.
 3. **Recent commits** — User says "manually test" and working tree is clean → run `git diff $(git merge-base HEAD main)..HEAD` (try `master` if `main` doesn't exist) to find what changed across recent commits.
 
+## Testing a PR Branch
+
+When testing changes from a PR (not local changes), create a worktree first so you don't disturb the current working tree:
+
+1. Run `git wt --pr <number>` to create a worktree for the PR branch
+2. `cd` into the new worktree directory
+3. Start the server there (see Server Start Command below)
+4. Proceed with the normal test flow
+
+## Server Start Command
+
+Determine how to start the dev server:
+
+1. **Config**: `fetch_config` with key `server` — the project's `.pi/config.json` may specify the exact command (e.g. `"alto react dev"`)
+2. **Project config files**: check for scripts in `package.json`, `Makefile`, or framework-specific configs
+3. **Common defaults**: try `mix phx.server` (Phoenix), `npm run dev` / `yarn dev` (JS), `make dev`, etc.
+
 ## Execution Modes
 
 ### Autonomous Mode (default)
