@@ -80,6 +80,16 @@ When no unstarted tickets are assigned (regardless of original mode):
 
 If no tickets found across all projects: "No unassigned tickets found in your projects either. Nothing to work on!"
 
+## Target Repository
+
+The skill can work with a repo other than CWD:
+
+1. **Explicit path** — User says "find work for ~/Developer/river/alto" → use that path
+2. **Tmux session** — If in a tmux session, assume the repo is the session's starting directory (check `tmux display-message -p '#{session_path}'`)
+3. **Fallback** — Use CWD
+
+When a target path is provided or detected, `cd` into that directory before detecting the default branch and creating the worktree.
+
 ## Important
 
 - Never auto-pick unassigned tickets. Always ask.
