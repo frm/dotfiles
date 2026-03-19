@@ -52,6 +52,8 @@ Extract the ticket from the branch name. Branch format is typically:
 
 ## Important Rules
 
+- **NEVER commit or amend unless the user explicitly says to** - Presenting a commit message is NOT permission to commit. A previous `/commit` interaction does not carry forward as blanket permission for future commits. Always wait for explicit instruction like "commit", "yes commit", etc.
+- **Never amend previous commits when making follow-up changes** - If there are new changes after a commit, they should be a separate commit. Only amend if the user explicitly asks to amend.
 - **Offer to commit with suggestion** - When presenting the message, ask "Want me to commit, or would you like to adjust anything?"
 - **In sandbox mode** - If sandbox is active (no git write permissions), copy to clipboard instead of committing
 - **Use exact message** - Never add co-authored-by lines, AI attribution, or any other text to the commit message
