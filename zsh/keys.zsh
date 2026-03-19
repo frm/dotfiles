@@ -32,6 +32,7 @@ x-insert-newline() { LBUFFER+=$'\n' }
 zle -N x-insert-newline
 bindkey '^[[13;2u' x-insert-newline        # CSI-u (tmux csi-u format)
 bindkey '^[[27;2;13~' x-insert-newline     # xterm modifyOtherKeys (Ghostty)
+bindkey -s '^[[32;2u' ' '                  # Shift+Space → space (CSI-u via tmux)
 
 # Prefix history search with Up/Down arrows
 autoload -U up-line-or-beginning-search down-line-or-beginning-search
