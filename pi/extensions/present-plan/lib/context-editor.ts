@@ -83,12 +83,50 @@ function clampToSegment(segments: WrapSegment[], segIdx: number, visualCol: numb
  * Handle a keypress for the shared input buffer.
  * Returns what happened so the caller can act on save/cancel.
  */
+function insertTextAtCursor(state: InputState, text: string) {
+	const normalized = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+	const pastedLines = normalized.split("\n");
+	const currentLine = state.lines[state.cursorRow];
+	const before = currentLine.slice(0, state.cursorCol);
+	const after = currentLine.slice(state.cursorCol);
+
+	if (pastedLines.length === 1) {
+		state.lines[state.cursorRow] = before + pastedLines[0] + after;
+		state.cursorCol += pastedLines[0].length;
+	} else {
+		state.lines = [
+			...state.lines.slice(0, state.cursorRow),
+			before + pastedLines[0],
+			...pastedLines.slice(1, -1),
+			pastedLines[pastedLines.length - 1] + after,
+			...state.lines.slice(state.cursorRow + 1),
+		];
+		state.cursorRow += pastedLines.length - 1;
+		state.cursorCol = pastedLines[pastedLines.length - 1].length;
+	}
+}
+
+const PASTE_START = "\x1b[200~";
+const PASTE_END = "\x1b[201~";
+
 function handleEditorKeyInput(
 	state: InputState,
 	data: string,
 	requestRender: () => void,
 ): "save" | "cancel" | "changed" | "unhandled" {
 	const kb = getEditorKeybindings();
+
+	// ── Bracketed paste ──
+	if (data.includes(PASTE_START)) {
+		let content = data.replace(PASTE_START, "");
+		const endIdx = content.indexOf(PASTE_END);
+		if (endIdx !== -1) content = content.substring(0, endIdx);
+		if (content.length > 0) {
+			insertTextAtCursor(state, content);
+		}
+		requestRender();
+		return "changed";
+	}
 
 	if (matchesKey(data, Key.escape)) return "cancel";
 	if (kb.matches(data, "submit")) return "save";
