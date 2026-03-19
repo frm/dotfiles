@@ -40,6 +40,7 @@ export async function syncNotifications(
 			if (pr.reviewers?.length) {
 				summaryParts.push(`Reviewers: ${pr.reviewers.join(", ")}`);
 			}
+			const reviewerMentions = (pr.reviewers ?? []).map((r: string) => `@${r}`).join(" ");
 			await notificationsState.publish({
 				source: "stale-prs",
 				fingerprint: fp,
@@ -51,6 +52,10 @@ export async function syncNotifications(
 					label: "Ping reviewers",
 					handler: "stale-prs:ping-reviewers",
 					params: { prNumber: pr.number, repo: pr.repo, reviewers: pr.reviewers ?? [] },
+					confirm: {
+						title: `Post comment on PR #${pr.number}?`,
+						body: `${reviewerMentions} friendly ping — this PR has been waiting for review`,
+					},
 				},
 			});
 		}

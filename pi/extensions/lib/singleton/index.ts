@@ -55,6 +55,9 @@ export function createSingleton<T extends Record<string, Function>>(opts: Single
 	type PushSubscriber = (event: string, data: unknown) => void;
 	const pushSubscribers = new Set<PushSubscriber>();
 
+	// Leader-side action claims (mirrors server.ts special-case handling)
+	const claimedActions = new Map<string, boolean>();
+
 	// ── Leader Setup ──────────────────────────────────────────────────────
 
 	async function startAsLeader(): Promise<void> {
@@ -156,10 +159,23 @@ export function createSingleton<T extends Record<string, Function>>(opts: Single
 			client = null;
 			startedAt = null;
 			pushSubscribers.clear();
+			claimedActions.clear();
 		},
 
 		async call(method, params) {
 			if (role === "leader" && service) {
+				// claimAction/completeAction are server-special-cased, not on the service object
+				if (method === "claimAction") {
+					const id = params?.id as string;
+					if (claimedActions.has(id)) return { ok: false };
+					claimedActions.set(id, true);
+					return { ok: true };
+				}
+				if (method === "completeAction") {
+					const id = params?.id as string;
+					claimedActions.delete(id);
+					return service.dismiss?.({ id });
+				}
 				const fn = service[method];
 				if (typeof fn !== "function") throw new Error(`Unknown method: ${String(method)}`);
 				return fn(params);

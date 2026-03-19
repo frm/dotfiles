@@ -51,11 +51,11 @@ Removes a notification by `source + fingerprint`. Returns `Promise<boolean>`.
 
 Returns `Promise<Notification[]>`. Filters expired notifications, then sorts by priority (blocked first) then by `updatedAt` descending.
 
-#### `notificationsState.executeAction(id)`
+#### `notificationsState.requestAction(id)`
 
-Executes the `suggestedAction` on a notification. Calls the registered handler by name, then dismisses the notification on success.
+Broadcasts an `action-request` event to all connected pi instances. The instance matching the target pane ID (passed from the panel) claims and executes the action, then dismisses the notification on completion.
 
-Returns `Promise<{ ok: boolean; error?: string }>`.
+Returns `Promise<{ ok: boolean; dispatched?: boolean; error?: string }>`.
 
 #### `notificationsState.registerHandler(name, fn)`
 
@@ -91,6 +91,10 @@ interface SuggestedAction {
   label: string;
   handler: string;                       // namespaced: "source:action-name"
   params: Record<string, unknown>;
+  confirm?: {                            // if set, panel shows y/n dialog before dispatching
+    title: string;
+    body: string;
+  };
 }
 
 interface PublishParams {

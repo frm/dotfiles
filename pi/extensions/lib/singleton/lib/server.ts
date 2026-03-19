@@ -20,11 +20,19 @@ export function createServer(sockPath: string, service: Record<string, Function>
 	let server: Server | null = null;
 	const connections = new Set<Socket>();
 	const subscribers: Subscriber[] = [];
+	const claimedBy = new Map<string, Socket>();
 
 	function removeConnection(socket: Socket) {
 		connections.delete(socket);
 		const idx = subscribers.findIndex((s) => s.socket === socket);
 		if (idx >= 0) subscribers.splice(idx, 1);
+
+		// Release claims held by this socket
+		for (const [id, claimingSocket] of claimedBy) {
+			if (claimingSocket === socket) {
+				claimedBy.delete(id);
+			}
+		}
 	}
 
 	async function dispatch(method: string, params?: Record<string, unknown>): Promise<unknown> {
@@ -50,6 +58,18 @@ export function createServer(sockPath: string, service: Record<string, Function>
 					subscribers.push({ socket, events: new Set(events) });
 				}
 				data = { ok: true };
+			} else if (msg.method === "claimAction") {
+				const id = msg.params?.id as string;
+				if (claimedBy.has(id)) {
+					data = { ok: false };
+				} else {
+					claimedBy.set(id, socket);
+					data = { ok: true };
+				}
+			} else if (msg.method === "completeAction") {
+				const id = msg.params?.id as string;
+				claimedBy.delete(id);
+				data = await dispatch("dismiss", { id });
 			} else {
 				data = await dispatch(msg.method, msg.params);
 			}

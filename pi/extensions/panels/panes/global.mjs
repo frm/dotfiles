@@ -75,7 +75,7 @@ let notifLoadedOnce = false;
 let prsLoadedOnce = false;
 let confirmingDelete = false;
 let confirmingMerge = false;
-let confirmingPing = null; // { number, body } when confirming a ping comment
+let confirmingAction = null; // { id, title, body } when confirming an action
 let confirmingAutoMerge = false;
 let merging = false;
 let deleting = false;
@@ -304,6 +304,22 @@ function refreshAfterAction(cleanup) {
 function refreshAfterDelete() { refreshAfterAction(() => { deleting = false; }); }
 function refreshAfterMerge() { refreshAfterAction(() => { merging = false; }); }
 
+let actionRefreshTimer = null;
+let actionRefreshCount = 0;
+
+function scheduleActionRefresh() {
+	if (actionRefreshTimer) clearInterval(actionRefreshTimer);
+	actionRefreshCount = 0;
+	actionRefreshTimer = setInterval(() => {
+		actionRefreshCount++;
+		refreshNotificationsAsync();
+		if (actionRefreshCount >= 10) {
+			clearInterval(actionRefreshTimer);
+			actionRefreshTimer = null;
+		}
+	}, 2000);
+}
+
 function doRefresh() {
 	if (refreshing) return;
 	refreshing = true;
@@ -350,15 +366,18 @@ function render() {
 		const entry = tab().getSelectedEntry();
 		const number = entry?.number ?? entry?.pr?.number ?? "?";
 		const action = confirmingAutoMerge ? "Enable auto-merge" : "Merge";
-		moveTo(row++, 1); write(contentLine(boldRed(` ${action} #${number}?`), innerW)); contentRow++;
-		moveTo(row++, 1); write(contentLine(" " + truncate(entry?.title ?? "", innerW - 2), innerW)); contentRow++;
-		moveTo(row++, 1); write(emptyLine(innerW)); contentRow++;
-		moveTo(row++, 1); write(contentLine(dim(" y/n"), innerW)); contentRow++;
-	} else if (confirmingPing) {
-		moveTo(row++, 1); write(contentLine(yellow(` Post comment on PR #${confirmingPing.number}?`), innerW)); contentRow++;
-		moveTo(row++, 1); write(contentLine(" " + truncate(confirmingPing.body, innerW - 2), innerW)); contentRow++;
-		moveTo(row++, 1); write(emptyLine(innerW)); contentRow++;
-		moveTo(row++, 1); write(contentLine(dim(" y/n"), innerW)); contentRow++;
+		moveTo(row + contentRow, 1); write(contentLine(boldRed(` ${action} #${number}?`), innerW)); contentRow++;
+		moveTo(row + contentRow, 1); write(contentLine(" " + truncate(entry?.title ?? "", innerW - 2), innerW)); contentRow++;
+		moveTo(row + contentRow, 1); write(emptyLine(innerW)); contentRow++;
+		moveTo(row + contentRow, 1); write(contentLine(dim(" y/n"), innerW)); contentRow++;
+	} else if (confirmingAction) {
+		moveTo(row + contentRow, 1); write(contentLine(yellow(` ${confirmingAction.title}`), innerW)); contentRow++;
+		const bodyLines = wrapText(" " + confirmingAction.body, innerW);
+		for (const line of bodyLines) {
+			moveTo(row + contentRow, 1); write(contentLine(line, innerW)); contentRow++;
+		}
+		moveTo(row + contentRow, 1); write(emptyLine(innerW)); contentRow++;
+		moveTo(row + contentRow, 1); write(contentLine(dim(" y/n"), innerW)); contentRow++;
 	} else if (deleting) {
 		moveTo(row, 1); write(contentLine(" " + spinner.colorFn(spinner.frame) + " " + truncate(spinner.message, innerW - 3), innerW));
 		contentRow = 1;
@@ -495,13 +514,19 @@ function handleInput(data) {
 		return;
 	}
 
-	if (confirmingPing) {
+	if (confirmingAction) {
 		if (inputStr === "y" || inputStr === "Y") {
-			const result = notif.acceptAction();
-			if (!result?.ok) flash(result?.error ?? "Ping failed", render, 2000, red);
-			else flash("Comment posted", render);
+			const pane = getActivePiPane();
+			const result = notif.acceptAction(pane);
+			if (result?.ok) {
+				focusPiPane(pane);
+				// Poll for server-side dismissal after handler completes
+				scheduleActionRefresh();
+			} else {
+				flash(result?.error ?? "Action failed", render, 2000, red);
+			}
 		}
-		confirmingPing = null;
+		confirmingAction = null;
 		render();
 		return;
 	}
@@ -541,18 +566,28 @@ function handleInput(data) {
 	}
 	if (activeTab === "notifications" && inputStr === "a") {
 		const entry = notif.getSelectedEntry();
-		if (entry?.suggestedAction?.handler === "stale-prs:ping-reviewers") {
-			const params = entry.suggestedAction.params;
-			const reviewers = (params.reviewers ?? []).map(r => `@${r}`).join(" ");
-			confirmingPing = {
-				number: params.prNumber,
-				body: `${reviewers} friendly ping — this PR has been waiting for review`,
+		if (!entry?.suggestedAction) { render(); return; }
+
+		// Generic confirmation dialog if action has confirm field
+		if (entry.suggestedAction.confirm) {
+			confirmingAction = {
+				id: entry.id,
+				title: entry.suggestedAction.confirm.title,
+				body: entry.suggestedAction.confirm.body,
 			};
 			render();
 			return;
 		}
-		const result = notif.acceptAction();
-		if (!result?.ok) flash(result?.error ?? "Action failed", render, 2000, red);
+
+		// No confirmation needed — dispatch immediately
+		const pane = getActivePiPane();
+		const result = notif.acceptAction(pane);
+		if (result?.ok) {
+			focusPiPane(pane);
+			scheduleActionRefresh();
+		} else {
+			flash(result?.error ?? "Action failed", render, 2000, red);
+		}
 		render();
 		return;
 	}

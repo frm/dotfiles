@@ -4,6 +4,10 @@ export interface SuggestedAction {
 	label: string;
 	handler: string;           // namespaced: "source:action-name"
 	params: Record<string, unknown>;
+	confirm?: {
+		title: string;
+		body: string;
+	};
 }
 
 export interface Notification {
@@ -39,5 +43,5 @@ export interface NotificationsService {
 	dismiss(params?: Record<string, unknown>): boolean;
 	dismissByFingerprint(params?: Record<string, unknown>): boolean;
 	snooze(params?: Record<string, unknown>): boolean;
-	executeAction(params?: Record<string, unknown>): Promise<{ ok: boolean; error?: string }>;
+	requestAction(params?: Record<string, unknown>): { ok: boolean; dispatched?: boolean; error?: string };
 }

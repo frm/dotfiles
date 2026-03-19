@@ -20,6 +20,6 @@ export function snoozeNotification(id: string) {
 	return client.request("snooze", { id });
 }
 
-export function executeAction(id: string) {
-	return client.request("executeAction", { id });
+export function requestAction(id: string, targetPaneId?: string) {
+	return client.request("requestAction", { id, targetPaneId });
 }

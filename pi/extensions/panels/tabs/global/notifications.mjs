@@ -1,7 +1,7 @@
-import { listNotifications, dismissNotification, dismissAll, snoozeNotification, executeAction } from "../../lib/notifications.ts";
+import { listNotifications, dismissNotification, dismissAll, snoozeNotification, requestAction } from "../../lib/notifications.ts";
 import {
 	dim, cyan, yellow, red, style,
-	truncate, visWidth, write, moveTo, selColor,
+	visWidth, write, moveTo, selColor,
 	emptyLine, contentLine, wrapText,
 	bSide,
 } from "../../lib/ui.ts";
@@ -113,15 +113,12 @@ export function dismissAllNotifications() {
 	rebuildNav();
 }
 
-export function acceptAction() {
+export function acceptAction(targetPaneId) {
 	const entry = getSelectedEntry();
 	if (!entry?.suggestedAction) return { ok: false, error: "No action available" };
-	const result = executeAction(entry.id);
-	if (result?.ok) {
-		state.expandedIds.delete(entry.id);
-		state.notifications = state.notifications.filter(n => n.id !== entry.id);
-		rebuildNav();
-	}
+	const result = requestAction(entry.id, targetPaneId);
+	// Don't remove locally — the notification is dismissed server-side
+	// after the handler finishes executing (via completeAction → dismiss).
 	return result ?? { ok: false, error: "Action failed" };
 }
 
@@ -155,8 +152,14 @@ export function renderTab(startRow, innerW, contentHeight) {
 			moveTo(row++, 1); contentRow++;
 			renderEntryRow(vr.data, vr.navIdx === state.selectedIdx, innerW);
 		} else if (vr.kind === "detail") {
-			moveTo(row++, 1); contentRow++;
-			renderDetailRow(vr.text, innerW);
+			const indent = "     ";
+			const wrapW = Math.max(1, innerW - indent.length);
+			const lines = wrapText(vr.text, wrapW);
+			for (const line of lines) {
+				if (contentRow >= contentHeight) break;
+				moveTo(row++, 1); contentRow++;
+				write(contentLine(dim(indent + line), innerW));
+			}
 		} else if (vr.kind === "title-wrap") {
 			// Render continuation lines of the title (line 1 is already in the entry row)
 			const prefix = "    "; // aligns with text after "→ ● "
@@ -198,8 +201,4 @@ function renderEntryRow(n, selected, innerW) {
 	write(bSide() + cursor + indicator + " " + firstLine + pad + bSide());
 }
 
-function renderDetailRow(text, innerW) {
-	const indent = "     ";
-	const full = dim(truncate(indent + text, innerW));
-	write(contentLine(full, innerW));
-}
+

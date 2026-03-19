@@ -64,30 +64,61 @@ export const notificationsState = {
 						if (ok) pushList();
 						return ok;
 					},
-					async executeAction(p) {
+					requestAction(p) {
 						const id = p?.id as string;
+						const targetPaneId = p?.targetPaneId as string | undefined;
 						const notification = store.get(id);
 						if (!notification?.suggestedAction) {
 							return { ok: false, error: "No action on this notification" };
 						}
-						const handler = handlers.get(notification.suggestedAction.handler);
-						if (!handler) {
-							return { ok: false, error: `Handler not found: ${notification.suggestedAction.handler}` };
-						}
-						try {
-							await handler(notification.suggestedAction.params);
-							store.dismiss(id);
-							pushList();
-							return { ok: true };
-						} catch (err: any) {
-							return { ok: false, error: err?.message ?? "Action failed" };
-						}
+						push("action-request", {
+							id,
+							handler: notification.suggestedAction.handler,
+							params: notification.suggestedAction.params,
+							targetPaneId,
+						});
+						return { ok: true, dispatched: true };
 					},
 				};
 			},
 		});
 
 		await singleton.start();
+
+		// Subscribe to action requests and handle claims
+		singleton.subscribe("action-request", async (data: unknown) => {
+			const { id, handler: handlerName, params, targetPaneId } = data as {
+				id: string;
+				handler: string;
+				params: Record<string, unknown>;
+				targetPaneId?: string;
+			};
+
+			// Only accept if targeted at this instance (or no target specified)
+			if (targetPaneId && targetPaneId !== process.env.TMUX_PANE) return;
+
+			const handler = handlers.get(handlerName);
+			if (!handler) return; // not our handler
+
+			// Try to claim
+			let claimed = false;
+			try {
+				const result = (await singleton!.call("claimAction", { id })) as { ok: boolean };
+				claimed = result?.ok ?? false;
+			} catch {
+				return; // couldn't claim
+			}
+			if (!claimed) return; // another instance claimed it
+
+			// Execute handler
+			try {
+				await handler(params);
+				await singleton!.call("completeAction", { id });
+			} catch {
+				// Handler failed — complete anyway to release claim and dismiss
+				await singleton!.call("completeAction", { id }).catch(() => {});
+			}
+		});
 	},
 
 	stop(): void {
@@ -135,10 +166,10 @@ export const notificationsState = {
 		} catch { return false; }
 	},
 
-	async executeAction(id: string): Promise<{ ok: boolean; error?: string }> {
+	async requestAction(id: string): Promise<{ ok: boolean; dispatched?: boolean; error?: string }> {
 		if (!singleton) return { ok: false, error: "Not started" };
 		try {
-			return (await singleton.call("executeAction", { id })) as { ok: boolean; error?: string };
+			return (await singleton.call("requestAction", { id })) as { ok: boolean; dispatched?: boolean; error?: string };
 		} catch { return { ok: false, error: "IPC error" }; }
 	},
 };
