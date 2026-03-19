@@ -85,11 +85,14 @@ export async function readContextLines(cwd: string, relPath: string, aroundLine:
 	}
 }
 
+const CHAOS_SIGNATURE = "\n\n---\n_Posted by CHAOS (Chaotically Helpful Autonomous Operating System) on behalf of @frm_";
+
 export async function postReply(cwd: string, prNumber: number, commentId: number, body: string): Promise<boolean> {
+	const signed = body + CHAOS_SIGNATURE;
 	const result = await runExec(
 		cwd,
 		"gh",
-		["api", `repos/{owner}/{repo}/pulls/${prNumber}/comments/${commentId}/replies`, "-f", `body=${body}`],
+		["api", `repos/{owner}/{repo}/pulls/${prNumber}/comments/${commentId}/replies`, "-f", `body=${signed}`],
 		20000,
 	);
 	return result.code === 0;
