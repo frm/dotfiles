@@ -1,6 +1,21 @@
+-- Pi Layers integration
+-- Loaded by pi/init.lua when PI_LAYER_ACTION_FILE is set
+
 local action_file = vim.env.PI_LAYER_ACTION_FILE
 
+local function current_file_context()
+  return {
+    file = vim.fn.expand("%:p"),
+    line = vim.fn.line("."),
+  }
+end
+
 local function write_action(data)
+  -- Merge in current file context
+  local ctx = current_file_context()
+  data.file = data.file or ctx.file
+  data.line = data.line or ctx.line
+
   local f = io.open(action_file, "w")
   if not f then return end
   f:write(vim.fn.json_encode(data))
@@ -12,13 +27,18 @@ local function detach()
 end
 
 -- q in normal mode: close layer
-vim.keymap.set("n", "q", function()
-  write_action({ action = "close" })
-  detach()
-end, { noremap = true, desc = "Pi: close layer" })
+-- Applied on every BufEnter to override buffer-local q mappings (e.g. Snacks dashboard)
+local function set_q_mappings()
+  vim.keymap.set("n", "q", function()
+    write_action({ action = "close" })
+    detach()
+  end, { buffer = 0, noremap = true, desc = "Pi: close layer" })
 
--- Q takes over macro recording (q's original role)
-vim.keymap.set("n", "Q", "q", { noremap = true, desc = "Record macro (moved from q)" })
+  vim.keymap.set("n", "Q", "q", { buffer = 0, noremap = true, desc = "Record macro (moved from q)" })
+end
+
+set_q_mappings()
+vim.api.nvim_create_autocmd("BufEnter", { callback = set_q_mappings })
 
 -- Tab in normal mode: cycle to next layer
 vim.keymap.set("n", "<Tab>", function()
@@ -26,19 +46,27 @@ vim.keymap.set("n", "<Tab>", function()
   detach()
 end, { noremap = true, desc = "Pi: cycle layer" })
 
+-- <leader>d in normal mode: go to diff layer for current file
+vim.keymap.set("n", "<leader>d", function()
+  write_action({ action = "goto", target = "diff" })
+  detach()
+end, { noremap = true, desc = "Pi: go to diff layer" })
+
+-- <leader>n in normal mode: go to notes layer for current file
+vim.keymap.set("n", "<leader>n", function()
+  write_action({ action = "goto", target = "notes" })
+  detach()
+end, { noremap = true, desc = "Pi: go to notes layer" })
+
 -- <leader>s in visual mode: send selection to pi
 vim.keymap.set("v", "<leader>s", function()
-  -- Yank selection into register z
-  vim.cmd('noautocmd normal! "zy')
+  -- Reselect and yank into register z
+  vim.cmd('noautocmd normal! gv"zy')
   local text = vim.fn.getreg("z")
-  local file = vim.fn.expand("%:p")
-  local line = vim.fn.line("'<")
 
   write_action({
     action = "send",
     text = text,
-    file = file,
-    line = line,
   })
   detach()
 end, { noremap = true, desc = "Pi: send selection" })
