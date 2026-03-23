@@ -77,5 +77,11 @@ Temporary Items
 # ai plans
 .ai/plans
 
+# locally cached code reviews
+.ai/reviews
+
 # pi project config
 .pi/config.json
+
+# pi notes
+.pi/notes
