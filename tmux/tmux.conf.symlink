@@ -72,6 +72,9 @@ bind -n S-Up    resize-pane -U 1
 # prefix+prefix to last window
 bind C-a last-window
 
+# C-n to go to next window (no prefix needed)
+bind -n C-n next-window
+
 # Focus or create idle pi window
 bind i run-shell "$DOTFILES/tmux/bin/tmux_idle_window"
 
