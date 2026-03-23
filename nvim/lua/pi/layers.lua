@@ -46,14 +46,14 @@ vim.keymap.set("n", "<Tab>", function()
   detach()
 end, { noremap = true, desc = "Pi: cycle layer" })
 
--- <leader>d in normal mode: go to diff layer for current file
-vim.keymap.set("n", "<leader>d", function()
+-- Alt+r in normal mode: go to diff/review layer for current file
+vim.keymap.set("n", "<A-r>", function()
   write_action({ action = "goto", target = "diff" })
   detach()
 end, { noremap = true, desc = "Pi: go to diff layer" })
 
--- <leader>n in normal mode: go to notes layer for current file
-vim.keymap.set("n", "<leader>n", function()
+-- Alt+n in normal mode: go to notes layer for current file
+vim.keymap.set("n", "<A-n>", function()
   write_action({ action = "goto", target = "notes" })
   detach()
 end, { noremap = true, desc = "Pi: go to notes layer" })
