@@ -72,6 +72,9 @@ bind -n S-Up    resize-pane -U 1
 # prefix+prefix to last window
 bind C-a last-window
 
+# Focus or create idle pi window
+bind i run-shell "$DOTFILES/tmux/bin/tmux_idle_window"
+
 # TPM plugins
 set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-battery'

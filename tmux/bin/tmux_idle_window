@@ -1,0 +1,17 @@
+#!/bin/sh
+# Focus the (idle) pi window, or create one if it doesn't exist.
+
+IDLE_NAME="(idle) pi"
+
+# Search all sessions for the idle window
+target=$(tmux list-windows -a -F "#{session_name}:#{window_index} #{window_name}" 2>/dev/null \
+	| grep " ${IDLE_NAME}$" \
+	| head -1 \
+	| cut -d' ' -f1)
+
+if [ -n "$target" ]; then
+	tmux select-window -t "$target" 2>/dev/null || \
+		tmux switch-client -t "$target" 2>/dev/null
+else
+	tmux new-window -n "$IDLE_NAME"
+fi
