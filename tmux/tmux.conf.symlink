@@ -12,7 +12,9 @@ set -as terminal-features 'xterm-ghostty:extkeys'
 # Enable hyperlink support (OSC 8)
 set -as terminal-features ",*:hyperlinks"
 
-# Enable passthrough for OSC sequences (hyperlinks, images, etc)
+# Enable passthrough for image protocols (sixel/kitty) and OSC sequences.
+# Note: this causes Ghostty XTVERSION responses to leak as raw input — nvim
+# handles this with a typeahead drain on startup (see nvim/lua/base.lua).
 set -g allow-passthrough on
 
 # Bind splits to C-A s/S
