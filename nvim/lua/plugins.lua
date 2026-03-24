@@ -138,6 +138,7 @@ require("lazy").setup({
     "folke/snacks.nvim",
     lazy = false, -- needed to enable snacks keybindings in ministarter
     opts = {
+      image = { enabled = false }, -- https://github.com/folke/snacks.nvim/issues/2766
       picker = {
         enabled = true,
         sources = {
