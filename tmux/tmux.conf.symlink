@@ -75,6 +75,8 @@ bind -n S-Up    resize-pane -U 1
 bind C-a last-window
 
 # C-n to go to next window (no prefix needed)
+bind n next-window
+bind N previous-window
 bind -n C-n next-window
 
 # Focus or create idle pi window
