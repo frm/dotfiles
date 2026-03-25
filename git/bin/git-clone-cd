@@ -14,7 +14,11 @@ else
   git clone "$@"
 fi
 
-# extract directory name from repo argument
-dir=$(echo "$1" | awk -F / '{ print $NF }' | sed 's/.git//g')
+# extract directory name: use custom dir if provided, otherwise derive from repo
+if [ $# -ge 2 ] && [ "$2" != "--" ] && case "$2" in -*) false;; *) true;; esac; then
+  dir="$2"
+else
+  dir=$(echo "$1" | awk -F / '{ print $NF }' | sed 's/.git//g')
+fi
 
 echo "$dir"
