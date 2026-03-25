@@ -247,6 +247,12 @@ __git_wt_pull_if_default_branch() {
   fi
 }
 
+__git_wt_notify() {
+  local title="$1"
+  local message="$2"
+  osascript -e "display notification \"$message\" with title \"$title\""
+}
+
 __git_wt_cleanup_elixir_ls() {
   local worktree_path="$1"
 
@@ -341,6 +347,44 @@ __git_wt_cp_artifacts() {
   printf '       ✓ all artifacts copied\n' >&2
 }
 
+# compile + env setup + post-setup hook in background, notify on completion
+__git_wt_compile_async() {
+  local worktree_path="$1"
+  local git_root="$2"
+  local branch_name="$3"
+  local log_file="$worktree_path/.log/git-wt-compile.log"
+
+  mkdir -p "$worktree_path/.log"
+
+  (
+    set +e
+    _wt_ok=true
+
+    __git_wt_setup_env "$worktree_path" || _wt_ok=false
+
+    if [ "$_wt_ok" = true ]; then
+      __git_wt_compile "$worktree_path" || _wt_ok=false
+    fi
+
+    if [ "$_wt_ok" = true ] && [ -n "$_MNDS_WORKTREE_POST_SETUP" ]; then
+      __echo_git "running post-setup hook..."
+      if [ "$_RESET" = true ]; then
+        (cd "$worktree_path" && $_MNDS_WORKTREE_POST_SETUP "$worktree_path" "$git_root" --reset) || _wt_ok=false
+      else
+        (cd "$worktree_path" && $_MNDS_WORKTREE_POST_SETUP "$worktree_path" "$git_root") || _wt_ok=false
+      fi
+    fi
+
+    if [ "$_wt_ok" = true ]; then
+      __git_wt_notify "Worktree ready" "Compile finished for $branch_name"
+    else
+      __git_wt_notify "Worktree compile failed" "Check $log_file"
+    fi
+  ) >> "$log_file" 2>&1 &
+
+  __echo_git "compiling in background (log: $log_file)"
+}
+
 #
 # main script
 #
@@ -371,17 +415,8 @@ __git_wt_attach "$worktree_path" "$branch_name"
 __echo_git "copying artifacts..."
 __git_wt_cp_artifacts "$git_root" "$worktree_path"
 __git_wt_cleanup_artifacts "$worktree_path"
-__git_wt_setup_env "$worktree_path"
-__git_wt_compile "$worktree_path"
 
-if [ -n "$_MNDS_WORKTREE_POST_SETUP" ]; then
-  __echo_git "running post-setup hook..."
-  if [ "$_RESET" = true ]; then
-    (cd "$worktree_path" && $_MNDS_WORKTREE_POST_SETUP "$worktree_path" "$git_root" --reset)
-  else
-    (cd "$worktree_path" && $_MNDS_WORKTREE_POST_SETUP "$worktree_path" "$git_root")
-  fi
-fi
+__git_wt_compile_async "$worktree_path" "$git_root" "$branch_name"
 
 __echo_git "worktree created at $worktree_path"
 echo "$worktree_path"

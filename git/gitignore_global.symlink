@@ -17,6 +17,7 @@ tmp/
 
 # db and logs
 log/
+.log/
 *.log
 *.sql
 *.sqlite
