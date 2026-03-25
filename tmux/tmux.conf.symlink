@@ -145,22 +145,25 @@ set -g @plugin 'fabioluciano/tmux-powerkit'
 set -g @powerkit_lazy_loading "true"
 
 set -g @powerkit_transparent "true"
-set -g @powerkit_edge_separator_style "pixel"
-set -g @powerkit_window_index_style "box_outline"
+set -g @powerkit_edge_separator_style "none:all"
+set -g @powerkit_separator_style "slant-up"
+set -g @powerkit_window_index_style "box"
 set -g @powerkit_status_position "top"
 set -g @powerkit_active_window_title "#W"
 set -g @powerkit_inactive_window_title "#W"
 set -g @powerkit_pane_border_lines "heavy"
-set -g @powerkit_icon_padding "2"
+set -g @powerkit_icon_padding "1"
+set -g @powerkit_session_icon "​"
+set -g @powerkit_active_window_icon "​"
+set -g @powerkit_inactive_window_icon "​"
 
-set -g @powerkit_plugins "git,github,cpu,battery,nowplaying"
-set -g @powerkit_theme "horizon"
+set -g @powerkit_plugins "cpu,battery,nowplaying"
+set -g @powerkit_theme "poimandres"
 set -g @powerkit_theme_variant "default"
 
 set -g @powerkit_show_options_key "None"
 
-set -g @powerkit_plugin_git_show_files "true"
-set -g @powerkit_plugin_git_branch_max_length "0"
+
 
 # Initialize TMUX plugin manager
 run '~/.tmux/plugins/tpm/tpm'
