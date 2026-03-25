@@ -40,11 +40,18 @@ end
 set_q_mappings()
 vim.api.nvim_create_autocmd("BufEnter", { callback = set_q_mappings })
 
+
 -- Tab in normal mode: cycle to next layer
 vim.keymap.set("n", "<Tab>", function()
   write_action({ action = "cycle" })
   detach()
 end, { noremap = true, desc = "Pi: cycle layer" })
+
+-- Shift+Tab in normal mode: cycle to previous layer
+vim.keymap.set("n", "<S-Tab>", function()
+  write_action({ action = "cycle-back" })
+  detach()
+end, { noremap = true, desc = "Pi: cycle layer back" })
 
 -- Alt+r in normal mode: go to diff/review layer for current file
 vim.keymap.set("n", "<A-r>", function()
