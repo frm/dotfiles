@@ -8,7 +8,6 @@ RESET='\033[0m'
 WD=$(pwd)
 
 DEV_DOTFILES=~/Developer/frm/dotfiles
-MAC_OS_MOJAVE_HEADERS=/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg
 
 function pp {
   echo -e "\n$1[$2]: $3${RESET}"
@@ -35,33 +34,20 @@ mkdir -p ~/Developer/frm
 git clone --recurse-submodules -j8 https://github.com/frm/dotfiles.git $DEV_DOTFILES
 
 cd $DEV_DOTFILES
+export DOTFILES="$DEV_DOTFILES"
 
 pp_info "install" "installing brew"
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 PATH="/opt/homebrew/bin:$PATH"
 
-pp_info "brew" "bundling apps"
-brew bundle
-
 pp_info "macos" "installing command line tools"
 xcode-select --install
+pp_info "macos" "press enter once the command line tools installation is complete"
+read -r
 
-MAC_OS_VERSION=$(sw_vers -productVersion)
-
-if [[ $MAC_OS_VERSION =~ "10.14" ]]; then
-  pp_info "macos" "installing macos mojave headers"
-
-  if [ ! -f $MAC_OS_MOJAVE_HEADERS ]; then
-    pp_error "macos" "failed installing Mojave SDK headers"
-    pp_error "macos" "please download them from https://developer.apple.com/download/more/?q=Command%20Line%20Tools"
-    exit 1
-  else
-    sudo installer -pkg $MAC_OS_MOJAVE_HEADERS -target /
-  fi
-else
-  pp_info "macos" "not using mojave, skipping headers"
-fi
+pp_info "brew" "bundling apps"
+brew bundle
 
 pp_info "macos" "setting up system configs"
 read_hostname=$(pp $RESET "macos" "enter your desired hostname (default: da3mon) ")
@@ -183,7 +169,7 @@ dirlink nvim ~/.config/
 
 pip install neovim
 gem install neovim
-yarn global add neovim
+npm i -g neovim
 
 pp_info "nvim" "fixing C-h bug"
 $DEV_DOTFILES/scripts/fix-nvim-c-h
@@ -206,12 +192,13 @@ curl                                                                          \
     https://raw.githubusercontent.com/dracula/sublime/master/Dracula.tmTheme
 
 for variant in frappe latte macchiato mocha; do
-  mkdir -p "$(bat --config-dir)/themes/Catppuccin-$variant"
+  Variant="$(tr '[:lower:]' '[:upper:]' <<< ${variant:0:1})${variant:1}"
+  mkdir -p "$(bat --config-dir)/themes/Catppuccin-$Variant"
 
-  curl                                                                                  \
-    -o                                                                                  \
-    "$(bat --config-dir)/themes/Catppuccin-$variant/Catppuccin-$variant.tmTheme"        \
-    "https://raw.githubusercontent.com/catppuccin/bat/main/Catppuccin-$variant.tmTheme"
+  curl                                                                                          \
+    -o                                                                                          \
+    "$(bat --config-dir)/themes/Catppuccin-$Variant/Catppuccin $Variant.tmTheme"                \
+    "https://raw.githubusercontent.com/catppuccin/bat/main/themes/Catppuccin%20$Variant.tmTheme"
 done
 
 bat cache --build
@@ -230,16 +217,11 @@ for variant in frappe latte macchiato mocha; do
   curl                                                                                  \
     -o                                                                                  \
     "$DOTFILES/starship/themes/catppuccin/$variant"                                     \
-    "https://raw.githubusercontent.com/catppuccin/starship/main/palettes/$variant.toml"
+    "https://raw.githubusercontent.com/catppuccin/starship/main/themes/$variant.toml"
 done
 
 pp_info "kitty" "setting configs"
 dirlink kitty ~/.config/kitty
-
-pp_info "kitty" "installing custom themes"
-for variant in Frappe Latte Macchiato Mocha; do
-  kitty +kitten themes --dump-theme "Catppuccin-$variant" > "$DOTFILES/kitty/Catppuccin-$variant.conf"
-done
 
 pp_info "fonts" "installing fira code"
 
@@ -248,8 +230,10 @@ mkdir fonts
 cd fonts
 
 for type in Light Retina Regular Medium Bold SemiBold; do
-  wget -O "FiraCode $type Nerd Font Complete Mono.ttf" "https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/FiraCode/$type/FiraCodeNerdFontMono-$type.ttf?raw=true"
-  wget -O "FiraCode $type Nerd Font Complete Mono.ttf" "https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/FiraCode/$type/FiraCodeNerdFont-$type.ttf?raw=true"
+  wget -O "FiraCode ${type} Nerd Font Complete Mono.ttf" \
+    "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/patched-fonts/FiraCode/$type/FiraCodeNerdFontMono-$type.ttf"
+  wget -O "FiraCode ${type} Nerd Font Complete.ttf" \
+    "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/patched-fonts/FiraCode/$type/FiraCodeNerdFont-$type.ttf"
 done
 
 mv ./*.ttf ~/Library/Fonts/
@@ -267,14 +251,15 @@ gln -srf ai/skills ~/.claude/skills
 gln -srf ai/agents.md ~/.claude/CLAUDE.md
 gln -srf ai/agents.md ~/.codex/AGENTS.md
 gln -srf claude/settings.json.symlink ~/.claude/settings.json
-gln -srf codex/config.toml.symlink ~/.codex/config.toml
 # codex adds custom scripts to ~/.codex/skills, so we copy instead of symlinking
 cp -r ai/skills/* ~/.codex/skills/
 
 cp ai/me.md.sample ai/me.md
 
 # pi setup
+mkdir -p ~/.pi/agent ~/.pi/shell
 gln -srf pi/config.json.symlink ~/.pi/config.json
+gln -srf pi/keybindings.json.symlink ~/.pi/agent/keybindings.json
 gln -srf pi/settings.json.symlink ~/.pi/agent/settings.json
 gln -srf pi/instructions.md ~/.pi/agent/instructions.md
 dirlink pi/agents ~/.pi/agent/agents
