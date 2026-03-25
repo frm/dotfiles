@@ -30,6 +30,11 @@ source $DOTFILES/starship/starship.init
 # Setup extra CLIs & external tools
 source $DOTFILES/sentry/sentry.init
 
+# Setup pi popup overrides
+if [[ -n "$PI_POPUP" ]]; then
+  source $DOTFILES/zsh/pi.zsh
+fi
+
 # Setup custom work profile
 if [ "$MNDS_WORK_PROFILE" ]; then
   source $DOTFILES/river/river.init

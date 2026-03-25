@@ -40,6 +40,11 @@ end
 set_q_mappings()
 vim.api.nvim_create_autocmd("BufEnter", { callback = set_q_mappings })
 
+-- Ctrl+z in normal mode: close layer (same as q)
+vim.keymap.set("n", "<C-z>", function()
+  write_action({ action = "close" })
+  detach()
+end, { noremap = true, desc = "Pi: close layer" })
 
 -- Tab in normal mode: cycle to next layer
 vim.keymap.set("n", "<Tab>", function()
