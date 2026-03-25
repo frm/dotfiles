@@ -79,6 +79,9 @@ bind n next-window
 bind N previous-window
 bind -n C-n next-window
 
+# Move current window to the end
+bind E run-shell "$DOTFILES/tmux/bin/tmux_move_window_end"
+
 # Focus or create idle pi window
 bind i run-shell "$DOTFILES/tmux/bin/tmux_idle_window"
 

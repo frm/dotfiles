@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+last=$(tmux list-windows -F '#{window_index}' | sort -n | tail -1)
+tmux move-window -t $((last + 1))
