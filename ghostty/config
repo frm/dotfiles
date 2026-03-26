@@ -17,4 +17,6 @@ macos-titlebar-style = hidden
 macos-icon = glass
 
 keybind = global:cmd+ctrl+t=toggle_quick_terminal
+# Forward Ctrl+Shift+n to tmux (bypass link detection)
+keybind = ctrl+shift+n=text:\x1b[999~
 
