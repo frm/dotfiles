@@ -265,6 +265,7 @@ gln -srf pi/instructions.md ~/.pi/agent/instructions.md
 dirlink pi/agents ~/.pi/agent/agents
 dirlink pi/prompts ~/.pi/agent/prompts
 dirlink pi/extensions ~/.pi/agent/extensions
+dirlink pi/references ~/.pi/agent/references
 dirlink pi/shell ~/.pi/shell
 pp_info "pi" "installing playwright extension dependencies..."
 (cd pi/extensions/playwright && npm install && npx playwright install chromium)
