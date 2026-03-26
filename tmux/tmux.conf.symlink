@@ -44,7 +44,7 @@ bind v copy-mode
 # Vim keybindings in copy mode
 setw -g mode-keys vi
 bind -T copy-mode-vi v send-keys -X begin-selection
-bind -T copy-mode-vi y send-keys -X copy-selection-and-cancel
+bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "pbcopy"
 
 # copy mode mouse selection: keep selection visible (prevent auto-cancel after select)
 bind-key -T copy-mode-vi MouseDown1Pane select-pane \; send-keys -X cancel
