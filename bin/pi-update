@@ -1,0 +1,173 @@
+#!/usr/bin/env zsh
+# pi-update — install/upgrade @mariozechner/pi-coding-agent globally across all node environments
+
+source $DOTFILES/functions/helpers.zsh
+
+PACKAGE="@mariozechner/pi-coding-agent"
+SPINNER=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
+
+BOLD=$(tput bold)
+RESET=$(tput sgr0)
+DIM=$(tput dim 2>/dev/null || echo "")
+GREEN=$(tput setaf 2)
+RED=$(tput setaf 1)
+CYAN=$(tput setaf 6)
+MAGENTA=$(tput setaf 5)
+WHITE=$(tput setaf 7)
+
+START_TIME=$SECONDS
+
+# ── helpers ───────────────────────────────────────────────────────────────────
+
+function __pi_update_node_version() {
+  (cd "$1" && mise exec -- node --version 2>/dev/null || echo "?")
+}
+
+function __pi_update_draw_row() {
+  local icon="$1" color="$2" label="$3" ver="$4"
+  printf "\r\033[2K  ${color}%s${RESET}  ${BOLD}%-18s${RESET}  ${DIM}%s${RESET}\n" \
+    "$icon" "$label" "$ver"
+}
+
+# pending: status file is empty/missing
+# success: status file contains "0"
+# failure: status file contains anything else
+function __pi_update_job_state() {
+  local file="$1"
+  if [[ ! -s "$file" ]]; then
+    echo "pending"
+  elif grep -q "^0$" "$file" 2>/dev/null; then
+    echo "success"
+  else
+    echo "fail"
+  fi
+}
+
+# ── main ──────────────────────────────────────────────────────────────────────
+
+function main() {
+  local term_width divider
+  term_width=$(tput cols 2>/dev/null || echo 60)
+  divider=$(printf '─%.0s' {1..$term_width})
+
+  # ── collect targets ───────────────────────────────────────────
+  typeset -a labels dirs
+  labels+=("default")
+  dirs+=("$HOME")
+
+  for base in "$HOME/Developer/river" "$HOME/Developer/frm"; do
+    for repo in "$base"/*/; do
+      [[ -d "$repo" ]] || continue
+      if [[ -f "$repo/mise.toml" || -f "$repo/.mise.toml" ]]; then
+        labels+=("${${repo%/}:t}")
+        dirs+=("$repo")
+      fi
+    done
+  done
+
+  local n=${#labels}
+
+  # ── node versions (fast, serial) ──────────────────────────────
+  typeset -a node_vers
+  for i in {1..$n}; do
+    node_vers+=("$(__pi_update_node_version "${dirs[$i]}")")
+  done
+
+  # ── launch all installs in parallel ───────────────────────────
+  typeset -a status_files output_files
+  for i in {1..$n}; do
+    status_files+=("$(mktemp)")
+    output_files+=("$(mktemp)")
+    (
+      cd "${dirs[$i]}" && mise exec -- npm install -g "$PACKAGE" >"${output_files[$i]}" 2>&1
+      echo $? >"${status_files[$i]}"
+    ) &
+  done
+
+  # ── header ────────────────────────────────────────────────────
+  printf "\n"
+  printf "  ${MAGENTA}${BOLD}pi${RESET}  ${WHITE}updating ${CYAN}%s${RESET}\n" "$PACKAGE"
+  printf "  ${DIM}%s${RESET}\n\n" "$divider"
+
+  # ── initial rows ──────────────────────────────────────────────
+  for i in {1..$n}; do
+    __pi_update_draw_row "⠋" "$CYAN" "${labels[$i]}" "${node_vers[$i]}"
+  done
+
+  # ── render loop ───────────────────────────────────────────────
+  local frame_idx=0
+  while true; do
+    sleep 0.08
+    (( frame_idx++ ))
+    local frame="${SPINNER[$((frame_idx % ${#SPINNER} + 1))]}"
+
+    printf "\033[${n}A"  # move cursor up n lines
+
+    local all_done=1
+    for i in {1..$n}; do
+      case "$(__pi_update_job_state "${status_files[$i]}")" in
+        pending)
+          all_done=0
+          __pi_update_draw_row "$frame" "$CYAN" "${labels[$i]}" "${node_vers[$i]}"
+          ;;
+        success)
+          __pi_update_draw_row "✓" "$GREEN" "${labels[$i]}" "${node_vers[$i]}"
+          ;;
+        fail)
+          __pi_update_draw_row "✗" "$RED" "${labels[$i]}" "${node_vers[$i]}"
+          ;;
+      esac
+    done
+
+    [[ $all_done -eq 1 ]] && break
+  done
+
+  # ── tally results ─────────────────────────────────────────────
+  local count_ok=0 count_fail=0
+  typeset -a failed_labels failed_outputs
+
+  for i in {1..$n}; do
+    case "$(__pi_update_job_state "${status_files[$i]}")" in
+      success)
+        (( count_ok++ ))
+        ;;
+      *)
+        (( count_fail++ ))
+        failed_labels+=("${labels[$i]}")
+        failed_outputs+=("${output_files[$i]}")
+        ;;
+    esac
+  done
+
+  # ── failure output ────────────────────────────────────────────
+  if [[ ${#failed_labels} -gt 0 ]]; then
+    printf "\n"
+    for i in {1..${#failed_labels}}; do
+      printf "  ${RED}${BOLD}%s output:${RESET}\n" "${failed_labels[$i]}"
+      sed 's/^/    /' "${failed_outputs[$i]}"
+      printf "\n"
+    done
+  fi
+
+  # ── summary ───────────────────────────────────────────────────
+  local elapsed=$(( SECONDS - START_TIME ))
+  local total=$(( count_ok + count_fail ))
+
+  printf "\n  ${DIM}%s${RESET}\n" "$divider"
+
+  if [[ $count_fail -eq 0 ]]; then
+    local plural=$([[ $total -eq 1 ]] && echo '' || echo 's')
+    printf "  ${GREEN}${BOLD}✓${RESET}  ${WHITE}%d environment%s updated${RESET}  ${DIM}(%ds)${RESET}\n\n" \
+      "$total" "$plural" "$elapsed"
+  else
+    printf "  ${RED}${BOLD}✗${RESET}  ${WHITE}%d updated, %d failed${RESET}  ${DIM}(%ds)${RESET}\n\n" \
+      "$count_ok" "$count_fail" "$elapsed"
+  fi
+
+  # ── cleanup ───────────────────────────────────────────────────
+  for i in {1..$n}; do
+    rm -f "${status_files[$i]}" "${output_files[$i]}"
+  done
+}
+
+main
