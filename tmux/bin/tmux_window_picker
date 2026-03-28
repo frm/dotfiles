@@ -1,0 +1,28 @@
+#!/bin/sh
+# Floating fuzzy picker for tmux windows with live pane preview.
+# Bound to prefix+p and alt+p in tmux.conf.
+
+# Always target the main user session, not hidden panel sessions.
+session=$(tmux display-message -p "#{session_name}")
+case "$session" in _pi_*|pi-*)
+	session=$(tmux list-sessions -F "#{session_name}" | grep -v "^_pi_\|^pi-" | head -1)
+	[ -z "$session" ] && exit 0
+	;;
+esac
+
+selected=$(
+	tmux list-windows -t "$session" -F "#{window_index}: #{window_name}" 2>/dev/null |
+	fzf \
+		--no-multi \
+		--reverse \
+		--no-info \
+		--prompt="window> " \
+		--preview="tmux capture-pane -t '${session}:{1}' -p -e 2>/dev/null | tail -n \$FZF_PREVIEW_LINES" \
+		--preview-window='right:60%' \
+		--delimiter=':' \
+)
+
+[ -z "$selected" ] && exit 0
+
+index=$(printf '%s' "$selected" | cut -d: -f1)
+tmux select-window -t "${session}:${index}" 2>/dev/null

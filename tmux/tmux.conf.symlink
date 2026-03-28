@@ -85,6 +85,10 @@ bind -n C-n next-window
 set -s user-keys[0] "\033[999~"
 bind -n User0 previous-window
 
+# Fuzzy window picker (floating popup with preview)
+bind p display-popup -E -w 80% -h 70% "$DOTFILES/tmux/bin/tmux_window_picker"
+bind -n M-p display-popup -E -w 80% -h 70% "$DOTFILES/tmux/bin/tmux_window_picker"
+
 # Move current window to the end
 bind E run-shell "$DOTFILES/tmux/bin/tmux_move_window_end"
 
