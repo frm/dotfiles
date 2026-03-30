@@ -83,6 +83,7 @@ Temporary Items
 
 # pi project config
 .pi/config.json
+.ai/config.json
 
 # pi notes
 .pi/notes
