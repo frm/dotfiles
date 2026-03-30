@@ -6,6 +6,8 @@ export MNDS_DEFAULT_MAIN_BRANCH_NAME=master
 export NVIM_MINUET_PROVIDER="claude"
 export NVIM_MINUET_ENABLED="0"
 
+export DD_SITE="us5.datadoghq.com"
+
 source $DOTFILES/river/alto/alto.init
 source $DOTFILES/river/gcloud/gcloud.init
 
