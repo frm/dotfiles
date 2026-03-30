@@ -37,6 +37,9 @@ set-option -g renumber-windows on
 # Window naming: git branch if session matches directory, else directory name
 set -g automatic-rename-format "#($DOTFILES/tmux/bin/tmux_window_name '#{pane_current_path}')"
 
+# Use the terminal's default colors for tmux popups so pi popups match the main background.
+set -g popup-style "fg=default,bg=default"
+
 # v to start copy mode as Vim's Visual Mode
 unbind [
 bind v copy-mode
@@ -173,8 +176,5 @@ set -g @powerkit_theme_variant "default"
 
 set -g @powerkit_show_options_key "None"
 
-
-
 # Initialize TMUX plugin manager
 run '~/.tmux/plugins/tpm/tpm'
-
