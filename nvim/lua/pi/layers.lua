@@ -71,14 +71,42 @@ vim.keymap.set("n", "<A-n>", function()
 end, { noremap = true, desc = "Pi: go to notes layer" })
 
 -- <leader>s in visual mode: send selection to pi
-vim.keymap.set("v", "<leader>s", function()
-  -- Reselect and yank into register z
-  vim.cmd('noautocmd normal! gv"zy')
-  local text = vim.fn.getreg("z")
+-- Uses :<C-u> to force vim to set '< '> marks before the function runs
+-- (which-key can prevent marks from being set on first visual selection otherwise)
+function _G.pi_send_selection()
+  local mode = vim.fn.visualmode()
+  local s = vim.fn.getpos("'<")
+  local e = vim.fn.getpos("'>")
+  local lines = vim.api.nvim_buf_get_lines(0, s[2] - 1, e[2], false)
+  if #lines == 0 then return end
+  if mode == "v" then
+    local end_col = e[3] == 2147483647 and #lines[#lines] or e[3]
+    if #lines == 1 then
+      lines[1] = lines[1]:sub(s[3], end_col)
+    else
+      lines[1] = lines[1]:sub(s[3])
+      lines[#lines] = lines[#lines]:sub(1, end_col)
+    end
+  elseif mode == "\22" then
+    local sc, ec = s[3], e[3]
+    if sc > ec then sc, ec = ec, sc end
+    for i, line in ipairs(lines) do
+      lines[i] = line:sub(sc, ec)
+    end
+  end
+
+  local abs = vim.fn.expand("%:p")
+  local git_root = vim.fn.systemlist("git rev-parse --show-toplevel")[1] or ""
+  local rel = abs
+  if git_root ~= "" and abs:sub(1, #git_root) == git_root then
+    rel = abs:sub(#git_root + 2)
+  end
+  local prefix = "file: " .. rel .. ":L" .. s[2] .. "-L" .. e[2] .. "\ncontent:\n"
 
   write_action({
     action = "send",
-    text = text,
+    text = prefix .. table.concat(lines, "\n") .. "\n",
   })
   detach()
-end, { noremap = true, desc = "Pi: send selection" })
+end
+vim.keymap.set("v", "<leader>s", ":<C-u>lua pi_send_selection()<CR>", { noremap = true, silent = true, desc = "Pi: send selection" })
