@@ -7,6 +7,7 @@ RESET='\033[0m'
 
 WD=$(pwd)
 
+DEV_CHAOS=~/Developer/frm/chaos
 DEV_DOTFILES=~/Developer/frm/dotfiles
 
 function pp {
@@ -31,9 +32,17 @@ function dirlink {
 
 pp_info "install" "setting up Developer directory"
 mkdir -p ~/Developer/frm
+
+pp_info "install" "cloning chaos"
+git clone git@github.com:frm/chaos.git $DEV_CHAOS
+
+pp_info "install" "cloning dotfiles"
 git clone --recurse-submodules -j8 https://github.com/frm/dotfiles.git $DEV_DOTFILES
 
 cd $DEV_DOTFILES
+ln -s ../chaos/ai ai
+ln -s ../chaos/pi pi
+
 export DOTFILES="$DEV_DOTFILES"
 
 pp_info "install" "installing brew"
