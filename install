@@ -276,6 +276,8 @@ dirlink pi/prompts ~/.pi/agent/prompts
 dirlink pi/extensions ~/.pi/agent/extensions
 dirlink pi/references ~/.pi/agent/references
 dirlink pi/shell ~/.pi/shell
+mkdir -p ~/.pi/nexus
+ln -sf $DEV_CHAOS/nexus/client ~/.pi/nexus/client
 pp_info "pi" "installing playwright extension dependencies..."
 (cd pi/extensions/playwright && npm install && npx playwright install chromium)
 
