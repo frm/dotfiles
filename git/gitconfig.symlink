@@ -15,7 +15,7 @@
   template = ~/.gitmessage
 [core]
   editor = nvim -f
-  pager = delta
+  pager = schism
   excludesfile = ~/.gitignore_global
 [credential]
   helper = osxkeychain
@@ -95,6 +95,4 @@
   rbm = !git-rebase-main
   pr = !git-pr
 [interactive]
-  diffFilter = delta --color-only
-[delta]
-  navigate = true
+  diffFilter = schism --no-pager
