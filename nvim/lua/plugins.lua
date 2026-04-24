@@ -94,6 +94,7 @@ require("lazy").setup({
 
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
+    branch = "main",
     dependencies = "nvim-treesitter/nvim-treesitter",
   },
 
@@ -340,7 +341,12 @@ require("lazy").setup({
   },
 
 
-  { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' },
+  {
+    'nvim-treesitter/nvim-treesitter',
+    branch = 'main',
+    lazy = false,
+    build = ':TSUpdate',
+  },
 
   'williamboman/mason.nvim',
   'williamboman/mason-lspconfig.nvim',

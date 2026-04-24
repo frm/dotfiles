@@ -44,6 +44,7 @@ nvim/
 - All plugins are declared in `lua/plugins.lua` as a lazy.nvim spec table.
 - Plugin configuration goes in `lua/plugins/config.lua`, not inline in the spec.
 - Custom/local plugins go in `lua/plugins/custom/` as standalone Lua modules with a `.setup()` function.
+- `nvim-treesitter` is pinned to the `main` branch (the post-0.12 rewrite). Setup uses `require('nvim-treesitter').install(...)` and a `FileType` autocmd that calls `vim.treesitter.start()`. The legacy `require('nvim-treesitter.configs').setup{...}` API is gone — do not reintroduce it.
 
 **Keybindings:**
 - Leader is Space, local leader is Comma.

@@ -420,54 +420,65 @@ end)
 -- TreeSitter
 -----------------------------------------------------------------
 
-require('nvim-treesitter.configs').setup {
-    endwise = {
-        enable = true,
-    },
-    highlight = {
-        enable = true,
-    },
-    ensure_installed = {
-        'awk',
-        'bash',
-        'c',
-        'css',
-        'dockerfile',
-        'eex',
-        'elixir',
-        'erlang',
-        'git_rebase',
-        'gitattributes',
-        'gitcommit',
-        'gitignore',
-        'go',
-        'graphql',
-        'haskell',
-        'heex',
-        'html',
-        'javascript',
-        'jq',
-        'json',
-        'lua',
-        'luadoc',
-        'make',
-        'markdown',
-        'markdown_inline',
-        'python',
-        'regex',
-        'ruby',
-        'rust',
-        'scss',
-        'solidity',
-        'sql',
-        'toml',
-        'tsx',
-        'typescript',
-        'vim',
-        'vimdoc',
-        'yaml'
-    }
+local treesitter_languages = {
+    'awk',
+    'bash',
+    'c',
+    'css',
+    'dockerfile',
+    'elixir',
+    'erlang',
+    'git_rebase',
+    'gitattributes',
+    'gitcommit',
+    'gitignore',
+    'go',
+    'graphql',
+    'haskell',
+    'heex',
+    'html',
+    'javascript',
+    'jq',
+    'json',
+    'lua',
+    'luadoc',
+    'make',
+    'markdown',
+    'markdown_inline',
+    'python',
+    'regex',
+    'ruby',
+    'rust',
+    'scss',
+    'solidity',
+    'sql',
+    'toml',
+    'tsx',
+    'typescript',
+    'vim',
+    'vimdoc',
+    'yaml',
 }
+
+require('nvim-treesitter').setup {
+    install_dir = vim.fn.stdpath('data') .. '/site',
+}
+
+-- Install (or update) parsers we want available. Async; idempotent.
+require('nvim-treesitter').install(treesitter_languages)
+
+-- Enable treesitter highlighting for the filetypes we care about. The `main`
+-- branch no longer enables highlighting via setup{}; it must be started
+-- explicitly per buffer.
+vim.api.nvim_create_autocmd('FileType', {
+    group = vim.api.nvim_create_augroup('frm_treesitter_highlight', { clear = true }),
+    callback = function(args)
+        local lang = vim.treesitter.language.get_lang(vim.bo[args.buf].filetype)
+        if not lang then return end
+        -- pcall: parser may not be installed yet on first run after migration.
+        pcall(vim.treesitter.start, args.buf, lang)
+    end,
+})
 
 -----------------------------------------------------------------
 -- Hop
