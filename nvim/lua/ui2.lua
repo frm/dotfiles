@@ -38,3 +38,20 @@ vim.api.nvim_create_autocmd("FileType", {
     end
   end,
 })
+
+-- ui2's msg float persists the last message until something replaces it. On the
+-- mini.starter dashboard there's nothing new to print, so leftovers (e.g.
+-- :checkhealth progress from a previous session) hang around. Close any open
+-- msg windows when the dashboard opens.
+vim.api.nvim_create_autocmd("User", {
+  pattern = "MiniStarterOpened",
+  group = vim.api.nvim_create_augroup("ui2_msg_clear_on_starter", { clear = true }),
+  callback = function()
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+      local buf = vim.api.nvim_win_get_buf(win)
+      if vim.bo[buf].filetype == "msg" then
+        pcall(vim.api.nvim_win_close, win, true)
+      end
+    end
+  end,
+})
