@@ -96,3 +96,5 @@
   pr = !git-pr
 [interactive]
   diffFilter = schism --no-pager
+[rebase]
+	updateRefs = true
