@@ -17,6 +17,7 @@ macos-titlebar-style = hidden
 macos-icon = glass
 
 keybind = global:cmd+ctrl+t=toggle_quick_terminal
-# Forward Ctrl+Shift+n to tmux (bypass link detection)
-keybind = ctrl+shift+n=text:\x1b[999~
+# Ghostty reserves Ctrl+Shift for link detection, so it never reaches tmux.
+# Forward Ctrl+Shift+n as a CSI-u sequence (matches tmux's extended-keys-format).
+keybind = ctrl+shift+n=csi:110;6u
 

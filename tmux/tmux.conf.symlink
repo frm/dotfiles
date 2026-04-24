@@ -82,11 +82,9 @@ bind N previous-window
 # C-n to go to next window (no prefix needed)
 bind -n C-n next-window
 # Ctrl+Shift+n → previous-window
-# Ghostty intercepts Ctrl+Shift for link detection mode, so the keypress
-# never reaches tmux. Workaround: Ghostty config binds ctrl+shift+n to send
-# a custom escape sequence (\x1b[999~), and we match it here via user-keys.
-set -s user-keys[0] "\033[999~"
-bind -n User0 previous-window
+# Ghostty intercepts Ctrl+Shift for link detection, so it forwards C-S-n as a
+# CSI-u sequence (see ghostty/config). Extended-keys lets tmux bind it directly.
+bind -n C-S-n previous-window
 
 # Fuzzy window picker (floating popup with preview)
 bind p display-popup -E -w 80% -h 70% "$DOTFILES/tmux/bin/tmux_window_picker"
