@@ -272,14 +272,18 @@ require("mason-lspconfig").setup({
 
 
 -----------------------------------------------------------------
--- VimTmuxNavigator
+-- Multiplexer navigation
 -----------------------------------------------------------------
 
--- vim-tmux-navigator doesn't actually set :TmuxNavigate* for terminals
-map('t', '<C-h>', '<C-\\><C-n>:TmuxNavigateLeft<CR>',  { silent = true })
-map('t', '<C-j>', '<C-\\><C-n>:TmuxNavigateDown<CR>',  { silent = true })
-map('t', '<C-k>', '<C-\\><C-n>:TmuxNavigateUp<CR>',    { silent = true })
-map('t', '<C-l>', '<C-\\><C-n>:TmuxNavigateRight<CR>', { silent = true })
+if vim.env.ZELLIJ then
+  require('plugins.custom.zellij_navigator').setup()
+else
+  -- vim-tmux-navigator doesn't actually set :TmuxNavigate* for terminals
+  map('t', '<C-h>', '<C-\\><C-n>:TmuxNavigateLeft<CR>',  { silent = true })
+  map('t', '<C-j>', '<C-\\><C-n>:TmuxNavigateDown<CR>',  { silent = true })
+  map('t', '<C-k>', '<C-\\><C-n>:TmuxNavigateUp<CR>',    { silent = true })
+  map('t', '<C-l>', '<C-\\><C-n>:TmuxNavigateRight<CR>', { silent = true })
+end
 
 -----------------------------------------------------------------
 -- Wilder

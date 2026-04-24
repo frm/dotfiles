@@ -1,0 +1,114 @@
+#!/usr/bin/env sh
+set -e
+# zellij_tab_preview — render metadata and pane content preview for a Zellij tab
+
+__zellij_tab_preview_require() {
+  if ! command -v "$1" >/dev/null 2>&1; then
+    echo "[zellij_tab_preview]: missing required command: $1" >&2
+    exit 1
+  fi
+}
+
+__zellij_tab_preview_heading() {
+  tab_id="$1"
+  tabs_json="$2"
+
+  printf '%s' "$tabs_json" |
+    jq -r --arg tab_id "$tab_id" '
+      map(select((.tab_id | tostring) == $tab_id))
+      | first
+      | [
+          (.active | if . then "● active" else "○ inactive" end),
+          ("tab " + ((.position + 1) | tostring)),
+          .name,
+          ((.selectable_tiled_panes_count | tostring) + " tiled"),
+          ((.selectable_floating_panes_count | tostring) + " floating")
+        ]
+      | join("  •  ")
+    '
+}
+
+__zellij_tab_preview_panes() {
+  tab_id="$1"
+  panes_json="$2"
+  pane_limit="$3"
+
+  printf '%s' "$panes_json" |
+    jq -r --arg tab_id "$tab_id" --argjson pane_limit "$pane_limit" '
+      map(select((.tab_id | tostring) == $tab_id and .is_selectable)) as $panes
+      | if ($panes | length) == 0 then
+          ["(no selectable panes)"]
+        else
+          (
+            $panes
+            | map(
+                [
+                  (if .is_focused then ">" else " " end),
+                  (.title // "untitled"),
+                  (if .pane_command then "[" + .pane_command + "]" else empty end)
+                ]
+                | join(" ")
+              )[:$pane_limit]
+          ) + (
+            if ($panes | length) > $pane_limit then
+              ["… " + ((($panes | length) - $pane_limit) | tostring) + " more panes"]
+            else
+              []
+            end
+          )
+        end
+      | .[]
+    '
+}
+
+__zellij_tab_preview_focused_pane_id() {
+  tab_id="$1"
+  panes_json="$2"
+
+  printf '%s' "$panes_json" |
+    jq -r --arg tab_id "$tab_id" '
+      (
+        map(select((.tab_id | tostring) == $tab_id and .is_selectable and .is_focused))
+        | first
+      ) // (
+        map(select((.tab_id | tostring) == $tab_id and .is_selectable))
+        | first
+      ) // empty
+      | if . == empty then
+          empty
+        else
+          (if .is_plugin then "plugin_" else "terminal_" end) + (.id | tostring)
+        end
+    '
+}
+
+main() {
+  __zellij_tab_preview_require zellij
+  __zellij_tab_preview_require jq
+
+  tab_id=$1
+  [ -z "$tab_id" ] && exit 0
+
+  preview_lines=${FZF_PREVIEW_LINES:-40}
+  pane_limit=6
+  screen_lines=$((preview_lines - 11))
+
+  if [ "$screen_lines" -lt 8 ]; then
+    screen_lines=8
+  fi
+
+  tabs_json=$(zellij action list-tabs --json)
+  panes_json=$(zellij action list-panes --json)
+
+  printf '%s\n\n' "$(__zellij_tab_preview_heading "$tab_id" "$tabs_json")"
+  printf 'Panes\n'
+  __zellij_tab_preview_panes "$tab_id" "$panes_json" "$pane_limit"
+
+  pane_id=$(__zellij_tab_preview_focused_pane_id "$tab_id" "$panes_json")
+  [ -z "$pane_id" ] && exit 0
+
+  printf '\nPreview\n'
+  zellij action dump-screen --pane-id "$pane_id" 2>/dev/null | tail -n "$screen_lines" || true
+}
+
+main "$@"

@@ -1,0 +1,54 @@
+#!/usr/bin/env sh
+set -e
+# zellij_tab_picker — fuzzy picker for Zellij tabs
+
+__zellij_tab_picker_require() {
+  if ! command -v "$1" >/dev/null 2>&1; then
+    echo "[zellij_tab_picker]: missing required command: $1" >&2
+    exit 1
+  fi
+}
+
+main() {
+  __zellij_tab_picker_require zellij
+  __zellij_tab_picker_require jq
+  __zellij_tab_picker_require fzf
+
+  selected=$(
+    zellij action list-tabs --json |
+      jq -r '
+        .[]
+        | [
+            (.tab_id | tostring),
+            (if .active then "●" else "○" end),
+            ((.position + 1) | tostring),
+            .name,
+            ((.selectable_tiled_panes_count | tostring) + "t/" + (.selectable_floating_panes_count | tostring) + "f"),
+            ([
+              (if .is_fullscreen_active then "full" else empty end),
+              (if .are_floating_panes_visible then "float" else empty end),
+              (if .is_sync_panes_active then "sync" else empty end),
+              (if .has_bell_notification then "bell" else empty end),
+              (if .is_flashing_bell then "flash" else empty end)
+            ] | join(","))
+          ]
+        | @tsv
+      ' |
+      fzf \
+        --no-multi \
+        --reverse \
+        --prompt='tab> ' \
+        --delimiter='\t' \
+        --with-nth=2,3,4,5,6 \
+        --preview='$HOME/.config/zellij/bin/zellij_tab_preview {1}' \
+        --preview-window='right:60%:wrap' \
+        --bind 'ctrl-/:toggle-preview'
+  )
+
+  [ -z "$selected" ] && exit 0
+
+  tab_id=$(printf '%s' "$selected" | cut -f1)
+  zellij action go-to-tab-by-id "$tab_id"
+}
+
+main "$@"
