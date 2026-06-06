@@ -25,7 +25,7 @@ alias c="cargo"
 alias i="iex"
 alias mk="make"
 
-alias sleep="pmset displaysleepnow > /dev/null 2>& 1"
+alias os.sleep="pmset displaysleepnow > /dev/null 2>& 1"
 
 alias cht="cheat"
 alias mo="moor --style=catppuccin-mocha --colors=16M --render-unprintable=whitespace --statusbar=plain"
