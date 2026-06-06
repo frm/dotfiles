@@ -105,10 +105,20 @@ set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-battery'
 set -g @plugin 'tmux-plugins/tmux-cpu'
 set -g @plugin 'tmux-plugins/tmux-sensible'
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+set -g @plugin 'tmux-plugins/tmux-continuum'
 
 set -g @plugin 'wfxr/tmux-fzf-url'
 set -g @plugin 'christoomey/vim-tmux-navigator'
 set -g @plugin 'fabioluciano/tmux-powerkit'
+
+# Resurrect: restore pane contents (history) too, not just layout/commands.
+set -g @resurrect-capture-pane-contents 'on'
+# Resurrect: restore vim/nvim sessions if they were saved by mksession.
+set -g @resurrect-strategy-nvim 'session'
+# Continuum: auto-save every 15 minutes; auto-restore last save on tmux start.
+set -g @continuum-save-interval '15'
+set -g @continuum-restore 'on'
 
 #############
 #           #
