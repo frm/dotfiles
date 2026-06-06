@@ -254,6 +254,9 @@ dirlink ghostty ~/.config/ghostty
 pp_info "zellij" "setting configs"
 dirlink zellij ~/.config/zellij
 
+pp_info "aerospace" "setting configs"
+gln -srf aerospace/aerospace.toml.symlink ~/.aerospace.toml
+
 pp_info "gh" "installing gh extensions..."
 cat gh/extensions | xargs -I {} gh extension install {}
 
