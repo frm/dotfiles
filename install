@@ -5,8 +5,6 @@ BLUE='\033[1;34m'
 RED='\033[1;91m'
 RESET='\033[0m'
 
-WD=$(pwd)
-
 DEV_CHAOS=~/Developer/frm/chaos
 DEV_DOTFILES=~/Developer/frm/dotfiles
 
@@ -27,7 +25,7 @@ function pp_error {
 }
 
 function dirlink {
-  (cd $HOME && ln -s "$WD/$1" "$2")
+  (cd $HOME && ln -sfn "$DEV_DOTFILES/$1" "$2")
 }
 
 pp_info "install" "setting up Developer directory"
@@ -37,9 +35,12 @@ pp_info "install" "cloning chaos"
 git clone git@github.com:frm/chaos.git $DEV_CHAOS
 
 pp_info "install" "cloning dotfiles"
-git clone --recurse-submodules -j8 https://github.com/frm/dotfiles.git $DEV_DOTFILES
+git clone --recurse-submodules -j8 git@github.com:frm/dotfiles.git $DEV_DOTFILES
 
 cd $DEV_DOTFILES
+
+pp_info "install" "syncing submodules"
+git submodule update --init --recursive
 ln -s ../chaos/ai ai
 ln -s ../chaos/pi pi
 
@@ -149,7 +150,7 @@ fast-theme XDG:catppuccin-$CATPPUCCIN_VARIANT
 
 pp_info "tmux" "installing plugins"
 mkdir -p ~/.tmux/plugins/
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+git clone git@github.com:tmux-plugins/tpm.git ~/.tmux/plugins/tpm
 gln -srf ./tmux/tmux.conf.symlink "$HOME/.tmux.conf"
 gln -srf ./tmux/tmate.conf.symlink "$HOME/.tmate.conf"
 ~/.tmux/plugins/tpm/bin/install_plugins
@@ -157,7 +158,7 @@ gln -srf ./tmux/tmate.conf.symlink "$HOME/.tmate.conf"
 pp_info "tmux" "installing catppuccin"
 CATPUCCIN_VERSION="v2.1.3"
 mkdir -p $HOME/.config/tmux/plugins/catppuccin
-git clone -b $CATPUCCIN_VERSION https://github.com/catppuccin/tmux.git ~/.config/tmux/plugins/catppuccin/tmux
+git clone -b $CATPUCCIN_VERSION git@github.com:catppuccin/tmux.git ~/.config/tmux/plugins/catppuccin/tmux
 
 pp_info "git" "setting up environment"
 gln -srf git/gitconfig.symlink ~/.gitconfig
@@ -182,6 +183,12 @@ npm i -g neovim
 
 pp_info "nvim" "fixing C-h bug"
 $DEV_DOTFILES/scripts/fix-nvim-c-h
+
+pp_info "nvim" "installing plugins"
+nvim --headless "+Lazy! sync" +qa
+
+pp_info "nvim" "registering remote plugins"
+nvim --headless "+UpdateRemotePlugins" +qa
 
 pp_info "luarocks" "setting up lua env"
 cat lua/deps | xargs -I {} luarocks install --server=https://luarocks.org/dev {}
@@ -246,7 +253,7 @@ for type in Light Retina Regular Medium Bold SemiBold; do
 done
 
 mv ./*.ttf ~/Library/Fonts/
-cd $WD
+cd $DEV_DOTFILES
 
 pp_info "ghostty" "setting configs"
 dirlink ghostty ~/.config/ghostty
@@ -272,7 +279,7 @@ cp -r ai/skills/* ~/.codex/skills/
 cp ai/me.md.sample ai/me.md
 
 # pi setup
-mkdir -p ~/.pi/agent ~/.pi/shell
+mkdir -p ~/.pi/agent
 gln -srf pi/config.json.symlink ~/.pi/config.json
 gln -srf pi/keybindings.json.symlink ~/.pi/agent/keybindings.json
 gln -srf pi/settings.json.symlink ~/.pi/agent/settings.json
@@ -284,8 +291,14 @@ dirlink pi/references ~/.pi/agent/references
 dirlink pi/shell ~/.pi/shell
 mkdir -p ~/.pi/nexus
 ln -sf $DEV_CHAOS/nexus/client ~/.pi/nexus/client
+pp_info "pi" "installing anthropic-max-oauth extension dependencies..."
+(cd pi/extensions/anthropic-max-oauth && npm install)
 pp_info "pi" "installing playwright extension dependencies..."
 (cd pi/extensions/playwright && npm install && npx playwright install chromium)
+
+pp_info "schism" "installing schism..."
+cargo install --git ssh://git@github.com/frm/schism.git
+mise reshim
 
 pp_info "sentry" "installing sentry cli..."
 curl https://cli.sentry.dev/install -fsS | bash
