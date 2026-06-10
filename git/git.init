@@ -7,12 +7,14 @@ source $DOTFILES/git/g.zsh
 # Load custom git commands
 export PATH="$PATH:$DOTFILES/git/bin"
 
-# Sets up user.email and user.signingkey to values set by env vars.
+# Sets up user.email, user.signingkey and gpg.format to values set by env vars.
 #
-# Before using git set GIT_EMAIL and GIT_SIGNING_KEY in
+# Before using git set GIT_EMAIL, GIT_SIGNING_KEY and GIT_GPG_FORMAT in
 # system/secrets.init
-export GIT_CONFIG_COUNT=2
+export GIT_CONFIG_COUNT=3
 export GIT_CONFIG_KEY_0="user.email"
 export GIT_CONFIG_VALUE_0=$GIT_EMAIL
 export GIT_CONFIG_KEY_1="user.signingkey"
 export GIT_CONFIG_VALUE_1=$GIT_SIGNING_KEY
+export GIT_CONFIG_KEY_2="gpg.format"
+export GIT_CONFIG_VALUE_2=$GIT_GPG_FORMAT
