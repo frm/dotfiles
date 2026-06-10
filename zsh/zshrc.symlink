@@ -39,7 +39,3 @@ fi
 if [ "$MNDS_WORK_PROFILE" ]; then
   source $DOTFILES/river/river.init
 fi
-
-
-# sentry
-fpath=("/Users/fernandomendes/.local/share/zsh/site-functions" $fpath)

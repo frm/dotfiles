@@ -1,2 +1,4 @@
 export SENTRY="$HOME/.sentry"
 export PATH="$PATH:$SENTRY/bin"
+
+fpath=("$HOME/.local/share/zsh/site-functions" $fpath)
