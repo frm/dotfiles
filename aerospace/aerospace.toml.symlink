@@ -44,10 +44,10 @@ automatically-unhide-macos-hidden-apps = false
 # even when they are invisible.
 # This config version is only available since 'config-version = 2'
 # Fallback value (if you omit the key): persistent-workspaces = []
-# Custom: dropped workspaces D, C, T for tmux/vim keybindings
+# Custom: dropped workspaces D, C, T, V for tmux/vim keybindings
 persistent-workspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B",
                          "E", "F", "G", "I", "M", "N", "O", "P", "Q",
-                         "R", "S", "U", "V", "W", "X", "Y", "Z"]
+                         "R", "S", "U", "W", "X", "Y", "Z"]
 
 # A callback that runs every time binding mode changes
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
@@ -102,7 +102,8 @@ on-mode-changed = []
     alt-enter = 'fullscreen'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#layout
-    alt-slash = 'layout tiles horizontal vertical'
+    alt-slash = 'layout tiles vertical'
+    alt-backslash = 'layout tiles horizontal'
     alt-comma = 'layout accordion horizontal vertical'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#focus
@@ -148,7 +149,7 @@ on-mode-changed = []
     alt-s = 'workspace S'
     # alt-t = 'workspace T'
     alt-u = 'workspace U'
-    alt-v = 'workspace V'
+    # alt-v = 'workspace V'
     alt-w = 'workspace W'
     alt-x = 'workspace X'
     alt-y = 'workspace Y'
@@ -181,7 +182,7 @@ on-mode-changed = []
     alt-shift-s = 'move-node-to-workspace S'
     # alt-shift-t = 'move-node-to-workspace T'
     alt-shift-u = 'move-node-to-workspace U'
-    alt-shift-v = 'move-node-to-workspace V'
+    # alt-shift-v = 'move-node-to-workspace V'
     alt-shift-w = 'move-node-to-workspace W'
     alt-shift-x = 'move-node-to-workspace X'
     alt-shift-y = 'move-node-to-workspace Y'
@@ -228,3 +229,11 @@ run = 'move-node-to-workspace S'
 [[on-window-detected]]
 if.app-id = 'company.thebrowser.dia'
 run = 'move-node-to-workspace S'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.iCal'
+run = 'move-node-to-workspace Q'
+
+[[on-window-detected]]
+if.app-id = 'com.linear'
+run = 'move-node-to-workspace Q'
