@@ -5,11 +5,7 @@
 # configure: error: library 'crypto' is required for OpenSSL
 #
 # These flags solve it.
-export POSTGRES_EXTRA_CONFIGURE_OPTIONS="
-  --with-lz4
-  --with-uuid=e2fs
-  --with-libraries=/usr/local/lib:$(brew --prefix openssl@3)/lib
-  --with-includes=/usr/local/include:$(brew --prefix openssl@3)/include"
+export POSTGRES_EXTRA_CONFIGURE_OPTIONS="--with-lz4 --with-uuid=e2fs --with-libraries=/usr/local/lib:$(brew --prefix openssl@3)/lib --with-includes=/usr/local/include:$(brew --prefix openssl@3)/include"
 
 pg_server() {
   pg_version=$(pg_ctl --version | cut -d ' ' -f3)
