@@ -31,28 +31,64 @@ __git_del_output_main_worktree() {
   fi
 }
 
+# read a var from a worktree env file, supporting mise toml (KEY = "value" under
+# [env]) and legacy shell .envrc (export KEY=value)
+__git_del_env_value() {
+  local env_file="$1"
+  local key="$2"
+
+  [ -f "$env_file" ] || return 0
+
+  case "$env_file" in
+    *.toml)
+      awk -v key="$key" '
+        /^[[:space:]]*\[env\][[:space:]]*$/ { in_env = 1; next }
+        /^[[:space:]]*\[/ { in_env = 0; next }
+        in_env && $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
+          sub("^[[:space:]]*" key "[[:space:]]*=[[:space:]]*", ""); gsub(/^"|"$/, ""); print; exit
+        }' "$env_file"
+      ;;
+    *)
+      awk -v key="$key" '$0 ~ "^export " key "=" { sub("^export " key "=", ""); print }' "$env_file"
+      ;;
+  esac
+}
+
 __git_del_teardown_elixir() {
   local worktree_path="$1"
-  local env_file="${_MNDS_WORKTREE_ENV_FILE:-.envrc}"
-  local full_env_path="$worktree_path/$env_file"
+  local full_env_path
+  if [ -n "$_MNDS_WORKTREE_ENV_FILE" ]; then
+    full_env_path="$worktree_path/$_MNDS_WORKTREE_ENV_FILE"
+  elif [ -f "$worktree_path/mise.local.toml" ]; then
+    full_env_path="$worktree_path/mise.local.toml"
+  else
+    full_env_path="$worktree_path/.envrc"
+  fi
 
   [ ! -f "$worktree_path/mix.exs" ] && return 0
   [ -z "$_MNDS_WORKTREE_ISOLATED_VARS" ] && return 0
   [ ! -f "$full_env_path" ] && return 0
 
-  # check if any DB var has a _wt_ isolated value
+  # only drop when a DB var carries a per-worktree suffix (a trailing
+  # _<8 hex hash> from __git_wt_setup_env, or the legacy _wt_<hash>)
   local has_isolated_db=false
   for var_name in $_MNDS_WORKTREE_ISOLATED_VARS; do
     local value
-    value=$(awk -v key="$var_name" '$0 ~ "^export " key "=" { sub("^export " key "=", ""); print }' "$full_env_path")
-    case "$value" in *_wt_*) has_isolated_db=true; break ;; esac
+    value=$(__git_del_env_value "$full_env_path" "$var_name")
+    case "$value" in
+      *_wt_*) has_isolated_db=true; break ;;
+      *_[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) has_isolated_db=true; break ;;
+    esac
   done
 
   [ "$has_isolated_db" = false ] && return 0
 
   __echo_git "[elixir] dropping isolated databases..."
   for env in dev test; do
-    (cd "$worktree_path" && . "$full_env_path" && MIX_ENV="$env" mix ecto.drop) 2>/dev/null || true
+    case "$full_env_path" in
+      *.toml) (cd "$worktree_path" && MIX_ENV="$env" mise exec -- mix ecto.drop) 2>/dev/null || true ;;
+      *)      (cd "$worktree_path" && . "$full_env_path" && MIX_ENV="$env" mix ecto.drop) 2>/dev/null || true ;;
+    esac
   done
 }
 

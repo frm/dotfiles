@@ -9,6 +9,11 @@ set -e
 # configs
 #
 
+# Untracked secrets copied verbatim into each worktree. .env/.envrc cover repos
+# that keep secrets + per-worktree overrides in shell env files (e.g. river);
+# __git_wt_setup_env then upserts the generated ports/derived vars into whichever
+# file _MNDS_WORKTREE_ENV_FILE points at (shell or mise toml). Repos that use a
+# mise.local.toml instead get secrets carried via _MNDS_WORKTREE_CARRY_VARS.
 _PROJECT_SECRETS=".env .envrc .pi"
 _ELIXIR_ARTIFACTS="deps _build priv/plts .elixir_ls"
 _JS_ARTIFACTS="node_modules assets"
@@ -147,8 +152,21 @@ __git_wt_hash_id() {
   printf '%s' "$digest" | cut -c1-8
 }
 
-# upsert export KEY=VALUE in an env file
+# upsert a KEY/VALUE in a worktree env file. The format follows the file type:
+# a .toml file gets KEY = "VALUE" under an [env] table (mise); anything else gets
+# export KEY=VALUE (shell, e.g. a .env / .envrc sourced directly).
 __git_wt_upsert_env() {
+  local env_file="$1"
+  local key="$2"
+  local value="$3"
+
+  case "$env_file" in
+    *.toml) __git_wt_upsert_env_toml "$env_file" "$key" "$value" ;;
+    *)      __git_wt_upsert_env_shell "$env_file" "$key" "$value" ;;
+  esac
+}
+
+__git_wt_upsert_env_shell() {
   local env_file="$1"
   local key="$2"
   local value="$3"
@@ -177,10 +195,70 @@ __git_wt_upsert_env() {
   mv "$tmp_file" "$env_file"
 }
 
+# upsert KEY = "VALUE" under the [env] table of a mise toml file
+__git_wt_upsert_env_toml() {
+  local env_file="$1"
+  local key="$2"
+  local value="$3"
+  local tmp_file="${env_file}.tmp.$$"
+
+  if [ ! -f "$env_file" ]; then
+    printf '[env]\n%s = "%s"\n' "$key" "$value" > "$env_file"
+    return
+  fi
+
+  # Upsert the key inside the [env] table: replace it in place if present, else
+  # append it to that table (creating [env] if the file has none).
+  awk -v key="$key" -v value="$value" '
+  BEGIN { in_env = 0; updated = 0; have_env = 0 }
+  # entering the [env] table
+  /^[[:space:]]*\[env\][[:space:]]*$/ { in_env = 1; have_env = 1; print; next }
+  # a new table starts: if we were in [env] and never updated, append before it
+  /^[[:space:]]*\[/ {
+    if (in_env && !updated) { print key " = \"" value "\""; updated = 1 }
+    in_env = 0; print; next
+  }
+  # a key line inside [env] that matches: replace it
+  in_env && $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
+    print key " = \"" value "\""; updated = 1; next
+  }
+  { print }
+  END {
+    if (updated) exit
+    if (in_env) { print key " = \"" value "\""; exit }
+    # no [env] table anywhere: create one
+    print ""; print "[env]"; print key " = \"" value "\""
+  }' "$env_file" > "$tmp_file"
+
+  mv "$tmp_file" "$env_file"
+}
+
+# read a KEY's value from a worktree env file (toml [env] or shell export)
+__git_wt_read_env() {
+  local env_file="$1"
+  local key="$2"
+
+  [ -f "$env_file" ] || return 0
+
+  case "$env_file" in
+    *.toml)
+      awk -v key="$key" '
+      /^[[:space:]]*\[env\][[:space:]]*$/ { in_env = 1; next }
+      /^[[:space:]]*\[/ { in_env = 0; next }
+      in_env && $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
+        sub("^[[:space:]]*" key "[[:space:]]*=[[:space:]]*", ""); gsub(/^"|"$/, ""); print; exit
+      }' "$env_file"
+      ;;
+    *)
+      awk -v key="$key" '$0 ~ "^export " key "=" { sub("^export " key "=", ""); print; exit }' "$env_file"
+      ;;
+  esac
+}
+
 # generate unique ports, derive unique names, and optionally isolate vars for a worktree
 __git_wt_setup_env() {
   local worktree_path="$1"
-  local env_file="${_MNDS_WORKTREE_ENV_FILE:-.envrc}"
+  local env_file="${_MNDS_WORKTREE_ENV_FILE:-mise.local.toml}"
   local full_env_path="$worktree_path/$env_file"
 
   [ -z "$_MNDS_WORKTREE_PORTS" ] && [ -z "$_MNDS_WORKTREE_RESET_VARS" ] && [ -z "$_MNDS_WORKTREE_DERIVED_VARS" ] && return 0
@@ -234,6 +312,36 @@ __git_wt_setup_env() {
       __echo_git "  $var_name=$unique_value"
     done
   fi
+
+  # Carry untracked secrets forward from the source repo's env file (same
+  # filename) into the worktree's, so each worktree shares e.g. the generated
+  # daemon secret without re-running its setup.
+  if [ -n "$_MNDS_WORKTREE_CARRY_VARS" ]; then
+    local source_env
+    source_env=$(git rev-parse --show-toplevel 2>/dev/null)/"$env_file"
+    if [ -f "$source_env" ]; then
+      __echo_git "carrying secrets forward:"
+      for var_name in $_MNDS_WORKTREE_CARRY_VARS; do
+        local carried
+        carried=$(__git_wt_read_env "$source_env" "$var_name")
+        if [ -n "$carried" ]; then
+          __git_wt_upsert_env "$full_env_path" "$var_name" "$carried"
+          __echo_git "  $var_name (copied)"
+        fi
+      done
+    fi
+  fi
+
+  # mise won't load an untrusted config; trust a generated mise file so the
+  # worktree's env applies on cd without a prompt. Shell env files (.env/.envrc)
+  # are loaded by their own tool (direnv/mise _.file) and need no trust here.
+  case "$full_env_path" in
+    *.toml)
+      if [ -f "$full_env_path" ] && command -v mise >/dev/null 2>&1; then
+        mise trust "$full_env_path" >/dev/null 2>&1 || true
+      fi
+      ;;
+  esac
 }
 
 # pull latest changes if on main/master to ensure worktree starts fresh
