@@ -78,7 +78,11 @@ else
 fi
 
 pp_info "mise" "setting up environment"
-gln -srf mise/mise.toml.symlink ~/.mise.toml
+# config must live only at the global path; a ~/.mise.toml is treated as a
+# local config and makes mise ignore trusted_config_paths for security reasons
+mkdir -p ~/.config/mise
+rm -f ~/.mise.toml
+gln -srf mise/mise.toml.symlink ~/.config/mise/config.toml
 
 # Ensure postgres is configured
 export POSTGRES_EXTRA_CONFIGURE_OPTIONS="
