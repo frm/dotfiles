@@ -1,0 +1,35 @@
+#!/usr/bin/env sh
+# posts an `agent-review` comment on the PR open for the current branch
+# usage: git ar
+
+set -e
+
+#
+# aux functions
+#
+
+__echo_git() {
+  echo "[git]: $1" >&2
+}
+
+__git_ar_pr_number() {
+  gh pr view --json number --jq '.number' 2>/dev/null
+}
+
+#
+# main script
+#
+
+pr=$(__git_ar_pr_number) || true
+
+if [ -z "$pr" ]; then
+  __echo_git "no open PR found for the current branch"
+  exit 1
+fi
+
+url=$(gh pr comment "$pr" --body "agent-review")
+
+gray=$(tput setaf 8 2>/dev/null || true)
+reset=$(tput sgr0 2>/dev/null || true)
+
+__echo_git "posted comment on #$pr ${gray}($url)${reset}"

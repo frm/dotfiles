@@ -8,6 +8,9 @@ export NVIM_MINUET_ENABLED="0"
 
 export DD_SITE="us5.datadoghq.com"
 
+# Load river-specific git commands
+export PATH="$PATH:$DOTFILES/river/git/bin"
+
 source $DOTFILES/river/alto/alto.init
 source $DOTFILES/river/gcloud/gcloud.init
 
