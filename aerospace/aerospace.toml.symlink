@@ -223,11 +223,11 @@ if.app-id = 'com.chaos.atlas'
 run = 'move-node-to-workspace A'
 
 [[on-window-detected]]
-if.app-id = 'com.tinyspeck.slackmacgap'
-run = 'move-node-to-workspace S'
+if.app-id = 'company.thebrowser.dia'
+run = ['move-node-to-workspace S', 'move right']
 
 [[on-window-detected]]
-if.app-id = 'company.thebrowser.dia'
+if.app-id = 'com.tinyspeck.slackmacgap'
 run = 'move-node-to-workspace S'
 
 [[on-window-detected]]
