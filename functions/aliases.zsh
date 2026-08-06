@@ -6,6 +6,7 @@ alias vi="command vim"
 alias ireallywantvi="command vi"
 alias cs="cursor"
 alias cs.ext="cs_extensions"
+alias h="herdr"
 
 alias ta="tmux attach"
 alias tls="tmux list-sessions"

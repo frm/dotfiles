@@ -1,0 +1,16 @@
+# rtk compresses command output before pi reads it. The hook only sees pi's
+# bash tool, so an interactive shell is never rewritten.
+
+[hooks]
+# `g` wraps git with commands that return paths — `g wt` prints the new
+# worktree's path as its last line, and callers read it. Rewriting its output
+# would break them.
+exclude_commands = ["g"]
+
+[tee]
+# Keep the full output when a command fails, so a broken build can be read
+# without running it again. Every field in this table is required.
+enabled = true
+mode = "failures"
+max_files = 20
+max_file_size = 1048576

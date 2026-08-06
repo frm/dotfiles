@@ -42,7 +42,6 @@ cd $DEV_DOTFILES
 pp_info "install" "syncing submodules"
 git submodule update --init --recursive
 ln -s ../chaos/ai ai
-ln -s ../chaos/pi pi
 
 export DOTFILES="$DEV_DOTFILES"
 
@@ -262,8 +261,10 @@ cd $DEV_DOTFILES
 pp_info "ghostty" "setting configs"
 dirlink ghostty ~/.config/ghostty
 
-pp_info "zellij" "setting configs"
-dirlink zellij ~/.config/zellij
+# herdr lives in chaos, not here: its keymap, worktree scripts, and plugins are
+# wired to nexus and pi, so it ships and installs with them.
+pp_info "herdr" "setting configs"
+$DEV_CHAOS/herdr/bin/install
 
 pp_info "aerospace" "setting configs"
 gln -srf aerospace/aerospace.toml.symlink ~/.aerospace.toml
@@ -282,23 +283,17 @@ cp -r ai/skills/* ~/.codex/skills/
 
 cp ai/me.md.sample ai/me.md
 
-# pi setup
-mkdir -p ~/.pi/agent
-gln -srf pi/config.json.symlink ~/.pi/config.json
-gln -srf pi/keybindings.json.symlink ~/.pi/agent/keybindings.json
-gln -srf pi/settings.json.symlink ~/.pi/agent/settings.json
-gln -srf pi/instructions.md ~/.pi/agent/instructions.md
-dirlink pi/agents ~/.pi/agent/agents
-dirlink pi/prompts ~/.pi/agent/prompts
-dirlink pi/extensions ~/.pi/agent/extensions
-dirlink pi/references ~/.pi/agent/references
-dirlink pi/shell ~/.pi/shell
-mkdir -p ~/.pi/nexus
-ln -sf $DEV_CHAOS/nexus/client ~/.pi/nexus/client
-pp_info "pi" "installing anthropic-max-oauth extension dependencies..."
-(cd pi/extensions/anthropic-max-oauth && npm install)
-pp_info "pi" "installing playwright extension dependencies..."
-(cd pi/extensions/playwright && npm install && npx playwright install chromium)
+# pi lives in chaos, alongside the extensions and nexus client it wires up.
+pp_info "pi" "setting configs"
+$DEV_CHAOS/pi/install
+
+# rtk ignores XDG_CONFIG_HOME on macOS, so its config only loads from here.
+pp_info "rtk" "setting configs"
+RTK_CONFIG_DIR="$HOME/Library/Application Support/rtk"
+mkdir -p "$RTK_CONFIG_DIR"
+gln -srf rtk/config.toml.symlink "$RTK_CONFIG_DIR/config.toml"
+pp_info "rtk" "installing the pi hook"
+rtk init -g --agent pi --auto-patch
 
 pp_info "schism" "installing schism..."
 cargo install --git ssh://git@github.com/frm/schism.git
