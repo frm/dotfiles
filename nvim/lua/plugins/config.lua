@@ -275,8 +275,10 @@ require("mason-lspconfig").setup({
 -- Multiplexer navigation
 -----------------------------------------------------------------
 
-if vim.env.ZELLIJ then
-  require('plugins.custom.zellij_navigator').setup()
+-- Inside herdr its own maps win over vim-tmux-navigator's; everywhere else
+-- tmux keeps working untouched.
+if vim.env.HERDR_PANE_ID then
+  require('plugins.custom.herdr_navigator').setup()
 else
   -- vim-tmux-navigator doesn't actually set :TmuxNavigate* for terminals
   map('t', '<C-h>', '<C-\\><C-n>:TmuxNavigateLeft<CR>',  { silent = true })
