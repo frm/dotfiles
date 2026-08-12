@@ -8,6 +8,7 @@
   rebase = true
 [push]
   default = current
+  useForceIfIncludes = true
 [color]
   ui = true
 [commit]
@@ -89,6 +90,7 @@
   mbrs = !git-my-branches --select --short
   mpr = !git-merge-pr
   nk = !git-nuke
+  pa = !git-push-all
   pb = !git-parent-branch
   ppr = !git-push-pr
   rba = !git-auto-rebase

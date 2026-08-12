@@ -1,0 +1,93 @@
+#!/usr/bin/env zsh
+# pushes every branch in the current stack in a single atomic push
+#
+# usage: git push-all [-b base] [--dry-run]
+#   -b: base branch the stack sits on (default: $MNDS_DEFAULT_MAIN_BRANCH_NAME or main)
+#   --dry-run: show what would be pushed without pushing
+#
+# the stack is every local branch reachable from HEAD but not from the base,
+# which is exactly the set `rebase.updateRefs` moves when rebasing the tip.
+
+set -e
+
+source $DOTFILES/functions/helpers.zsh
+
+#
+# aux functions
+#
+
+__git_pa_infer_base() {
+  local configured="${MNDS_DEFAULT_MAIN_BRANCH_NAME:-}"
+
+  if [[ -n "$configured" ]] && git-branch-check "$configured"; then
+    echo "$configured"
+  elif git-branch-check main; then
+    echo "main"
+  elif git-branch-check master; then
+    echo "master"
+  else
+    _mnds_pp_error "git" "couldn't infer base branch, pass -b"
+    return 1
+  fi
+}
+
+__git_pa_stack_branches() {
+  local base="$1"
+
+  comm -23 \
+    <(git branch --format='%(refname:short)' --merged HEAD | sort) \
+    <(git branch --format='%(refname:short)' --merged "$base" | sort)
+}
+
+__git_pa_report() {
+  local base="$1"
+  shift
+
+  _mnds_pp_info "git" "stack off of $base:"
+  for branch in "$@"; do
+    _mnds_pp_neutral "git" "  $branch"
+  done
+  echo ""
+}
+
+__git_pa_push() {
+  _mnds_pp_info "git" "pushing $# branches atomically..."
+  git push -u --force-with-lease --atomic origin "$@"
+}
+
+#
+# main script
+#
+
+main() {
+  zparseopts -D -E -- b:=base -dry-run=dry_run
+
+  base=${(@)base:#-b}
+  base=${base:-$(__git_pa_infer_base)} || return 1
+
+  if ! git-branch-check "$base"; then
+    _mnds_pp_error "git" "base branch '$base' doesn't exist"
+    return 1
+  fi
+
+  typeset -a branches
+  branches=(${(f)"$(__git_pa_stack_branches "$base")"})
+
+  if (( $#branches == 0 )); then
+    _mnds_pp_warn "git" "no branches ahead of $base, nothing to push"
+    return 0
+  fi
+
+  __git_pa_report "$base" "${branches[@]}"
+
+  if [[ -n "$dry_run" ]]; then
+    _mnds_pp_info "git" "dry run, not pushing"
+    return 0
+  fi
+
+  __git_pa_push "${branches[@]}"
+
+  _mnds_pp_success "git" "done"
+}
+
+main "$@"
