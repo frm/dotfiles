@@ -44,6 +44,20 @@ __git_wt_normalize_branch_path() {
   esac
 }
 
+# lowercase new branches so a repo settles on one casing
+# existing local/remote branches are used as-is
+__git_wt_canonical_branch() {
+  local branch_name="$1"
+
+  if git show-ref --verify --quiet "refs/heads/$branch_name" \
+    || git show-ref --verify --quiet "refs/remotes/origin/$branch_name"; then
+    echo "$branch_name"
+    return
+  fi
+
+  echo "$branch_name" | tr '[:upper:]' '[:lower:]'
+}
+
 # when we have a pr number instead, we use gh to extract the branch name
 __git_wt_parse_opts_from_pr() {
   local pr_number="$1"
@@ -75,7 +89,7 @@ __git_wt_parse_opts() {
         shift 2
         ;;
       *)
-        branch_name="$1"
+        branch_name=$(__git_wt_canonical_branch "$1")
         shift
         ;;
     esac
