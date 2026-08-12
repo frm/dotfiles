@@ -1,61 +1,101 @@
 #!/usr/bin/env zsh
+# rebases the current branch onto the latest origin/<destination>
+#
+# usage: git rebase-main [destination]
+#   destination: branch to rebase onto (default: main, or master)
+#
+# the local destination ref is fast-forwarded as a convenience, but the rebase
+# always targets origin/<destination>, so a destination that can't advance
+# (dirty worktree, diverged) never blocks the rebase.
+#
+# the todo editor only opens when the branch carries more than one commit,
+# since that's when there's something to squash or reorder.
 
 set -e
 
-git_prefix="[git]:"
-destination=$1
-branch=$(git rev-parse --abbrev-ref HEAD)
+source $DOTFILES/functions/helpers.zsh
 
-_echo() {
-  echo -e "$git_prefix $@"
-}
+#
+# aux functions
+#
 
-_git_checkout() {
-  local output=$(git checkout-worktree "$1")
-
-  if [ -d "$output" ]; then
-    cd "$output"
+__git_rbm_infer_destination() {
+  if git branch-check main; then
+    echo "main"
+  elif git branch-check master; then
+    echo "master"
+  else
+    _mnds_pp_error "git" "couldn't infer destination branch, pass one explicitly"
+    return 1
   fi
 }
 
-_git_rebase_or_skip() {
-  # skip if worktree has unstaged changes
-  if ! git diff --quiet; then
+# path of the worktree holding a branch, empty when it isn't checked out
+__git_rbm_worktree_of() {
+  local branch="$1"
+
+  git worktree list --porcelain \
+    | awk -v ref="refs/heads/$branch" '
+      /^worktree / { path = substr($0, 10) }
+      $0 == "branch " ref { print path; exit }
+    '
+}
+
+# fast-forward the local destination ref. a checked-out branch can't be fetched
+# into, so that case merges inside its own worktree instead; git refuses either
+# form when the update isn't a fast-forward or would clobber local edits.
+# failure is expected and handled by the caller, so git's own diagnostics are
+# dropped rather than dumped over a rebase that's about to succeed.
+__git_rbm_advance_destination() {
+  local destination="$1"
+  local worktree=$(__git_rbm_worktree_of "$destination")
+
+  if [[ -z "$worktree" ]]; then
+    git fetch --quiet origin "$destination:$destination" 2>/dev/null
+    return
+  fi
+
+  git -C "$worktree" merge --quiet --ff-only "origin/$destination" >/dev/null 2>&1
+}
+
+__git_rbm_rebase() {
+  local destination="$1"
+  local incoming=$(git rev-list --count "HEAD..origin/$destination")
+  local mine=$(git rev-list --count "origin/$destination..HEAD")
+
+  if (( incoming == 0 )); then
+    _mnds_pp_info "git" "already up to date with origin/$destination"
     return 0
   fi
-  git rebase "$@"
+
+  if (( mine > 1 )); then
+    _mnds_pp_info "git" "interactive rebase onto origin/$destination ($incoming new, $mine of mine)..."
+    git rebase -i "origin/$destination"
+    return
+  fi
+
+  _mnds_pp_info "git" "rebasing onto origin/$destination ($incoming new commits)..."
+  git rebase "origin/$destination"
 }
 
-if [ -z "$destination" ]; then
-  if $(git branch-check main); then
-    destination="main"
-  elif $(git branch-check master); then
-    destination="master"
-  else
-    echo "couldn't infer destination branch. main and master not here. exiting..."
-    exit 1
+#
+# main script
+#
+
+main() {
+  local destination=${1:-$(__git_rbm_infer_destination)}
+  local branch=$(git rev-parse --abbrev-ref HEAD)
+
+  _mnds_pp_info "git" "fetching origin/$destination..."
+  git fetch --quiet origin "$destination"
+
+  if ! __git_rbm_advance_destination "$destination"; then
+    _mnds_pp_warn "git" "local $destination can't fast-forward (diverged or dirty), leaving it alone"
   fi
-fi
 
-_echo "fetching origin/$destination..."
-git fetch origin $destination
+  __git_rbm_rebase "$destination"
 
-commits_behind=$(git rev-list --count HEAD.."remotes/origin/$destination")
+  _mnds_pp_success "git" "$branch is up to date with origin/$destination"
+}
 
-if [[ $commits_behind -lt 1 ]]; then
-  _echo "already up to speed with origin/$destination, no rebase needed"
-  exit 0
-fi
-
-original_dir=$(pwd)
-
-# Try to update local destination branch (master/main)
-# This may fail in worktrees if the main worktree has changes - that's ok
-_echo "rebasing $destination..."
-_git_checkout $destination 2>/dev/null && _git_rebase_or_skip origin/$destination || true
-
-_echo "rebasing $branch"
-# cd back into where we were in case of worktrees
-cd "$original_dir"
-_git_checkout $branch
-git rebase -i origin/$destination
+main "$@"
