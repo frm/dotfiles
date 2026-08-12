@@ -15,6 +15,10 @@ set -e
 
 source $DOTFILES/functions/helpers.zsh
 
+# `!` git aliases export these pinned to the calling worktree, which makes every
+# `git -C <other worktree>` below run against this worktree's HEAD and index.
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE
+
 #
 # aux functions
 #
@@ -25,7 +29,7 @@ __git_rbm_infer_destination() {
   elif git branch-check master; then
     echo "master"
   else
-    _mnds_pp_error "git" "couldn't infer destination branch, pass one explicitly"
+    _mnds_pp_error "git" "couldn't infer destination branch, pass one explicitly" >&2
     return 1
   fi
 }
@@ -42,10 +46,7 @@ __git_rbm_worktree_of() {
 }
 
 # fast-forward the local destination ref. a checked-out branch can't be fetched
-# into, so that case merges inside its own worktree instead; git refuses either
-# form when the update isn't a fast-forward or would clobber local edits.
-# failure is expected and handled by the caller, so git's own diagnostics are
-# dropped rather than dumped over a rebase that's about to succeed.
+# into, so that case merges inside its own worktree instead.
 __git_rbm_advance_destination() {
   local destination="$1"
   local worktree=$(__git_rbm_worktree_of "$destination")
@@ -56,6 +57,26 @@ __git_rbm_advance_destination() {
   fi
 
   git -C "$worktree" merge --quiet --ff-only "origin/$destination" >/dev/null 2>&1
+}
+
+# git's refusal is either silent (--quiet fetch) or multi-line, so the reason is
+# worked out here instead of parroted back.
+__git_rbm_refusal_reason() {
+  local destination="$1"
+  local worktree=$(__git_rbm_worktree_of "$destination")
+
+  if ! git merge-base --is-ancestor "$destination" "origin/$destination"; then
+    echo "it has diverged from origin/$destination"
+    return
+  fi
+
+  echo "its worktree at $worktree has changes in the way"
+}
+
+__git_rbm_abort_on_conflict() {
+  _mnds_pp_error "git" "rebase stopped on conflicts"
+  _mnds_pp_neutral "git" "resolve them, 'git add' each file, then 'git rbc' — or 'git rb --abort' to bail"
+  exit 1
 }
 
 __git_rbm_rebase() {
@@ -70,12 +91,12 @@ __git_rbm_rebase() {
 
   if (( mine > 1 )); then
     _mnds_pp_info "git" "interactive rebase onto origin/$destination ($incoming new, $mine of mine)..."
-    git rebase -i "origin/$destination"
+    git rebase -i "origin/$destination" || __git_rbm_abort_on_conflict
     return
   fi
 
   _mnds_pp_info "git" "rebasing onto origin/$destination ($incoming new commits)..."
-  git rebase "origin/$destination"
+  git rebase "origin/$destination" || __git_rbm_abort_on_conflict
 }
 
 #
@@ -83,15 +104,16 @@ __git_rbm_rebase() {
 #
 
 main() {
-  local destination=${1:-$(__git_rbm_infer_destination)}
+  local destination=$1
+  [[ -n "$destination" ]] || destination=$(__git_rbm_infer_destination)
+
   local branch=$(git rev-parse --abbrev-ref HEAD)
 
   _mnds_pp_info "git" "fetching origin/$destination..."
   git fetch --quiet origin "$destination"
 
-  if ! __git_rbm_advance_destination "$destination"; then
-    _mnds_pp_warn "git" "local $destination can't fast-forward (diverged or dirty), leaving it alone"
-  fi
+  __git_rbm_advance_destination "$destination" \
+    || _mnds_pp_warn "git" "left local $destination alone: $(__git_rbm_refusal_reason $destination)"
 
   __git_rbm_rebase "$destination"
 
