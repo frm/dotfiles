@@ -1,6 +1,10 @@
 export ALTO="$RIVER/alto"
 export PATH="$ALTO/bin:$PATH"
 
+# Where herdr's review panes run. Reviews only read code, so the main checkout
+# is enough and no worktree is needed.
+export CHAOS_HERDR_REVIEW_CWD="$ALTO"
+
 eval "$(alto completions zsh)"
 
 alias a="alto"
