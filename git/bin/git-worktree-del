@@ -5,6 +5,8 @@
 
 set -e
 
+. "$DOTFILES/git/lib/worktree.sh"
+
 #
 # aux functions
 #
@@ -22,99 +24,92 @@ __git_wt_get_worktree_path() {
     | cut -d' ' -f2
 }
 
-# read a var's value from a worktree env file, supporting both the mise toml
-# format (KEY = "value" under [env]) and the legacy shell .envrc (export KEY=value)
-__git_wt_env_value() {
-  local env_file="$1"
-  local key="$2"
-
-  [ -f "$env_file" ] || return 0
-
-  case "$env_file" in
-    *.toml)
-      awk -v key="$key" '
-        /^[[:space:]]*\[env\][[:space:]]*$/ { in_env = 1; next }
-        /^[[:space:]]*\[/ { in_env = 0; next }
-        in_env && $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
-          sub("^[[:space:]]*" key "[[:space:]]*=[[:space:]]*", ""); gsub(/^"|"$/, ""); print; exit
-        }' "$env_file"
-      ;;
-    *)
-      awk -v key="$key" '$0 ~ "^export " key "=" { sub("^export " key "=", ""); print }' "$env_file"
-      ;;
-  esac
-}
-
-# locate the worktree's env file, preferring mise.local.toml, falling back to a
-# legacy .envrc so worktrees created before the mise migration still tear down
-__git_wt_env_file() {
+# Drop the databases this worktree owns. The names are recomputed from the
+# worktree's own path and primary's base rather than trusted from the marker:
+# the file is gitignored but writable by anything, and a tampered value would
+# otherwise steer a drop at a shared or sibling database.
+__git_wt_teardown_databases() {
   local worktree_path="$1"
+  local primary_root="$2"
+  local hash name base recorded expected suffix
 
-  if [ -n "$_MNDS_WORKTREE_ENV_FILE" ]; then
-    echo "$worktree_path/$_MNDS_WORKTREE_ENV_FILE"
-  elif [ -f "$worktree_path/mise.local.toml" ]; then
-    echo "$worktree_path/mise.local.toml"
-  else
-    echo "$worktree_path/.envrc"
-  fi
-}
+  [ "$(__git_wt_marker_get "$worktree_path" .db_mode)" = "isolated" ] || return 0
 
-__git_wt_teardown_elixir() {
-  local worktree_path="$1"
-  local full_env_path
-  full_env_path=$(__git_wt_env_file "$worktree_path")
+  hash=$(__git_wt_hash_id "$(cd "$worktree_path" && pwd -P)")
 
-  [ ! -f "$worktree_path/mix.exs" ] && return 0
-  [ -z "$_MNDS_WORKTREE_ISOLATED_VARS" ] && return 0
-  [ ! -f "$full_env_path" ] && return 0
+  for name in $(__git_wt_vars_by_strategy database); do
+    recorded=$(__git_wt_marker_var "$worktree_path" "$name")
+    base=$(__git_wt_resolve_env "$primary_root" "$name")
 
-  # only drop when a DB var carries a per-worktree suffix (a trailing
-  # _<8 hex hash> from __git_wt_setup_env, or the legacy _wt_<hash>)
-  local has_isolated_db=false
-  for var_name in $_MNDS_WORKTREE_ISOLATED_VARS; do
-    local value
-    value=$(__git_wt_env_value "$full_env_path" "$var_name")
-    case "$value" in
-      *_wt_*) has_isolated_db=true; break ;;
-      *_[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) has_isolated_db=true; break ;;
-    esac
-  done
+    [ -n "$recorded" ] && [ -n "$base" ] || continue
 
-  [ "$has_isolated_db" = false ] && return 0
+    expected="${base}_${hash}"
+    if [ "$recorded" != "$expected" ]; then
+      __echo_git "refusing to drop '$recorded': expected '$expected' for this worktree"
+      continue
+    fi
 
-  __echo_git "[elixir] dropping isolated databases..."
-  for env in dev test; do
-    case "$full_env_path" in
-      *.toml) (cd "$worktree_path" && MIX_ENV="$env" mise exec -- mix ecto.drop) 2>/dev/null || true ;;
-      *)      (cd "$worktree_path" && . "$full_env_path" && MIX_ENV="$env" mix ecto.drop) 2>/dev/null || true ;;
-    esac
+    for suffix in $_WT_DB_SUFFIXES; do
+      __git_wt_db_exists "${recorded}${suffix}" || continue
+      __echo_git "dropping ${recorded}${suffix}"
+      __git_wt_db_drop "${recorded}${suffix}" || true
+    done
   done
 }
 
-__git_wt_teardown_hook() {
+# Free the ports this worktree owns. Derived from its path, never read from the
+# marker, so a tampered file cannot point this at an arbitrary local service.
+__git_wt_teardown_ports() {
   local worktree_path="$1"
+  local hash port_count index name port pids
 
-  [ -z "$_MNDS_WORKTREE_PRE_TEARDOWN" ] && return 0
+  port_count=$(__git_wt_vars_by_strategy port | wc -l | tr -d ' ')
+  [ "$port_count" -gt 0 ] || return 0
 
-  local git_root
-  git_root=$(cd "$worktree_path" && git rev-parse --show-toplevel 2>/dev/null) || true
+  hash=$(__git_wt_hash_id "$(cd "$worktree_path" && pwd -P)")
+  index=0
 
-  __echo_git "running teardown hook..."
-  (cd "$worktree_path" && $_MNDS_WORKTREE_PRE_TEARDOWN "$worktree_path" "$git_root") || true
+  for name in $(__git_wt_vars_by_strategy port); do
+    port=$(__git_wt_derive_port "$hash" "$index" "$port_count")
+    index=$((index + 1))
+
+    pids=$(lsof -nP -tiTCP:"$port" -sTCP:LISTEN 2>/dev/null || true)
+    [ -n "$pids" ] || continue
+
+    __echo_git "freeing port $port ($name)"
+    # Unquoted: lsof returns one pid per line.
+    # shellcheck disable=SC2086
+    kill -9 $pids 2>/dev/null || true
+  done
 }
 
 __git_wt_teardown() {
   local worktree_path="$1"
+  local primary_root
 
-  __git_wt_teardown_elixir "$worktree_path"
-  __git_wt_teardown_hook "$worktree_path"
+  __git_wt_marker_exists "$worktree_path" || return 0
+  primary_root=$(__git_wt_primary_root)
+  __git_wt_load_config "$primary_root"
+
+  __git_wt_run_hook worktree-teardown "$worktree_path" "$primary_root" || true
+  __git_wt_teardown_databases "$worktree_path" "$primary_root"
+  __git_wt_teardown_ports "$worktree_path"
 }
 
 __git_wt_remove_worktree() {
   local worktree_path="$1"
 
   __echo_git "removing worktree at $worktree_path"
-  git worktree remove "$worktree_path" --force
+
+  # --force twice: the first covers a dirty tree, the second the untracked
+  # files provisioning generated (env file, marker, logs). git still refuses
+  # when submodules or nested checkouts are present, so fall back to removing
+  # the directory ourselves and pruning the administrative entry.
+  if ! git worktree remove --force --force "$worktree_path"; then
+    __echo_git "git declined; removing $worktree_path directly"
+    rm -rf "$worktree_path"
+    git worktree prune
+  fi
 }
 
 __git_wt_delete_local_branch() {

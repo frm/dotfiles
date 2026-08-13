@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+#
+# Runs before `git worktree-del` drops this worktree's databases, frees its
+# ports and removes it. Use it to release anything the generic tooling doesn't
+# know about — containers, simulators, launch agents.
+#
+# To enable: cp worktree-teardown.sample worktree-teardown && chmod +x worktree-teardown
+#
+# Arguments:
+#   $1  the worktree being removed
+#   $2  the primary worktree
+#
+# Failures are ignored: teardown always proceeds.
+
+set -e
+
+exit 0

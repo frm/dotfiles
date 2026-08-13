@@ -88,3 +88,6 @@ Temporary Items
 
 # pi notes
 .pi/notes
+
+# worktree identity, derived by git-worktree-add
+.worktree-state.json

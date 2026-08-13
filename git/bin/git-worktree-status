@@ -1,0 +1,87 @@
+#!/usr/bin/env sh
+# shows the current worktree's derived identity and server state
+# usage: git worktree-status
+
+set -e
+
+. "$DOTFILES/git/lib/worktree.sh"
+
+#
+# aux functions
+#
+
+__git_status_server_state() {
+  local port="$1"
+
+  if lsof -nP -tiTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
+    echo "running"
+  else
+    echo "stopped"
+  fi
+}
+
+__git_status_print_ports() {
+  local root="$1"
+  local name value
+
+  __git_wt_vars_by_strategy port | while IFS= read -r name; do
+    value=$(__git_status_value "$root" "$name")
+    [ -n "$value" ] || continue
+
+    printf "  %-16s http://localhost:%-6s %s\n" \
+      "$(__git_wt_port_label "$name")" "$value" "$(__git_status_server_state "$value")"
+  done
+}
+
+__git_status_print_vars() {
+  local root="$1"
+  local strategy="$2"
+  local name value
+
+  __git_wt_vars_by_strategy "$strategy" | while IFS= read -r name; do
+    value=$(__git_status_value "$root" "$name")
+    [ -n "$value" ] || continue
+
+    printf "  %-16s %s\n" "$(echo "$name" | tr '[:upper:]' '[:lower:]')" "$value"
+  done
+}
+
+# Provisioned worktrees report what they were given; primary reports what its
+# config resolves to.
+__git_status_value() {
+  local root="$1" name="$2"
+
+  if __git_wt_marker_exists "$root"; then
+    __git_wt_marker_var "$root" "$name"
+  else
+    __git_wt_resolve_env "$root" "$name"
+  fi
+}
+
+#
+# main script
+#
+
+root=$(git rev-parse --show-toplevel 2>/dev/null) || {
+  echo "[git]: must be run inside a git worktree" >&2
+  exit 1
+}
+primary_root=$(__git_wt_primary_root)
+__git_wt_load_config "$primary_root"
+
+if __git_wt_marker_exists "$root"; then
+  printf "%s  [%s]  databases %s\n" \
+    "$(basename "$root")" \
+    "$(__git_wt_marker_get "$root" .hash)" \
+    "$(__git_wt_marker_get "$root" .db_mode)"
+elif [ "$root" = "$primary_root" ]; then
+  printf "%s  [primary]\n" "$(basename "$root")"
+else
+  printf "%s  [unprovisioned]\n" "$(basename "$root")"
+  echo "Run 'git worktree-add' from the repo to provision it."
+fi
+
+echo
+__git_status_print_ports "$root"
+__git_status_print_vars "$root" database
+__git_status_print_vars "$root" unique

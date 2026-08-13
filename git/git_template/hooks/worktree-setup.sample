@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+#
+# Runs after `git worktree-add` has shared artifacts, derived this worktree's
+# identity and installed dependencies. Use it for whatever the generic tooling
+# can't know about this repo.
+#
+# To enable: cp worktree-setup.sample worktree-setup && chmod +x worktree-setup
+#
+# Arguments:
+#   $1  the new worktree's path
+#   $2  the source worktree it was created from
+#
+# Environment:
+#   _WT_HASH   this worktree's 8-char identity hash
+#   _WT_RESET  "true" when --reset was passed (databases were isolated)
+#
+# Failing (non-zero exit) marks setup as failed in the completion notification.
+
+set -e
+
+exit 0

@@ -7,6 +7,7 @@ Custom git setup: aliases, custom commands, worktree management, and the `g` wra
 ```
 git/
   bin/              Custom git subcommands (invoked as `git <name>` or `g <name>`)
+  lib/worktree.sh   Shared helpers for the worktree commands (sourced, not run)
   g.zsh             The `g()` wrapper function — handles cd for worktree/checkout commands
   completions.zsh   Zsh completions for g/git/hub, with branch completion for custom commands
   git.init          Shell init script — sources g.zsh, completions, adds bin/ to PATH
@@ -46,9 +47,58 @@ Follow the patterns in `git-worktree-add` and `git-worktree-del`:
 **Worktree-specific patterns:**
 - Branch path normalization: `__git_wt_normalize_branch_path` flattens deep paths (`a/b/c` → `a/b-c`).
 - Worktree path inference: `__git_wt_infer_worktree_path` handles being called from inside or outside a worktree.
-- Artifact copying: `__git_wt_cp_artifacts` copies build artifacts (deps, node_modules, .env) from the source tree.
-- Environment isolation: `__git_wt_setup_env` assigns unique ports and derived vars per worktree via hashing.
-- Project-specific hooks: `$_MNDS_WORKTREE_POST_SETUP` and `$_MNDS_WORKTREE_PRE_TEARDOWN` env vars allow per-project customization without editing the scripts.
+- Shared helpers live in `lib/worktree.sh` and are prefixed `__git_wt_`. Anything used by more than one command belongs there.
+
+## Worktree commands
+
+`worktree-add` shares the source worktree's artifacts, derives a per-worktree identity, and installs dependencies in the background. `worktree-del` reverses it. `worktree-list` and `worktree-status` report.
+
+### Sharing
+
+Artifacts are copied with `cp -ca` (APFS `clonefile`), so a multi-GB `_build` costs no disk and no data movement until one side is written. Copies run concurrently because cloning still walks every inode.
+
+What gets shared is mostly inferred. Language detection walks for marker files at any depth — `mix.exs`, `package.json`, `Cargo.toml`, `pyproject.toml` — and contributes both the paths to copy (`deps`, `_build`, `node_modules`, `target`, `.venv`) and the install command to run afterwards. A marker only counts as a project root when a lockfile sits beside it; otherwise it's a workspace member whose root installs on its behalf.
+
+`.elixir_ls` and `.expert` are copied without their `build/` subdirectory, which bakes in absolute paths.
+
+### Identity
+
+Each worktree hashes its own path into an 8-char id, then derives values from it. Bases always resolve from the **primary** worktree, so branching off a worktree yields `nexus_<hash>`, never `nexus_<hash>_<hash>`.
+
+Resolution goes through `mise env --json` for mise repos (it already merges config layers) and through sourcing `.envrc`/`.env` otherwise.
+
+Derived values are written to the worktree's env file — `mise.local.toml` for mise repos, `.envrc`/`.env` otherwise — and recorded in `.worktree-state.json` at the worktree root.
+
+### The marker file
+
+`.worktree-state.json` is written **last**, only once everything that can fail has succeeded, so it doubles as the "provisioned" flag. A worktree with a marker is skipped; a directory without one is resumed in place. It's gitignored globally.
+
+It is not trusted for destructive operations. Teardown recomputes the databases and ports a worktree owns from its path and primary's config, and refuses to act on a mismatch — the file is writable by anything, and a tampered value would otherwise steer a drop at a shared database.
+
+### Per-repo contract
+
+Four variables, read from the repo's resolved env. Most repos need one or none.
+
+| var | purpose |
+|---|---|
+| `_WT_VARS` | `NAME:strategy` pairs — see below |
+| `_WT_COPY` | extra paths to share, for what detection can't infer |
+| `_WT_ENV_FILE` | where derived values are written (auto-detected) |
+| `_WT_DB_PSQL` | psql command prefix (default `psql -h localhost -U postgres`) |
+
+Strategies:
+
+- `port` — assigned from the worktree's hash bucket, in declaration order. The first one declared is what `worktree-list` shows.
+- `unique` — primary's value plus `_<hash>`.
+- `database` — `unique`, plus lifecycle: `<base>_dev` and `<base>_test` are cloned from the source worktree on `--reset` and dropped on teardown. The var holds a **base name**; the `_dev`/`_test` suffixes are convention.
+
+Database cloning uses `CREATE DATABASE ... WITH TEMPLATE`, so an isolated worktree starts with real data rather than an empty migrated schema. The template is the source worktree's database, not primary's — branching off a worktree means its migrations are the ones that match. The marker is only flipped to `isolated` after every clone succeeds, so a failure leaves the worktree on the shared databases rather than pointing at ones that don't exist.
+
+### Hooks
+
+`worktree-setup` and `worktree-teardown` live in the shared git dir (`git rev-parse --git-common-dir`), so they're machine-local, per-repo, and never controlled by whatever branch a worktree has checked out. Non-executable `.sample` stubs are seeded there; `chmod +x` a copy to enable one. Setup hooks receive `_WT_HASH` and `_WT_RESET` in their environment.
+
+With language detection providing real defaults, a hook is only needed when a repo does something the generic tooling can't know about.
 
 ## The `g` Wrapper (`g.zsh`)
 

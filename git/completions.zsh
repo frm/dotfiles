@@ -10,6 +10,7 @@ _git_wrapper() {
   case ${words[2]} in
     co) __git_branches; _files ;;
     cpr|mpr|ppr|dl|del|wt|wtd) __git_branches ;;
+    wtl|wts) ;;
     *) _git ;;
   esac
 }

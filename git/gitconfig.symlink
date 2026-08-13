@@ -74,6 +74,8 @@
   untrack = update-index --assume-unchanged
   wt = worktree-add
   wtd = worktree-del
+  wtl = worktree-list
+  wts = worktree-status
 
   apf = !git-amend-push
   bb = !git-browse-branch

@@ -1,0 +1,74 @@
+#!/usr/bin/env sh
+# lists worktrees with their identity, database and server state
+# usage: git worktree-list
+
+set -e
+
+. "$DOTFILES/git/lib/worktree.sh"
+
+#
+# aux functions
+#
+
+# The first declared port is the one a repo's server listens on, so it stands
+# in for the worktree in the table.
+__git_list_headline_port() {
+  __git_wt_vars_by_strategy port | head -1
+}
+
+__git_list_server_state() {
+  local port="$1"
+
+  [ -n "$port" ] && [ "$port" != "-" ] || {
+    echo "-"
+    return
+  }
+
+  if lsof -nP -tiTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
+    echo "up"
+  else
+    echo "down"
+  fi
+}
+
+__git_list_row() {
+  local path="$1"
+  local primary_root="$2"
+  local port_var="$3"
+  local id port db branch name
+
+  if __git_wt_marker_exists "$path"; then
+    id=$(__git_wt_marker_get "$path" .hash)
+    port=$(__git_wt_marker_var "$path" "$port_var")
+    db=$(__git_wt_marker_get "$path" '.vars | to_entries | map(select(.value.strategy == "database")) | .[0].value.value')
+    [ -n "$db" ] && db="$db/$(__git_wt_marker_get "$path" .db_mode)"
+  elif [ "$path" = "$primary_root" ]; then
+    id="primary"
+    port=$(__git_wt_resolve_env "$path" "$port_var")
+    db=$(__git_wt_resolve_env "$path" "$(__git_wt_vars_by_strategy database | head -1)")
+  fi
+
+  branch=$(git -C "$path" symbolic-ref --short HEAD 2>/dev/null || echo "(detached)")
+  name=$(basename "$path")
+
+  printf "%-30s %-9s %-7s %-24s %-7s %s\n" \
+    "$name" "${id:--}" "${port:--}" "$db" "$(__git_list_server_state "$port")" "$branch"
+}
+
+#
+# main script
+#
+
+primary_root=$(__git_wt_primary_root)
+__git_wt_load_config "$primary_root"
+port_var=$(__git_list_headline_port)
+
+printf "%-30s %-9s %-7s %-24s %-7s %s\n" \
+  "WORKTREE" "ID" "PORT" "DATABASE" "SERVER" "BRANCH"
+
+git worktree list --porcelain \
+  | awk '/^worktree /{ print substr($0, 10) }' \
+  | while IFS= read -r path; do
+    [ -d "$path" ] || continue
+    __git_list_row "$path" "$primary_root" "$port_var"
+  done
