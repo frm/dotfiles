@@ -164,13 +164,27 @@ __git_wt_setup_vars() {
         value=$(__git_wt_derive_port "$hash" "$port_index" "$port_count")
         port_index=$((port_index + 1))
         ;;
-      unique|database)
+      unique)
         base=$(__git_wt_resolve_env "$primary_root" "$name")
         [ -n "$base" ] || {
           __echo_git "  $name: no value in primary, skipping"
           continue
         }
         value="${base}_${hash}"
+        ;;
+      database)
+        base=$(__git_wt_resolve_env "$primary_root" "$name")
+        [ -n "$base" ] || {
+          __echo_git "  $name: no value in primary, skipping"
+          continue
+        }
+        # Only a --reset worktree gets its own databases; without one the
+        # derived name would point at a database nothing ever created.
+        if [ "$_RESET" = true ]; then
+          value="${base}_${hash}"
+        else
+          value="$base"
+        fi
         ;;
     esac
 
@@ -201,6 +215,8 @@ __git_wt_isolate_databases() {
     return 1
   }
 
+  local cloned=0
+
   for name in $(__git_wt_vars_by_strategy database); do
     template=$(__git_wt_resolve_env "$source_root" "$name")
     target=$(__git_wt_marker_var "$worktree_path" "$name")
@@ -216,8 +232,32 @@ __git_wt_isolate_databases() {
 
       __echo_git "  cloning ${template}${suffix} -> ${target}${suffix}"
       __git_wt_db_clone "${template}${suffix}" "${target}${suffix}" || return 1
+      cloned=$((cloned + 1))
     done
   done
+
+  # Nothing cloned means the worktree has no databases of its own, so it must
+  # not be recorded as isolated.
+  [ "$cloned" -gt 0 ]
+}
+
+# Rewrite every database var back to primary's shared base. Echoes the updated
+# marker rows.
+__git_wt_reset_databases() {
+  local worktree_path="$1" primary_root="$2" vars_tsv="$3"
+  local env_path="$worktree_path/$(__git_wt_env_file "$worktree_path")"
+  local name base
+
+  for name in $(__git_wt_vars_by_strategy database); do
+    base=$(__git_wt_resolve_env "$primary_root" "$name")
+    [ -n "$base" ] || continue
+    __git_wt_upsert_env "$env_path" "$name" "$base"
+    __echo_git "  $name=$base"
+  done
+
+  printf '%s' "$vars_tsv" | awk -F'\t' -v OFS='\t' -v base="$base" '
+    $3 == "database" { $2 = base }
+    { print }'
 }
 
 #
@@ -496,7 +536,11 @@ if [ "$_RESET" = true ]; then
   if __git_wt_isolate_databases "$worktree_path" "$git_root"; then
     __git_wt_marker_write "$worktree_path" "$hash" isolated "$vars_tsv"
   else
-    __echo_git "database isolation failed; worktree is on the shared databases"
+    # Point the worktree back at the shared databases: its derived names were
+    # written ahead of the clone and now name databases that don't exist.
+    __echo_git "database isolation failed; falling back to the shared databases"
+    vars_tsv=$(__git_wt_reset_databases "$worktree_path" "$primary_root" "$vars_tsv")
+    __git_wt_marker_write "$worktree_path" "$hash" shared "$vars_tsv"
   fi
 fi
 
