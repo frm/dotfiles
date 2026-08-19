@@ -1,0 +1,98 @@
+#!/usr/bin/env zsh
+# builds a PR body from a commit message and the repo's PR template
+#
+# usage: git pr-body [-r rev] [-t template]
+#   -r: commit to take the body from (default: HEAD)
+#   -t: template path (default: auto-discovered)
+#
+# the commit body is pasted verbatim into the template's description section
+# (Description / Summary / What changed / Overview), replacing whatever
+# placeholder that section shipped with. every other section is kept as-is.
+#
+# fallbacks:
+#   no template            → the commit body alone
+#   no description section → the body, a rule, then the whole template
+#
+# prints to stdout. the PR title is not this script's job — it's the commit
+# subject, `git log -1 --pretty=format:%s`.
+
+set -e
+
+source "$DOTFILES/functions/helpers.zsh"
+
+__git_prb_find_template() {
+  local templates=(
+    ".github/pull_request_template.md"
+    ".github/PULL_REQUEST_TEMPLATE.md"
+    "pull_request_template.md"
+    "PULL_REQUEST_TEMPLATE.md"
+    "docs/pull_request_template.md"
+  )
+
+  for template in "${templates[@]}"; do
+    if [ -f "$template" ]; then
+      echo "$template"
+      return
+    fi
+  done
+}
+
+__git_prb_merge() {
+  local template="$1"
+  local body_file="$2"
+
+  awk -v bodyfile="$body_file" '
+    function emit_body(   line) {
+      print ""
+      while ((getline line < bodyfile) > 0) print line
+      close(bodyfile)
+      print ""
+    }
+
+    # the description section is where the commit body belongs. everything
+    # after its heading up to the next heading is placeholder prose written
+    # for the author, not content — drop it and paste the body instead.
+    !done && tolower($0) ~ /^#+[ \t]*(description|summary|what changed|overview)[ \t]*$/ {
+      print
+      emit_body()
+      done = 1
+      skipping = 1
+      next
+    }
+
+    skipping && /^#/ { skipping = 0 }
+    skipping { next }
+
+    { print }
+
+    END { if (!done) exit 3 }
+  ' "$template"
+}
+
+zparseopts -D -E -- r:=rev t:=template
+
+rev=${${(@)rev:#-r}:-HEAD}
+template=${(@)template:#-t}
+template=${template:-$(__git_prb_find_template)}
+
+body_file=$(mktemp)
+trap "rm -f '$body_file'" EXIT
+
+git log -1 --pretty=format:%b "$rev" | sed -e :a -e '/^\n*$/{$d;N;};/\n$/ba' > "$body_file"
+
+if [ ! -s "$body_file" ]; then
+  _mnds_pp_error "git" "commit $rev has no body" >&2
+  exit 1
+fi
+
+if [ -z "$template" ]; then
+  /bin/cat "$body_file"
+  exit 0
+fi
+
+if ! __git_prb_merge "$template" "$body_file"; then
+  _mnds_pp_warn "git" "no description section in $template, appending template" >&2
+  /bin/cat "$body_file"
+  echo "\n---\n"
+  /bin/cat "$template"
+fi

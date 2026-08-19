@@ -274,16 +274,9 @@ __git_ppr_create_pr() {
     pr_args+=(--fill)
   elif (( commit_count == 1 )); then
     _mnds_pp_info "git" "single commit + template, opening editor"
-    local title=$(git log -1 --pretty=format:"%s")
-    local body=$(git log -1 --pretty=format:"%b")
-    local template_content=$(/bin/cat "$template")
 
-    pr_args+=(--title "$title")
-    pr_args+=(--body "$body
-
----
-
-$template_content")
+    pr_args+=(--title "$(git log -1 --pretty=format:"%s")")
+    pr_args+=(--body "$(git pr-body -t "$template")")
     pr_args+=(--editor)
   else
     _mnds_pp_info "git" "multiple commits + template, interactive mode"
