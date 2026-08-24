@@ -1,9 +1,9 @@
 #!/usr/bin/env zsh
-# pi-update — install/upgrade @mariozechner/pi-coding-agent globally across all node environments
+# pi-update — install/upgrade @earendil-works/pi-coding-agent globally across all node environments
 
 source $DOTFILES/functions/helpers.zsh
 
-PACKAGE="@mariozechner/pi-coding-agent"
+PACKAGE="@earendil-works/pi-coding-agent"
 SPINNER=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
 
 BOLD=$(tput bold)
