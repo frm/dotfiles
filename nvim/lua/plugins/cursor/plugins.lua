@@ -7,19 +7,19 @@ require("lazy").setup({
   -----------------------------------------------------------------
 
   -- Behaviour
-  'derekprior/vim-trimmer',
-  'SirVer/ultisnips',
+  "derekprior/vim-trimmer",
+  "SirVer/ultisnips",
   {
-     'smoka7/hop.nvim',
-     version = "*",
-     opts = {
-       keys = 'etovxqpdygfblzhckisuran'
-     }
+    "smoka7/hop.nvim",
+    version = "*",
+    opts = {
+      keys = "etovxqpdygfblzhckisuran",
+    },
   },
 
   -- Functionality
-  'tpope/vim-abolish',
-  'tpope/vim-surround',
+  "tpope/vim-abolish",
+  "tpope/vim-surround",
   -- tpope is still the og but I can't use it with cursor since it doesn't
   -- handle interaction dialogs well. when an alternate doesn't exist, it hangs
   -- and I can't create it
@@ -28,22 +28,22 @@ require("lazy").setup({
   -- accepts automatic creation somehow
   { dir = "~/Developer/frm/vim-projectionist" },
 
-  'JoosepAlviste/nvim-ts-context-commentstring',
+  "JoosepAlviste/nvim-ts-context-commentstring",
 
   {
-    'numToStr/Comment.nvim',
+    "numToStr/Comment.nvim",
     lazy = false,
     config = function()
-      require('Comment').setup()
-    end
+      require("Comment").setup()
+    end,
   },
 
   -----------------------------------------------------------------
   -- Colours
   -----------------------------------------------------------------
 
-  'sainnhe/gruvbox-material',
-  'sainnhe/everforest',
-  { 'dracula/vim', name = 'dracula' },
-  { "catppuccin/nvim", name = "catppuccin", priority = 1000 }
+  "sainnhe/gruvbox-material",
+  "sainnhe/everforest",
+  { "dracula/vim", name = "dracula" },
+  { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
 })

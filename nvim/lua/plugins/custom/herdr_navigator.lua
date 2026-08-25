@@ -31,14 +31,18 @@ end
 local function navigate(wincmd, direction)
   local from = vim.api.nvim_get_current_win()
   vim.cmd("wincmd " .. wincmd)
-  if vim.api.nvim_get_current_win() ~= from then return end
+  if vim.api.nvim_get_current_win() ~= from then
+    return
+  end
 
   focus_herdr_pane(direction)
 end
 
 function M.setup()
   for _, spec in ipairs(DIRECTIONS) do
-    local handler = function() navigate(spec.wincmd, spec.direction) end
+    local handler = function()
+      navigate(spec.wincmd, spec.direction)
+    end
 
     vim.keymap.set("n", spec.key, handler, { silent = true, noremap = true })
     vim.keymap.set("t", spec.key, function()

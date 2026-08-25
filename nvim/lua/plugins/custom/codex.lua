@@ -8,7 +8,7 @@ local function startinsert_in_codex()
         for _, win in ipairs(vim.api.nvim_list_wins()) do
           if vim.api.nvim_win_get_buf(win) == buf then
             vim.api.nvim_set_current_win(win)
-            vim.cmd('startinsert')
+            vim.cmd("startinsert")
             return
           end
         end
@@ -18,7 +18,7 @@ local function startinsert_in_codex()
 end
 
 function M.toggle()
-  local codex = require('codex')
+  local codex = require("codex")
   local was_open = codex.is_open and codex.is_open()
   codex.toggle()
   if not was_open then
@@ -27,7 +27,7 @@ function M.toggle()
 end
 
 function M.focus()
-  local codex = require('codex')
+  local codex = require("codex")
   if not (codex.is_open and codex.is_open()) then
     codex.open()
   end
@@ -35,19 +35,19 @@ function M.focus()
 end
 
 function M.select_model()
-  local cache_path = vim.fn.expand('~/.codex/models_cache.json')
-  local file = io.open(cache_path, 'r')
+  local cache_path = vim.fn.expand("~/.codex/models_cache.json")
+  local file = io.open(cache_path, "r")
   if not file then
-    vim.notify('Codex models cache not found. Run /models in codex first.', vim.log.levels.WARN)
+    vim.notify("Codex models cache not found. Run /models in codex first.", vim.log.levels.WARN)
     return
   end
 
-  local content = file:read('*all')
+  local content = file:read("*all")
   file:close()
 
   local ok, data = pcall(vim.fn.json_decode, content)
   if not ok or not data.models then
-    vim.notify('Failed to parse models cache', vim.log.levels.ERROR)
+    vim.notify("Failed to parse models cache", vim.log.levels.ERROR)
     return
   end
 
@@ -56,11 +56,13 @@ function M.select_model()
     table.insert(models, m.slug)
   end
 
-  vim.ui.select(models, { prompt = 'Select Codex model:' }, function(selected)
-    if not selected then return end
+  vim.ui.select(models, { prompt = "Select Codex model:" }, function(selected)
+    if not selected then
+      return
+    end
 
-    local codex = require('codex')
-    local state = require('codex.state')
+    local codex = require("codex")
+    local state = require("codex.state")
 
     -- Kill existing job if running
     if state.job then
@@ -80,7 +82,9 @@ function M.select_model()
     -- Update config and reopen
     codex.setup({ model = selected })
     codex.open()
-    vim.schedule(function() vim.cmd('startinsert') end)
+    vim.schedule(function()
+      vim.cmd("startinsert")
+    end)
   end)
 end
 
@@ -107,7 +111,7 @@ function M.send()
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
 
   -- Open codex if not open
-  local codex = require('codex')
+  local codex = require("codex")
   if not (codex.is_open and codex.is_open()) then
     codex.open()
   end
@@ -124,7 +128,7 @@ function M.send()
           for _, win in ipairs(vim.api.nvim_list_wins()) do
             if vim.api.nvim_win_get_buf(win) == buf then
               vim.api.nvim_set_current_win(win)
-              vim.cmd('startinsert')
+              vim.cmd("startinsert")
               return
             end
           end

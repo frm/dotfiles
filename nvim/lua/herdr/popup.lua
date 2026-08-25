@@ -15,7 +15,9 @@ end
 
 local function herdr(...)
   local bin = vim.env.HERDR_BIN_PATH
-  if bin == nil or bin == "" then bin = "herdr" end
+  if bin == nil or bin == "" then
+    bin = "herdr"
+  end
 
   return vim.system({ bin, ... }):wait()
 end
@@ -37,7 +39,9 @@ local function selected_lines()
   local mode = vim.fn.visualmode()
   local from, to = vim.fn.getpos("'<"), vim.fn.getpos("'>")
   local lines = vim.api.nvim_buf_get_lines(0, from[2] - 1, to[2], false)
-  if #lines == 0 then return nil end
+  if #lines == 0 then
+    return nil
+  end
 
   if mode == "v" then
     -- A linewise-to-end selection reports a sentinel column, so clamp it to
@@ -51,7 +55,9 @@ local function selected_lines()
     end
   elseif mode == "\22" then
     local first, last = from[3], to[3]
-    if first > last then first, last = last, first end
+    if first > last then
+      first, last = last, first
+    end
     for i, line in ipairs(lines) do
       lines[i] = line:sub(first, last)
     end
@@ -77,7 +83,9 @@ end
 -- holds one instead of typing into whatever took its place.
 function M.send_selection()
   local lines, first, last = selected_lines()
-  if not lines then return end
+  if not lines then
+    return
+  end
 
   local header = ("file: %s:L%d-L%d\ncontent:\n"):format(relative_path(), first, last)
   local result = herdr("agent", "prompt", host_pane(), header .. table.concat(lines, "\n") .. "\n")

@@ -23,8 +23,8 @@ function M.zoom()
   else
     -- Save current layout and zoom
     state.prev_layout = vim.fn.winrestcmd()
-    vim.cmd("wincmd |")  -- maximize width
-    vim.cmd("wincmd _")  -- maximize height
+    vim.cmd("wincmd |") -- maximize width
+    vim.cmd("wincmd _") -- maximize height
     state.zoomed = true
   end
 end

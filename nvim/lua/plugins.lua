@@ -5,9 +5,9 @@ vim.g.mapleader = " "
 -- Local plugins (plugins/custom)
 -----------------------------------------------------------------
 
-local assistant = require('plugins.custom.assistant')
-local codex = require('plugins.custom.codex')
-require('plugins.custom.memorise').setup()
+local assistant = require("plugins.custom.assistant")
+local codex = require("plugins.custom.codex")
+require("plugins.custom.memorise").setup()
 
 -----------------------------------------------------------------
 -- Lazy plugins
@@ -15,75 +15,74 @@ require('plugins.custom.memorise').setup()
 
 require("lazy").setup({
   -- meta utils
-  { 'echasnovski/mini.nvim', version = false },
+  { "echasnovski/mini.nvim", version = false },
 
   -- gui
-  'christoomey/vim-tmux-navigator',
+  "christoomey/vim-tmux-navigator",
 
   {
-    'nvim-lualine/lualine.nvim',
-    dependencies = { 'nvim-tree/nvim-web-devicons' }
+    "nvim-lualine/lualine.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
   },
 
   {
-    'stevearc/aerial.nvim',
+    "stevearc/aerial.nvim",
     dependencies = {
-       "nvim-treesitter/nvim-treesitter",
-       "nvim-tree/nvim-web-devicons"
+      "nvim-treesitter/nvim-treesitter",
+      "nvim-tree/nvim-web-devicons",
     },
     config = function()
-      require('aerial').setup()
-    end
+      require("aerial").setup()
+    end,
   },
 
-
   {
-    'romgrk/barbar.nvim',
+    "romgrk/barbar.nvim",
     dependencies = {
-      'lewis6991/gitsigns.nvim',
-      'nvim-tree/nvim-web-devicons',
+      "lewis6991/gitsigns.nvim",
+      "nvim-tree/nvim-web-devicons",
     },
   },
 
   {
-    'nvim-tree/nvim-tree.lua',
-    dependencies = {'nvim-tree/nvim-web-devicons'},
+    "nvim-tree/nvim-tree.lua",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
     version = "*",
-    lazy = false
+    lazy = false,
   },
 
-  'sphamba/smear-cursor.nvim',
-  'gelguy/wilder.nvim',
-  'RRethy/vim-illuminate',
-  'wincent/terminus',
-  'voldikss/vim-floaterm',
-  { 'RRethy/vim-hexokinase', build = 'make hexokinase' },
+  "sphamba/smear-cursor.nvim",
+  "gelguy/wilder.nvim",
+  "RRethy/vim-illuminate",
+  "wincent/terminus",
+  "voldikss/vim-floaterm",
+  { "RRethy/vim-hexokinase", build = "make hexokinase" },
 
   -- behaviour
   {
-    'Wansmer/treesj',
-    dependencies = { 'nvim-treesitter/nvim-treesitter' }
+    "Wansmer/treesj",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
   },
 
   {
-    'kevinhwang91/nvim-ufo',
-    dependencies = 'kevinhwang91/promise-async'
+    "kevinhwang91/nvim-ufo",
+    dependencies = "kevinhwang91/promise-async",
   },
 
-  'JoosepAlviste/nvim-ts-context-commentstring',
+  "JoosepAlviste/nvim-ts-context-commentstring",
 
   {
-    'numToStr/Comment.nvim',
+    "numToStr/Comment.nvim",
     lazy = false,
     config = function()
-      require('Comment').setup()
-    end
+      require("Comment").setup()
+    end,
   },
 
   -- shadow behaviour
-  'derekprior/vim-trimmer',
-  'farmergreg/vim-lastplace',
-  'RRethy/nvim-treesitter-endwise',
+  "derekprior/vim-trimmer",
+  "farmergreg/vim-lastplace",
+  "RRethy/nvim-treesitter-endwise",
 
   {
     "HiPhish/rainbow-delimiters.nvim",
@@ -97,39 +96,39 @@ require("lazy").setup({
   },
 
   -- ide-nss/functionality
-  'tpope/vim-fugitive',
-  'tpope/vim-rhubarb',
-  'APZelos/blamer.nvim',
+  "tpope/vim-fugitive",
+  "tpope/vim-rhubarb",
+  "APZelos/blamer.nvim",
   {
-    'SirVer/ultisnips',
+    "SirVer/ultisnips",
     init = function()
       vim.g.UltiSnipsExpandOrJumpTrigger = "<C-j>"
       vim.g.UltiSnipsExpandTrigger = "<C-j>"
       vim.g.UltiSnipsJumpForwardTrigger = "<C-j>"
       vim.g.UltiSnipsJumpBackwardTrigger = "<C-k>"
-      vim.g.UltiSnipsSnippetDirectories = {vim.fn.expand("$HOME/.dotfiles/nvim/UltiSnips")}
-    end
+      vim.g.UltiSnipsSnippetDirectories = { vim.fn.expand("$HOME/.dotfiles/nvim/UltiSnips") }
+    end,
   },
-  'tpope/vim-projectionist',
-  'tpope/vim-abolish',
-  'tpope/vim-surround',
-  'vim-test/vim-test',
-  'stefandtw/quickfix-reflector.vim',
-  { 'mg979/vim-visual-multi', branch = 'master' },
+  "tpope/vim-projectionist",
+  "tpope/vim-abolish",
+  "tpope/vim-surround",
+  "vim-test/vim-test",
+  "stefandtw/quickfix-reflector.vim",
+  { "mg979/vim-visual-multi", branch = "master" },
 
   {
     "embear/vim-localvimrc",
     init = function()
       vim.g.localvimrc_whitelist = "^" .. vim.fn.expand("$HOME") .. "/Developer/.*"
-    end
+    end,
   },
 
   {
-     'smoka7/hop.nvim',
-     version = "*",
-     opts = {
-       keys = 'etovxqpdygfblzhckisuran'
-     }
+    "smoka7/hop.nvim",
+    version = "*",
+    opts = {
+      keys = "etovxqpdygfblzhckisuran",
+    },
   },
 
   -- Snacks.nvim
@@ -155,7 +154,12 @@ require("lazy").setup({
             keys = {
               ["<C-v>"] = { "edit_vsplit", mode = { "i", "n" } },
               ["<C-x>"] = { "edit_split", mode = { "i", "n" } },
-              ["<C-u>"] = { function() vim.api.nvim_set_current_line("") end, mode = { "i", "n" } },
+              ["<C-u>"] = {
+                function()
+                  vim.api.nvim_set_current_line("")
+                end,
+                mode = { "i", "n" },
+              },
             },
           },
         },
@@ -163,21 +167,75 @@ require("lazy").setup({
     },
     keys = {
       -- Files
-      { "<C-p>", function() Snacks.picker.files() end, desc = "Find files" },
-      { "<C-f>", function() Snacks.picker.resume({ source = "grep" }) end, desc = "Grep" },
+      {
+        "<C-p>",
+        function()
+          Snacks.picker.files()
+        end,
+        desc = "Find files",
+      },
+      {
+        "<C-f>",
+        function()
+          Snacks.picker.resume({ source = "grep" })
+        end,
+        desc = "Grep",
+      },
 
       -- Git
-      { "<localleader>gb", function() Snacks.picker.git_branches() end, desc = "Git branches" },
-      { "<localleader>gc", function() Snacks.picker.git_log() end, desc = "Git commits" },
+      {
+        "<localleader>gb",
+        function()
+          Snacks.picker.git_branches()
+        end,
+        desc = "Git branches",
+      },
+      {
+        "<localleader>gc",
+        function()
+          Snacks.picker.git_log()
+        end,
+        desc = "Git commits",
+      },
 
       -- LSP
-      { "<localleader>gr", function() Snacks.picker.lsp_references() end, desc = "LSP references" },
-      { "<localleader>gt", function() Snacks.picker.diagnostics() end, desc = "Diagnostics" },
-      { "<localleader>o", function() Snacks.picker.lsp_symbols() end, desc = "LSP symbols" },
+      {
+        "<localleader>gr",
+        function()
+          Snacks.picker.lsp_references()
+        end,
+        desc = "LSP references",
+      },
+      {
+        "<localleader>gt",
+        function()
+          Snacks.picker.diagnostics()
+        end,
+        desc = "Diagnostics",
+      },
+      {
+        "<localleader>o",
+        function()
+          Snacks.picker.lsp_symbols()
+        end,
+        desc = "LSP symbols",
+      },
 
       -- GitHub
-      { "<localleader>ghi", function() Snacks.picker.git_issues() end, desc = "GitHub issues" },
-      { "<localleader>ghp", function() Snacks.picker.git_prs() end, desc = "GitHub PRs" },
+      {
+        "<localleader>ghi",
+        function()
+          Snacks.picker.git_issues()
+        end,
+        desc = "GitHub issues",
+      },
+      {
+        "<localleader>ghp",
+        function()
+          Snacks.picker.git_prs()
+        end,
+        desc = "GitHub PRs",
+      },
     },
   },
 
@@ -192,18 +250,25 @@ require("lazy").setup({
       picker = "snacks",
     },
     keys = {
-      { "<localleader>ga", function() require("tiny-code-action").code_action() end, mode = { "n", "v" }, desc = "Code Action" },
+      {
+        "<localleader>ga",
+        function()
+          require("tiny-code-action").code_action()
+        end,
+        mode = { "n", "v" },
+        desc = "Code Action",
+      },
     },
   },
 
   -- Languages
 
-  'lucidstack/hex.vim',
-  'tjdevries/nlua.nvim',
+  "lucidstack/hex.vim",
+  "tjdevries/nlua.nvim",
 
   {
-    'MeanderingProgrammer/render-markdown.nvim',
-    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
+    "MeanderingProgrammer/render-markdown.nvim",
+    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
     ---@module 'render-markdown'
     ---@type render.md.UserConfig
     opts = {},
@@ -212,12 +277,12 @@ require("lazy").setup({
   -- AI
 
   {
-    'milanglacier/minuet-ai.nvim',
-    cond = os.getenv('NVIM_MINUET_ENABLED') ~= '0',
-    dependencies = { 'nvim-lua/plenary.nvim' },
+    "milanglacier/minuet-ai.nvim",
+    cond = os.getenv("NVIM_MINUET_ENABLED") ~= "0",
+    dependencies = { "nvim-lua/plenary.nvim" },
     config = function()
-      require('minuet').setup({
-        provider = os.getenv('NVIM_MINUET_PROVIDER') or 'claude',
+      require("minuet").setup({
+        provider = os.getenv("NVIM_MINUET_PROVIDER") or "claude",
         throttle = 1000,
         debounce = 500,
       })
@@ -257,15 +322,19 @@ require("lazy").setup({
           keys = {
             claude_quit = {
               "<C-q>",
-              function(self) self:hide() end,
+              function(self)
+                self:hide()
+              end,
               mode = "t",
-              desc = "Hide Claude terminal"
+              desc = "Hide Claude terminal",
             },
             claude_zoom = {
               "<C-w>z",
-              function() assistant.zoom() end,
+              function()
+                assistant.zoom()
+              end,
               mode = { "t", "n", "i" },
-              desc = "Toggle zoom"
+              desc = "Toggle zoom",
             },
           },
         },
@@ -274,89 +343,116 @@ require("lazy").setup({
   },
 
   {
-  'johnseth97/codex.nvim',
+    "johnseth97/codex.nvim",
     lazy = true,
-    cmd = { 'Codex', 'CodexToggle' },
+    cmd = { "Codex", "CodexToggle" },
     keys = {
-      { '<leader>cc', function() codex.toggle() end, desc = 'Toggle Codex', mode = { 'n', 't' } },
-      { '<leader>cf', function() codex.focus() end, desc = 'Focus Codex' },
-      { '<leader>cm', function() codex.select_model() end, desc = 'Select Codex model' },
-      { '<leader>cs', function() codex.send() end, desc = 'Send to Codex', mode = 'v' },
       {
-        '<C-w>z',
-        function() assistant.zoom() end,
-        desc = 'Toggle zoom',
-        mode = { 't', 'n' },
-        ft = 'codex',
+        "<leader>cc",
+        function()
+          codex.toggle()
+        end,
+        desc = "Toggle Codex",
+        mode = { "n", "t" },
+      },
+      {
+        "<leader>cf",
+        function()
+          codex.focus()
+        end,
+        desc = "Focus Codex",
+      },
+      {
+        "<leader>cm",
+        function()
+          codex.select_model()
+        end,
+        desc = "Select Codex model",
+      },
+      {
+        "<leader>cs",
+        function()
+          codex.send()
+        end,
+        desc = "Send to Codex",
+        mode = "v",
+      },
+      {
+        "<C-w>z",
+        function()
+          assistant.zoom()
+        end,
+        desc = "Toggle zoom",
+        mode = { "t", "n" },
+        ft = "codex",
       },
     },
     opts = {
       keymaps = {
         toggle = nil,
-        quit = '<C-q>',
+        quit = "<C-q>",
       },
-      model       = 'gpt-5.2-codex',
-      border      = 'rounded',
-      width       = 0.3,
-      height      = 0.3,
+      model = "gpt-5.2-codex",
+      border = "rounded",
+      width = 0.3,
+      height = 0.3,
       autoinstall = false,
-      panel       = true,
-      use_buffer  = false,
+      panel = true,
+      use_buffer = false,
     },
   },
 
-  'neovim/nvim-lspconfig',
+  "neovim/nvim-lspconfig",
 
-  'hrsh7th/nvim-cmp',
-  'hrsh7th/cmp-nvim-lsp',
-  'hrsh7th/cmp-buffer',
-  'hrsh7th/cmp-path',
-  'quangnguyen30192/cmp-nvim-ultisnips',
+  "hrsh7th/nvim-cmp",
+  "hrsh7th/cmp-nvim-lsp",
+  "hrsh7th/cmp-buffer",
+  "hrsh7th/cmp-path",
+  "quangnguyen30192/cmp-nvim-ultisnips",
 
   {
     "rachartier/tiny-inline-diagnostic.nvim",
     event = "LspAttach",
     priority = 1000,
     config = function()
-        require("tiny-inline-diagnostic").setup({
-            options = {
-                add_messages = {
-                    display_count = true,
-                },
-                multilines = {
-                    enabled = true,
-                },
-                show_source = {
-                    enabled = false,
-                },
-                enable_on_insert = false,
-            },
-          })
+      require("tiny-inline-diagnostic").setup({
+        options = {
+          add_messages = {
+            display_count = true,
+          },
+          multilines = {
+            enabled = true,
+          },
+          show_source = {
+            enabled = false,
+          },
+          enable_on_insert = false,
+        },
+      })
 
-       -- Disable Neovim's default virtual text diagnostics
-        vim.diagnostic.config({ virtual_text = false, signs = false })
+      -- Disable Neovim's default virtual text diagnostics
+      vim.diagnostic.config({ virtual_text = false, signs = false })
     end,
   },
 
-
   {
-    'nvim-treesitter/nvim-treesitter',
-    branch = 'main',
+    "nvim-treesitter/nvim-treesitter",
+    branch = "main",
     lazy = false,
-    build = ':TSUpdate',
+    build = ":TSUpdate",
   },
 
-  'williamboman/mason.nvim',
-  'williamboman/mason-lspconfig.nvim',
-  'WhoIsSethDaniel/mason-tool-installer.nvim',
-  'stevearc/conform.nvim',
-  'mfussenegger/nvim-lint',
-  'mfussenegger/nvim-dap',
-  'jay-babu/mason-nvim-dap.nvim',
+  "williamboman/mason.nvim",
+  "williamboman/mason-lspconfig.nvim",
+  "WhoIsSethDaniel/mason-tool-installer.nvim",
+  "stevearc/conform.nvim",
+  "mfussenegger/nvim-lint",
+  "mfussenegger/nvim-dap",
+  "jay-babu/mason-nvim-dap.nvim",
   { "folke/neodev.nvim", opts = {} }, -- required for nvim-dap-ui
   { "nvim-neotest/nvim-nio" }, -- required for nvim-dap-ui
-  'rcarriga/nvim-dap-ui',
-  'theHamsta/nvim-dap-virtual-text',
+  "rcarriga/nvim-dap-ui",
+  "theHamsta/nvim-dap-virtual-text",
   {
     "folke/which-key.nvim",
     event = "VeryLazy",
@@ -364,16 +460,16 @@ require("lazy").setup({
       vim.o.timeout = true
       vim.o.timeoutlen = 300
     end,
-    opts = {}
+    opts = {},
   },
 
   -----------------------------------------------------------------
   -- Colours
   -----------------------------------------------------------------
 
-  'sainnhe/gruvbox-material',
-  'sainnhe/everforest',
-  { 'dracula/vim', name = 'dracula' },
+  "sainnhe/gruvbox-material",
+  "sainnhe/everforest",
+  { "dracula/vim", name = "dracula" },
   { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
-  'lunarvim/horizon.nvim'
+  "lunarvim/horizon.nvim",
 })

@@ -33,8 +33,12 @@ vim.api.nvim_create_autocmd("FileType", {
   callback = function(args)
     for _, win in ipairs(vim.fn.win_findbuf(args.buf)) do
       pcall(vim.api.nvim_win_set_config, win, { border = "rounded" })
-      pcall(vim.api.nvim_set_option_value, "winhighlight",
-        "FloatBorder:Ui2MsgBorder,NormalFloat:Ui2MsgText", { win = win })
+      pcall(
+        vim.api.nvim_set_option_value,
+        "winhighlight",
+        "FloatBorder:Ui2MsgBorder,NormalFloat:Ui2MsgText",
+        { win = win }
+      )
     end
   end,
 })

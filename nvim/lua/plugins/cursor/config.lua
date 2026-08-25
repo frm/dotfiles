@@ -2,12 +2,12 @@
 -- Hop
 -----------------------------------------------------------------
 
-require('hop').setup()
+require("hop").setup()
 local hop = require("hop")
 
-vim.keymap.set('', 'f', function()
+vim.keymap.set("", "f", function()
   hop.hint_char1()
-end, { remap=true })
+end, { remap = true })
 
 -- these are the default configs for nvim but for vs code/cursor we just want
 -- the hint_char1 option, no need for the others. keeping them here for
@@ -31,4 +31,3 @@ end, { remap=true })
 --   hop.hint_char1({ direction = directions.BEFORE_CURSOR, current_line_only = true, hint_offset = 1 })
 -- end, { remap=true })
 --
-
