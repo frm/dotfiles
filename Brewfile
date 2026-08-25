@@ -1,8 +1,7 @@
-tap 'cantino/mcfly'
-tap 'eddieantonio/eddieantonio'
-tap 'datadog-labs/pack'
-tap 'nikitabobko/tap'
-tap 'FelixKratz/formulae'
+tap 'eddieantonio/eddieantonio', trusted: true
+tap 'datadog-labs/pack', trusted: true
+tap 'nikitabobko/tap', trusted: true
+tap 'FelixKratz/formulae', trusted: true
 
 brew 'ansible'
 brew 'asciinema'
@@ -16,7 +15,7 @@ brew 'cmake'
 brew 'coreutils'
 brew 'cowsay'
 brew 'curl'
-brew 'datadog-labs/pack/pup'
+brew 'datadog-labs/pack/pup', trusted: true
 brew 'diff-so-fancy'
 brew 'direnv'
 brew 'duf'
@@ -77,4 +76,5 @@ brew 'zsh'
 brew 'zsh-completions'
 brew 'zsh-fast-syntax-highlighting'
 
-cask 'nikitabobko/tap/aerospace'
+cask 'font-fira-code-nerd-font'
+cask 'nikitabobko/tap/aerospace', trusted: true

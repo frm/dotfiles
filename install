@@ -32,7 +32,7 @@ pp_info "install" "setting up Developer directory"
 mkdir -p ~/Developer/frm
 
 pp_info "install" "cloning chaos"
-git clone git@github.com:frm/chaos.git $DEV_CHAOS
+git clone --recurse-submodules -j8 git@github.com:frm/chaos.git $DEV_CHAOS
 
 pp_info "install" "cloning dotfiles"
 git clone --recurse-submodules -j8 git@github.com:frm/dotfiles.git $DEV_DOTFILES
@@ -41,7 +41,7 @@ cd $DEV_DOTFILES
 
 pp_info "install" "syncing submodules"
 git submodule update --init --recursive
-ln -s ../chaos/ai ai
+ln -sfn ../chaos/ai ai
 
 export DOTFILES="$DEV_DOTFILES"
 
@@ -175,7 +175,9 @@ mkdir -p ~/.gnupg
 gln -srf gnupg/gpg-agent.conf.symlink ~/.gnupg/gpg-agent.conf
 
 pp_info "fzf" "setting up fzf"
-$(brew --prefix)/opt/fzf/install
+# system/fzf.init already sources ~/.fzf.zsh, and ~/.zshrc is a symlink into
+# this repo — letting the installer edit it would dirty a tracked file.
+$(brew --prefix)/opt/fzf/install --key-bindings --completion --no-update-rc
 
 pp_info "nvim" "setting up environment"
 dirlink nvim ~/.config/
@@ -193,8 +195,10 @@ nvim --headless "+Lazy! sync" +qa
 pp_info "nvim" "registering remote plugins"
 nvim --headless "+UpdateRemotePlugins" +qa
 
-pp_info "luarocks" "setting up lua env"
-cat lua/deps | xargs -I {} luarocks install --server=https://luarocks.org/dev {}
+# Lazy! sync returns before mason's async package installs finish, so +qa kills
+# them mid-download. MasonToolsInstallSync blocks until they're done.
+pp_info "nvim" "installing mason packages"
+nvim --headless "+MasonToolsInstallSync" +qa
 
 pp_info "bat" "installing custom theme"
 mkdir -p "$(bat --config-dir)/themes/tranquility"
@@ -242,22 +246,6 @@ done
 pp_info "kitty" "setting configs"
 dirlink kitty ~/.config/kitty
 
-pp_info "fonts" "installing fira code"
-
-cd ~/Downloads
-mkdir fonts
-cd fonts
-
-for type in Light Retina Regular Medium Bold SemiBold; do
-  wget -O "FiraCode ${type} Nerd Font Complete Mono.ttf" \
-    "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/patched-fonts/FiraCode/$type/FiraCodeNerdFontMono-$type.ttf"
-  wget -O "FiraCode ${type} Nerd Font Complete.ttf" \
-    "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/patched-fonts/FiraCode/$type/FiraCodeNerdFont-$type.ttf"
-done
-
-mv ./*.ttf ~/Library/Fonts/
-cd $DEV_DOTFILES
-
 pp_info "ghostty" "setting configs"
 dirlink ghostty ~/.config/ghostty
 
@@ -300,6 +288,10 @@ cargo install --git ssh://git@github.com/frm/schism.git
 mise reshim
 
 pp_info "sentry" "installing sentry cli..."
-curl https://cli.sentry.dev/install -fsS | bash
+# sentry/sentry.init already sets PATH and fpath, and ai/skills is the source of
+# truth for agent skills — left to itself the installer duplicates all three and
+# writes into the repos through their symlinks.
+curl https://cli.sentry.dev/install -fsS | bash -s -- \
+  --no-modify-path --no-completions --no-agent-skills
 
 pp_success "install" "automatic config done!"
