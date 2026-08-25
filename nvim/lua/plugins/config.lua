@@ -1,5 +1,3 @@
--- LuaFormatter off
-
 local merge = function(t1, t2)
     for k, v in pairs(t2) do
         if (type(v) == "table") and (type(t1[k] or false) == "table") then
@@ -101,6 +99,7 @@ require("mason-tool-installer").setup({
     ensure_installed = {
         "prettierd",
         "eslint_d",
+        "stylua",
     },
 })
 
@@ -210,6 +209,7 @@ conform.setup({
     css = { "prettierd" },
     html = { "prettierd" },
     markdown = { "prettierd" },
+    lua = { "stylua" },
   },
 })
 
@@ -609,4 +609,3 @@ map('n', '<leader>av', ':AV<CR>')
 
 map('n', '<localleader>gbl', ':BlamerToggle<CR>')
 
--- LuaFormatter on

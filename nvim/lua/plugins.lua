@@ -1,5 +1,3 @@
--- LuaFormatter off
-
 -- Make sure to set `mapleader` before lazy so your mappings are correct
 vim.g.mapleader = " "
 
@@ -379,4 +377,3 @@ require("lazy").setup({
   { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
   'lunarvim/horizon.nvim'
 })
--- LuaFormatter on
