@@ -11,7 +11,9 @@
 #                   database  unique, plus clone <base>_dev/<base>_test on
 #                             create and drop them on teardown
 #   _WT_COPY      extra paths to share, for what language detection can't infer
-#   _WT_ENV_FILE  where derived values are written (auto-detected)
+#   _WT_ENV_FILE  where derived values are written (auto-detected). Space-
+#                 separated for a repo that needs more than one, each written
+#                 in the format its extension implies.
 #   _WT_DB_PSQL   psql command prefix (default: psql -h localhost -U postgres)
 
 _WT_ALWAYS_COPY=".env .envrc .pi"
@@ -109,9 +111,11 @@ __git_wt_is_mise_repo() {
   [ -f "$1/mise.toml" ] || [ -f "$1/.mise.toml" ]
 }
 
-# Where derived values get written. mise repos take the local overlay next to
+# Where derived values get written, as a space-separated list. Auto-detection
+# always answers with exactly one: mise repos take the local overlay next to
 # their config (matching its dotting); everything else prefers .envrc, which is
-# shell config, over .env, which apps tend to read directly.
+# shell config, over .env, which apps tend to read directly. A repo needing
+# several declares them itself.
 __git_wt_env_file() {
   local root="$1"
 
@@ -188,6 +192,32 @@ __git_wt_upsert_env() {
     *.toml) __git_wt_upsert_env_toml "$@" ;;
     *) __git_wt_upsert_env_shell "$@" ;;
   esac
+}
+
+# Upsert KEY into every env file the repo declared.
+__git_wt_write_env() {
+  local root="$1" env_files="$2" key="$3" value="$4"
+  local file
+
+  for file in $env_files; do
+    __git_wt_upsert_env "$root/$file" "$key" "$value"
+  done
+}
+
+__git_wt_trust_env() {
+  local root="$1" env_files="$2"
+  local file
+
+  command -v mise >/dev/null 2>&1 || return 0
+
+  for file in $env_files; do
+    case "$file" in
+      *.toml)
+        mise trust --yes "$root" >/dev/null 2>&1 || true
+        return 0
+        ;;
+    esac
+  done
 }
 
 __git_wt_upsert_env_shell() {

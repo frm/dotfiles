@@ -153,7 +153,7 @@ __git_wt_setup_vars() {
   local worktree_path="$1"
   local primary_root="$2"
   local hash="$3"
-  local env_path="$worktree_path/$(__git_wt_env_file "$worktree_path")"
+  local env_files="$(__git_wt_env_file "$worktree_path")"
   local name strategy base value port_index port_count
 
   port_count=$(__git_wt_vars_by_strategy port | wc -l | tr -d ' ')
@@ -189,18 +189,12 @@ __git_wt_setup_vars() {
         ;;
     esac
 
-    __git_wt_upsert_env "$env_path" "$name" "$value"
+    __git_wt_write_env "$worktree_path" "$env_files" "$name" "$value"
     __echo_git "  $name=$value"
     printf '%s\t%s\t%s\n' "$name" "$value" "$strategy"
   done
 
-  # mise refuses to load a config it hasn't been told to trust, and we just
-  # generated one.
-  case "$env_path" in
-    *.toml)
-      command -v mise >/dev/null 2>&1 && mise trust --yes "$worktree_path" >/dev/null 2>&1 || true
-      ;;
-  esac
+  __git_wt_trust_env "$worktree_path" "$env_files"
 }
 
 # Clone each `database` var's dev/test databases for this worktree. The
@@ -246,13 +240,13 @@ __git_wt_isolate_databases() {
 # marker rows.
 __git_wt_reset_databases() {
   local worktree_path="$1" primary_root="$2" vars_tsv="$3"
-  local env_path="$worktree_path/$(__git_wt_env_file "$worktree_path")"
+  local env_files="$(__git_wt_env_file "$worktree_path")"
   local name base
 
   for name in $(__git_wt_vars_by_strategy database); do
     base=$(__git_wt_resolve_env "$primary_root" "$name")
     [ -n "$base" ] || continue
-    __git_wt_upsert_env "$env_path" "$name" "$base"
+    __git_wt_write_env "$worktree_path" "$env_files" "$name" "$base"
     __echo_git "  $name=$base"
   done
 
