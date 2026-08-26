@@ -12,7 +12,7 @@
 #
 # Environment:
 #   _WT_HASH   this worktree's 8-char identity hash
-#   _WT_RESET  "true" when --reset was passed (databases were isolated)
+#   _WT_ISOLATE  "true" unless --shared was passed (databases were isolated)
 #
 # Failing (non-zero exit) marks setup as failed in the completion notification.
 

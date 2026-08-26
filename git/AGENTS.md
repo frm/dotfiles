@@ -90,13 +90,13 @@ Strategies:
 
 - `port` — assigned from the worktree's hash bucket, in declaration order. The first one declared is what `worktree-list` shows.
 - `unique` — primary's value plus `_<hash>`.
-- `database` — `unique`, plus lifecycle: `<base>_dev` and `<base>_test` are cloned from the source worktree on `--reset` and dropped on teardown. The var holds a **base name**; the `_dev`/`_test` suffixes are convention.
+- `database` — `unique`, plus lifecycle: `<base>_dev` and `<base>_test` are cloned from the source worktree by default (opt out with `--shared`) and dropped on teardown. The var holds a **base name**; the `_dev`/`_test` suffixes are convention.
 
 Database cloning uses `CREATE DATABASE ... WITH TEMPLATE`, so an isolated worktree starts with real data rather than an empty migrated schema. The template is the source worktree's database, not primary's — branching off a worktree means its migrations are the ones that match. The marker is only flipped to `isolated` after every clone succeeds, so a failure leaves the worktree on the shared databases rather than pointing at ones that don't exist.
 
 ### Hooks
 
-`worktree-setup` and `worktree-teardown` live in the shared git dir (`git rev-parse --git-common-dir`), so they're machine-local, per-repo, and never controlled by whatever branch a worktree has checked out. Non-executable `.sample` stubs are seeded there; `chmod +x` a copy to enable one. Setup hooks receive `_WT_HASH` and `_WT_RESET` in their environment.
+`worktree-setup` and `worktree-teardown` live in the shared git dir (`git rev-parse --git-common-dir`), so they're machine-local, per-repo, and never controlled by whatever branch a worktree has checked out. Non-executable `.sample` stubs are seeded there; `chmod +x` a copy to enable one. Setup hooks receive `_WT_HASH` and `_WT_ISOLATE` in their environment.
 
 With language detection providing real defaults, a hook is only needed when a repo does something the generic tooling can't know about.
 

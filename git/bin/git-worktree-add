@@ -1,11 +1,12 @@
 #!/usr/bin/env sh
 # creates a worktree for a branch, sharing build artifacts and deriving
 # per-worktree ports/identity
-# usage: git worktree-add [--reset] <branch>
-#        git worktree-add [--reset] --pr <number>
+# usage: git worktree-add [--shared] <branch>
+#        git worktree-add [--shared] --pr <number>
 #
-# --reset isolates the worktree's databases: each `database` var in _WT_VARS
-# gets its own <base>_<hash>_dev / _test cloned from the source worktree's.
+# Each `database` var in _WT_VARS gets its own <base>_<hash>_dev / _test cloned
+# from the source worktree's. --shared opts out, pointing the worktree at the
+# source's databases instead.
 
 set -e
 
@@ -64,16 +65,16 @@ __git_wt_parse_opts_from_pr() {
   echo "$branch_name"
 }
 
-# Parse opts into globals rather than echoing: --reset has to outlive the call,
+# Parse opts into globals rather than echoing: --shared has to outlive the call,
 # which it wouldn't in a command substitution's subshell.
-_RESET=false
+_ISOLATE=true
 _BRANCH_NAME=""
 
 __git_wt_parse_opts() {
   while [ $# -gt 0 ]; do
     case $1 in
-      --reset|-r)
-        _RESET=true
+      --shared|-s)
+        _ISOLATE=false
         shift
         ;;
       --pr)
@@ -178,9 +179,9 @@ __git_wt_setup_vars() {
           __echo_git "  $name: no value in primary, skipping"
           continue
         }
-        # Only a --reset worktree gets its own databases; without one the
-        # derived name would point at a database nothing ever created.
-        if [ "$_RESET" = true ]; then
+        # A --shared worktree keeps the source's databases; deriving a name
+        # there would point at a database nothing ever created.
+        if [ "$_ISOLATE" = true ]; then
           value="${base}_${hash}"
         else
           value="$base"
@@ -442,7 +443,7 @@ __git_wt_setup_async() {
     __git_wt_install_deps "$worktree_path" || _wt_ok=false
 
     if [ "$_wt_ok" = true ]; then
-      _WT_HASH="$hash" _WT_RESET="$_RESET" \
+      _WT_HASH="$hash" _WT_ISOLATE="$_ISOLATE" \
         __git_wt_run_hook worktree-setup "$worktree_path" "$git_root" || _wt_ok=false
     fi
 
@@ -490,8 +491,8 @@ branch_name="$_BRANCH_NAME"
 
 if [ -z "$branch_name" ]; then
   __echo_git "branch name required"
-  echo "usage: git worktree-add [--reset] <branch>" >&2
-  echo "       git worktree-add [--reset] --pr <number>" >&2
+  echo "usage: git worktree-add [--shared] <branch>" >&2
+  echo "       git worktree-add [--shared] --pr <number>" >&2
   exit 1
 fi
 
@@ -531,7 +532,7 @@ vars_tsv=$(__git_wt_setup_vars "$worktree_path" "$primary_root" "$hash")
 # everything that can fail has succeeded.
 __git_wt_marker_write "$worktree_path" "$hash" shared "$vars_tsv"
 
-if [ "$_RESET" = true ]; then
+if [ "$_ISOLATE" = true ]; then
   __echo_git "isolating databases:"
   if __git_wt_isolate_databases "$worktree_path" "$git_root"; then
     __git_wt_marker_write "$worktree_path" "$hash" isolated "$vars_tsv"
