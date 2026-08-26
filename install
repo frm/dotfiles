@@ -249,11 +249,6 @@ dirlink kitty ~/.config/kitty
 pp_info "ghostty" "setting configs"
 dirlink ghostty ~/.config/ghostty
 
-# herdr lives in chaos, not here: its keymap, worktree scripts, and plugins are
-# wired to nexus and pi, so it ships and installs with them.
-pp_info "herdr" "setting configs"
-$DEV_CHAOS/herdr/bin/install
-
 pp_info "aerospace" "setting configs"
 gln -srf aerospace/aerospace.toml.symlink ~/.aerospace.toml
 
@@ -271,9 +266,10 @@ cp -r ai/skills/* ~/.codex/skills/
 
 cp ai/me.md.sample ai/me.md
 
-# pi lives in chaos, alongside the extensions and nexus client it wires up.
-pp_info "pi" "setting configs"
-$DEV_CHAOS/pi/install
+# pi and herdr live in chaos, alongside the nexus daemon and atlas they're wired
+# to, so chaos installs all four together and offers its service auth at the end.
+pp_info "chaos" "installing"
+$DEV_CHAOS/bin/install
 
 # rtk ignores XDG_CONFIG_HOME on macOS, so its config only loads from here.
 pp_info "rtk" "setting configs"
