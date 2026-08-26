@@ -18,3 +18,9 @@ macos-icon = glass
 
 keybind = global:cmd+ctrl+t=toggle_quick_terminal
 
+# Send ctrl+Home/End instead of the default ctrl+a / ctrl+e: ctrl+a is herdr's
+# prefix, so it never reaches the app underneath. Bare Home/End is no good
+# either — pi's fullscreen TUI binds those to scroll top/bottom.
+keybind = super+arrow_left=esc:[1;5H
+keybind = super+arrow_right=esc:[1;5F
+
