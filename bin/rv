@@ -1,0 +1,51 @@
+#!/usr/bin/env sh
+set -e
+# rv — review a PR with pi's review-pr skill, from a PR number or URL
+
+#
+# aux functions
+#
+
+__rv_echo() {
+  echo "[rv]: $1" >&2
+}
+
+__rv_print_usage() {
+  echo "usage: rv <pr-number|pr-url>" >&2
+  exit 1
+}
+
+__rv_resolve_url() {
+  ref="$1"
+
+  case "$ref" in
+    http://*|https://*)
+      echo "$ref"
+      return 0
+      ;;
+  esac
+
+  case "$ref" in
+    *[!0-9]*|'')
+      __rv_echo "not a PR number or URL: $ref"
+      exit 1
+      ;;
+  esac
+
+  gh pr view "$ref" --json url --jq .url
+}
+
+#
+# main
+#
+
+main() {
+  [ $# -eq 1 ] || __rv_print_usage
+
+  url=$(__rv_resolve_url "$1")
+
+  __rv_echo "reviewing $url"
+  exec pi "/skill:review-pr $url"
+}
+
+main "$@"
