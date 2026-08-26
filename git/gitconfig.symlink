@@ -101,3 +101,5 @@
   diffFilter = schism --no-pager
 [rebase]
 	updateRefs = true
+[gpg "ssh"]
+	allowedSignersFile = /Users/fernandomendes/.ssh/allowed_signers
