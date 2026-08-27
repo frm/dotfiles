@@ -117,6 +117,14 @@ Key aliases:
 
 Most single-letter aliases map to standard git commands (`a`=add, `b`=branch, `c`=commit, etc.).
 
+### The `diff.elixir.xfuncname` override
+
+`gitconfig.symlink` redefines the `elixir` diff driver's funcname regex. Git ships one built in, but its bundled TRE regex engine segfaults on it for some multi-file `.ex` diffs — `tre_match` → `ff_regexp` → `get_func_line` → `xdl_emit_diff`, SIGSEGV, empty output. Single-file diffs of the same commits succeed, so it only shows up on real review-sized ranges.
+
+Repro before the override: `git diff 59ba377fb5...32462d2f95` in `RiverFinancial/alto` (PR #15534) exits 139. Affects Homebrew git 2.55.0 and Apple git 2.50.1 alike, so it's upstream, not a local build.
+
+The replacement regex covers the same `def*`/`describe`/`test`/`setup` forms and produces correct hunk headers. Remove it once upstream git fixes the crash.
+
 ## Completions (`completions.zsh`)
 
 Custom completions for `g`, `git`, and `hub`. Commands that take branches (`co`, `dl`, `wt`, `wtd`, etc.) get branch name completion via `__git_branches`. Everything else falls through to the default `_git` completer.

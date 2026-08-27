@@ -25,6 +25,11 @@
   defaultBranch = main
 [diff]
   tool = nvimdiff
+[diff "elixir"]
+  # Overrides git's builtin elixir funcname regex, which segfaults its bundled
+  # TRE engine (tre_match -> ff_regexp -> get_func_line) on some multi-file .ex
+  # diffs. Repro: alto 59ba377fb5...32462d2f95. Drop this once git ships a fix.
+  xfuncname = "^[ \t]*((def|defp|defmacro|defmacrop|defmodule|defprotocol|defimpl|defstruct|defdelegate|defguard|defguardp|defexception|describe|test|setup)[ \t(].*)$"
 [difftool]
   prompt = false
 [difftool "nvimdiff"]
