@@ -1,6 +1,16 @@
 export FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
 export FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
 
+# Homebrew leaves its share dirs group-writable, which compaudit rejects
+for dir in \
+  "$(brew --prefix)/share" \
+  "$(brew --prefix)/share/zsh" \
+  "$(brew --prefix)/share/zsh/site-functions" \
+  "$(brew --prefix)/share/zsh-completions"; do
+  [[ -d $dir && -w $dir ]] && chmod g-w,o-w "$dir" 2>/dev/null
+done
+unset dir
+
 autoload -Uz compinit
 
 # Smarter compinit load
