@@ -136,7 +136,10 @@ __git_wt_attach() {
     git worktree add --track "$worktree_path" -b "$branch_name" "origin/$branch_name"
   else
     # new branch off the current worktree's HEAD, carrying its commits
+    local parent=$(git rev-parse --abbrev-ref HEAD)
+
     git worktree add "$worktree_path" -b "$branch_name"
+    git config "branch.$branch_name.parent" "$parent"
   fi
 }
 

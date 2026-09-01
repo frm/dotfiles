@@ -1,0 +1,93 @@
+#!/usr/bin/env zsh
+# rebases the current branch onto its parent branch in a stack
+#
+# usage: git rebase-parent [-i] [parent]
+#   -i:     interactive rebase
+#   parent: branch to rebase onto (default: git parent-branch)
+#
+# the parent is a local branch you own, so this targets the local ref and never
+# fetches — the point is to replay onto the version you just amended. use
+# 'git rbm' when the branch sits directly on main.
+
+set -e
+
+source $DOTFILES/functions/helpers.zsh
+
+# `!` git aliases export these pinned to the calling worktree.
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE
+
+#
+# aux functions
+#
+
+__git_rbp_is_main() {
+  [[ "$1" == "main" || "$1" == "master" ]]
+}
+
+__git_rbp_validate() {
+  local parent="$1"
+  local branch="$2"
+
+  if [[ "$parent" == "$branch" ]]; then
+    _mnds_pp_error "git" "$branch is its own parent, nothing to rebase onto"
+    return 1
+  fi
+
+  if __git_rbp_is_main "$parent"; then
+    _mnds_pp_error "git" "$branch sits directly on $parent, use 'git rbm'"
+    return 1
+  fi
+
+  if ! git-branch-check "$parent"; then
+    _mnds_pp_error "git" "parent branch '$parent' doesn't exist locally"
+    return 1
+  fi
+}
+
+__git_rbp_abort_on_conflict() {
+  _mnds_pp_error "git" "rebase stopped on conflicts"
+  _mnds_pp_neutral "git" "resolve them, 'git add' each file, then 'git rbc' — or 'git rb --abort' to bail"
+  exit 1
+}
+
+__git_rbp_rebase() {
+  local parent="$1"
+  local interactive="$2"
+  local incoming=$(git rev-list --count "HEAD..$parent")
+
+  if [[ -n "$interactive" ]]; then
+    _mnds_pp_info "git" "interactive rebase onto $parent ($incoming new commits)..."
+    git rebase -i "$parent" || __git_rbp_abort_on_conflict
+    return
+  fi
+
+  if (( incoming == 0 )); then
+    _mnds_pp_info "git" "already up to date with $parent"
+    return 0
+  fi
+
+  _mnds_pp_info "git" "rebasing onto $parent ($incoming new commits)..."
+  git rebase "$parent" || __git_rbp_abort_on_conflict
+}
+
+#
+# main script
+#
+
+main() {
+  zparseopts -D -E -- i=interactive
+
+  local branch=$(git rev-parse --abbrev-ref HEAD)
+
+  local parent=$1
+  [[ -n "$parent" ]] || parent=$(git-parent-branch) || return 1
+
+  _mnds_pp_info "git" "parent branch: $parent"
+
+  __git_rbp_validate "$parent" "$branch" || return 1
+  __git_rbp_rebase "$parent" "$interactive"
+
+  _mnds_pp_success "git" "$branch is up to date with $parent"
+}
+
+main "$@"

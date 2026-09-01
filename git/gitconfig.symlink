@@ -101,6 +101,7 @@
   pb = !git-parent-branch
   ppr = !git-push-pr
   rbm = !git-rebase-main
+  rbp = !git-rebase-parent
   pr = !git-pr
 [interactive]
   diffFilter = schism --no-pager

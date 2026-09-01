@@ -1,37 +1,116 @@
 #!/usr/bin/env zsh
 # find the parent branch for HEAD or -b
+#
+# usage: git parent-branch [-b branch]
+#   -b: branch to resolve the parent of (default: HEAD)
+#
+# resolution goes config, then fork point, then merge-base topology. the config
+# entry is written by worktree-add and can be set by hand:
+#
+#   git config branch.<name>.parent <parent>
 
 source "$DOTFILES/functions/helpers.zsh"
 
-zparseopts -- {b,-branch}:=branch
+#
+# aux functions
+#
 
-if (( $#branch )); then
-  branch=$branch[2]
-else
-  branch=$(git rev-parse --abbrev-ref HEAD)
-fi
-
-get_parent_branch() {
-  # attempt via reflog's branch checkout history
-  parent=$(git reflog show --date=iso "$branch" \
-    | awk '/checkout: moving from/ {print $6; exit}')
-
-  if [ -z "$parent" ]; then
-    # attempt via reflog's full checkout history
-    parent=$(git reflog show --date=iso \
-      | grep "$branch" \
-      | grep checkout \
-      | tail -n 1 \
-      | awk '{print $8; exit}')
-  fi
-
-  if [ -n "$parent" ]; then
-    echo "$parent"
-    return 0
-  fi
-
-  _mnds_pp_error "git" "couldn't determine parent branch" 1>&2
-  return 1
+__git_pb_from_config() {
+  git config --get "branch.$1.parent"
 }
 
-echo "$(get_parent_branch)"
+# the commit a branch was created at, from the oldest entry in its own reflog.
+# empty for branches whose reflog has aged out or predates the clone.
+__git_pb_fork_commit() {
+  git reflog show "$1" --format='%H %gs' 2>/dev/null \
+    | awk '/branch: Created from/ {commit = $1} END {print commit}'
+}
+
+# of the branches holding a commit, the nearest one — fewest commits from there
+# to its tip. seeded with the fork point this names the parent exactly; seeded
+# with a merge-base it can't tell a parent from a sibling, so it's only ever
+# called with one candidate set at a time.
+__git_pb_nearest_containing() {
+  local commit="$1"
+  local branch="$2"
+
+  git branch --contains "$commit" --format='%(refname:short)' | while read -r candidate; do
+    [[ "$candidate" != "$branch" ]] || continue
+
+    echo "$(git rev-list --count $commit..$candidate) $candidate"
+  done | sort -k1,1n -k2,2 | head -n 1 | cut -d' ' -f2
+}
+
+__git_pb_from_fork_point() {
+  local branch="$1"
+  local fork=$(__git_pb_fork_commit "$branch")
+
+  [[ -n "$fork" ]] || return 0
+
+  __git_pb_nearest_containing "$fork" "$branch"
+}
+
+__git_pb_base_distance() {
+  git rev-list --count "$1..$2" 2>/dev/null
+}
+
+__git_pb_infer_base() {
+  if git-branch-check main; then
+    echo "main"
+  elif git-branch-check master; then
+    echo "master"
+  fi
+}
+
+# fallback for when the reflog is gone. the parent is the branch we diverged
+# from most recently, so the one whose merge-base with us is the fewest commits
+# back. a child branch has the same merge-base, so candidates further from the
+# base branch than we are get dropped.
+__git_pb_from_topology() {
+  local branch="$1"
+  local tip=$(git rev-parse "$branch")
+  local base=$(__git_pb_infer_base)
+  local reach=$(__git_pb_base_distance "$base" "$branch")
+
+  git branch --format='%(refname:short)' | while read -r candidate; do
+    [[ "$candidate" != "$branch" ]] || continue
+
+    local merge_base=$(git merge-base "$candidate" "$branch" 2>/dev/null)
+    [[ -n "$merge_base" && "$merge_base" != "$tip" ]] || continue
+
+    local distance=$(__git_pb_base_distance "$base" "$candidate")
+    [[ -z "$reach" || -z "$distance" || $distance -lt $reach ]] || continue
+
+    echo "$(git rev-list --count $merge_base..$branch) $candidate"
+  done | sort -k1,1n -k2,2 | head -n 1 | cut -d' ' -f2
+}
+
+__git_pb_resolve() {
+  local branch="$1"
+
+  local parent=$(__git_pb_from_config "$branch")
+  [[ -n "$parent" ]] || parent=$(__git_pb_from_fork_point "$branch")
+  [[ -n "$parent" ]] || parent=$(__git_pb_from_topology "$branch")
+
+  if [[ -z "$parent" ]]; then
+    _mnds_pp_error "git" "couldn't determine parent branch" >&2
+    return 1
+  fi
+
+  echo "$parent"
+}
+
+#
+# main script
+#
+
+main() {
+  zparseopts -D -E -- {b,-branch}:=branch
+
+  local target=${branch[2]}
+  [[ -n "$target" ]] || target=$(git rev-parse --abbrev-ref HEAD)
+
+  __git_pb_resolve "$target"
+}
+
+main "$@"
