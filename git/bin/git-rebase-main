@@ -1,8 +1,15 @@
 #!/usr/bin/env zsh
 # rebases the current branch onto the latest origin/<destination>
 #
-# usage: git rebase-main [destination]
+# usage: git rebase-main [--stack] [--reattach] [destination]
 #   destination: branch to rebase onto (default: main, or master)
+#   --stack:     also move the stack's branch refs held by other worktrees
+#   --reattach:  put detached worktrees back on their branches
+#
+# git's --update-refs skips branches checked out in a worktree, which is every
+# branch of a stack here. --stack detaches those worktrees first so the refs
+# move, then reattaches them. a rebase that stops on conflicts leaves them
+# detached until --reattach runs, since the refs only move once it finishes.
 #
 # the local destination ref is fast-forwarded as a convenience, but the rebase
 # always targets origin/<destination>, so a destination that can't advance
@@ -76,7 +83,77 @@ __git_rbm_refusal_reason() {
 __git_rbm_abort_on_conflict() {
   _mnds_pp_error "git" "rebase stopped on conflicts"
   _mnds_pp_neutral "git" "resolve them, 'git add' each file, then 'git rbc' — or 'git rb --abort' to bail"
+
+  [[ -f "$(__git_rbm_state_file)" ]] \
+    && _mnds_pp_neutral "git" "worktrees stay detached until you run 'git rbm --reattach' afterwards"
+
   exit 1
+}
+
+#
+# stack detaching
+#
+
+__git_rbm_state_file() {
+  echo "$(git rev-parse --git-common-dir)/rbm-stack-detached"
+}
+
+# the branches --update-refs would move: everything reachable from HEAD but not
+# from the destination. one that has advanced past its fork point drops out,
+# which is correct — the rebase wouldn't move it either.
+__git_rbm_stack_branches() {
+  local destination="$1"
+
+  comm -23 \
+    <(git branch --format='%(refname:short)' --merged HEAD | sort) \
+    <(git branch --format='%(refname:short)' --merged "$destination" | sort)
+}
+
+__git_rbm_detach() {
+  local destination="$1"
+  local current=$(git rev-parse --show-toplevel)
+  local state=$(__git_rbm_state_file)
+
+  rm -f "$state"
+
+  local stacked worktree
+
+  for stacked in $(__git_rbm_stack_branches "$destination"); do
+    worktree=$(__git_rbm_worktree_of "$stacked")
+
+    [[ -n "$worktree" && "$worktree" != "$current" ]] || continue
+
+    _mnds_pp_neutral "git" "  detaching $stacked"
+    git -C "$worktree" checkout --quiet --detach
+    printf '%s\t%s\n' "$worktree" "$stacked" >> "$state"
+  done
+}
+
+# a worktree whose checkout fails keeps its line, so a later --reattach retries
+# only what's left.
+__git_rbm_reattach() {
+  local state=$(__git_rbm_state_file)
+
+  [[ -f "$state" ]] || return 0
+
+  local pending=$(mktemp)
+  local detached stacked
+
+  while IFS=$'\t' read -r detached stacked; do
+    [[ -n "$detached" && -n "$stacked" ]] || continue
+
+    if git -C "$detached" checkout --quiet "$stacked" 2>/dev/null; then
+      _mnds_pp_neutral "git" "  reattached $stacked"
+      continue
+    fi
+
+    _mnds_pp_warn "git" "left $stacked detached: $detached has changes in the way"
+    _mnds_pp_neutral "git" "  stash or commit them, then 'git -C $detached checkout $stacked'"
+    printf '%s\t%s\n' "$detached" "$stacked" >> "$pending"
+  done < "$state"
+
+  rm -f "$state"
+  [[ -s "$pending" ]] && mv "$pending" "$state" || rm -f "$pending"
 }
 
 __git_rbm_rebase() {
@@ -104,6 +181,14 @@ __git_rbm_rebase() {
 #
 
 main() {
+  zparseopts -D -E -- -stack=stack -reattach=reattach
+
+  if [[ -n "$reattach" ]]; then
+    _mnds_pp_info "git" "reattaching worktrees..."
+    __git_rbm_reattach
+    return
+  fi
+
   local destination=$1
   [[ -n "$destination" ]] || destination=$(__git_rbm_infer_destination)
 
@@ -115,7 +200,14 @@ main() {
   __git_rbm_advance_destination "$destination" \
     || _mnds_pp_warn "git" "left local $destination alone: $(__git_rbm_refusal_reason $destination)"
 
+  if [[ -n "$stack" ]]; then
+    _mnds_pp_info "git" "detaching stack worktrees so their refs can move..."
+    __git_rbm_detach "$destination"
+  fi
+
   __git_rbm_rebase "$destination"
+
+  [[ -n "$stack" ]] && __git_rbm_reattach
 
   _mnds_pp_success "git" "$branch is up to date with origin/$destination"
 }
