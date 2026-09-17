@@ -45,6 +45,7 @@
   allow = always
 [gpg]
   program = /opt/homebrew/bin/gpg
+	format = ssh
 [hub]
   protocol = ssh
 [advice]
