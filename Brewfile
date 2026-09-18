@@ -77,4 +77,5 @@ brew 'zsh-completions'
 brew 'zsh-fast-syntax-highlighting'
 
 cask 'font-fira-code-nerd-font'
+cask 'font-monaspace-nf'
 cask 'nikitabobko/tap/aerospace', trusted: true
