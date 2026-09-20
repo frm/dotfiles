@@ -78,6 +78,8 @@ Temporary Items
 # ai plans
 .ai/plans
 .ai/canvas
+.ai/executions/
+.ai/research/
 
 # locally cached code reviews
 .ai/reviews
