@@ -5,13 +5,18 @@
 #   -r: commit to take the body from (default: HEAD)
 #   -t: template path (default: auto-discovered)
 #
-# the commit body is pasted verbatim into the template's description section
-# (Description / Summary / What changed / Overview), replacing whatever
-# placeholder that section shipped with. every other section is kept as-is.
+# labeled blocks in the commit body (`Why:`, `How:`) are pasted into the
+# template sections with matching headings, replacing their placeholders.
+# labels and headings match through aliases: Why ↔ Motivation / Context /
+# Problem / Background, How ↔ What / What changed / Changes / Implementation /
+# Approach / Solution. every other section is kept as-is.
 #
 # fallbacks:
-#   no template            → the commit body alone
-#   no description section → the body, a rule, then the whole template
+#   a block has no matching section → the whole body goes into the description
+#                                     section (Description / Summary /
+#                                     What changed / Overview)
+#   no template                     → the commit body alone
+#   no description section          → the body, a rule, then the whole template
 #
 # prints to stdout. the PR title is not this script's job — it's the commit
 # subject, `git log -1 --pretty=format:%s`.
@@ -42,30 +47,89 @@ __git_prb_merge() {
   local body_file="$2"
 
   awk -v bodyfile="$body_file" '
-    function emit_body(   line) {
-      print ""
-      while ((getline line < bodyfile) > 0) print line
+    function trim(s) {
+      sub(/^[ \t]+/, "", s)
+      sub(/[ \t]+$/, "", s)
+      return s
+    }
+
+    function strip_blank_lines(s) {
+      sub(/^[ \t\n]+/, "", s)
+      sub(/[ \t\n]+$/, "", s)
+      return s
+    }
+
+    function canonical(s) {
+      s = tolower(trim(s))
+      sub(/:$/, "", s)
+      if (s ~ /^(why|motivation|context|problem|background)$/) return "why"
+      if (s ~ /^(how|what|what changed|changes|implementation|approach|solution)$/) return "how"
+      return s
+    }
+
+    function is_heading(line) { return line ~ /^#+[ \t]/ }
+
+    function heading_text(line) {
+      sub(/^#+[ \t]*/, "", line)
+      return trim(line)
+    }
+
+    function render(   i, skipping) {
+      for (i = 1; i <= lines; i++) {
+        if (skipping && is_heading(template[i])) skipping = 0
+        if (skipping) continue
+        print template[i]
+        if (!(i in fill)) continue
+        print ""
+        print fill[i]
+        print ""
+        skipping = 1
+      }
+    }
+
+    function fill_labeled_sections(   i, key, slot) {
+      if (labeled == 0 || preamble != "") return 0
+      for (i = 1; i <= lines; i++) {
+        if (!is_heading(template[i])) continue
+        key = canonical(heading_text(template[i]))
+        if ((key in block) && !(key in slot)) slot[key] = i
+      }
+      for (key in block) if (!(key in slot)) return 0
+      for (key in block) fill[slot[key]] = strip_blank_lines(block[key])
+      return 1
+    }
+
+    function fill_description_section(   i) {
+      for (i = 1; i <= lines; i++) {
+        if (!is_heading(template[i])) continue
+        if (tolower(heading_text(template[i])) !~ /^(description|summary|what changed|overview)$/) continue
+        fill[i] = whole
+        return 1
+      }
+      return 0
+    }
+
+    BEGIN {
+      while ((getline line < bodyfile) > 0) {
+        whole = whole (whole_lines++ ? "\n" : "") line
+        if (line ~ /^[A-Za-z][A-Za-z ]*:[ \t]*$/) {
+          label = canonical(line)
+          labeled++
+          block[label] = block[label] "\n"
+          continue
+        }
+        if (label == "") preamble = preamble trim(line)
+        else block[label] = block[label] line "\n"
+      }
       close(bodyfile)
-      print ""
     }
 
-    # the description section is where the commit body belongs. everything
-    # after its heading up to the next heading is placeholder prose written
-    # for the author, not content — drop it and paste the body instead.
-    !done && tolower($0) ~ /^#+[ \t]*(description|summary|what changed|overview)[ \t]*$/ {
-      print
-      emit_body()
-      done = 1
-      skipping = 1
-      next
+    { template[++lines] = $0 }
+
+    END {
+      if (!fill_labeled_sections() && !fill_description_section()) exit 3
+      render()
     }
-
-    skipping && /^#/ { skipping = 0 }
-    skipping { next }
-
-    { print }
-
-    END { if (!done) exit 3 }
   ' "$template"
 }
 
