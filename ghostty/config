@@ -18,6 +18,12 @@ macos-icon = glass
 
 keybind = global:cmd+ctrl+t=toggle_quick_terminal
 
+# herdr cycles its tabs with ctrl+tab. Unbinding isn't enough: AppKit's native
+# tab switching then eats the key. A GTK-only action is a no-op on macOS, and
+# unconsumed: still sends the key on to herdr.
+keybind = unconsumed:ctrl+tab=show_gtk_inspector
+keybind = unconsumed:ctrl+shift+tab=show_gtk_inspector
+
 # Send ctrl+Home/End instead of the default ctrl+a / ctrl+e: ctrl+a is herdr's
 # prefix, so it never reaches the app underneath. Bare Home/End is no good
 # either — pi's fullscreen TUI binds those to scroll top/bottom.
