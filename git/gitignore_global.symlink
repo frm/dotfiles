@@ -80,8 +80,10 @@ Temporary Items
 .ai/canvas
 .ai/executions/
 .ai/research/
+.ai/briefs/
 
 # locally cached code reviews
+.ai/review
 .ai/reviews
 
 # pi project config
