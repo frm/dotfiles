@@ -5,7 +5,7 @@ BLUE='\033[1;34m'
 RED='\033[1;91m'
 RESET='\033[0m'
 
-DEV_CHAOS=~/Developer/frm/chaos
+DEV_SABLE=~/Developer/frm/sable
 DEV_DOTFILES=~/Developer/frm/dotfiles
 
 function pp {
@@ -31,8 +31,8 @@ function dirlink {
 pp_info "install" "setting up Developer directory"
 mkdir -p ~/Developer/frm
 
-pp_info "install" "cloning chaos"
-git clone --recurse-submodules -j8 git@github.com:frm/chaos.git $DEV_CHAOS
+pp_info "install" "cloning sable"
+git clone --recurse-submodules -j8 git@github.com:frm/sable.git $DEV_SABLE
 
 pp_info "install" "cloning dotfiles"
 git clone --recurse-submodules -j8 git@github.com:frm/dotfiles.git $DEV_DOTFILES
@@ -41,7 +41,7 @@ cd $DEV_DOTFILES
 
 pp_info "install" "syncing submodules"
 git submodule update --init --recursive
-ln -sfn ../chaos/ai ai
+ln -sfn ../sable/ai ai
 
 export DOTFILES="$DEV_DOTFILES"
 
@@ -255,29 +255,18 @@ gln -srf aerospace/aerospace.toml.symlink ~/.aerospace.toml
 pp_info "gh" "installing gh extensions..."
 cat gh/extensions | xargs -I {} gh extension install {}
 
-pp_info "ai" "setting up AI coding assistant skills"
-mkdir -p ~/.claude ~/.codex/skills
-gln -srf ai/skills ~/.claude/skills
-gln -srf ai/agents.md ~/.claude/CLAUDE.md
-gln -srf ai/agents.md ~/.codex/AGENTS.md
+pp_info "claude" "setting configs"
+mkdir -p ~/.claude
 gln -srf claude/settings.json.symlink ~/.claude/settings.json
-# codex adds custom scripts to ~/.codex/skills, so we copy instead of symlinking
-cp -r ai/skills/* ~/.codex/skills/
 
-cp ai/me.md.sample ai/me.md
-
-# pi and herdr live in chaos, alongside the nexus daemon and atlas they're wired
-# to, so chaos installs all four together and offers its service auth at the end.
-pp_info "chaos" "installing"
-$DEV_CHAOS/bin/install
+pp_info "sable" "installing"
+$DEV_SABLE/bin/sable install
 
 # rtk ignores XDG_CONFIG_HOME on macOS, so its config only loads from here.
 pp_info "rtk" "setting configs"
 RTK_CONFIG_DIR="$HOME/Library/Application Support/rtk"
 mkdir -p "$RTK_CONFIG_DIR"
 gln -srf rtk/config.toml.symlink "$RTK_CONFIG_DIR/config.toml"
-pp_info "rtk" "installing the pi hook"
-rtk init -g --agent pi --auto-patch
 
 pp_info "schism" "installing schism..."
 cargo install --git ssh://git@github.com/frm/schism.git

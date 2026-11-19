@@ -219,7 +219,7 @@ if.app-id = 'com.mitchellh.ghostty'
 run = ['move-node-to-workspace A', 'move right']
 
 [[on-window-detected]]
-if.app-id = 'com.chaos.atlas'
+if.app-id = 'com.sable.app'
 run = 'move-node-to-workspace A'
 
 [[on-window-detected]]

@@ -1,7 +1,6 @@
 {
   "permissions": {
     "allow": [
-      "Bash(~/.dotfiles/ai/bin/speech-off)",
       "Bash(gh:*)",
       "Bash(ls:*)",
       "Bash(pbcopy:*)",
