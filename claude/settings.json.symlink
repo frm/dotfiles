@@ -47,5 +47,6 @@
     "network": {
       "allowLocalBinding": true
     }
-  }
+  },
+  "theme": "auto"
 }
